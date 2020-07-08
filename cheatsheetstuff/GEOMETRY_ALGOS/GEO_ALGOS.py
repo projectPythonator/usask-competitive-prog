@@ -5,15 +5,20 @@ from sys import stdin as rf
 #euclidean_distance (floats)tested on cursethedarkness, sibice, imperfectgps
 #dist_pt_seg tested on goatrope
 #segments_intersect tested on countingtriangles
+#convex_hull_monotone_chain tested on convexhull2, convexhull, dartscoring, robotprotection
+#polygon_area tested on convexpolygonarea
+#polygon_signed_area tested on polygonarea
+#polygon_where_pt tested on pointinpolygon for in on out of polygon
+        
+
 EPS=1e-12
 NUM_SIG=9
 #todo make sure we know the math behind the functions it loosk like 
 # a lot of matrix operation stuffs 
 #uncomment the comment the commented lines for floating point cords
 class pt_xy:
-    #def __init__(self, new_x, new_y):self.x,self.y=map(round,[new_x,new_y])
-    def __init__(self, new_x=float(0), new_y=float(0)):
-        self.x,self.y=round(new_x, NUM_SIG), round(new_y, NUM_SIG)
+    def __init__(self, new_x, new_y):self.x,self.y=map(int,[new_x,new_y])
+    #def __init__(self, new_x=float(0), new_y=float(0)): self.x,self.y=round(new_x, NUM_SIG), round(new_y, NUM_SIG)
     
     def set_pt_xy(self, n_pt_xy): self.x,self.y=n_pt_xy.x,n_pt_xy.y
     def display(self): print(self.x,self.y)
@@ -24,15 +29,85 @@ class pt_xy:
     def __truediv__(self, c): return pt_xy(self.x/c, self.y/c) #does this even make sense in a int based point
     def __floordiv__(self, c): return pt_xy(self.x//c, self.y//c)
     
-    #def __lt__(self, b): return (self.x<b.x) if self.x!=b.x else (self.y<b.y)
-    #def __eq__(self, b): return (self.x==b.x) and (self.y==b.y)
-    def __lt__(self, b): return (self.x<b.x) if math.fabs(self.x-b.x)>EPS else (self.y<b.y)
-    def __eq__(self, b): return (abs(self.x-b.x)<EPS) and (abs(self.y-b.y)<EPS)
+
+    def __lt__(self, b): return (self.x<b.x) if self.x!=b.x else (self.y<b.y)
+    def __eq__(self, b): return (self.x==b.x) and (self.y==b.y)
+    #def __lt__(self, b): return (self.x<b.x) if math.fabs(self.x-b.x)>EPS else (self.y<b.y)
+    #def __eq__(self, b): return (abs(self.x-b.x)<EPS) and (abs(self.y-b.y)<EPS)
+    
+    def __str__(self): return "{} {}".format(self.x, self.y)
+
     
     def __str__(self): return "(x={},y={})".format(self.x, self.y)
     
     def __round__(self, n): return pt_xy(round(self.x,n),round(self.y,n))
     def __hash__(self):return hash((self.x,self.y))
+
+class DLL:
+    def __init__(self, v):
+        self.LIS={}
+        self.head=None
+        self.Nam=v
+    
+    def __len__(self): return len(self.LIS)
+    
+    def rem_el(self, el):
+        if el not in self.LIS:
+            print("error {} not in {} when deleting".format(el, self.Nam))
+            return
+        p,s=self.LIS[el] #pred, succ
+        if el==self.head: self.head=s
+        del self.LIS[el]
+        leno=len(self.LIS)
+        if leno==0: return
+        elif leno==1: self.LIS[p]=(None, None)
+        elif leno==2: self.LIS[p], self.LIS[s]=(s, s), (p, p)
+        else:
+            self.LIS[p]=(self.LIS[p][0], s)
+            self.LIS[s]=(self.LIS[s][0], p)
+            
+    def add_first(self, a):
+        self.head=a
+        self.LIS[a]=(None, None)
+    
+    #add a after b
+    def add_after(self, a, b):
+        leno=len(self.LIS)
+        if leno==0: self.add_first(b); return; #or print an error in our algo
+        elif leno==1: self.LIS[a], self.LIS[b]=(b, b), (a, a)
+        else:
+            c=self.LIS[b][1]
+            bb,cc=self.LIS[b], self.LIS[c]
+            self.LIS[a]=(b,c)
+            self.LIS[b], self.LIS[c]=(bb[0], a), (a, cc[1])
+    
+    #add a before b
+    def add_after(self, a, b):
+        leno=len(self.LIS)
+        if b==self.head: self.head=a
+        if leno==0: self.add_first(b); return; #or print an error in our algo
+        elif leno==1: self.LIS[a], self.LIS[b]=(b, b), (a, a)
+        else:
+            c=self.LIS[b][0]
+            bb,cc=self.LIS[b], self.LIS[c]
+            self.LIS[a]=(c,b)
+            self.LIS[b], self.LIS[c]=(a, bb[1]), (cc[0], a)
+
+class ADJDLL:
+    def __init__(self, n):
+        self.adj={i: DLL(i) for i in range(n)}
+        
+    def PRED(self, a, b): return self.adj[a][b][0]
+    def SUCC(self, a, b): return self.adj[a][b][1]
+    
+    def INSERT(self, L, R, LL, RR):#left is before right is after 
+        self.adj[L].add_after(R, RR)
+        self.adj[R].add_before(L, LL)
+    
+    def DELETE(self, L, R):
+        self.adj[L].rem_el(R)
+        self.adj[R].rem_el(L)
+
 
 class GEO_ALGOS:
     def __init__(self):
@@ -57,7 +132,7 @@ class GEO_ALGOS:
         return pt_xy(p.x*math.cos(t)-p.y*math.sin(t), p.x*math.sin(t)+p.y*math.cos(t))
     
     def point_rotation_wrt_line(self, a, b, c):
-        return self.epscmp(self.cross_product(b-a,c-a))
+        return self.c_cmp(self.cross_product(b-a,c-a),0)
     
     def angle_abc(self, a, b, c): #MARKED
         ab,cb=a-b,c-b
@@ -162,6 +237,14 @@ class GEO_ALGOS:
         for i in range(min(len(ps),len(qs))):
             rTans.append((ps[i], qs[i]))
         return rTans
+
+
+    def triangle_has_pt(self, a, b, c, p):
+        t1=(self.point_rotation_wrt_line(a,b,p)>=0)
+        t2=(self.point_rotation_wrt_line(b,c,p)>=0)
+        t3=(self.point_rotation_wrt_line(c,a,p)>=0)
+        return t1 and t2 and t3
+
     
     def triangle_area_2bh(self, b, h):
         return b*h/2
@@ -172,6 +255,9 @@ class GEO_ALGOS:
         
     def triangle_perimeter(self, ab, bc, ca):
         return ab+bc+ca
+    
+    def triangle_area_verts(self, a, b, c):
+        return (self.cross_product(a,b)+self.cross_product(b,c)+self.cross_product(c,a))/2
         
     def incircle_helper(self, ab, bc, ca):
         return self.triangle_area_heron(ab, bc, ca)/(self.triangle_perimeter(ab, bc, ca)*0.5)
@@ -282,6 +368,11 @@ class GEO_ALGOS:
                 return True
         return False   
     
+    def polygon_where_pt(self, ps, p):
+        a,b=self.polygon_contains_pt(ps, p), self.polygon_has_pt(ps, p)
+        return 0 if b else 1 if a else -1
+
+    
     def polygon_centroid(self, ps):
         ans=pt_xy(0,0)
         for i in range(len(ps)-1):
@@ -297,8 +388,6 @@ class GEO_ALGOS:
                 if self.is_segments_intersect(ps[i],ps[j],ps[k],ps[l]):
                     return False
         return True
-    
-
     
     def polygon_cut(self, ps, a, b):
         ans=[]
@@ -318,21 +407,168 @@ class GEO_ALGOS:
     def convex_hull_monotone_chain(self, ps):
         def f(pts):
             r=[]
+            app,pop=r.append,r.pop
             for p in pts:
-                while len(r)>1 and self.cross_product(r[-1]-r[-2], p-r[-2])<=0:r.pop()
-                r.append(p)
+                while len(r)>1 and self.cross_product(r[-1]-r[-2], p-r[-2])<=0:pop() #< means include colinear 
+                app(p)
             return r
         ans=sorted(set(ps))
         if len(ans)<=1: return ans
         lower,upper=f(ans),f(ans[::-1])
         return lower[:-1] + upper[:-1]
+    
+    def polygon_rotating_caliper(self, ps):
+        n,t,ans=len(ps)-1,0,0.0
+        for i in range(n):
+            pi=ps[i]
+            pii=ps[i+1] if i+1<=n else ps[0]
+            p=pii-pi
+            while (t+1)%n!=i:
+                if self.c_cmp(self.cross_product(p, ps[t+1]-pi)-self.cross_product(p, ps[t]-pi),0)<0:
+                    break
+                t=(t+1)%n
+            #ans=max(ans, self.triangle_area_verts(pi, pii, ps[t]))
+            ans=max(ans, self.euclidean_distance(pi, ps[t]))
+            ans=max(ans, self.euclidean_distance(pii, ps[t]))
+        return ans
+    
+    def bf_helper(self, x1, x2):
+        ans=(self.dist2(self.X[x1], self.X[x1+1]), self.X[x1], self.X[x1+1])
+        for i in range(x1, x2):
+            for j in range(i+1, x2):
+                dt=self.dist2(self.X[i], self.X[j])
+                if dt<ans[0]:
+                    ans=(dt, self.X[i], self.X[j])
+        return ans
+
+    def closest_pair(self, x1, x2, Y):
+        n=x2-x1
+        if n<=3: return self.bf_helper(x1, x2)
+        l_siz, r_siz=x1+n-n//2, x1+n//2
+        mid=round((self.X[l_siz].x+self.X[r_siz].x)/2)
+        YL, YR=[],[]
+        rapp,lapp=YR.append,YL.append
+        for py in Y:
+            if mid<py.x: rapp(py)
+            else:        lapp(py)
+        dl=self.closest_pair(x1, l_siz, YL)
+        if dl[0]==0: return dl
+        dr=self.closest_pair(l_siz, x2, YR)
+        if dr[0]==0: return dr
+        da=dl if dl[0]<dr[0] else dr
+        YP=[p for p in Y if da[0]>(p.x-mid)**2]
+        for i in range(len(YP)):
+            for j in range(i+1, len(YP)):
+                if (YP[i].y-YP[j].y)**2>=da[0]: break
+                dt=self.dist2(YP[i],YP[j])
+                if dt<da[0]:
+                    da=(dt,YP[i], YP[j])
+        return da
+
+    def compute_closest_pair(self, pts):
+        self.X=sorted(pts, key=lambda pt_xy: pt_xy.x)
+        Y=sorted(pts, key=lambda pt_xy: pt_xy.y)
+        return self.closest_pair(0,len(pts), Y)
+    
+    #might be a way to merge the two lower ones
+    def dt_find_uct(self, lb, le, rb, re):
+        X,Y=le,rb
+        ZT=self.CHL[self.CHLM[X]+1]
+        ZR, ZL=self.CHR[self.CHRM[Y]+1], self.DT.PRED(X, ZT)
+        while True: #check online later to see if it needs to be like this or if it needs to be something else 
+            if self.point_rotation_wrt_line(self.V[X], self.V[Y], self.V[ZR])<0:
+                Y,ZR=ZR,self.DT.SUCC(ZR, Y)
+            else:
+                if self.point_rotation_wrt_line(self.V[X], self.V[Y], self.V[ZL])<0:
+                    X,ZL=ZL,self.DT.PRED(ZL, X)
+                else:
+                    return (X,Y)
+        return None #error
+    
+    def dt_find_lct(self, lb, le, rb, re):
+        X,Y=le,rb
+        ZT=self.CHL[self.CHLM[X]+1]
+        ZR, ZL=self.CHR[self.CHRM[Y]+1], self.DT.PRED(X, ZT)
+        while True: #check online later to see if it needs to be like this or if it needs to be something else 
+            if self.point_rotation_wrt_line(self.V[X], self.V[Y], self.V[ZR])<0:
+                Y,ZR=ZR,self.DT.SUCC(ZR, Y)
+            else:
+                if self.point_rotation_wrt_line(self.V[X], self.V[Y], self.V[ZL])<0:
+                    X,ZL=ZL,self.DT.PRED(ZL, X)
+                else:
+                    return (X,Y)
+        return None #error
+    
+    def dt_divide(self, l, r):
+        n=r-l
+        if n<4: 
+            #base case a triangle or less
+            ch=self.convex_hull_monotone_chain(self.V[l:r])
+            #add the triangulation start here
+            return ch
+        nl,nr=l+n-n//2, l+n//2
+        #get the left and right convex hulls recursively maybe change that storage method
+        #so its not in a object var idk just want to get it done
+        self.CHL=self.dt_divide(l, nl) 
+        self.CHR=self.dt_divide(nl, r)
+        self.CHLM={el:i for el,i in enumerate(self.CHL)}
+        self.CHRM={el:i for el,i in enumerate(self.CHR)}
+        BT=self.dt_find_lct(l, nl-1, nl, r)
+        UT=self.dt_find_uct(l, nl-1, nl, r)
+        L,R=BT[0], BT[1]
+        LP,RP=self.CHL[self.CHLM[L]+1], self.CHR[self.CHRM[R]+1]
+        while BT!=UT: # make this look correct
+            a=b=False
+            self.DT.INSERT(L,R,LP,RP)
+            R1=self.DT.PRED(R,L)
+            #if r1 left of line from L to R
+            if self.point_rotation_wrt_line(self.V[L], self.V[R], self.V[R1])>0:
+                R2=self.DT.PRED(R,R1)
+                while True: #put test as qtest
+                    self.DT.DELETE(R,R1)
+                    R1=R2
+                    R2=self.DT.PRED(R,R1)
+            else: a=True
+            L1=self.DT.SUCC(L,R)
+            #if l1 left of line from R to L
+            if self.point_rotation_wrt_line(self.V[R], self.V[L], self.V[L1])<0:
+                L2=self.DT.SUCC(L,L1)
+                while True: #put cond as qtest
+                    self.DT.DELETE(L, L1)
+                    L1=L2
+                    L2=self.DT.SUCC(L,L1)
+            else: b=True
+            if a: LP,L=L,L1
+            else:
+                if b: RP,R=R,R1
+                else:
+                    if True: #put qtest here
+                        RP,R=R,R1
+                    else:
+                        LP,L=L,L1
+        return self.CHL #merge them into this ?
+        
+        
         
     
+    def compute_delaunay_triangles(self, ps):
+        self.DT=ADJDLL(len(ps))
+        self.V=sorted(ps)
+        ans=self.dt_divide(0, len(ps))
+        #triangulation in the DT 
+
 def main():
     obj=GEO_ALGOS()
-    test=[pt_xy(i//10, i%10) for i in range(100)]
-
-    ans=obj.convex_hull_monotone_chain(test)
-    for i in ans:
-        i.display()
+    tri=[None]*3
+    for i in range(3):
+        x,y=map(int, rf.readline().split())
+        tri[i]=pt_xy(x,y)
+    tri.append(tri[0])
+    n=int(rf.readline().strip())
+    amt=0
+    for i in range(n):
+        x,y=map(int, rf.readline().split())
+        if 0<=obj.polygon_where_pt(tri, pt_xy(x,y)):
+            amt+=1
+    print("{:.1f}\n{}".format(obj.triangle_area_verts(tri[0],tri[1],tri[2]),amt))
 main()
