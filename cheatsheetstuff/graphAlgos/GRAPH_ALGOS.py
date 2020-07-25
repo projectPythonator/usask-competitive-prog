@@ -1,8 +1,25 @@
 from sys import stdin as rf
 #dijkstras tested shortestpath1, shortestpath2(modified works), flowerytrails(modified works), fulltank(modified)
 #APSP tested on allpairspath, kastenlauf(modified), arbitrage
-INF=2000000000
 
+'''
+put list of tested stuff in a different file
+Algorithms in this class
+E=num edges
+V=num vertices
+Dijkstras SSSP (Dijkstras) O((E+V)LogV) our version okay with negative weights but not negative cycles
+FlyodWarshalls (APSP) O(V^3) time O(V^2) space the 4-5 liner, also has many mods that can change it up
+flood fill dfs and bfs(ff_dfs, ff_bfs) O(V+E) good for 2d grid fill stuffs just a variation on bfs or dfs
+topology_sort_bfs O(V+E) just the bfs modified for topology sorting
+
+mst_prims_faster O((E+V)LogV) is a dijkstra varient of prims that has a decent run time for python(still gets beat out by large dataset tho)
+bipartite_colour O(V+E) colours a graph in two colours and tells us if it cant be done
+bfs_vanilla O(V+E) does a bfs search on the graph modified to also solve sssp on unweighted graphs
+tarjanSCC O(V+E) for finding strongly connected components in a directed graph 
+kosarajuSCC O(V+E) alternitve version for finding strongly connected components in a directed graph 
+'''
+
+INF=2000000000
 class GRAPH_ALGOS():
     def __init__(self):
         self.adj={}
@@ -159,7 +176,7 @@ class GRAPH_ALGOS():
             #remove vis too?
     
     
-    def tarjanSCC():
+    def tarjanSCC(self):
         from sys import setrecursionlimit
         setrecursionlimit(100000)
         self.low={i:INF for i in self.adj}
@@ -169,3 +186,35 @@ class GRAPH_ALGOS():
         for v in self.adj:
             if self.num[v]==INF:
                 self.tarjan_helper(v)
+    
+    def kosaraju_helper1(self, u):
+        self.seen.add(u)
+        for v in self.adj:
+            if v not in self.seen:
+                self.kosaraju_helper1(v)
+        self.stk.append(u)
+    
+    def kosaraju_helper2(self, u):
+        self.seen.add(u)
+        self.scc[u]=self.curNum
+        for v in self.adjT:
+            if v not in self.seen: 
+                self.kosaraju_helper2(u)
+                
+    def kosarajuSCC(self):
+        self.seen=set()
+        self.stk=[]
+        for v in self.adj:
+            if v not in self.seen:
+                self.kosaraju_helper1(v)
+        self.seen=set()
+        self.curNum=0
+        while self.stk:
+            while self.stk and self.stk[-1] in self.seen: self.stk.pop()
+            if self.stk:
+                self.kosaraju_helper2(self.stk[-1])
+                self.curNum+=1
+                
+    def bellmanford(self):
+        self.dst={i:INF for i in self.adj}
+        

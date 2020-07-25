@@ -405,17 +405,14 @@ class GEO_ALGOS:
     
     #https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Convex_hull/Monotone_chain
     def convex_hull_monotone_chain(self, ps):
-        def f(pts):
-            r=[]
-            app,pop=r.append,r.pop
+        def f(pts, r, lim):
             for p in pts:
-                while len(r)>1 and self.cross_product(r[-1]-r[-2], p-r[-2])<=0:pop() #< means include colinear 
-                app(p)
-            return r
-        ans=sorted(set(ps))
+                while len(r)>lim and self.cross_product(r[-1]-r[-2], p-r[-2])<0:r.pop()
+                r.append(p)
+            r.pop()
+        ans,r=sorted(set(ps)),[]
         if len(ans)<=1: return ans
-        lower,upper=f(ans),f(ans[::-1])
-        return lower[:-1] + upper[:-1]
+        f(ans, r, 1);f(ans[::-1], r, len(r)+1);return r
     
     def polygon_rotating_caliper(self, ps):
         n,t,ans=len(ps)-1,0,0.0
