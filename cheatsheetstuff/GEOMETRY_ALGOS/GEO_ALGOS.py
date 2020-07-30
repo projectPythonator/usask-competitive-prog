@@ -30,7 +30,7 @@ class pt_xy:
     def __floordiv__(self, c): return pt_xy(self.x//c, self.y//c)
     
 
-    def __lt__(self, b): return (self.x<b.x) if self.x!=b.x else (self.y<b.y)
+    def __lt__(self, b): return (self.x, self.y) < (b.x, b.y)
     def __eq__(self, b): return (self.x==b.x) and (self.y==b.y)
     #def __lt__(self, b): return (self.x<b.x) if math.fabs(self.x-b.x)>EPS else (self.y<b.y)
     #def __eq__(self, b): return (abs(self.x-b.x)<EPS) and (abs(self.y-b.y)<EPS)
