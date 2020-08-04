@@ -133,7 +133,7 @@ class GRAPH_ALGOS():
     def bipartite_helper(self, s):
         from collection import deque
         self.col[s]=0
-        if len(self.adj[s]==0): return
+        if len(self.adj[s])==0: return
         b, q=True, deque(); q.append(s)
         while b and q:
             u=q.popleft()
