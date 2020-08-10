@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 
+=======
+>>>>>>> cbf9f2a (Update README.md)
 # Programming Contest Cheat Sheet (python 3)
 ---
 ## Description
