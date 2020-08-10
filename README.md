@@ -10,3 +10,4 @@
 ## Table of contents
 ### Math Algos
 ###### [prime test trivial](https://github.com/projectPythonator/usask-competitive-prog/blob/9f17df6293cd230d46b6d3e38450582edc22f530/cheatsheetstuff/mathAlgos/math_class.py#L5-L12)
+###### [prime test miller rabin](https://github.com/projectPythonator/usask-competitive-prog/blob/883e2b1a73905139d6066a4581dd7a7629f8b32f/cheatsheetstuff/mathAlgos/math_class.py#L39-L46)
