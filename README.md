@@ -1,4 +1,6 @@
 
-# Programming Contest Cheat Sheet
+# Programming Contest Cheat Sheet (python 3)
 ---
-All the code and algorithms here are suited for python3 with the phasing out of python2 it is not guaranteed that it will work in python 2
+## Description
+This Repository is a collection of Alogrithm implementations seen frequently in both competitve programming contests and interviews. We use python to take advantage of pythons ability to produce short code implementations at the cost of a constant factor at runtime. We are trying to implement the shortest code that still has a reasonable runtime. Most of the code is writen in a way that translating it to c, java, or c++ should be reasonably easy this and lots of the code comes from c/c++ implmemtations
+---
