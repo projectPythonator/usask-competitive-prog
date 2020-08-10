@@ -10,7 +10,6 @@ class MATH_ALGOS:
       if n%p==0 or n%(p+2)==0: return False
       p+=6
     return True
-  
   def siv_prime(self, n):
     F=self; F.P,p=[True]*n,[2]
     for i in range(4, n, 2): p[i]=False
