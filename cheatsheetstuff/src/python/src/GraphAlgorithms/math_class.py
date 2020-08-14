@@ -1,3 +1,5 @@
+import math as M
+from sys import stdin as rf
 
 class MATH_ALGOS:
   def __init__(self): pass
@@ -142,5 +144,33 @@ class MATH_ALGOS:
     if n==k or k==0: return 1
     if (n,k) not in F.bin: F.bin[(n,k)]=f(n-1,k)+f(n-1,k-1)
     return F.bin[(n,k)]
-  
+    
   def prep_bin(self): self.bin={}
+  
+  def fft(F, A):
+    n=len(A); N=n//2
+    if n==1: return
+    L,R=[None]*(n//2),[None]*(n//2)
+    for i in range(N): L[i],R[i]=A[2*i],A[2*i+1]
+    F.fft(L); F.fft(R)
+    for i in range(N): 
+      x=complex(M.cos(2*M.pi*i/n),M.sin(2*M.pi*i/n))
+      A[i],A[i+N]=L[i]+x*R[i], L[i]-x*R[i]
+    
+  def ifft(F, A):
+    for i in range(len(A)): A[i]=A[i].conjugate()
+    F.fft(A)
+    for i in range(len(A)): A[i]=A[i].conjugate()
+    for i in range(len(A)): A[i]/=len(A)
+  
+  def mul_poly(F, a,b):
+    n,l=1,len(a)+len(b)-1
+    while n<l: n*=2
+    A=[complex(0)]*n; B=[complex(0)]*n; C=[complex(0)]*n
+    for i in range(len(a)): A[i]=complex(a[i])
+    for i in range(len(b)): B[i]=complex(b[i])
+    F.fft(A); F.fft(B)
+    for i in range(n): C[i]=A[i]*B[i]
+    F.ifft(C); R=[round(c.real) for c in C]
+    R=R[:l]
+    return R
