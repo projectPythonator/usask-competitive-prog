@@ -68,3 +68,44 @@ class RURQ:
   def RU(F, a,b,v): F.rt.RU(a,b,v); F.ft.RU(a, v*(a-1)); F.ft.RU(b+1, -v*b)
   def PQ(F, a,b): 
     return F.PQ(1,b)-F.PQ(1,a-1) if a>1 else F.rt.PQ(b)*b-F.ft.RSQ(1,b)
+
+class SEGMENTTREE1:
+  def __init__(F,a):
+    F.n=len(a); F.T=[0]*(4*F.n); F.Z=[-1]*(4*F.n); F.A=[i for i in a]
+    F.B(1,0,F.n-1)
+  
+  def L(F, a): return 2*a
+  def R(F, a): return 2*a+1
+  def C(F, a,b): max(a,b) if a==-1 or b==-1 else min(a,b)
+  
+  def B(F, p,l,r):
+    if l==r: F.T[p]=F.A[l]
+    else:
+      m=(l+r)//2; F.B(F.L(p),l,m); F.B(F.R(p),m+1,r) 
+      F.T[p]=F.C(F.T[F.L(p)],F.T[F.R(p)]) 
+  
+  def P(F, p,l,r):
+    if F.Z[p]>-1: 
+      F.T[p]=F.Z[p]
+      if l!=r: F.Z[F.L(p)]=F.Z[F.R(p)]=F.Z[p]
+      else: F.A[l]=F.Z[p]
+      F.Z[p]=-1
+  
+  def RMQ(F, p,l,r,i,j):
+    F.P(p,l,r)
+    if i>j: return -1
+    if l>=i and r<=j: return F.T[p]
+    m=(l+r)//2
+    return F.C(F.RMQ(F.L(p),l,m,i,min(m,j)),F.RMQ(F.R(p),m+1,r,max(i,m+1),j))
+  
+  def UPDATE(F, p,l,r,i,j,v):
+    F.P(p,l,r)
+    if i>j: return
+    if l>=i and r<=j: F.Z[p]=v; F.P(p,l,r)
+    else:
+      m=(l+r)//2
+      F.UPDATE(F.L(p),l,m,i,min(m,j),v); F.UPDATE(F.R(p),m+1,r,max(i,m+1),j,v)
+      a=F.Z[F.L(p)] if F.Z[F.L(p)]!=-1 else F.T[F.L(p)]
+      b=F.Z[F.R(p)] if F.Z[F.R(p)]!=-1 else F.T[F.R(p)]
+      F.T[p]=F.T[F.L(p)] if a<=b else F.T[F.R(p)]
+  
