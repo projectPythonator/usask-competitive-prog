@@ -41,7 +41,7 @@ class FenwickTree:
   def LSB(F, a): return a&(-a)
 
   def RSQ(F, a,b):
-    if a>1: return F.RSQ(1,b)-F.RSQ(1,b-1)
+    if a>1: return F.RSQ(1,b)-F.RSQ(1,a-1)
     s=0
     while b>0: s+=F.T[b]; b-=F.LSB(b)
     return s
