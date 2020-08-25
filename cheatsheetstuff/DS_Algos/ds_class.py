@@ -1,4 +1,5 @@
 from sys import stdin as rf
+import math
 #from steven and felix 3rd book
 class UFDS1:
   def __init__(F, N): F.ns,F.S,F.R,F.P=N,[1]*N,[0]*N,list(range(N))
@@ -109,3 +110,21 @@ class SEGMENTTREE1:
       b=F.Z[F.R(p)] if F.Z[F.R(p)]!=-1 else F.T[F.R(p)]
       F.T[p]=F.T[F.L(p)] if a<=b else F.T[F.R(p)]
   
+#currently based on steven and felix version
+class SPARSE_TABLE_DS: # renamed shorted after 
+  def __init__(F, A):
+    n=len(A); N=int(math.log2(n))+1; F.A=A; F.P2=[0]*(N+1); F.L2=[0]*(2**N+1)
+    for i in range(N+1): F.P2[i],F.L2[2**i]=2**i,i
+    for i in range(2, F.P2[N]):
+      if F.L2[i]==0: F.L2[i]=F.L2[i-1]
+    F.ST=[[None]*n for _ in range(F.L2[n]+1)]
+    for i in range(n): F.ST[0][i]=i
+    for i in range(1, N+1):
+      a=F.P2[i-1]
+      for j in range(n-F.P2[i]+1):
+        x,y=F.ST[i-1][j],F.ST[i-1][j+a]
+        F.ST[i][j]=x if A[x]<=A[y] else y
+  
+  def RMQ(F,i,j):
+    k=F.L2[j-i+1]; x,y=F.ST[k][i],F.ST[k][j-F.P2[k]+1]
+    return x if F.A[x]<=F.A[y] else y
