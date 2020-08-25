@@ -111,7 +111,7 @@ class SEGMENTTREE1:
       F.T[p]=F.T[F.L(p)] if a<=b else F.T[F.R(p)]
   
 #currently based on steven and felix version
-class SPARSE_TABLE_DS: # renamed shorted after 
+class SPARSE_TABLE_DS: # rename shorter later
   def __init__(F, A):
     n=len(A); N=int(math.log2(n))+1; F.A=A; F.P2=[0]*(N+1); F.L2=[0]*(2**N+1)
     for i in range(N+1): F.P2[i],F.L2[2**i]=2**i,i
@@ -128,3 +128,17 @@ class SPARSE_TABLE_DS: # renamed shorted after
   def RMQ(F,i,j):
     k=F.L2[j-i+1]; x,y=F.ST[k][i],F.ST[k][j-F.P2[k]+1]
     return x if F.A[x]<=F.A[y] else y
+
+#port from steven and felix book
+class Lowest_common_ansestor: # rename shorter later
+  def __init__(F, g):
+    F.G=g; n=len(g); F.H=[-1]*n; F.E=[0]*(2*n); F.L=[0]*(2*n); F.I=0
+    F.DFS(0, 0); F.G=None; F.ST=SPARSE_TABLE_DS(F.L)
+  
+  def DFS(F, u,d):
+    F.H[u]=F.I; F.E[F.I]=u; F.L[F.I]=d; F.I+=1
+    for v in F.G[u]:
+      F.DFS(v, d+1); F.E[F.I]=u; F.L[F.I]=d; F.I+=1
+
+  def LCA(F, i, j):
+    a,b=min(F.H[i],F.H[j]),max(F.H[i],F.H[j]); c=F.ST.RMQ(a,b); return F.E[c]
