@@ -1,9 +1,14 @@
 #data structurea
 #union find 
 class UnionFind:
+    ''' 
+    space O(n) --> N*3 or N*2 for now 
+    search time α(n) -->  inverse ackerman practically constant 
+    insert time O(1) --> 
+    '''
     def __init__(self, n):
         self.parents = list(range(n))
-        self.ranks  = [0]*n #optional optimzation 
+        self.ranks = [0]*n #optional optimzation 
         self.sizes = [0]*n #optional information
         self.num_sets = n #optional information
         
