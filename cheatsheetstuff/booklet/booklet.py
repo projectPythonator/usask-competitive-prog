@@ -3,9 +3,9 @@
 class UnionFind:
     def __init__(self, n):
         self.parents = list(range(n))
-        self.ranks  = [0]*n
-        self.sizes = [0]*n
-        self.num_sets = n
+        self.ranks  = [0]*n #optional optimzation 
+        self.sizes = [0]*n #optional information
+        self.num_sets = n #optional information
         
     def find_set(self, u):
         u_parent = u
@@ -38,5 +38,5 @@ class UnionFind:
             self.sizes[up] += self.sizes[vp]
         self.num_sets -= 1
 
-    def size_of_u(self, u):
+    def size_of_u(self, u): #optional information
         return self.sizes[self.find_set(u)]
