@@ -70,7 +70,6 @@ class GRAPH_ALGOS():
     def kruskals_via_heaps(self):
         UF=UnionFind(self.num_nodes)
         heapify(self.edge_list)
-        edges_left=0
         mst = []
         while self.edge_list:
             w,uv = heappop(self.edge_list)
