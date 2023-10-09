@@ -63,9 +63,8 @@ class GRAPH_ALGOS():
         self.num_edges += 1
     
     def update_edge(self, edge, w, u, v):
-        uv = u*self.num_nodes + v
-        #self.edge_list[edge] = (w,u,v)
-        self.edge_list[edge] = (w,uv)
+        self.edge_list[edge] = (w,u,v)
+        #uv = u*self.num_nodes + v; self.edge_list[edge] = (w,uv)
     
     #will kill the edge list but will save memory
     def kruskals_via_heaps(self):
