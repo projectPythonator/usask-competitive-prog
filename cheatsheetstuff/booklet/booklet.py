@@ -60,11 +60,12 @@ class GRAPH_ALGOS():
     def init_structures(self): #take what you need and leave the rest
         self.adj_list = [{} for _ in range(self.num_nodes)]
         #self.edge_list = [(0,0,0)]*self.num_edges
-        #self.matrix = [[0]*self.cols for _ in range(self.rows)]
+        #self.matrix = [[0]*self.num_cols for _ in range(self.num_rows)]
     
         #self.queue = deque()
         #self.not_processed = set(list(range(self.num_nodes)))
         #self.stk = []
+        #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
     
         #self.dist = [INF]*self.num_nodes
         #self.mst_node_set = []
@@ -89,6 +90,16 @@ class GRAPH_ALGOS():
                 if self.dist[v]>self.dist[u]+1:
                     self.dist[v]=self.dist[u]+1
                     self.queue.append(v)
+
+    def bfs_flood_fill(self, start_row, start_col, old_val, new_val):
+        self.stk.append(start_row, start_col)
+        while self.stk:
+            row,col = self.stk.pop()
+            if 0<=row<self.num_rows and 0<=col<self.num_cols:
+                if self.matrx[row][col]==old_val:
+                    self.matrx[row][col] = new_val
+                    for row_mod,col_mod in dir_rc:
+                        self.stkk.append((row+row_mod, col+col_mod))
     
     #will kill the edge list but will save memory
     def kruskals_heaps_mst(self):
