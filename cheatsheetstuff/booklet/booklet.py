@@ -64,6 +64,7 @@ class GRAPH_ALGOS():
     
         #self.queue = deque()
         #self.not_processed = set(list(range(self.num_nodes)))
+        #self.stk = []
     
         #self.dist = [INF]*self.num_nodes
         #self.mst_node_set = []
