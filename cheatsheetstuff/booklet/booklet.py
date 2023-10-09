@@ -56,8 +56,7 @@ class GRAPH_ALGOS():
         self.num_nodes = V
     
     def init_edge_list(self):
-        #self.edge_list = [(0,0,0)]*self.num_edges
-        self.edge_list = [(0,0)]*self.num_edges
+        self.edge_list = [(0,0,0)]*self.num_edges
     
     def append_edge(self, w, u, v):
         self.edge_list.append((w,u,v))
