@@ -77,15 +77,13 @@ class GRAPH_ALGOS():
         UF=UnionFind(self.num_nodes)
         heapify(self.edge_list)
         mst = []
-        while self.edge_list:
+        while self.edge_list and  UF.num_sets>1:
             w,u,v = heappop(self.edge_list) #use w, uv = ... for single cord storage
             #v,u = uv%self.num_nodes, uv//self.num_nodes
             if UF.is_same_set(u,v):
                 continue
             mst.append((w,u,v))
             UF.union_set(u,v)
-            if UF.amt_of_sets()==1:
-                break
         self.edge_left = None
         mst.sort()
         return mst
