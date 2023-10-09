@@ -72,8 +72,8 @@ class GRAPH_ALGOS():
         heapify(self.edge_list)
         mst = []
         while self.edge_list:
-            w,uv = heappop(self.edge_list)
-            v,u = uv%self.num_nodes, uv//self.num_nodes
+            w,u,v = heappop(self.edge_list) #use w, uv = ... for single cord storage
+            #v,u = uv%self.num_nodes, uv//self.num_nodes
             if UF.is_same_set(u,v):
                 continue
             mst.append((w,u,v))
