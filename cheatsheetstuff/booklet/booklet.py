@@ -54,6 +54,12 @@ class GRAPH_ALGOS():
     def __init__(self, V, E):
         self.num_edges = E
         self.num_nodes = V
+
+    def init_adj_list(self):
+        self.adj_list = [{} for _ in range(self.num_nodes)]
+    
+    def update_adj_list(self, w, u, v):
+        self.adj_list[u][v] = w
     
     def init_edge_list(self):
         self.edge_list = [(0,0,0)]*self.num_edges
@@ -83,5 +89,35 @@ class GRAPH_ALGOS():
         self.edge_left = None
         mst.sort()
         return mst
-
+        
+    def prims_process_complete(self, u):
+        self.taken.remove(u)
+        for v in self.taken:
+            uv_dist = get_dist(u, v)
+            heappush(self.heap, (uv_dist, v))
+    
+    def prims_process(self, u):
+        self.taken.remove(u)
+        for v, w in self.adj_list.items():
+            heappush(self.heap, (w, v))
+    
+    def prims_mst(self):
+        self.taken = set(list(range(self.num_nodes)))
+        self.heap = []
+        self.prims_process_complete(0)
+        nodes_taken = 0
+        mst = []
+        while self.heap:
+            w,v = heappop(self.heap)
+            if v not in self.taken:
+                continue
+            mst.append((w,v))
+            self.prims_process_complete(v)
+            nodes_taken += 1
+            if nodes_taken==self.num_nodes-1:
+                break
+        self.heap = None
+        self.taken = None
+        mst.sort()
+        return mst[-1][0]
 
