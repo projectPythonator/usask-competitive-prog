@@ -101,7 +101,7 @@ class GRAPH_ALGOS():
     
     def prims_process(self, u):
         self.not_processed.remove(u)
-        for v, w in self.adj_list.items():
+        for v, w in self.adj_list[u].items():
             if v not in self.not_processed or w>self.disto[v]:
                 continue
             self.disto[v] = w
