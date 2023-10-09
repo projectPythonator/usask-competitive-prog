@@ -67,7 +67,7 @@ class GRAPH_ALGOS():
         #uv = u*self.num_nodes + v; self.edge_list[edge] = (w,uv)
     
     #will kill the edge list but will save memory
-    def kruskals_via_heaps(self):
+    def kruskals_heaps_mst(self):
         UF=UnionFind(self.num_nodes)
         heapify(self.edge_list)
         mst = []
