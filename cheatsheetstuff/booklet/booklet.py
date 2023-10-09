@@ -55,11 +55,12 @@ class GRAPH_ALGOS():
         self.num_edges = E
         self.num_nodes = V
 
-    def init_adj_list(self):
+    def init_structures(self): #take what you need and leave the rest
         self.adj_list = [{} for _ in range(self.num_nodes)]
-    
-    def init_edge_list(self):
-        self.edge_list = [(0,0,0)]*self.num_edges
+        #self.edge_list = [(0,0,0)]*self.num_edges
+        #self.dist = [INF]*self.num_nodes
+        #self.queue = deque()
+        #self.mst_node_set = []
     
     def append_edge_list(self, w, u, v):
         self.edge_list.append((w,u,v))
@@ -74,30 +75,28 @@ class GRAPH_ALGOS():
 
     def bfs_vanilla(self, start, end):
         from collections import deque
-        distance = [INF]*self.num_nodes
-        queue, distance[start] = deque([start]), 0
+        self.queue.append(start); self.dist[start] = 0
         while queue:
-            u = queue.popleft()
+            u = self.queue.popleft()
             for v in self.adj_list[u]:
-                if distance[v]>distance[u]+1:
-                    distance[v]=distance[u]+1
-                    queue.append(v)
+                if self.dist[v]>self.dist[u]+1:
+                    self.dist[v]=self.dist[u]+1
+                    self.queue.append(v)
     
     #will kill the edge list but will save memory
     def kruskals_heaps_mst(self):
         UF=UnionFind(self.num_nodes)
         heapify(self.edge_list)
-        mst = []
         while self.edge_list and  UF.num_sets>1:
             w,u,v = heappop(self.edge_list) #use w, uv = ... for single cord storage
             #v,u = uv%self.num_nodes, uv//self.num_nodes
             if UF.is_same_set(u,v):
                 continue
-            mst.append((w,u,v))
+            self.mst_node_set.append((w,u,v))
             UF.union_set(u,v)
         self.edge_left = None
         mst.sort()
-        return mst
+        return self.mst_node_set
         
     def prims_process_complete(self, u):
         self.not_processed.remove(u)
@@ -122,16 +121,15 @@ class GRAPH_ALGOS():
         self.heap = []
         self.prims_process_complete(0)
         nodes_taken = 0
-        mst = []
         while self.heap and nodes_taken<self.num_nodes:
             w,v = heappop(self.heap)
             if v not in self.not_processed:
                 continue
-            mst.append((w,v))
+            self.mst_node_set.append((w,v))
             self.prims_process_complete(v)
             nodes_taken += 1
         self.heap = None
         self.taken = None
-        mst.sort()
-        return mst[-1][0]
+        self.mst_node_set.sort()
+        return self.mst_node_set[-1][0]
 
