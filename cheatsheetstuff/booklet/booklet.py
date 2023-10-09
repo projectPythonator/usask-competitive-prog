@@ -114,15 +114,13 @@ class GRAPH_ALGOS():
         self.prims_process_complete(0)
         nodes_taken = 0
         mst = []
-        while self.heap:
+        while self.heap and nodes_taken<self.num_nodes:
             w,v = heappop(self.heap)
             if v not in self.not_processed:
                 continue
             mst.append((w,v))
             self.prims_process_complete(v)
             nodes_taken += 1
-            if nodes_taken==self.num_nodes-1:
-                break
         self.heap = None
         self.taken = None
         mst.sort()
