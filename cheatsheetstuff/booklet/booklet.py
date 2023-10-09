@@ -58,6 +58,7 @@ class GRAPH_ALGOS():
     def init_structures(self): #take what you need and leave the rest
         self.adj_list = [{} for _ in range(self.num_nodes)]
         #self.edge_list = [(0,0,0)]*self.num_edges
+        #self.matrix = [[0]*self.cols for _ in range(self.rows)]
     
         #self.queue = deque()
         #self.not_processed = set(list(range(self.num_nodes)))
