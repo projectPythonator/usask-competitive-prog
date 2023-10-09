@@ -71,6 +71,17 @@ class GRAPH_ALGOS():
     def update_edge_list(self, edge, w, u, v):
         self.edge_list[edge] = (w,u,v)
         #uv = u*self.num_nodes + v; self.edge_list[edge] = (w,uv)
+
+    def bfs_vanilla(self, start, end):
+        from collections import deque
+        distance = [INF]*self.num_nodes
+        queue, distance[start] = deque([start]), 0
+        while queue:
+            u = queue.popleft()
+            for v in self.adj_list[u]:
+                if distance[v]>distance[u]+1:
+                    distance[v]=distance[u]+1
+                    queue.append(v)
     
     #will kill the edge list but will save memory
     def kruskals_heaps_mst(self):
