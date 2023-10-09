@@ -58,8 +58,11 @@ class GRAPH_ALGOS():
     def init_structures(self): #take what you need and leave the rest
         self.adj_list = [{} for _ in range(self.num_nodes)]
         #self.edge_list = [(0,0,0)]*self.num_edges
-        #self.dist = [INF]*self.num_nodes
+    
         #self.queue = deque()
+        #self.not_processed = set(list(range(self.num_nodes)))
+    
+        #self.dist = [INF]*self.num_nodes
         #self.mst_node_set = []
     
     def append_edge_list(self, w, u, v):
@@ -102,34 +105,26 @@ class GRAPH_ALGOS():
         self.not_processed.remove(u)
         for v in self.not_processed:
             uv_dist = get_dist(u, v)
-            if uv_dist>self.disto[v]:
-                continue
-            self.disto[v] = uv_dist
-            heappush(self.heap, (uv_dist, v))
+            if uv_dist<=self.dist[v]:
+                self.dist[v] = uv_dist
+                heappush(self.edge_list, (uv_dist, v, u))
     
     def prims_process(self, u):
         self.not_processed.remove(u)
         for v, w in self.adj_list[u].items():
-            if v not in self.not_processed or w>self.disto[v]:
-                continue
-            self.disto[v] = w
-            heappush(self.heap, (w, v))
+            if v in self.not_processed and w<=self.dist[v]:
+                self.dist[v] = w
+                heappush(self.edge_list, (w, v, u))
     
     def prims_mst(self):
-        self.disto = [INF]*self.num_nodes
-        self.not_processed = set(list(range(self.num_nodes)))
-        self.heap = []
-        self.prims_process_complete(0)
+        self.prims_process(0)
         nodes_taken = 0
-        while self.heap and nodes_taken<self.num_nodes:
-            w,v = heappop(self.heap)
-            if v not in self.not_processed:
-                continue
-            self.mst_node_set.append((w,v))
-            self.prims_process_complete(v)
-            nodes_taken += 1
-        self.heap = None
-        self.taken = None
+        while self.edge_list and nodes_taken<self.num_nodes:
+            w,v,u = heappop(self.edge_list)
+            if v in self.not_processed:
+                self.prims_process(v)
+                self.mst_node_set.append((w,v,u))
+                nodes_taken += 1
         self.mst_node_set.sort()
-        return self.mst_node_set[-1][0]
+        return self.mst_node_set
 
