@@ -82,6 +82,6 @@ class GRAPH_ALGOS():
                 break
         self.edge_left = None
         mst.sort()
-        return mst[-1][0]
+        return mst
 
 
