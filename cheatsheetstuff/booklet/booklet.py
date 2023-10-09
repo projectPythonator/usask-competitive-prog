@@ -58,15 +58,15 @@ class GRAPH_ALGOS():
     def init_adj_list(self):
         self.adj_list = [{} for _ in range(self.num_nodes)]
     
-    def update_adj_list(self, w, u, v):
-        self.adj_list[u][v] = w
-    
     def init_edge_list(self):
         self.edge_list = [(0,0,0)]*self.num_edges
     
     def append_edge(self, w, u, v):
         self.edge_list.append((w,u,v))
         self.num_edges += 1
+
+    def update_adj_list(self, w, u, v):
+        self.adj_list[u][v] = w
     
     def update_edge(self, edge, w, u, v):
         self.edge_list[edge] = (w,u,v)
