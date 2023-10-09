@@ -73,9 +73,7 @@ class GRAPH_ALGOS():
         mst = []
         while self.edge_list:
             w,uv = heappop(self.edge_list)
-            v = uv%self.num_nodes
-            uv //= self.num_nodes
-            u = uv
+            v,u = uv%self.num_nodes, uv//self.num_nodes
             if UF.is_same_set(u,v):
                 continue
             mst.append((w,u,v))
