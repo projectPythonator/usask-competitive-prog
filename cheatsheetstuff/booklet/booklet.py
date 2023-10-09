@@ -61,14 +61,14 @@ class GRAPH_ALGOS():
     def init_edge_list(self):
         self.edge_list = [(0,0,0)]*self.num_edges
     
-    def append_edge(self, w, u, v):
+    def append_edge_list(self, w, u, v):
         self.edge_list.append((w,u,v))
         self.num_edges += 1
 
     def update_adj_list(self, w, u, v):
         self.adj_list[u][v] = w
     
-    def update_edge(self, edge, w, u, v):
+    def update_edge_list(self, edge, w, u, v):
         self.edge_list[edge] = (w,u,v)
         #uv = u*self.num_nodes + v; self.edge_list[edge] = (w,uv)
     
@@ -91,8 +91,8 @@ class GRAPH_ALGOS():
         return mst
         
     def prims_process_complete(self, u):
-        self.taken.remove(u)
-        for v in self.taken:
+        self.not_processed.remove(u)
+        for v in self.not_processed:
             uv_dist = get_dist(u, v)
             if uv_dist>self.disto[v]:
                 continue
@@ -100,23 +100,23 @@ class GRAPH_ALGOS():
             heappush(self.heap, (uv_dist, v))
     
     def prims_process(self, u):
-        self.taken.remove(u)
+        self.not_processed.remove(u)
         for v, w in self.adj_list.items():
-            if v not in taken or w>self.disto[v]:
+            if v not in self.not_processed or w>self.disto[v]:
                 continue
             self.disto[v] = w
             heappush(self.heap, (w, v))
     
     def prims_mst(self):
         self.disto = [INF]*self.num_nodes
-        self.taken = set(list(range(self.num_nodes)))
+        self.not_processed = set(list(range(self.num_nodes)))
         self.heap = []
         self.prims_process_complete(0)
         nodes_taken = 0
         mst = []
         while self.heap:
             w,v = heappop(self.heap)
-            if v not in self.taken:
+            if v not in self.not_processed:
                 continue
             mst.append((w,v))
             self.prims_process_complete(v)
