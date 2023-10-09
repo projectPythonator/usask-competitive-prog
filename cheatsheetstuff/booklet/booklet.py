@@ -49,6 +49,44 @@ class UnionFind:
 ######################################################################################
 #
 
-
+INF=2**31
+class GRAPH_ALGOS():
+    def __init__(self, V, E):
+        self.num_edges = E
+        self.num_nodes = V
+    
+    def init_edge_list(self):
+        #self.edge_list = [(0,0,0)]*self.num_edges
+        self.edge_list = [(0,0)]*self.num_edges
+    
+    def append_edge(self, w, u, v):
+        self.edge_list.append((w,u,v))
+        self.num_edges += 1
+    
+    def update_edge(self, edge, w, u, v):
+        uv = u*self.num_nodes + v
+        #self.edge_list[edge] = (w,u,v)
+        self.edge_list[edge] = (w,uv)
+    
+    #will kill the edge list but will save memory
+    def kruskals_via_heaps(self):
+        UF=UnionFind(self.num_nodes)
+        heapify(self.edge_list)
+        edges_left=0
+        mst = []
+        while self.edge_list:
+            w,uv = heappop(self.edge_list)
+            v = uv%self.num_nodes
+            uv //= self.num_nodes
+            u = uv
+            if UF.is_same_set(u,v):
+                continue
+            mst.append((w,u,v))
+            UF.union_set(u,v)
+            if UF.amt_of_sets()==1:
+                break
+        self.edge_left = None
+        mst.sort()
+        return mst[-1][0]
 
 
