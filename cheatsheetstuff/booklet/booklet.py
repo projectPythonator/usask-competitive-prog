@@ -94,14 +94,21 @@ class GRAPH_ALGOS():
         self.taken.remove(u)
         for v in self.taken:
             uv_dist = get_dist(u, v)
+            if uv_dist>self.disto[v]:
+                continue
+            self.disto[v] = uv_dist
             heappush(self.heap, (uv_dist, v))
     
     def prims_process(self, u):
         self.taken.remove(u)
         for v, w in self.adj_list.items():
+            if v not in taken or w>self.disto[v]:
+                continue
+            self.disto[v] = w
             heappush(self.heap, (w, v))
     
     def prims_mst(self):
+        self.disto = [INF]*self.num_nodes
         self.taken = set(list(range(self.num_nodes)))
         self.heap = []
         self.prims_process_complete(0)
