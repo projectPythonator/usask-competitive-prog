@@ -51,9 +51,11 @@ class UnionFind:
 
 INF=2**31
 class GRAPH_ALGOS():
-    def __init__(self, V, E):
+    def __init__(self, V, E, N=None, M=None):
         self.num_edges = E
         self.num_nodes = V
+        self.num_rows = N
+        self.num_cols = M
 
     def init_structures(self): #take what you need and leave the rest
         self.adj_list = [{} for _ in range(self.num_nodes)]
