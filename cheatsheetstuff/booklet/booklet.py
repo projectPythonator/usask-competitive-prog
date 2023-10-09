@@ -93,12 +93,9 @@ class GRAPH_ALGOS():
         while self.edge_list and  UF.num_sets>1:
             w,u,v = heappop(self.edge_list) #use w, uv = ... for single cord storage
             #v,u = uv%self.num_nodes, uv//self.num_nodes
-            if UF.is_same_set(u,v):
-                continue
-            self.mst_node_set.append((w,u,v))
-            UF.union_set(u,v)
-        self.edge_left = None
-        mst.sort()
+            if not UF.is_same_set(u,v):
+                self.mst_node_set.append((w,u,v))
+                UF.union_set(u,v)
         return self.mst_node_set
         
     def prims_process_complete(self, u):
