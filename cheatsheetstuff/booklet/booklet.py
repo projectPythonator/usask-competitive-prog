@@ -65,6 +65,7 @@ class GRAPH_ALGOS():
         #self.queue = deque()
         #self.not_processed = set(list(range(self.num_nodes)))
         #self.stk = []
+        #self.heap = []
         #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
     
         #self.dist = [INF]*self.num_nodes
@@ -81,7 +82,7 @@ class GRAPH_ALGOS():
         self.edge_list[edge] = (w,u,v)
         #uv = u*self.num_nodes + v; self.edge_list[edge] = (w,uv)
 
-    def dfs_flood_fill(self, row, col, old_val, new_val):
+    def dfs_flood_fill(self, row, col, old_val, new_val): #needs test
         ans,self.matrix[row][col]=1,new_val
         for row_mod,col_mod in dir_rc:
             if 0<=row<self.num_rows and 0<=col<self.num_cols:
@@ -108,6 +109,12 @@ class GRAPH_ALGOS():
                     self.matrx[row][col] = new_val
                     for row_mod,col_mod in dir_rc:
                         self.stkk.append((row+row_mod, col+col_mod))
+
+    def sssp_dijkstras_heaps(self, start, end):
+        heappush(self.heap, (0, start))
+        self.dist[start] = 0
+        self.parent[start] = start
+        
     
     #will kill the edge list but will save memory
     def kruskals_heaps_mst(self):  #needs test
@@ -127,20 +134,20 @@ class GRAPH_ALGOS():
             uv_dist = get_dist(u, v)
             if uv_dist<=self.dist[v]:
                 self.dist[v] = uv_dist
-                heappush(self.edge_list, (uv_dist, v, u))
+                heappush(self.heap, (uv_dist, v, u))
     
     def prims_process(self, u): #needs test
         self.not_processed.remove(u)
         for v, w in self.adj_list[u].items():
             if v in self.not_processed and w<=self.dist[v]:
                 self.dist[v] = w
-                heappush(self.edge_list, (w, v, u))
+                heappush(self.heap, (w, v, u))
     
     def prims_mst(self):  #needs test
         self.prims_process(0)
         nodes_taken = 0
         while self.edge_list and nodes_taken<self.num_nodes:
-            w,v,u = heappop(self.edge_list)
+            w,v,u = heappop(self.heap)
             if v in self.not_processed:
                 self.prims_process(v)
                 self.mst_node_set.append((w,v,u))
