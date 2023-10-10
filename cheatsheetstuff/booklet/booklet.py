@@ -51,6 +51,9 @@ class UnionFind:
 
 INF=2**31
 class GRAPH_ALGOS():
+    UNVISITED = 0
+    VISITED = 1
+    EXPLORED = 2
     def __init__(self, V, E, N=None, M=None):
         self.num_edges = E
         self.num_nodes = V
@@ -65,7 +68,7 @@ class GRAPH_ALGOS():
     
         #self.queue = deque()
         #self.not_visited = set(list(range(self.num_nodes)))
-        #self.visited = [False]*self.num_nodes
+        #self.visited = [UNVISITED]*self.num_nodes
         #self.stk = []
         #self.heap = []
         #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
@@ -96,25 +99,43 @@ class GRAPH_ALGOS():
         return ans
 
     def dfs_topology_sort_helper(self, u):
-        self.visited[u] = True
+        self.visited[u] = VISITED
         for v,w in self.adj_list[u]:
-            if not self.visited[v]:
+            if self.visited[v]==UNVISITED:
                 self.dfs_topology_sort_helper(v)
         self.topo_sort_node_set.append(u)
         
     def dfs_topology_sort(self):
         self.topo_sort_node_set = []
         for u in range(self.num_nodes):
-            if not self.visited[v]:
+            if self.visited[v]==UNVISITED:
                 self.dfs_topology_sort_helper(u)
         self.topo_sort_node_set = self.topo_sort_node_set[::-1]
 
     def dfs_bipartite_checker(self):
         pass # find code for this later
 
+    def dfs_cycle_checker_helper(self, u):
+        self.visited[u] = EXPLORED
+        for v in self.adj_list[u]:
+            info = '{} to {} is a '.format(u, v)
+            if self.visited[v]==UNVISTED:
+                print(info+'tree edge')
+                self.parent[v] = u
+                self.dfs_cycle_checker_helper(v)
+            elif self.visited[v]==EXPLORED:
+                if v == self.parent[u]:
+                    print(info+'bidirectional edge')
+                else:
+                    print(info+'back edge')
+            elif self.visited[v]==VISITED:
+                print(info+'forward/crossedge')
+        self.visited[u] = VISITED
+
     def dfs_cycle_checker(self):
-        
-    
+        for u in range(self.num_nodes):
+            if self.visited[u]==UNVISITED:
+                self.dfs_cycle_checker_helper(u)    
 
     def bfs_vanilla(self, start, end): #needs test
         from collections import deque
