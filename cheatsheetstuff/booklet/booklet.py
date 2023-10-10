@@ -174,7 +174,7 @@ class GRAPH_ALGOS():
                         self.matrix[i][j]=-INF
 
     #will kill the edge list but will save memory
-    def kruskals_heaps_mst(self):  #needs test
+    def mst_kruskals_heaps(self):  #needs test
         from heapq import heapify, heappop
         UF=UnionFind(self.num_nodes)
         heapify(self.edge_list)
@@ -186,7 +186,7 @@ class GRAPH_ALGOS():
                 UF.union_set(u,v)
         return self.mst_node_set
         
-    def prims_process_complete(self, u):  #needs test
+    def mst_prims_process_complete(self, u):  #needs test
         from heapq import heappush
         self.not_visited.remove(u)
         for v in self.not_visited:
@@ -195,7 +195,7 @@ class GRAPH_ALGOS():
                 self.dist[v] = uv_dist
                 heappush(self.heap, (uv_dist, v, u))
     
-    def prims_process(self, u): #needs test
+    def mst_prims_process(self, u): #needs test
         from heapq import heappush
         self.not_visited.remove(u)
         for v, w in self.adj_list[u].items():
@@ -203,7 +203,7 @@ class GRAPH_ALGOS():
                 self.dist[v] = w
                 heappush(self.heap, (w, v, u))
     
-    def prims_mst(self):  #needs test
+    def mst_prims(self):  #needs test
         from heapq import heappop
         self.prims_process(0)
         nodes_taken = 0
