@@ -64,7 +64,8 @@ class GRAPH_ALGOS():
         #self.matrix = [[0]*self.num_cols for _ in range(self.num_rows)]
     
         #self.queue = deque()
-        #self.not_processed = set(list(range(self.num_nodes)))
+        #self.not_visited = set(list(range(self.num_nodes)))
+        #self.visited = [False]*self.num_nodes
         #self.stk = []
         #self.heap = []
         #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
@@ -91,6 +92,10 @@ class GRAPH_ALGOS():
                     ans += self.dfs_flood_fill(row+row_mod, col+col_mod, old_val, new_val)
         return ans
 
+    def dfs_topology_sort_helper(self, u):
+        
+    def dfs_topology_sort(self, 
+
     def bfs_vanilla(self, start, end): #needs test
         from collections import deque
         self.queue.append(start); self.dist[start] = 0
@@ -110,6 +115,8 @@ class GRAPH_ALGOS():
                     self.matrx[row][col] = new_val
                     for row_mod,col_mod in dir_rc:
                         self.stkk.append((row+row_mod, col+col_mod))
+
+
 
     def sssp_dijkstras_heaps(self, start, end): #needs test
         from heapq import heappush, heappop
@@ -156,8 +163,8 @@ class GRAPH_ALGOS():
         
     def prims_process_complete(self, u):  #needs test
         from heapq import heappush
-        self.not_processed.remove(u)
-        for v in self.not_processed:
+        self.not_visited.remove(u)
+        for v in self.not_visited:
             uv_dist = get_dist(u, v)
             if uv_dist<=self.dist[v]:
                 self.dist[v] = uv_dist
@@ -165,9 +172,9 @@ class GRAPH_ALGOS():
     
     def prims_process(self, u): #needs test
         from heapq import heappush
-        self.not_processed.remove(u)
+        self.not_visited.remove(u)
         for v, w in self.adj_list[u].items():
-            if v in self.not_processed and w<=self.dist[v]:
+            if v in self.not_visited and w<=self.dist[v]:
                 self.dist[v] = w
                 heappush(self.heap, (w, v, u))
     
@@ -175,9 +182,9 @@ class GRAPH_ALGOS():
         from heapq import heappop
         self.prims_process(0)
         nodes_taken = 0
-        while self.edge_list and nodes_taken<self.num_nodes:
+        while self.heap and nodes_taken<self.num_nodes:
             w,v,u = heappop(self.heap)
-            if v in self.not_processed:
+            if v in self.not_visited:
                 self.prims_process(v)
                 self.mst_node_set.append((w,v,u))
                 nodes_taken += 1
