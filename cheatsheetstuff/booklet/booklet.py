@@ -128,7 +128,18 @@ class GRAPH_ALGOS():
                     heappush(self.heap, (self.dist[v], v))
         return self.dist[end]
 
-    
+    def apsp_floyd_warshall(self): #needs test
+        for k in range(self.num_nodes):
+            for i in range(self.num_nodes):
+                for j in range(self.num_nodes):
+                    self.matrix[i][j] = min(self.matrix[i][j], self.matrix[i][k]+self.matrix[k][j])
+
+    def apsp_floyd_warshall_neg_cycles(self): #needs test
+        for i in range(self.num_nodes):
+            for j in range(self.num_nodes):
+                for k in range(self.num_nodes):
+                    if self.matrix[k][k]<0 and self.matrix[i][k]!=INF and self.matrix[k][j]!=INF:
+                        self.matrix[i][j]=-INF
 
     #will kill the edge list but will save memory
     def kruskals_heaps_mst(self):  #needs test
