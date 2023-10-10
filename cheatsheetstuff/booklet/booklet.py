@@ -70,6 +70,7 @@ class GRAPH_ALGOS():
         #self.heap = []
         #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
         #self.in_degree = [0]*self.num_nodes
+        #self.color = [INF]*self.num_nodes
     
         #self.dist = [INF]*self.num_nodes
         #self.mst_node_set = []
@@ -143,6 +144,25 @@ class GRAPH_ALGOS():
                 if self.in_degree[v] <= 0:
                     heappush(self.heap, v)
 
+    def bfs_bipartite_check_helper(self, start):
+        from collections import deque
+        self.queue.clear()
+        self.color[start] = 0
+        self.queue.append(start)
+        is_bipartite = True
+        while self.queue and is_bipartite:
+            u = self.queue.popleft()
+            for v in self.adj_list[u]:
+                if self.color[v]!=INF:
+                    is_bipartite = False
+                    break
+                self.color[v] = not self.color[u]
+
+    def bfs_bipartite_check(self):
+        for u in self.adj_list:
+            if self.color[u] == INF:
+                self.bfs_bipartite_check_helper(u)
+        
     def sssp_dijkstras_heaps(self, start, end): #needs test
         from heapq import heappush, heappop
         heappush(self.heap, (0, start))
