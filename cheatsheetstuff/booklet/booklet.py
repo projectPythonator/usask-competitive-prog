@@ -190,6 +190,9 @@ class GRAPH_ALGOS():
         for u in self.adj_list:
             if self.color[u] == INF:
                 self.bfs_bipartite_check_helper(u)
+
+    def bfs_cycle_checker(self):
+        pass #need to get the implimentation 
         
     def sssp_dijkstras_heaps(self, start, end): #needs test
         from heapq import heappush, heappop
