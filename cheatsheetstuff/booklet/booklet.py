@@ -109,6 +109,12 @@ class GRAPH_ALGOS():
                 self.dfs_topology_sort_helper(u)
         self.topo_sort_node_set = self.topo_sort_node_set[::-1]
 
+    def dfs_bipartite_checker(self):
+        pass # find code for this later
+
+
+    
+
     def bfs_vanilla(self, start, end): #needs test
         from collections import deque
         self.queue.append(start); self.dist[start] = 0
