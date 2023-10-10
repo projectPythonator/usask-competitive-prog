@@ -72,6 +72,7 @@ class GRAPH_ALGOS():
     
         #self.dist = [INF]*self.num_nodes
         #self.mst_node_set = []
+        #self.topo_sort_node_set = []
     
     def append_edge_list(self, w, u, v):
         self.edge_list.append((w,u,v))
@@ -93,8 +94,18 @@ class GRAPH_ALGOS():
         return ans
 
     def dfs_topology_sort_helper(self, u):
+        self.visited[u] = True
+        for v,w in self.adj_list[u]:
+            if not self.visited[v]:
+                self.dfs_topology_sort_helper(v)
+        self.topo_sort_node_set.append(u)
         
-    def dfs_topology_sort(self, 
+    def dfs_topology_sort(self):
+        self.topo_sort_node_set = []
+        for u in range(self.num_nodes):
+            if not self.visited[v]:
+                self.dfs_topology_sort_helper(u)
+        self.topo_sort_node_set = self.topo_sort_node_set[::-1]
 
     def bfs_vanilla(self, start, end): #needs test
         from collections import deque
