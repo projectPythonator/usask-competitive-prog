@@ -69,6 +69,7 @@ class GRAPH_ALGOS():
         #self.stk = []
         #self.heap = []
         #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
+        #self.in_degree = [0]*self.num_nodes
     
         #self.dist = [INF]*self.num_nodes
         #self.mst_node_set = []
@@ -127,7 +128,20 @@ class GRAPH_ALGOS():
                     for row_mod,col_mod in dir_rc:
                         self.stkk.append((row+row_mod, col+col_mod))
 
-
+    def bfs_kahns_topological_sort(self):
+        from heapq import heappush, heappop
+        for list_of_u in self.adj_list:
+            for v in list_of_u:
+                self.in_degree[v] += 1
+        for u in range(self.num_nodes):
+            if 0==self.in_degree[u]:
+                heapppush(self.heap, u)
+        while self.heap:
+            u = heappop(self.heap)
+            for v in adj_list[u]:
+                self.in_degree[v] -= 1
+                if self.in_degree[v] <= 0:
+                    heappush(self.heap, v)
 
     def sssp_dijkstras_heaps(self, start, end): #needs test
         from heapq import heappush, heappop
