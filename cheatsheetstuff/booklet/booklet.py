@@ -51,9 +51,9 @@ class UnionFind:
 
 class GRAPH_ALGOS():
     INF=2**31
-    UNVISITED = 0
-    VISITED = 1
-    EXPLORED = 2
+    UNVISITED = -1
+    EXPLORED  = -2
+    VISITED   = -3
     
     def __init__(self, V, E, N=None, M=None):
         self.num_edges = E
