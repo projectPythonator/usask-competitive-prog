@@ -75,10 +75,13 @@ class GRAPH_ALGOS():
         #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
         #self.in_degree = [0]*self.num_nodes
         #self.color = [INF]*self.num_nodes
+        #self.low_values = [0]*self.num_nodes
+        #self.parent = [-1]*self.num_nodes
     
         #self.dist = [INF]*self.num_nodes
         #self.mst_node_set = []
         #self.topo_sort_node_set = []
+        #self.articulation_points = []
     
     def append_edge_list(self, w, u, v):
         self.edge_list.append((w,u,v))
@@ -136,7 +139,37 @@ class GRAPH_ALGOS():
     def dfs_cycle_checker(self):
         for u in range(self.num_nodes):
             if self.visited[u]==UNVISITED:
-                self.dfs_cycle_checker_helper(u)    
+                self.dfs_cycle_checker_helper(u)
+
+    def dfs_articulation_point_and_bridge_helper(self, u):
+        self.visited[u] = self.dfs_counter
+        self.low_values[u] = self.visited[u]
+        self.dfs_counter += 1
+        for v in self.adj_list[u]:
+            if self.visited[v]==UNVISITED:
+                self.parent[v] = u
+                if u==self.dfs_root:
+                    self.root_children += 1
+                self.dfs_articulation_point_and_bridge_helper(v)
+                if self.low_values[v] >= self.visited[u]:
+                    self.articulation_points[u] = 1
+                if self.low_values[v] > self.visited[u]:
+                    print("bridge?")
+                self.low_values[u] = min(self.low_values[u], self.low_values[v])
+            elif v != self.parents[u]:
+                self.low_values[u] = min(self.low_values[u], self.visited[v])
+
+    def dfs_articulation_point_and_bridge(self):
+        self.dfs_counter = 0
+        for u in range(self.num_nodes):
+            if self.visited[u]==UNVISITED:
+                self.dfs_root = u
+                self.root_children = 0
+                self.dfs_articulation_point_and_bridge_helper(u)
+                self.articulation_points[self.dfs_root] = (self.root_children>1)
+        for i,u in enumerate(self.articulation_points):
+            if u:
+                print("vertix {}".format(i))
 
     def bfs_vanilla(self, start, end): #needs test
         from collections import deque
