@@ -81,7 +81,15 @@ class GRAPH_ALGOS():
         self.edge_list[edge] = (w,u,v)
         #uv = u*self.num_nodes + v; self.edge_list[edge] = (w,uv)
 
-    def bfs_vanilla(self, start, end):
+    def dfs_flood_fill(self, row, col, old_val, new_val):
+        ans,self.matrix[row][col]=1,new_val
+        for row_mod,col_mod in dir_rc:
+            if 0<=row<self.num_rows and 0<=col<self.num_cols:
+                if self.matrix[row][col]==old_val:
+                    ans += self.dfs_flood_fill(row+row_mod, col+col_mod, old_val, new_val)
+        return ans
+
+    def bfs_vanilla(self, start, end): #needs test
         from collections import deque
         self.queue.append(start); self.dist[start] = 0
         while queue:
@@ -91,7 +99,7 @@ class GRAPH_ALGOS():
                     self.dist[v]=self.dist[u]+1
                     self.queue.append(v)
 
-    def bfs_flood_fill(self, start_row, start_col, old_val, new_val):
+    def bfs_flood_fill(self, start_row, start_col, old_val, new_val):  #needs test
         self.stk.append(start_row, start_col)
         while self.stk:
             row,col = self.stk.pop()
@@ -102,7 +110,7 @@ class GRAPH_ALGOS():
                         self.stkk.append((row+row_mod, col+col_mod))
     
     #will kill the edge list but will save memory
-    def kruskals_heaps_mst(self):
+    def kruskals_heaps_mst(self):  #needs test
         UF=UnionFind(self.num_nodes)
         heapify(self.edge_list)
         while self.edge_list and  UF.num_sets>1:
@@ -113,7 +121,7 @@ class GRAPH_ALGOS():
                 UF.union_set(u,v)
         return self.mst_node_set
         
-    def prims_process_complete(self, u):
+    def prims_process_complete(self, u):  #needs test
         self.not_processed.remove(u)
         for v in self.not_processed:
             uv_dist = get_dist(u, v)
@@ -121,14 +129,14 @@ class GRAPH_ALGOS():
                 self.dist[v] = uv_dist
                 heappush(self.edge_list, (uv_dist, v, u))
     
-    def prims_process(self, u):
+    def prims_process(self, u): #needs test
         self.not_processed.remove(u)
         for v, w in self.adj_list[u].items():
             if v in self.not_processed and w<=self.dist[v]:
                 self.dist[v] = w
                 heappush(self.edge_list, (w, v, u))
     
-    def prims_mst(self):
+    def prims_mst(self):  #needs test
         self.prims_process(0)
         nodes_taken = 0
         while self.edge_list and nodes_taken<self.num_nodes:
