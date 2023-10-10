@@ -110,12 +110,24 @@ class GRAPH_ALGOS():
                     for row_mod,col_mod in dir_rc:
                         self.stkk.append((row+row_mod, col+col_mod))
 
-    def sssp_dijkstras_heaps(self, start, end):
+    def sssp_dijkstras_heaps(self, start, end): #needs test
         heappush(self.heap, (0, start))
         self.dist[start] = 0
         self.parent[start] = start
-        
+        while self.heap:
+            cur_dist, u = heappop(self.heap)
+            if self.dist[u]<cur_dist:
+                continue
+            #if u==end: return cur_dist #uncomment this line for fast return
+            for v, weight in self.adj_list[u].items():
+                if self.dist[v]>cur_dist+weight:
+                    self.dist[v] = cur_dist+weight
+                    self.parent[v] = u
+                    heappush(self.heap, (self.dist[v], v))
+        return self.dist[end]
+
     
+
     #will kill the edge list but will save memory
     def kruskals_heaps_mst(self):  #needs test
         UF=UnionFind(self.num_nodes)
