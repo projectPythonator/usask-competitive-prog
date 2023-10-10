@@ -58,6 +58,7 @@ class GRAPH_ALGOS():
         self.num_cols = M
 
     def init_structures(self): #take what you need and leave the rest
+        from collections import deque
         self.adj_list = [{} for _ in range(self.num_nodes)]
         #self.edge_list = [(0,0,0)]*self.num_edges
         #self.matrix = [[0]*self.num_cols for _ in range(self.num_rows)]
@@ -111,6 +112,7 @@ class GRAPH_ALGOS():
                         self.stkk.append((row+row_mod, col+col_mod))
 
     def sssp_dijkstras_heaps(self, start, end): #needs test
+        from heapq import heappush, heappop
         heappush(self.heap, (0, start))
         self.dist[start] = 0
         self.parent[start] = start
@@ -130,6 +132,7 @@ class GRAPH_ALGOS():
 
     #will kill the edge list but will save memory
     def kruskals_heaps_mst(self):  #needs test
+        from heapq import heapify, heappop
         UF=UnionFind(self.num_nodes)
         heapify(self.edge_list)
         while self.edge_list and  UF.num_sets>1:
@@ -141,6 +144,7 @@ class GRAPH_ALGOS():
         return self.mst_node_set
         
     def prims_process_complete(self, u):  #needs test
+        from heapq import heappush
         self.not_processed.remove(u)
         for v in self.not_processed:
             uv_dist = get_dist(u, v)
@@ -149,6 +153,7 @@ class GRAPH_ALGOS():
                 heappush(self.heap, (uv_dist, v, u))
     
     def prims_process(self, u): #needs test
+        from heapq import heappush
         self.not_processed.remove(u)
         for v, w in self.adj_list[u].items():
             if v in self.not_processed and w<=self.dist[v]:
@@ -156,6 +161,7 @@ class GRAPH_ALGOS():
                 heappush(self.heap, (w, v, u))
     
     def prims_mst(self):  #needs test
+        from heapq import heappop
         self.prims_process(0)
         nodes_taken = 0
         while self.edge_list and nodes_taken<self.num_nodes:
