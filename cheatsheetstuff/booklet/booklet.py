@@ -112,7 +112,8 @@ class GRAPH_ALGOS():
     def dfs_bipartite_checker(self):
         pass # find code for this later
 
-
+    def dfs_cycle_checker(self):
+        
     
 
     def bfs_vanilla(self, start, end): #needs test
