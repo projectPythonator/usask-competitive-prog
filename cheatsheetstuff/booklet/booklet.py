@@ -171,7 +171,7 @@ class GRAPH_ALGOS():
             if u:
                 print("vertix {}".format(i))
 
-    def dfs_scc_kosaraju_helper(self, u,
+    def dfs_scc_kosaraju_helper(self, u):
         pass
 
     def dfs_scc_kosaraju(self):
