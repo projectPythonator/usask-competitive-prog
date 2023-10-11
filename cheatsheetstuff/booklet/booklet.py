@@ -141,7 +141,7 @@ class GRAPH_ALGOS():
             if self.visited[u]==UNVISITED:
                 self.dfs_cycle_checker_helper(u)
 
-    def dfs_articulation_point_and_bridge_helper(self, u):
+    def dfs_articulation_point_and_bridge_helper(self, u): # need to rego over this and test it *** not as confident as the other code atm since have not really used it to solve a problem
         self.visited[u] = self.dfs_counter
         self.low_values[u] = self.visited[u]
         self.dfs_counter += 1
