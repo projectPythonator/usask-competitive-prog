@@ -178,9 +178,26 @@ class GRAPH_ALGOS():
         pass
     
     def dfs_scc_tarjans_helper(self, u):
-        pass
-        
+        self.num_cmp += 1
+        self.low_values[u]=self.visited[u]=self.num_cmp
+        self.stk.append(u)
+        self.not_visited.add(u)
+        for v in self.adj_list[u]:
+            if self.visited[v]==INF:
+                self.dfs_scc_tarjans_helper(v)
+                self.low_values[u] = min(self.low_values[u], self.low_values[v])
+            elif self.v in self.not_visited:
+                self.low_values[u] = min(self.low_values[u], self.visited[v])
+        if self.low_values[u]==self.visited[u]:
+            self.scc.append(set(self.stk))
+            self.stk=[]
+
     def dfs_scc_tarjans(self):
+        from sys import setrecursionlimit
+        setrecursionlimit(100000) 
+        for u in self.adj_list:
+            if self.num[u]==INF:
+                self.dfs_scc_tarjans_helper(u)
         pass
 
     def bfs_vanilla(self, start, end): #needs test
