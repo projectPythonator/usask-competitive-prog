@@ -171,6 +171,18 @@ class GRAPH_ALGOS():
             if u:
                 print("vertix {}".format(i))
 
+    def dfs_scc_kosaraju_helper(self, u,
+        pass
+
+    def dfs_scc_kosaraju(self):
+        pass
+    
+    def dfs_scc_tarjans_helper(self, u):
+        pass
+        
+    def dfs_scc_tarjans(self):
+        pass
+
     def bfs_vanilla(self, start, end): #needs test
         from collections import deque
         self.queue.append(start); self.dist[start] = 0
