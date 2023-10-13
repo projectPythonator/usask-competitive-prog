@@ -171,11 +171,32 @@ class GRAPH_ALGOS():
             if u:
                 print("vertix {}".format(i))
 
-    def dfs_scc_kosaraju_helper(self, u):
-        pass
+    def dfs_scc_kosaraju_pass1(self, u):
+        self.not_visited.remmove(u)
+        for v in self.adj_list[u]:
+            if v  in self.not_visited:
+                self.dfs_scc_kosaraju_pass1(v)
+        self.stk.append(u)
+
+    def dfs_scc_kosaraju_pass2(self, u):
+        self.not_visited.remove(u)
+        self.scc[u] = self.cur_num
+        for v in self.adj_list_trans:
+            if v in self.not_visited:
+                self.dfs_scc_kosaraju_pass2(v)
 
     def dfs_scc_kosaraju(self):
-        pass
+        for u in self.adj_list:
+            if v not in self.not_seen:
+                self.dfs_scc_kosaraju_pass1(u)
+        self.not_visited = set(list(self.adj_list))
+        self.cur_num = 0
+        while self.stk:
+            while self.stk and self.stk[-1] not in self.not_visited: 
+                self.stk.pop()
+            if self.stk:
+                self.dfs_scc_kosaraju_pass2(self.stk[-1])
+                self.cur_num += 1
     
     def dfs_scc_tarjans_helper(self, u):
         self.num_cmp += 1
