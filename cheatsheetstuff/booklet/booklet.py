@@ -533,6 +533,47 @@ class MATH_ALGOS:
         self.catalan[0] = 1
         for i in range(n-1):
             self.catalan[i+1] = ((4*i+2)%p * self.catalan[i]%p * pow(i+1, p-2, p)) % p
+
     
+
+
+    def catalan_n_mod_p_helper(self, table, val):
+        self.prime_factorize(val)
+        factor_tally = Counter(self.prime_factors)
+        for k, v in factor_tally.items():
+            if k not in table:
+                table[k] = 0
+            table[k] += v
+
+    def catalan_n_mod_p(self, n, p):
+        # from collections import counter needs to be imported
+        self.sieve_primes(int((5*n)**0.5))
+        tpf = {}
+        bpf = {}
+        for i in range(n):
+            self.catalan_n_mod_p_helper(tpf, 4*i+2)
+            self.catalan_n_mod_p_helper(bpf, i+2)
+        for k, v in bpf.items():
+            tpf[k] -= v
+        ans = 1
+        for k, v in tpf.items():
+            if v > 0:
+                ans *= pow(k, v, p)
+        return ans % p
+
+    def binomial_coefficient(self, n, k):
+        k = min(k, n-k)
+        res = 1
+        for i in range(k):
+            res *= (n-i)
+            res //= (i+1)
+        return res
+            
+    def binomial_coefficient_dp(self, n, k):
+        if n == k or 0 == k:
+            return 1
+        if (n, k) not in self.binomial:
+            self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
+        return self.binomial[(n, k)]
 
     
