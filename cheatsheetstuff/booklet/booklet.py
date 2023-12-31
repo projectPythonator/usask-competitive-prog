@@ -359,26 +359,29 @@ class MATH_ALGOS:
         self.n=None
         self.primes_sieve = []
         self.primes_list = []
+        self.primes_set = set()
+        self.prime_factors = []
 
     def init_data(self, n): #call before using other functions, make a reset if needed to reset per case
         self.primes_sieve = [True] * n
         self.primes_list = []
         self.primes_set = set()
+        self.prime_factors = []
         
     def is_prime_triv(self, n):
-        if n<=3:
-            return n>1
-        elif n%2==0 or n%3==0:
+        if n <= 3:
+            return n > 1
+        elif n%2 == 0 or n%3 == 0:
             return False
         p=5
-        while p*p<=n:
-            if n%p==0 or n%(p+2)==0:
+        while p*p <= n:
+            if n%p == 0 or n%(p+2) == 0:
                 return False
             p+=6
         return True
         
     def sieve_primes(self, n):
-        self.primes_list=[2]
+        self.primes_list = [2]
         for i in range(4, n, 2):
             self.primes_sieve[i] = False
         for i in range(3, n, 2):
@@ -390,3 +393,16 @@ class MATH_ALGOS:
     def gen_set_primes(self):
         self.primes_set=set(self.primes_list)
 
+    def prime_factorize(self, n):
+        self.prime_factors = [] # clobbers the previous prime factors so save before calling this func
+        for p in self.primes_list:
+            if p*p > n:
+                break
+            if n%p == 0:
+                while n%p == 0:
+                    n//=p
+                    self.prime_factors.append(p)
+        if n > 1:
+            self.prime_factors.append(n)
+
+    
