@@ -352,3 +352,13 @@ class GRAPH_ALGOS():
         self.mst_node_set.sort()
         return self.mst_node_set
 
+
+
+class MATH_ALGOS:
+    def __init__(self):
+        self.n=None
+        
+
+
+
+
