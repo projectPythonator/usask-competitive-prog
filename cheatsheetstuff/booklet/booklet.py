@@ -361,6 +361,8 @@ class MATH_ALGOS:
         self.primes_list = []
         self.primes_set = set()
         self.prime_factors = []
+        self.mrpt_known_bounds = []
+        self.mrpt_known_tests = []
 
     def init_data(self, n): #call before using other functions, make a reset if needed to reset per case
         self.primes_sieve = [True] * n
@@ -404,5 +406,32 @@ class MATH_ALGOS:
                     self.prime_factors.append(p)
         if n > 1:
             self.prime_factors.append(n)
+
+   def is_composite(self, a, d, n, s):
+        if pow(a, d, n)==1:
+            return False
+        for i in range(s):
+            if pow(a, 2**i * d, n)==n-1:
+                return False
+        return True 
+    
+    def is_prime_mrpt(self, n, precision_for_huge_n=16):
+        if n in self.primes_set:
+            return True
+        if any((n%self.primes_list[p] == 0) for p in range(50)) or n < 2 or n == 3215031751:
+            return False
+        d, s = n-1, 0
+        while not d % 2:
+            d, s = d//2, s+1
+        for i, bound in enumerate(self.mrpt_known_bounds):
+            if n < bound:
+                return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s) for j in range(i))
+        return not any(self.is_composite(self.primes_list[j], d, n, s) for j in range(precision_for_huge_n))
+    
+    def prep_mrpt(self):
+        self.mrpt_known_bounds = [1373653, 25326001, 118670087467, 2152302898747, 3474749660383, 341550071728321]
+        self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
+        self.sieve_primes(1000) #comment out if different size needed
+        self.gen_set_primes() #comment out if already have bigger size
 
     
