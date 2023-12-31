@@ -434,6 +434,13 @@ class MATH_ALGOS:
         self.sieve_primes(1000) #comment out if different size needed
         self.gen_set_primes() #comment out if already have bigger size
 
+    #test this against stevens
+    def extended_euclid(self, a, b):
+        if 0 == b:
+            return 1, 0, a
+        x, y, d = self.extendedEuclid(b, a%b)
+        return y, x-y*(a//b), d
+
     def mod(self, a, b):
         return ((a % b) + b) % b
 
