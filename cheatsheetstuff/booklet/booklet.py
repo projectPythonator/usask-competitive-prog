@@ -451,19 +451,42 @@ class MATH_ALGOS:
             y, yy = yy, y-q*yy
         return a, x, y
 
-    def mod(self, a, n):
+    def mod(self, a, n): #needs test
         return ((a % n) + n) % n
 
-    def modular_linear_equation_solver(self, a, b, n):
+    def modular_linear_equation_solver(self, a, b, n): #needs test
         x, y, d = self.extended_euclid(a, n)
         if 0 == b % d:
             x = self.mod(x*(b//d), n)
             return [self.mod(x+i*(n//d), n) for i in range(d)]
         return []
 
-    def mod_inverse(self, a, n):
+    def mod_inverse(self, a, n): #needs test
         x, y, d = self.extended_euclid(a, n)
         return -1 if d > 1 else self.mod(x, n)
+
+    # stanford icpc 2013-14
+    def crt_helper(self, x, a, y, b): #needs test
+        s, t, d = self.extended_euclid(x, y)
+        return (0, -1) if a%d != b%d else (self.mod(s*b*x + t*a*y, x*y)//d, x*y//d)
+    
+    # from stanford icpc 2013-14
+    def chinese_remainder_theorem(self, x, a):
+        ans = (a[0], x[0])
+        for i in range(1, len(x)):
+            ans = self.crt_helper(ans[1], ans[0], x[i], a[i])
+            if -1 == ans[1]:
+                break
+        return ans
+    
+    #test this its from stanford icpc 2013-14
+    #computes x and y in ax+by=c failure x=y=-1
+    def linear_diophantine(self, a, b, c):
+        d = math.gcd(a,b)
+        if c%d == 0:
+            x = c//d * self.mod_inverse(a//b, b//d)
+            return (x, (c - a*x//b))
+        return (-1, -1)
         
 
     
