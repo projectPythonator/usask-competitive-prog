@@ -357,6 +357,13 @@ class GRAPH_ALGOS():
 class MATH_ALGOS:
     def __init__(self):
         self.n=None
+        self.primes_sieve = []
+        self.primes_list = []
+
+    def init_data(self, n): #call before using other functions, make a reset if needed to reset per case
+        self.primes_sieve = [True] * n
+        self.primes_list = []
+        self.primes_set = set()
         
     def is_prime_triv(self, n):
         if n<=3:
@@ -369,5 +376,17 @@ class MATH_ALGOS:
                 return False
             p+=6
         return True
-
+        
+    def sieve_primes(self, n):
+        self.primes_list=[2]
+        for i in range(4, n, 2):
+            self.primes_sieve[i] = False
+        for i in range(3, n, 2):
+            if self.primes_sieve[i]:
+                self.primes_list.append(i)
+                for j in range(i*i, n, 2*i):
+                    self.primes_sieve[j] = False
+    
+    def gen_set_primes(self):
+        self.primes_set=set(self.primes_list)
 
