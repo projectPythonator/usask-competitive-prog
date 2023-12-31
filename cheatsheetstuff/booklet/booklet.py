@@ -451,7 +451,21 @@ class MATH_ALGOS:
             y, yy = yy, y-q*yy
         return a, x, y
 
-    def mod(self, a, b):
-        return ((a % b) + b) % b
+    def mod(self, a, n):
+        return ((a % n) + n) % n
+
+    def modular_linear_equation_solver(self, a, b, n):
+        x, y, d = self.extended_euclid(a, n)
+        if 0 == b % d:
+            x = self.mod(x*(b//d), n)
+            return [self.mod(x+i*(n//d), n) for i in range(d)]
+        return []
+
+    def mod_inverse(self, a, n):
+        x, y, d = self.extended_euclid(a, n)
+        return -1 if d > 1 else self.mod(x, n)
+        
+
+    
 
     
