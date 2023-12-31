@@ -520,7 +520,13 @@ class MATH_ALGOS:
     def fibonacci_n_dp(self, n):
         self.fibonacci_dict = {}
         return self.fibonacci_n_dp_helper(n)
-        
+    
+    #this needs testing 
+    def generate_catalan_n(self, n):
+        self.catalan = [0] * (n+1)
+        self.catalan[0] = 1
+        for i in range(n-1):
+            self.catalan[i+1] = self.catalan[i]*(4*i+2)//(i+2)
 
     
 
