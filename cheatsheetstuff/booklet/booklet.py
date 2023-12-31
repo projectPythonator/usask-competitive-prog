@@ -140,7 +140,8 @@ class GRAPH_ALGOS():
         for u in range(self.num_nodes):
             if self.visited[u]==UNVISITED:
                 self.dfs_cycle_checker_helper(u)
-
+    # dfs_articulation_point_and_bridge_helper tested in advent of code for  removing 3 nodes from a graph on removing the last node 
+    # seems to work fine not sure if hidden bugs still here 
     def dfs_articulation_point_and_bridge_helper(self, u): # need to rego over this and test it *** not as confident as the other code atm since have not really used it to solve a problem
         self.visited[u] = self.dfs_counter
         self.low_values[u] = self.visited[u]
