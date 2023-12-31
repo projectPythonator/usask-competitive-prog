@@ -25,7 +25,7 @@ class UnionFind:
     def is_same_set(self, u, v):
         return self.find_set(u)==self.find_set(v)
 
-    def union_set(self, u, v):
+    def union_set(self, u, v): # BUG sizes not working needs a fix probably just revert back to book implementtion from steven and felix
         up = self.find_set(u)
         vp = self.find_set(v)
         if up==vp:
