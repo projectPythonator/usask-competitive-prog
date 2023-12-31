@@ -434,4 +434,7 @@ class MATH_ALGOS:
         self.sieve_primes(1000) #comment out if different size needed
         self.gen_set_primes() #comment out if already have bigger size
 
+    def mod(self, a, b):
+        return ((a % b) + b) % b
+
     
