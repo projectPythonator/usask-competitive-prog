@@ -528,6 +528,11 @@ class MATH_ALGOS:
         for i in range(n-1):
             self.catalan[i+1] = self.catalan[i]*(4*i+2)//(i+2)
 
+    def generate_catalan_n_mod_inverse(self, n, p):
+        self.catalan = [0] * (n+1)
+        self.catalan[0] = 1
+        for i in range(n-1):
+            self.catalan[i+1] = ((4*i+2)%p * self.catalan[i]%p * pow(i+1, p-2, p)) % p
     
 
     
