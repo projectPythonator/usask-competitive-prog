@@ -438,18 +438,18 @@ class MATH_ALGOS:
     def extended_euclid(self, a, b):
         if 0 == b:
             return 1, 0, a
-        x, y, d = self.extendedEuclid(b, a%b)
+        x, y, d = self.extended_euclid(b, a%b)
         return y, x-y*(a//b), d
 
     def extended_euclid_2(self, a, b):
-          xx, yy = 0, 1
-          x, y = 1, 0
-          while b != 0:
+        xx, yy = 0, 1
+        x, y = 1, 0
+        while b != 0:
             q = a//b
             a, b = b, a%b
             x, xx = xx, x-q*xx
             y, yy = yy, y-q*yy
-          return a, x, y
+        return a, x, y
 
     def mod(self, a, b):
         return ((a % b) + b) % b
