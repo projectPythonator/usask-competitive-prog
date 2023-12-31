@@ -358,7 +358,16 @@ class MATH_ALGOS:
     def __init__(self):
         self.n=None
         
-
-
+    def is_prime_triv(self, n):
+        if n<=3:
+            return n>1
+        elif n%2==0 or n%3==0:
+            return False
+        p=5
+        while p*p<=n:
+            if n%p==0 or n%(p+2)==0:
+                return False
+            p+=6
+        return True
 
 
