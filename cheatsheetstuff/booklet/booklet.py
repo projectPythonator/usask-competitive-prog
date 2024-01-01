@@ -579,4 +579,75 @@ class MATH_ALGOS:
             self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
         return self.binomial[(n, k)]
 
+import math
+# remember to sub stuff out for integer ops when you want only integers 
+# for ints need to change init, eq and 
+class pt_xy:
+    def __init__(self, x_val, y_val): 
+        self.x, self.y = map(float, [x_val, y_val])
+
+    def __add__(self, other):
+        return pt_xy(self.x+other.x, self.y+other.y)
+    def __sub__(self, other): 
+        return pt_xy(self.x-other.x, self.y-other.y)
+    def __mul__(self, scale): 
+        return pt_xy(self.x*scale, self.y*scale)
+    def __truediv__(self, scale): 
+        return pt_xy(self.x/scale, self.y/scale)
+    def __floordiv__(self, scale): 
+        return pt_xy(self.x//scale, self.y//scale)
+
+    def __eq__(self, other): 
+        return math.isclose(self.x, other.x) and math.isclose(self.y, other.y)
+    def __lt__(self, other):
+        return False if self == other else (self.x, self.y) < (other.x, other.y)
+
+    def __str__(self): 
+        return "{} {}".format(self.x, self.y)
+    def __str__(self): 
+        return "(x = {:20}, y = {:20})".format(self.x, self.y)
+    def __round__(self, n): 
+        return pt_xy(round(self.x, n), round(self.y, n))
+    def __hash__(self):
+        return hash((self.x, self.y))
+
+class pt_xyz:
+    def __init__(self, x_val, y_val, z_val): 
+        self.x, self.y, self.z = map(float, [x_val, y_val, z_val])
+
+    def __add__(self, other):
+        return pt_xyz(self.x+other.x, self.y+other.y, self.z+other.z)
+    def __sub__(self, other): 
+        return pt_xyz(self.x-other.x, self.y-other.y, self.z-other.z)
+    def __mul__(self, scale): 
+        return pt_xyz(self.x*scale, self.y*scale, self.z*scale)
+    def __truediv__(self, scale): 
+        return pt_xyz(self.x/scale, self.y/scale, self.z/scale)
+    def __floordiv__(self, scale): 
+        return pt_xyz(self.x//scale, self.y//scale, self.z//scale)
+
+    def __eq__(self, other): 
+        return math.isclose(self.x, other.x) and math.isclose(self.y, other.y) and math.isclose(self.z, other.z)
+    def __lt__(self, other):
+        return False if self == other else (self.x, self.y, self.z) < (other.x, other.y, other.y)
+
+    def __str__(self): 
+        return "{} {} {}".format(self.x, self.y, self.z)
+    def __str__(self): 
+        return "(x = {:20}, y = {:20}), z = {:20})".format(self.x, self.y, self.z)
+    def __round__(self, n): 
+        return pt_xyz(round(self.x, n), round(self.y, n), round(self.z, n)
+    def __hash__(self):
+        return hash((self.x, self.y, self.z))
+
+def Geometry_Algorithms:
+    def __init__(self):
+        pass
+    # replacing epscmp and c_cmp for epscmp simply use compare_ab(a, 0) or math.isclose(a, 0)
+    def compare_ab(self, a, b): return 0 if math.isclose(a, b) else -1 if a<b else 1
+
+    def dot_product_2d(self, a, b): return a.x*b.x + a.y*b.y
+    def cross_product_2d(self, a, b): return a.x*b.y - a.y*b.x
     
+
+
