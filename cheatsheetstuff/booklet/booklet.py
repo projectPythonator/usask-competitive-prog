@@ -579,37 +579,29 @@ class MATH_ALGOS:
             self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
         return self.binomial[(n, k)]
 
-import math
+from math import isclose, dist, sin, cos, acos, sqrt
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and 
 class pt_xy:
     def __init__(self, x_val, y_val): 
         self.x, self.y = map(float, [x_val, y_val])
 
-    def __add__(self, other):
-        return pt_xy(self.x+other.x, self.y+other.y)
-    def __sub__(self, other): 
-        return pt_xy(self.x-other.x, self.y-other.y)
-    def __mul__(self, scale): 
-        return pt_xy(self.x*scale, self.y*scale)
-    def __truediv__(self, scale): 
-        return pt_xy(self.x/scale, self.y/scale)
-    def __floordiv__(self, scale): 
-        return pt_xy(self.x//scale, self.y//scale)
+    def __add__(self, other): return pt_xy(self.x+other.x, self.y+other.y)
+    def __sub__(self, other): return pt_xy(self.x-other.x, self.y-other.y)
+    def __mul__(self, scale): return pt_xy(self.x*scale, self.y*scale)
+    def __truediv__(self, scale): return pt_xy(self.x/scale, self.y/scale)
+    def __floordiv__(self, scale): return pt_xy(self.x//scale, self.y//scale)
 
-    def __eq__(self, other): 
-        return math.isclose(self.x, other.x) and math.isclose(self.y, other.y)
-    def __lt__(self, other):
-        return False if self == other else (self.x, self.y) < (other.x, other.y)
+    def __eq__(self, other): return isclose(self.x, other.x) and isclose(self.y, other.y)
+    def __lt__(self, other): return False if self == other else (self.x, self.y) < (other.x, other.y)
 
-    def __str__(self): 
-        return "{} {}".format(self.x, self.y)
-    def __str__(self): 
-        return "(x = {:20}, y = {:20})".format(self.x, self.y)
-    def __round__(self, n): 
-        return pt_xy(round(self.x, n), round(self.y, n))
-    def __hash__(self):
-        return hash((self.x, self.y))
+    def __str__(self): return "{} {}".format(self.x, self.y)
+    def __str__(self): return "(x = {:20}, y = {:20})".format(self.x, self.y)
+    def __round__(self, n): return pt_xy(round(self.x, n), round(self.y, n))
+    def __hash__(self): return hash((self.x, self.y))
+
+    def get_tup(self): return (self.x, self.y)
+
 
 class pt_xyz:
     def __init__(self, x_val, y_val, z_val): 
@@ -627,7 +619,7 @@ class pt_xyz:
         return pt_xyz(self.x//scale, self.y//scale, self.z//scale)
 
     def __eq__(self, other): 
-        return math.isclose(self.x, other.x) and math.isclose(self.y, other.y) and math.isclose(self.z, other.z)
+        return isclose(self.x, other.x) and isclose(self.y, other.y) and isclose(self.z, other.z)
     def __lt__(self, other):
         return False if self == other else (self.x, self.y, self.z) < (other.x, other.y, other.y)
 
@@ -644,10 +636,65 @@ def Geometry_Algorithms:
     def __init__(self):
         pass
     # replacing epscmp and c_cmp for epscmp simply use compare_ab(a, 0) or math.isclose(a, 0)
-    def compare_ab(self, a, b): return 0 if math.isclose(a, b) else -1 if a<b else 1
+    def compare_ab(self, a, b): return 0 if isclose(a, b) else -1 if a<b else 1
 
     def dot_product_2d(self, a, b): return a.x*b.x + a.y*b.y
     def cross_product_2d(self, a, b): return a.x*b.y - a.y*b.x
+
+    def distance_normalized_2d(self, a, b): return math.dist(a.get_tup(), b.get_tup())
+    def distance_2d(self, a, b): return self.dot_product_2d(a-b, a-b)
+
+    def rotate_cw_90_wrt_origin_2d(self, pt): return pt_xy(pt.y, -pt.x)
+    def rotate_ccw_90_wrt_origin_2d(self, pt): return pt_xy(-pt.y, pt.x)
+    def rotate_ccw_rad_wrt_origin_2d(self, pt, rad):
+        return pt_xy(pt.x*cos(rad) - pt.y*sin(rad), 
+                     pt.x*sin(rad) + pt.y*cos(rad))
+
+    # 0 if colinear else 1 if counter clock wise (ccw) else -1 if clockwise (cw) 
+    def point_c_rotation_wrt_line_ab_2d(self, a, b, c):
+        return self.compare_ab(self.cross_product_2d(b-a, c-a), 0.0)
+
+    def angle_point_c_wrt_line_ab_2d(self, a, b, c): # possibly doesn't work for some (probably overflow)
+        ab, cb = a-b, c-b
+        abcb = self.dot_product_2d(ab, cb)
+        abab = self.dot_product_2d(ab, ab)
+        cbcb = self.dot_product_2d(cb, cb)
+        # return acos(abcb/sqrt(abab*cbcb))
+        return acos(abcb/(sqrt(abab)*sqrt(cbcb)))
+
+    # projection funcs just returns closes point to obj based on a point c
+    def project_pt_c_to_line_ab_2d(self, a, b, c):
+        ba, ca = b-a, c-a
+        return a + ba*(self.dot_product_2d(ca, ba)/self.dot_product_2d(ba, ba))
+
+    # use compare_ab in return if this isn't good enough
+    def project_pt_c_to_line_seg_ab_2d(self, a, b, c):
+        ba, ca = b-a, c-a
+        u = self.dot_product_2d(ba, ba)
+        if self.compare_ab(u, 0.0) == 0:
+            return a
+        u = self.dot_product_2d(ca, ba)/u
+        return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab_2d(a, b, c)
+
+    def distance_pt_c_to_line_ab_2d(self, a, b, c):
+        return self.distance_normalized_2d(c, self.project_pt_c_to_line_ab_2d(a, b, c))
+
+    def distance_pt_c_to_line_seg_ab_2d(self, a, b, c):
+        return self.distance_normalized_2d(c, self.project_pt_c_to_line_seg_ab_2d(a, b, c))
+    
+    def is_parallel_lines_ab_and_cd_2d(self, a, b, c, d):
+        return self.compare_ab(self.cross_product_2d(b-a, c-d), 0.0) == 0
+
+    def is_collinear_lines_ab_and_cd_2d(self, a, b, c, d):
+        return (self.is_parallel_lines_ab_and_cd_2d(a, b, c, d)
+        and self.is_parallel_lines_ab_and_cd_2d(b, a, a, c)
+        and self.is_parallel_lines_ab_and_cd_2d(d, c, c, a))
+
+
+    
+    
+        
+    
     
 
 
