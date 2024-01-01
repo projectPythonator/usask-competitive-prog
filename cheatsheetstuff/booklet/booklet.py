@@ -453,6 +453,9 @@ class MATH_ALGOS:
             y, yy = yy, y-q*yy
         return a, x, y
 
+    # use in c++ and java
+    # use ((a % n) + n) % n for getting proper mod of negative value 
+    # use (a + b) % --> ((a % n) + (b % n)) % n for operations sub out + for * and - 
     def mod(self, a, n): #needs test
         return ((a % n) + n) % n
 
