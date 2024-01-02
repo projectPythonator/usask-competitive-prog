@@ -717,9 +717,25 @@ def Geometry_Algorithms:
 
     def pt_circle_center_given_pt_abc(self, a, b, c):
         ab, ac = (a+b)/2, (a+c)/2
-        ab_rot, ac_rot = ab+self.rotate_cw_90_wrt_origin_2d(a-ab), ac+self.rotate_cw_90_wrt_origin_2d(a-ac)
+        ab_rot = ab+self.rotate_cw_90_wrt_origin_2d(a-ab)
+        ac_rot = ac+self.rotate_cw_90_wrt_origin_2d(a-ac)
         return self.pt_lines_intersect_ab_to_cd_2d(ab, ab_rot, ac, ac_rot)
 
+    def pts_line_ab_intersects_circle_cr_2d(self, a, b, c, r):
+        ba, ac = b-a, a-c
+        bb = self.dot_product_2d(ba, ba)
+        ab = self.dot_product_2d(ac, ba)
+        aa = self.dot_product_2d(ac, ac)-r*r
+        dist = ab*ab - bb*aa
+        result = self.compare_ab(dist, 0.0)
+        if result >= 0:
+            first_intersect = c + ac + ba*(-ab + sqrt(dist+EPS))/bb
+            second_intersect = c + ac + ba*(-ab - sqrt(dist))/bb
+            return (first_intersect) if result == 0 else (first_intersect, second_intersect)
+        return None # no intersect 
+
+
+        
 
             
     
