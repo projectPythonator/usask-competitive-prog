@@ -745,7 +745,17 @@ def Geometry_Algorithms:
             return (pt1+pt2) if self.compare_ab(y, 0.0) <= 0 else (pt1+pt2, pt1-pt2)
         return None # no overlap
 
-
+    def pt_tangent_to_circle_cr_2d(self, c, r, p):
+        pc = p-c
+        x = self.dot_product_2d(pc, pc)
+        dist = x - r*r
+        result = self.compare_ab(dist, 0.0)
+        if result >= 0:
+            dist = dist if result else 0
+            q1 = pa * (r*r / x)
+            q2 = self.rotate_ccw_90_wrt_origin_2d(pa * (-r * sqrt(dist)/x))
+            return [a+q1-q2, a+q1+q2]
+        return []
 
 
         
