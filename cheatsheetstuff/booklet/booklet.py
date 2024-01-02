@@ -702,7 +702,15 @@ def Geometry_Algorithms:
         return (not self.is_parallel_lines_ab_and_cd_2d(a, b, c, d) or 
                 self.is_collinear_lines_ab_and_cd_2d(a, b, c, d))
 
+    def pt_lines_intersect_ab_to_cd_2d(self, a, b, c, d):
+        ba, ca, cd = b-a, c-a, c-d
+        return a + ba*(self.cross_product_2d(ca, cd)/self.cross_product_2d(ba, cd))
 
+    def pt_line_seg_intersect_ab_to_cd_2d(self, a, b, c, d):
+        x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product_2d(d, c)
+        u = abs(y*a.x + x*a.y + cross_prod)
+        v = abs(y*b.x + x*b.y + cross_prod)
+        return pt_xy((a.x*v + b.x*u)/(v + u), (a.y*v + b.y*u)/(v + u))
             
     
         
