@@ -711,6 +711,16 @@ def Geometry_Algorithms:
         u = abs(y*a.x + x*a.y + cross_prod)
         v = abs(y*b.x + x*b.y + cross_prod)
         return pt_xy((a.x*v + b.x*u)/(v + u), (a.y*v + b.y*u)/(v + u))
+
+    def is_point_in_circle(self, a, b, r): # use <= if you want points on the circumfrance 
+        return self.compare_ab(self.distance_normalized_2d(a, b), r) < 0
+
+    def pt_circle_center_given_pt_abc(self, a, b, c):
+        ab, ac = (a+b)/2, (a+c)/2
+        ab_rot, ac_rot = ab+self.rotate_cw90(a-ab), ac+self.rotate_cw90(a-ac)
+        return self.pt_lines_intersect_ab_to_cd_2d(ab, ab_rot, ac, ac_rot)
+
+
             
     
         
