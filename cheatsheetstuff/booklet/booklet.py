@@ -690,8 +690,20 @@ def Geometry_Algorithms:
         and self.is_parallel_lines_ab_and_cd_2d(b, a, a, c)
         and self.is_parallel_lines_ab_and_cd_2d(d, c, c, a))
 
+    def is_segments_intersect_ab_to_cd_2d(self, a, b, c, d):
+        if self.is_collinear_lines_ab_and_cd_2d(a, b, c, d):
+            lo, hi = a, b if a < b else b, a
+            return lo <= c <= hi or lo <= d <= hi
+        a_val = self.cross_product_2d(d-a, b-a)*self.cross_product_2d(c-a, b-a)
+        c_val = self.cross_product_2d(a-c, d-c)*self.cross_product_2d(b-c, d-c)
+        return not(a_val>0 or c_val>0)
 
-    
+    def is_lines_intersect_ab_to_cd_2d(self, a, b, c, d):
+        return (not self.is_parallel_lines_ab_and_cd_2d(a, b, c, d) or 
+                self.is_collinear_lines_ab_and_cd_2d(a, b, c, d))
+
+
+            
     
         
     
