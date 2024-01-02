@@ -717,7 +717,7 @@ def Geometry_Algorithms:
 
     def pt_circle_center_given_pt_abc(self, a, b, c):
         ab, ac = (a+b)/2, (a+c)/2
-        ab_rot, ac_rot = ab+self.rotate_cw90(a-ab), ac+self.rotate_cw90(a-ac)
+        ab_rot, ac_rot = ab+self.rotate_cw_90_wrt_origin_2d(a-ab), ac+self.rotate_cw_90_wrt_origin_2d(a-ac)
         return self.pt_lines_intersect_ab_to_cd_2d(ab, ab_rot, ac, ac_rot)
 
 
