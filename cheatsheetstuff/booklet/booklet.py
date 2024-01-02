@@ -734,6 +734,19 @@ def Geometry_Algorithms:
             return (first_intersect) if result == 0 else (first_intersect, second_intersect)
         return None # no intersect 
 
+    def pts_two_circles_intersect_ar1_br1_2d(self, c1, c2, r1, r2):
+        center_dist = self.distance_normalized_2d(c1, c2)
+        if self.compare_ab(center_dist, r1+r2) <= 0 \
+        and self.compare_ab(center_dist+min(r1, r2), max(r1, r2)) >= 0:
+            x = (center_dist*center_dist - r2*r2 + r1*r1)/(2*center_dist)
+            y = sqrt(r1*r1 - x*x)
+            v = (b-a)/center_dist
+            pt1, pt2 = a + v*x, self.rotate_ccw_90_wrt_origin_2d(v)*y
+            return (pt1+pt2) if self.compare_ab(y, 0.0) <= 0 else (pt1+pt2, pt1-pt2)
+        return None # no overlap
+
+
+
 
         
 
