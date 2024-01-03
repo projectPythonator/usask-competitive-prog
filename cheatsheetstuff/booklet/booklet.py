@@ -837,9 +837,42 @@ def Geometry_Algorithms:
             return (True, radius, round(intersection_pt, 12)) # can remove the round function
         return (False, 0, 0)
 
+    def triangle_circle_center_pt_abcd_2d(self, a, b, c, d):
+        ba, dc = b-a, d-c
+        pt_1, pt_2 = pt_xy(ba.y, -ba.x), pt_xy(dc.y, -dc.x)
+        cross_product_1_2 = self.cross_product_2d(pt_1, pt_2)
+        cross_product_2_1 = self.cross_product_2d(pt_2, pt_1)
+        if self.compare_ab(cross_product_1_2, 0.0) == 0:
+            return None
+        pt_3 = pt_xy(self.dot_product_2d(a, pt_1), self.dot_product_2d(c, pt_2))
+        x = ((pt_3.x * pt_2.y) - (pt_3.y * pt_1.y)) / cross_product_1_2
+        y = ((pt_3.x * pt_2.x) - (pt_3.y * pt_1.x)) / cross_product_2_1
+        return pt_xy(x, y) 
 
+    def angle_bisector_for_triangle_abc_2d(self, a, b, c):
+        dist_ba = self.distance_normalized_2d(b, a)
+        dist_ca = self.distance_normalized_2d(c, a)
+        ref_pt = (b-a) / dist_ba * dist_ca
+        return ref_pt + (c-a) + a
 
-        
+    def perpendicular_bisector_for_triangle_ab_2d(self, a, b):
+        ba = b-a
+        ba = pt_xy(-ba.y, ba.x)
+        return ba + (a+b)/2
+
+    def incircle_pt_of_triangle_abc_v2_2d(self, a, b, c):
+        abc = self.angle_bisector_for_triangle_abc_2d(a, b, c)
+        bca = self.angle_bisector_for_triangle_abc_2d(b, c, a)
+        return self.triangle_circle_center_pt_abcd_2d(a, abc, b, bca)
+
+    def circumcenter_pt_of_triangle_abc_v2_2d(self, a, b, c):
+        ab = self.perpendicular_bisector_for_triangle_ab_2d(a, b)
+        bc = self.perpendicular_bisector_for_triangle_ab_2d(b, c)
+        ab2, bc2 = (a+b)/2, (b+c)/2
+        return self.triangle_circle_center_pt_abcd_2d(ab2, ab, bc2, bc)
+
+    def orthocenter_pt_of_triangle_abc_v2_2d(self, a, b, c):
+        return a + b + c - 2*self.circumcenter_pt_of_triangle_abc_v2_2d(a, b, c)
 
 
     
