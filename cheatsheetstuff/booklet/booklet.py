@@ -776,6 +776,74 @@ def Geometry_Algorithms:
             r_tangents.append((ps[i], qs[i]))
         return r_tangents
 
+    def sides_of_triangle_abc_2d(self, a, b, c):
+        ab = self.distance_normalized_2d(a, b)
+        bc = self.distance_normalized_2d(b, c)
+        ca = self.distance_normalized_2d(c, a)
+        return ab, bc, ca
+
+    def pt_p_in_triangle_abc_2d(self, a, b, c, p):
+        return self.point_c_rotation_wrt_line_ab_2d(a, b, p) >= 0 and  \
+                self.point_c_rotation_wrt_line_ab_2d(b, c, p) >= 0 and \
+                self.point_c_rotation_wrt_line_ab_2d(c, a, p) >= 0
+
+    def perimeter_of_triangle_abc_2d(self, ab, bc, ca):
+        return ab + bc + ca
+
+    def triangle_area_bh_2d(self, b, h):
+        return b*h/2
+
+    def triangle_area_heron_abc_2d(self, ab, bc, ca):
+        s = self.perimeter_of_triangle_abc_2d(ab, bc, ca) / 2
+        return sqrt(s * (s-ab) * (s-bc) * (s-ca))
+
+    def triangle_area_cross_product_abc_2d(self, a, b, c):
+        ab = self.cross_product_2d(a, b)
+        bc = self.cross_product_2d(b, c)
+        ca = self.cross_product_2d(c, a)
+        return (ab + bc + ca)/2
+
+    def incircle_radis_of_triangle_abc_helper_2d(self, ab, bc, ca):
+        area = self.triangle_area_heron_abc_2d(ab, bc, ca)
+        perimeter = self.perimeter_of_triangle_abc_2d(ab, bc, ca)/2
+        return area/perimeter
+
+    def incircle_radis_of_triangle_abc_2d(self, a, b, c):
+        ab, bc, ca = self.sides_of_triangle_abc_2d(a, b, c)
+        return self.incircle_radis_of_triangle_abc_helper_2d(ab, bc, ca)
+
+    def circumcircle_radis_of_triangle_abc_helper_2d(self, ab, bc, ca):
+        area = self.triangle_area_heron_abc_2d(ab, bc, ca)
+        return (ab*bc*ca) / (4*area)
+        
+    def circumcircle_radis_of_triangle_abc_2d(self, a, b, c):
+        ab, bc, ca = self.sides_of_triangle_abc_2d(a, b, c)
+        return circumcircle_radis_of_triangle_abc_helper_2d(ab, bc, ca)
+
+    def incircle_pt_for_triangle_abc_2d(self, a, b, c):
+        radius = self.incircle_radis_of_triangle_abc_2d(a, b, c)
+        if self.compare_ab(radius, 0.0):
+            return (False, 0, 0)
+        dist_ab = self.distance_normalized_2d(a, b)
+        dist_bc = self.distance_normalized_2d(b, c)
+        dist_ac = self.distance_normalized_2d(a, c)
+        ratio_1 = dist_ab/dist_ac
+        ratio_2 = dist_ab/dist_bc
+        pt_1 = b + (c-b) * (ratio_1/(ratio_1 + 1.0)) 
+        pt_2 = a + (c-a) * (ratio_2/(ratio_2 + 1.0))
+
+        if self.is_lines_intersect_ab_to_cd_2d(a, pt_1, b, pt_2):
+            intersection_pt = self.pt_lines_intersect_ab_to_cd_2d(a, pt_1, b, pt_2)
+            return (True, radius, round(intersection_pt, 12)) # can remove the round function
+        return (False, 0, 0)
+
+
+
+        
+
+
+    
+
 
         
 
