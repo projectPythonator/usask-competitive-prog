@@ -579,7 +579,7 @@ class MATH_ALGOS:
             self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
         return self.binomial[(n, k)]
 
-from math import isclose, dist, sin, cos, acos, sqrt
+from math import isclose, dist, sin, cos, acos, sqrt, fsum
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and 
 class pt_xy:
@@ -873,6 +873,66 @@ def Geometry_Algorithms:
 
     def orthocenter_pt_of_triangle_abc_v2_2d(self, a, b, c):
         return a + b + c - 2*self.circumcenter_pt_of_triangle_abc_v2_2d(a, b, c)
+
+    # note these assume counter clockwise ordering of points
+    def perimeter_of_polygon_pts_2d(self, pts):
+        return fsum([self.distance_normalized_2d(pts[i], pts[i+1]) for i in range(len(pts)-1)])
+
+    def signed_area_of_polygon_pts_2d(self, pts):
+        return fsum([self.distance_normalized_2d(pts[i], pts[i+1]) for i in range(len(pts)-1)])/2
+
+    def area_of_polygon_pts_2d(self, pts):
+        return abs(self.signed_area_of_polygon_pts_2d(pts))
+
+    # < is counter clock wise <= includes collinear > for clock wise >= includes collinear
+    def is_convex_helper(self, a, b, c):
+        return 0 < self.point_c_rotation_wrt_line_ab_2d(a, b, c)
+
+    def is_convex_polygon_pts_2d(self, pts):
+        lim = len(pts)
+        if lim > 3:
+            is_ccw = self.is_convex_helper(pts[0], pts[1], pts[2])
+            for i in range(1, n-1):
+                a, b, c = pts[i], pts[i+1], pts[i+2 if i+2<lim else 1]
+                if base != self.is_convex_helper(a, b, c):
+                    return False
+            return True 
+        return False
+
+    def pt_p_in_polygon_pts_v2_2d(self, pts, p):
+        ans = False
+        px, py = p.get_tup()
+        for i in range(len(pts)-1):
+            x1, y1 = pts[i].get_tup()
+            x2, y2 = pts[i+1].get_tup()
+            lo, hi = y1, y2 if y1 < y2 else y2, y1
+            if lo <= py < hi and px < (x1 + (x2-x1) * (py-y1) / (y2-y1)):
+                ans = not ans
+        return ans
+
+    def pt_p_in_convex_polygon_pts_2d(self, pts, p):
+        n = len(pts)
+        if n == 2:
+            distance = self.distance_pt_c_to_line_seg_ab_2d(pts[0], pts[1], p)
+            return self.compare_ab(distance, 0.0) == 0
+        left, right = 1, n
+        while left < right:
+            mid = (left + rigth)/2 + 1
+            side = self.point_c_rotation_wrt_line_ab_2d(pts[0], pts[mid], p)
+            left, right = mid, right if side == 1 else left, mid-1
+        side = self.point_c_rotation_wrt_line_ab_2d(pts[0], pts[left], p)
+        if side == -1 or left == n:
+            return False
+        side = self.point_c_rotation_wrt_line_ab_2d(pts[left], pts[left+1] - pts[left], p)
+        return side >= 0
+
+    def pt_p_on_polygon_perimeter_pts_2d(self, pts, p):
+        for i in range(len(pts)-1):
+            distance = self.distance_pt_c_to_line_seg_ab_2d(pts[i], pts[i+1], p)
+            if self.compare_ab(distance, 0.0) == 0:
+                return True
+        return False
+
 
 
     
