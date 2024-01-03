@@ -757,6 +757,25 @@ def Geometry_Algorithms:
             return [a+q1-q2, a+q1+q2]
         return []
 
+    def tangents_between_2_circles_2d(self, c1, r1, c2, r2):
+        r_tangents = []
+        if self.compare_ab(r1, r2) == 0:
+            c2c1 = c2 - c1
+            multiplier = r1/sqrt(self.dot_product_2d(c2c1, c2c1))
+            tangent = self.rotate_ccw_90_wrt_origin_2d(c2c1 * multiplier) # need better name
+            r_tangents = [(c1+tangent, c2+tangent), (c1-tangent, c2-tangent)]
+        else:
+            ref_pt = ((c1 * -r2) + (c2 * r1)) / (r1 - r2)
+            ps = self.pt_tangent_to_circle_cr_2d(c1, r1, ref_pt)
+            qs = self.pt_tangent_to_circle_cr_2d(c2, r2, ref_pt)
+            r_tangents = [(ps[i], qs[i]) for i in range(min(len(ps), len(qs)))]
+        ref_pt = ((c1 * r2) + (c2 * r1)) / (r1 + r2)
+        ps = self.pt_tangent_to_circle_cr_2d(c1, r1, ref_pt)
+        qs = self.pt_tangent_to_circle_cr_2d(c2, r2, ref_pt)
+        for i in range(min(len(ps), len(qs))):
+            r_tangents.append((ps[i], qs[i]))
+        return r_tangents
+
 
         
 
