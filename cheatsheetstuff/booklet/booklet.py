@@ -579,7 +579,7 @@ class MATH_ALGOS:
             self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
         return self.binomial[(n, k)]
 
-from math import isclose, dist, sin, cos, acos, sqrt, fsum
+from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi, tau
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and 
 class pt_xy:
@@ -899,6 +899,27 @@ def Geometry_Algorithms:
             return True 
         return False
 
+    def pt_p_in_polygon_pts_v1_2d(self, pts, p):
+        n = len(pts)
+        if n > 3:
+            if p in pts:
+                return 0
+            for i in range(n-1):
+                dist_ip = self.distance_normalized_2d(pts[i], p)
+                dist_pj = self.distance_normalized_2d(p, pts[i+1])
+                dist_ij = self.distance_normalized_2d(pts[i], pts[i+1])
+                if self.compare_ab(dist_ip+dist_pj, dist_ij) == 0:
+                    return 0
+            angle_sum = 0.0
+            for i in range(n-1):
+                if 1 == self.point_c_rotation_wrt_line_ab_2d(pts[i], pts[i+1], p):
+                    angle_sum += angle_point_c_wrt_line_ab_2d(pts[i], pts[i+1], p)
+                else:
+                    angle_sum -= angle_point_c_wrt_line_ab_2d(pts[i], pts[i+1], p)
+            return self.compare_ab(abs(angle_sum), pi)
+            
+        return -1
+
     def pt_p_in_polygon_pts_v2_2d(self, pts, p):
         ans = False
         px, py = p.get_tup()
@@ -933,6 +954,7 @@ def Geometry_Algorithms:
                 return True
         return False
 
+    
 
 
     
