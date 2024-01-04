@@ -973,6 +973,22 @@ def Geometry_Algorithms:
                     return False
         return True
 
+    def polygon_cut(self, pts, a, b):
+        ans, n = [], len(pts)
+        for i in range(n-1):
+            rot_1 = self.point_c_rotation_wrt_line_ab_2d(a, b, pts[i])
+            rot_2 = self.point_c_rotation_wrt_line_ab_2d(a, b, pts[i+1])
+            if 1 == rot_1:
+                ans.append(pts[i])
+            elif 0 == rot_1:
+                ans.append(pts[i])
+                continue
+            if 1 == rot_1 and -1 == rot_2:
+                ans.append(self.pt_line_seg_intersect_ab_to_cd_2d(pts[i], pts[i+1], a, b))
+        if ans and ans[0] != ans[-1]:
+            ans.append(ans[0])
+        return ans
+
     def convex_hull_monotone_chain(self, pts):
         def func(points, r, lim):
             for p in points:
@@ -988,7 +1004,7 @@ def Geometry_Algorithms:
         func(ans[::-1], convex, len(r)+1)
         return r
     
-
+    def 
     
 
 
