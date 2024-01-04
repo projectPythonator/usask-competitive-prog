@@ -902,14 +902,6 @@ def Geometry_Algorithms:
     def pt_p_in_polygon_pts_v1_2d(self, pts, p):
         n = len(pts)
         if n > 3:
-            if p in pts:
-                return 0
-            for i in range(n-1):
-                dist_ip = self.distance_normalized_2d(pts[i], p)
-                dist_pj = self.distance_normalized_2d(p, pts[i+1])
-                dist_ij = self.distance_normalized_2d(pts[i], pts[i+1])
-                if self.compare_ab(dist_ip+dist_pj, dist_ij) == 0:
-                    return 0
             angle_sum = 0.0
             for i in range(n-1):
                 if 1 == self.point_c_rotation_wrt_line_ab_2d(pts[i], pts[i+1], p):
@@ -917,7 +909,6 @@ def Geometry_Algorithms:
                 else:
                     angle_sum -= angle_point_c_wrt_line_ab_2d(pts[i], pts[i+1], p)
             return self.compare_ab(abs(angle_sum), pi)
-            
         return -1
 
     def pt_p_in_polygon_pts_v2_2d(self, pts, p):
@@ -930,6 +921,18 @@ def Geometry_Algorithms:
             if lo <= py < hi and px < (x1 + (x2-x1) * (py-y1) / (y2-y1)):
                 ans = not ans
         return ans
+
+    def pt_p_on_polygon_perimeter_pts_2d(self, pts, p):
+            n = len(pts)
+            if p in pts:
+                return True
+            for i in range(n-1):
+                dist_ip = self.distance_normalized_2d(pts[i], p)
+                dist_pj = self.distance_normalized_2d(p, pts[i+1])
+                dist_ij = self.distance_normalized_2d(pts[i], pts[i+1])
+                if self.compare_ab(dist_ip+dist_pj, dist_ij) == 0:
+                    return True
+            return False
 
     def pt_p_in_convex_polygon_pts_2d(self, pts, p):
         n = len(pts)
@@ -946,13 +949,30 @@ def Geometry_Algorithms:
             return False
         side = self.point_c_rotation_wrt_line_ab_2d(pts[left], pts[left+1] - pts[left], p)
         return side >= 0
+    
+    # use a set with points if possible checking on the same polygon many times    
+    # return 0 for on 1 for in -1 for out
+    def pt_p_position_wrt_polygon_pts_2d(self, pts, p):
+        return 0 if self.pt_p_on_polygon_perimeter_pts_2d(pts, p) \
+                else 1 if self.pt_p_in_polygon_pts_v2_2d(pts, p) else -1
 
-    def pt_p_on_polygon_perimeter_pts_2d(self, pts, p):
-        for i in range(len(pts)-1):
-            distance = self.distance_pt_c_to_line_seg_ab_2d(pts[i], pts[i+1], p)
-            if self.compare_ab(distance, 0.0) == 0:
-                return True
-        return False
+    def centroid_pt_of_convex_polygon(self, pts):
+        ans, n = pt_xy(0, 0), len(pts)
+        for i in range(n-1):
+            ans = ans + (pts[i]+pts[i+1]) * self.cross_product_2d(pts[i], pts[i+1])
+            return ans / (6.0 * self.signed_area_of_polygon_pts_2d(pts))
+
+    def is_polygon_pts_simple(self, pts):
+        n = len(pts)
+        for i in range(n-1):
+            for k in range(i+1, n-1):
+                j, l = (i+1) % n, (k+1) % n
+                if i == l or j == k:
+                    continue
+                if self.is_segments_intersect_ab_to_cd_2d(pts[i], pts[j], pts[k], pts[l]):
+                    return False
+        return True
+    
 
     
 
