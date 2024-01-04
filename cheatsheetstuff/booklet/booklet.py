@@ -956,13 +956,13 @@ def Geometry_Algorithms:
         return 0 if self.pt_p_on_polygon_perimeter_pts_2d(pts, p) \
                 else 1 if self.pt_p_in_polygon_pts_v2_2d(pts, p) else -1
 
-    def centroid_pt_of_convex_polygon(self, pts):
+    def centroid_pt_of_convex_polygon_2d(self, pts):
         ans, n = pt_xy(0, 0), len(pts)
         for i in range(n-1):
             ans = ans + (pts[i]+pts[i+1]) * self.cross_product_2d(pts[i], pts[i+1])
             return ans / (6.0 * self.signed_area_of_polygon_pts_2d(pts))
 
-    def is_polygon_pts_simple(self, pts):
+    def is_polygon_pts_simple_quadratic_2d(self, pts):
         n = len(pts)
         for i in range(n-1):
             for k in range(i+1, n-1):
@@ -972,6 +972,21 @@ def Geometry_Algorithms:
                 if self.is_segments_intersect_ab_to_cd_2d(pts[i], pts[j], pts[k], pts[l]):
                     return False
         return True
+
+    def convex_hull_monotone_chain(self, pts):
+        def func(points, r, lim):
+            for p in points:
+                while len(r) > lim and \
+                    self.point_c_rotation_wrt_line_ab_2d(r[-2], r[-1], p)) == -1:
+                    r.pop()
+                r.append(p)
+            r.pop()
+        ans, convex = sorted(set(pts)), []
+        if len(ans) < 2: 
+            return ans
+        func(ans, convex, 1)
+        func(ans[::-1], convex, len(r)+1)
+        return r
     
 
     
