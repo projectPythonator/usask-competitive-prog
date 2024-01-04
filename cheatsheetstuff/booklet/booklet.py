@@ -1004,7 +1004,21 @@ def Geometry_Algorithms:
         func(ans[::-1], convex, len(r)+1)
         return r
     
-    def 
+    def rotating_caliper_of_polygon_pts_2d(self, pts):
+        n, t, ans = len(pts)-1, 0, 0.0
+        for i in range(n):
+            pi = pts[i]
+            pj = pts[i+1] if i+1 <= n else pts[i]
+            p = pj-pi
+            while (t+1) % n != i:
+                cross_1 = self.cross_produc_2d(p, pts[t+1] - pi)
+                cross_2 = self.cross_produc_2d(p, pts[t] - pi)
+                if self.compare_ab(cross_1, cross_2) == -1:
+                    break
+                t = (t+1) % n
+            ans = max(ans, self.distance_normalized_2d(pi, pts[t]))
+            ans = max(ans, self.distance_normalized_2d(pj, pts[t]))
+        return ans
     
 
 
