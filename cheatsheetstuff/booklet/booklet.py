@@ -1019,8 +1019,54 @@ def Geometry_Algorithms:
             ans = max(ans, self.distance_normalized_2d(pi, pts[t]))
             ans = max(ans, self.distance_normalized_2d(pj, pts[t]))
         return ans
-    
 
+    def closest_pair_helper_2d(self, lo, hi):
+        r_closest = (self.distance_2d(self.x_ordering[lo], self.x_ordering[lo+1]),
+                     self.x_ordering[lo], 
+                     self.x_ordering[lo+1])
+        for i in range(lo, hi):
+            for j in range(i+1, hi):
+                distance_ij = self.distance_2d(self.x_ordering[i], 
+                                               self.x_ordering[j])
+                if self.compare_ab(distance_ij, r_closest):
+                    r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
+        return r_closest
+
+    def closest_pair_recursive_2d(self, lo, hi, y_ordering):
+        n = hi-lo
+        if n < 4: # base case 
+            return self.closest_pair_helper_2d(lo, hi)
+        left_len, right_len = lo + n - n//2, lo + n//2
+        mid = round((self.x_ordering[left_len].x + self.x_ordering[right_len].x)/2)
+        y_part_left = [el for el in y_ordering if self.compare_ab(el.x, mid) <= 0]
+        y_part_right = [el for el in y_ordering if self.compare_ab(el.x, mid) > 0]
+        best_left = self.closest_pair_recursive_2d(lo, left_len, y_part_left)
+        if self.compare_ab(best_left[0], 0.0) == 0:
+            return best_left
+        best_right = self.closest_pair_recursive_2d(left_len, hi, y_part_right)
+        if self.compare_ab(best_right[0], 0.0) == 0:
+            return best_right
+        y_part_left = None
+        y_part_right = None
+        best_pair = best_left if self.compare_ab(best_left[0], best_right[0]) <= 0 else best_right
+        y_check = [el for el in y_ordering if self.compare_ab((el.x - mid) * (el.x - mid), best_pair[0]) < 0]
+        y_check_len = len(y_check)
+        for i in range(y_check_len):
+            for j in range(i+1, y_check_len):
+                dist_ij = y_check[i].y - y_check[j].y
+                if self.compare_ab(dist_ij * dist_ij, best_pair[0]) > 0:
+                    break
+                dist_ij = self.distance_2d(y_check[i], y_check[j])
+                if self.compare_ab(dist_ij, best_pair) < 0:
+                    best_pair = (dist_ij, y_check[i], y_check[j])
+        return best_pair
+
+    def compute_closest_pair_2d(self, pts):
+        self.x_ordering = sorted(pts, key=lambda pt_xy: pt_xy.x)
+        y_ordering = sorted(pts, key=lambda pt_xy: pt_xy.y)
+        return self.closest_pair_recursive_2d(0, len(pts), y_ordering)
+        
+                
 
     
 
