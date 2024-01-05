@@ -351,10 +351,9 @@ class GRAPH_ALGOS():
                 nodes_taken += 1
         self.mst_node_set.sort()
         return self.mst_node_set
+        
 
-
-
-class MATH_ALGOS:
+class Math_Algorithms:
     def __init__(self):
         self.n=None
         self.primes_sieve = []
@@ -468,7 +467,7 @@ class MATH_ALGOS:
 
     def mod_inverse(self, a, n): #needs test
         x, y, d = self.extended_euclid(a, n)
-        return -1 if d > 1 else self.mod(x, n)
+        return -1 if d > 1 else (x + n) % n
 
     # stanford icpc 2013-14
     def crt_helper(self, x, a, y, b): #needs test
@@ -1068,7 +1067,7 @@ def Geometry_Algorithms:
         
 
 
-def String_algorithms:
+def String_Algorithms:
     def __init__(self):
         self.n = 0
         self.text = ''
@@ -1091,7 +1090,14 @@ def String_algorithms:
         self.suffix_array = [i for i in range(self.text_len)]
         self.rank_arrary = [ord(self.text[i]) for i in range(self.text_len)]
         self.powers_of_2 = [2**i for i in range(32) if 2**i < self.text_len]
-            
+
+    def prepare_rolling_hash_data(self):
+        self.prime_p = 131
+        self.mod_m = 10**9 - 7
+        self.powers = [0] * self.text_len
+        self.h_vals = [0] * self.text_len
+        self.math_algos = Math_Algorithms()
+
     def kmp_preprocess(self, target):
         self.prepare_pattern_data(target)
         self.back_table = [0] * (self.pattern_len + 1)
@@ -1210,10 +1216,26 @@ def String_algorithms:
                 self.longest_common_prefix[i] > max_lcp):
                 ind, max_lcp = i, self.longest_common_prefix[i]
         return (max_lcp, ind)
-                    
         
-    
+    def compute_rolling_hash(self, new_text):
+        self.prepare_text_data(new_text)
+        self.prepare_rolling_hash_data()
+        self.powers[0] = 1
+        self.h_vals[0] = 0
+        for i in range(1, self.text_len):
+            self.powers[i] = (self.powers[i - 1] * self.prime_p) % self.mod_m
+        for i in range(self.text_len):
+            if i != 0:
+                self.h_vals[i] = self.h_vals[i - 1]
+            self.h_vals[i] = (self.h_vals[i] + (ord(self.text[i]) * self.powers[i]) % self.mod_m) % self.mod_m
 
+    def hash_fast(self, l, r):
+        if l == 0:
+            return self.h_vals[r]
+        ans = ((self.h_vals[r] - self.h_vals[l - 1]) % self.mod_m + self.mod_m) % self.mod_m
+        ans = (ans * self.math_algos.mod_inverse(self.powers[l], self.mod_m)) % self.mod_m
+        return ans
+        
 
         
 
