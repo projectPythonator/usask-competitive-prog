@@ -1206,7 +1206,7 @@ def String_algorithms:
     def compute_longest_common_substring(self):
         ind, max_lcp = 0, -1
         for i in range(1, self.text_len):
-            if (self.owner(self.suffix_array[i]) !+ self.owner(self.suffix_array[i - 1]) and
+            if (self.owner(self.suffix_array[i]) != self.owner(self.suffix_array[i - 1]) and
                 self.longest_common_prefix[i] > max_lcp):
                 ind, max_lcp = i, self.longest_common_prefix[i]
         return (max_lcp, ind)
