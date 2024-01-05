@@ -1066,8 +1066,152 @@ def Geometry_Algorithms:
         y_ordering = sorted(pts, key=lambda pt_xy: pt_xy.y)
         return self.closest_pair_recursive_2d(0, len(pts), y_ordering)
         
-                
 
+
+def String_algorithms:
+    def __init__(self):
+        self.n = 0
+        self.text = ''
+
+    def init_data(self, new_text):
+        self.n = len(new_text):
+        self.text = new_text
+
+    def prepare_text_data(self, new_text):
+        self.text = new_text
+        self.text_len = len(new_text)
+
+    def prepare_pattern_data(self, new_pattern):
+        self.pattern = new_pattern
+        self.pattern_len = len(new_pattern)
+
+    def prepare_suffix_array_data(self, new_len):
+        self.text_len = new_len
+        self.counts_len = max(300, self.text_len)
+        self.suffix_array = [i for i in range(self.text_len)]
+        self.rank_arrary = [ord(self.text[i]) for i in range(self.text_len)]
+        self.powers_of_2 = [2**i for i in range(32) if 2**i < self.text_len]
+            
+    def kmp_preprocess(self, target):
+        self.prepare_pattern_data(target)
+        self.back_table = [0] * (self.pattern_len + 1)
+        self.back_table[0], j = -1, -1
+        for i in range(self.pattern_len):
+            while j >= 0 and self.pattern[i] != self.pattern[j]:
+                j = self.back_table[j]
+            j += 1
+            self.back_table[i+1] = j
+
+    def kmp_search_find_indices(self):
+        ans = []
+        j = 0
+        for i in range(self.text_len):
+            while j >= 0 and self.text[i] != self.pattern[j]:
+                j = self.back_table[j]
+            j += 1
+            if j == self.pattern_len:
+                ans.append(1 + i - j)
+                j = self.back_table[j]
+        return ans
+
+    def suffix_array_preprocess(self, new_text):
+        self.prepare_text_data(''.join([new_text, chr(0)*100010]))
+        self.epare_suffix_array_data(len(new_text) + 1)
+
+    def suffix_array_counting_sort(self, k):
+        suffix_array_temp = [0] * self.text_len
+        counts = [0] * self.counts_len
+        ind = 0
+        counts[0] = self.text_len - (self.text_len - k)
+        for i in range(self.text_len - k):
+            counts[self.rank_array[i + k]] += 1
+        for i in range(self.counts_len):
+            counts_i = counts[i]
+            counts[i] = ind
+            ind += counts_i
+        for i in range(self.text_len):
+            pos = 0
+            if self.suffix_array[i] + k < self.text_len:
+                pos = self.rank_array[self.suffix_array[i] + k]
+            suffix_array_temp[counts[pos]] = self.suffix_array[i]
+            counts[pos] += 1
+        self.suffix_array = [el for el in suffix_array_temp]
+
+    def suffix_array_build_array(self):
+        for k in self.powers_of_2:
+            self.suffix_array_counting_sort(k)
+            self.suffix_array_counting_sort(0)
+            rank_array_temp = [0] * self.text_len
+            rank = 0
+            for i in range(1, self.text_len):
+                suffix_1 = self.suffix_array[i]
+                suffix_2 = self.suffix_array[i - 1]
+                r = r if (self.rank_array[suffix_1] == self.rank_array[suffix_2] and 
+                          self.rank_array[suffix_1 + k] == self.rank_array[suffix_2 + k] else r + 1)
+                rank_array_temp[suffix_1] = r
+            self.rank_array = [el for el in rank_array_temp]
+
+    def suffix_array_check_from_ind(self, ind):
+        for i in range(self.pattern_len):
+            if self.pattern[i] != self.text[ind + i]:
+                return 1 if ord(self.text[ind + i]) > ord(self.pattern[i]) else -1
+        return 0
+
+    def suffix_array_binary_search(self, lo, hi, comp_val):
+        while lo < hi:
+            mid = (lo + hi)//2
+            lo, hi = lo, mid if self.suffix_array_check_from_ind(self.suffix_array[mid]) > comp_val \
+                            else mid + 1, hi
+        return lo, hi
+
+    def suffix_array_string_matching(self, new_pattern):
+        self.prepare_text_data(new_pattern)
+        lo, _ = self.suffix_array_binary_search(0, self.text_len - 1, -1)
+        if self.suffix_array_check_from_ind(self.suffix_array[lo]) != 0:
+            return (-1, -1)
+        _, hi = self.suffix_array_binary_search(lo, self.text_len - 1, 0)
+        if self.suffix_array_check_from_ind(self.suffix_array[hi]) != 0:
+            hi -= 1
+        return (lo, hi)
+
+    def compute_longest_common_prefix(self):
+        permuted_lcp = [0] * self.text_len
+        phi = [0] * self.text_len
+        l = 0
+        phi[0] = -1
+        for i in range(1, self.text_len):
+            phi[self.suffix_array[i]] = self.suffix_array[i - 1]
+        for i in range(self.text_len):
+            if phi[i] == -1:
+                permuted_lcp[i] = 0
+                continue
+            while (i + l < self.text_len and 
+                   phi[i] + l < self.text_len and 
+                   self.text[i + l] == self.text[phi[i] + l]):
+                l += 1
+            permuted_lcp[i] = l
+            l = max(l - 1, 0)
+        self.longest_common_prefix = [permuted_lcp[el] for el in self.suffix_array]
+
+    def compute_longest_repeated_substring(self):
+        ind, max_lcp = 0, -1
+        for i in range(1, self.text_len):
+            if self.longest_common_prefix[i] > max_lcp:
+                ind, max_lcp = i, self.longest_common_prefix[i]
+        return (max_lcp, ind)
+
+    def owner(self, ind):
+        return 1 if ind < self.text_len - self.pattern_len - 1 else 2
+
+    def compute_longest_common_substring(self):
+        ind, max_lcp = 0, -1
+        for i in range(1, self.text_len):
+            if (self.owner(self.suffix_array[i]) !+ self.owner(self.suffix_array[i - 1]) and
+                self.longest_common_prefix[i] > max_lcp):
+                ind, max_lcp = i, self.longest_common_prefix[i]
+        return (max_lcp, ind)
+                    
+        
     
 
 
