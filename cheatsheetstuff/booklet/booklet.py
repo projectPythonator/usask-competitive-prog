@@ -578,7 +578,7 @@ class Math_Algorithms:
             self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
         return self.binomial[(n, k)]
 
-from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi, tau
+from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi, tau, atan2
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and 
 class pt_xy:
@@ -631,9 +631,63 @@ class pt_xyz:
     def __hash__(self):
         return hash((self.x, self.y, self.z))
 
-def Geometry_Algorithms:
+class Quad_Edge:
+    def __init__(self):
+        self.origin = pt_xy(0, 0)
+        self.rot = None
+        self.o_next = None
+        self.used = False
+
+    def rev(self): return self.rot.rot
+    def l_next(self): return self.rot.rev().o_next.rot
+    def o_prev(self): return self.rot.o_next.rot
+    def dest(self): return self.rev().origin
+
+class Quad_edge_data_structure:
     def __init__(self):
         pass
+
+    def make_edge(self, in_pt, out_pt):
+        e1 = Quad_Edge()
+        e2 = Quad_Edge()
+        e3 = Quad_Edge()
+        e4 = Quad_Edge()
+        e1.origin = in_pt
+        e2.origin = out_pt
+        e3.origin = pt_xy(2**63, 2**63)
+        e4.origin = pt_xy(2**63, 2**63)
+        e1.rot = e3
+        e2.rot = e4
+        e3.rot = e2
+        e4.rot = e1
+        e1.o_next = e1
+        e2.o_next = e2
+        e3.o_next = e4
+        e4.o_next = e3
+        return e1
+
+    def splice(self, a, b):
+        a.o_next.rot.o_next, b.o_next.rot.o_next =  b.o_next.rot.o_next, a.o_next.rot.o_next
+        a.o_next, b.o_next = b.o_next, a.o_next
+
+    def delete_edge(self, edge):
+        self.splice(edge, edge.o_prev())
+        self.splice(edge.rev(), edge.rev().o_prev())
+        del edge.rev().rot
+        del edge.rev()
+        del edge.rot
+        del edge
+
+    def connect(self, a, b):
+        e = self.make_edge(a.dest(), b.origin)
+        self.splice(e, a.l_next())
+        self.splice(e.rev(), b)
+        return e
+
+class Geometry_Algorithms:
+    def __init__(self):
+        self.quad_edges = Quad_Edge_Data_Structure()
+        
     # replacing epscmp and c_cmp for epscmp simply use compare_ab(a, 0) or math.isclose(a, 0)
     def compare_ab(self, a, b): return 0 if isclose(a, b) else -1 if a<b else 1
 
@@ -1064,6 +1118,143 @@ def Geometry_Algorithms:
         self.x_ordering = sorted(pts, key=lambda pt_xy: pt_xy.x)
         y_ordering = sorted(pts, key=lambda pt_xy: pt_xy.y)
         return self.closest_pair_recursive_2d(0, len(pts), y_ordering)
+
+    def delaunay_triangulation_slow(self, pts):
+        n = len(pts)
+        ans = []
+        z = [self.dot_product_2d(el, el) for el in pts]
+        x = [el.x for el in pts]
+        y = [el.y for el in pts]
+        for i in range(n-2):
+            for j in range(i + 1, n):
+                for k in range(i + 1, n):
+                    if j == k: continue
+                    xn = (y[j]-y[i])*(z[k]-z[i]) - (y[k]-y[i])*(z[j]-z[i])
+                    yn = (x[k]-x[i])*(z[j]-z[i]) - (x[j]-x[i])*(z[k]-z[i])
+                    zn = (x[j]-x[i])*(y[k]-y[i]) - (x[k]-x[i])*(y[j]-y[i])
+                    flag = zn < 0
+                    for m in range(n):
+                        if flag:
+                            flag = flag and ((x[m]-x[i])*xn + 
+                                             (y[m]-y[i])*yn + 
+                                             (z[m]-z[i])*zn <= 0)
+                        else:
+                            break
+                    if flag:
+                        ans.append((i, j, k))
+        return ans
+
+    def pt_left_of_edge_2d(self, pt, edge):
+        return 1 == self.point_c_rotation_wrt_line_ab_2d(pt, edge.origin, edge.dest())
+
+    def pt_right_of_edge_2d(self, pt, edge):
+        return -1 == self.point_c_rotation_wrt_line_ab_2d(pt, edge.origin, edge.dest())
+
+    def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
+        return (a1 * (b2 * c3 - c2 * b3) - 
+                a2 * (b1 * c3 - c1 * b3) + 
+                a3 * (b1 * c2 - c1 * b2))
+
+    def is_in_circle(self, a, b, c, d):
+        a_dot = self.self.dot_product_2d(a, a)
+        b_dot = self.self.dot_product_2d(b, b)
+        c_dot = self.self.dot_product_2d(c, c)
+        d_dot = self.self.dot_product_2d(d, d)
+        det = -self.det3_helper(b.x, b.y, b_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
+        det += self.det3_helper(a.x, a.y, a_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
+        det -= self.det3_helper(a.x, a.y, a_dot, b.x, b.y, b_dot, d.x, d.y, d_dot)
+        det += self.det3_helper(a.x, a.y, a_dot, b.x, b.y, b_dot, c.x, c.y, c_dot)
+        return det > 0
+        # use this if above doesn't work for what ever reason
+        # def angle(l, mid, r):
+        #     x = self.dot_product_2d(l-mid, r-mid)
+        #     y = self.cross_product_2d(l-mid, r-mid)
+        #     return atan2(x, y)
+        # kek = angle(a, b, c) + angle(c, d, a) - angle(b, c, d) - angle(d, a, b)
+        # return self.compare_ab(kek, 0.0) > 0
+
+    def build_triangulation(l, r, pts):
+        if r - l + 1 == 2:
+            res = self.quad_edges.make_edge(pts[l], pts[r])
+            return (res, res.rev())
+        if r - l + 1 == 3:
+            edge_a = self.quad_edges.make_edge(pts[l], pts[l + 1])
+            edge_b = self.quad_edges.make_edge(pts[l + 1], pts[r])
+            self.quad_edges.splce(edge_a.rev(), edge_b)
+            sg = self.point_c_rotation_wrt_line_ab_2d(pts[l], pts[l + 1], pts[r])
+            if sg == 0:
+                return (edge_a, edge_b.rev())
+            edge_c = self.quad_edges.connect(edge_b, edge_a)
+            return (edge_a, edge_b.rev()) if sg == 1 else (edge_c.rev(), edge_c)
+        mid = (l + r) // 2
+        ldo, ldi = self.build_triangulation(l, mid, p)
+        rdi, rdo = self.build_triangulation(mid + 1, r, p)
+        while True:
+            if self.pt_left_of_edge_2d(rdi.origin, ldi):
+                ldi = ldi.l_next()
+                continue
+            if self.pt_right_of_edge_2d(ldi.origin, rdi):
+                rdi = rdi.rev().o_next
+                continue
+            break
+        base_edge_l = self.quad_edges.connect(rdi.rev(), ldi)
+        if ldi.origin == ldo.origin:
+            ldo = base_edge_l.rev()
+        if rdi.origin == rlo.origin:
+            rdo = base_edge_l
+        while True:
+            l_cand_edge = base_edge_l.rev().o_next
+            if self.right_of(l_cand_edge.dest(), base_edge_l):
+                while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin, 
+                                        l_cand_edge.dest(), l_cand_edge.o_next.dest()):
+                    t = l_cand_edge.o_next
+                    self.quad_edges.delete_edge(l_cand_edge)
+                    l_cand_edge = t
+            r_cand_edge = base_edge_l.o_prev()
+            if self.right_of(r_cand_edge.dest(), base_edge_l):
+                    while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin, 
+                                            r_cand_edge.dest(), r_cand_edge.o_prev().dest()):
+                    t = r_cand_edge.o_prev()
+                    self.quad_edges.delete_edge(r_cand_edge)
+                    r_cand_edge = t
+            l_check = self.right_of(l_cand_edge.dest(), base_edge_l)
+            r_check = self.right_of(r_cand_edge.dest(), base_edge_l)
+            if not l_check and not r_check:
+                break
+            if (not l_check or 
+                    r_check and 
+                    self.is_in_circle(l_cand_edge.dest(), l_cand_edge.origin, r_cand_edge.origin, r_cand_edge.dest())):
+                base_edge_l = self.quad_edges.connect(r_cand_edge, base_edge_l.rev())
+            else:
+                base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
+        return (ldo, rdo)        
+            
+    def delaunay_triangulation_fast(self, pts):
+        pts.sort()
+        result = self.build_triangulation(0, len(pts) - 1, p)
+        edge = result[0]
+        edges = [edge]
+        while self.point_c_rotation_wrt_line_ab_2d(edge.o_next.dest(), edge.dest(), edge.origin) < 0:
+            edge = edge.o_next
+        def add_helper(pts, edge, edges):
+            cur = edge
+            while True:
+                cur.used = True
+                pts.append(cur.origin)
+                edges.append(cur.rev())
+                cur = cur.l_next()
+                if cur == edge:
+                    return
+        add_helper(pts, edge, edges)
+        pts = []
+        kek = 0
+        while kek < len(edges):
+            edge = edges[kek]
+            kek += 1
+            if not edge.used:
+                add_helper(pts, edge, edges)
+        ans = [(pts[i], pts[i + 1], pts[i + 2]) for i in range(0, len(pts), 3)]
+        return ans
         
 
 
