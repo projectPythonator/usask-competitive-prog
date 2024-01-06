@@ -48,6 +48,8 @@ class UnionFind:
 
 ######################################################################################
 #
+from collections import deque
+from heapq import heappush, heappop, heapreplace
 
 class GRAPH_ALGOS():
     INF=2**31
@@ -351,6 +353,76 @@ class GRAPH_ALGOS():
                 nodes_taken += 1
         self.mst_node_set.sort()
         return self.mst_node_set
+
+    def max_flow_bfs(self, source, sink):
+        self.dist = [-1] * self.num_nodes
+        self.path = [[-1, -1] for _ in range(self.num_nodes)]
+        self.queue = deque([source])
+        self.dist[s] = 0
+        while self.queue:
+            u = self.queue.pop_left()
+            if u == sink:
+                break
+            for idx in self.adj_list[u]:
+                v, cap, flow = self.edge_list[idx]
+                if cap - flow > 0 and self.dist[v] == -1:
+                    self.dist[v] = self.dist[u] + 1
+                    self.queue.append(v)
+                    self.path[v] = [u, idx]
+        return self.dist[sink] != -1
+
+    def max_flow_dfs(self, u, sink, flow_in):
+        if u == sink or flow_in == 0:
+            return flow_in
+        for i in range(self.last[u], len(self.adj_list[u])):
+            self.last[u] = i
+            v, edge_cap, edge_flow = self.edge_list[self.adj_list[u][i]]
+            if self.dist[v] != self.dist[u] + 1:
+                continue
+            pushed_flow = self.max_flow_dfs(v, sink, min(flow_in, edge_cap - edge_flow))
+            if pushed_flow != 0:
+                flow_in += pushed_flow
+                self.edge_list[self.adj_list[u][i]][2] = edge_flow
+                self.edge_list[self.adj_list[u][i] ^ 1][2] -= pushed_flow
+                return pushed_flow
+        return 0
+
+    def max_flow_send_one_flow(self, source, sink, flow_in):
+        if source == sink:
+            return flow_in
+        u, edge_ind = self.path[sink]
+        _, edge_cap, edge_flow = self.edge_list[edge_ind]
+        pushed_flow = self.max_flow_send_one_flow(sink, u, min(flow_in, edge_cap - edge_flow))
+        self.edge_list[edge_ind][2] = edge_flow + pushed_flow
+        self.edge_list[edge_ind ^ 1][2] -= pushed_flow
+        return pushed_flow
+
+    def max_flow_add_edge(self, u, v, capacity, directed):
+        if u == v:
+            return
+        self.edge_list.append([v, capacity, 0])
+        self.adj_list.append(len(self.edge_list) - 1)
+        self.edge_list.append([u, 0 if directed else capacity, 0])
+        self.adj_list.append(len(self.edge_list) - 1)
+
+    def edmonds_karp(self, source, sink):
+        max_flow = 0
+        while self.max_flow_bfs(source, sink):
+            flow = self.max_flow_send_one_flow(source, sink, inf)
+            if flow == 0:
+                break
+            max_flow += flow
+        return max_flow
+
+    def dinic(self, source, sink):
+        max_flow = 0
+        while self.max_flow_bfs(source, sink):
+            self.last = [0] * self.num_nodes
+            flow = self.send_one_flow(source, sink, inf)
+            while flow != 0:
+                max_flow += flow
+                flow = self.max_flow_dfs(source, sink, inf)
+        return max_flow
         
 
 class Math_Algorithms:
@@ -535,9 +607,6 @@ class Math_Algorithms:
         self.catalan[0] = 1
         for i in range(n-1):
             self.catalan[i+1] = ((4*i+2)%p * self.catalan[i]%p * pow(i+1, p-2, p)) % p
-
-    
-
 
     def catalan_n_mod_p_helper(self, table, val):
         self.prime_factorize(val)
