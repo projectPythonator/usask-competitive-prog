@@ -9,7 +9,7 @@ class UnionFind:
     def __init__(self, n):
         self.parents = list(range(n))
         self.ranks = [0]*n #optional optimzation 
-        self.sizes = [0]*n #optional information
+        self.sizes = [1]*n #optional information
         self.num_sets = n #optional information
         
     def find_set(self, u):
@@ -33,10 +33,10 @@ class UnionFind:
 
         if self.ranks[up] < self.ranks[vp]:
             self.parents[up] = vp
-            self.sizes[vp] = self.sizes[up]
+            self.sizes[vp] += self.sizes[up]
         elif self.ranks[vp] < self.ranks[up]:
             self.parents[vp] = up
-            self.sizes[up] = self.sizes[vp]
+            self.sizes[up] += self.sizes[vp]
         else:
             self.parents[vp] = up
             self.ranks[up] += 1
@@ -401,9 +401,9 @@ class GRAPH_ALGOS():
         if u == v:
             return
         self.edge_list.append([v, capacity, 0])
-        self.adj_list.append(len(self.edge_list) - 1)
+        self.adj_list[u].append(len(self.edge_list) - 1)
         self.edge_list.append([u, 0 if directed else capacity, 0])
-        self.adj_list.append(len(self.edge_list) - 1)
+        self.adj_list[v].append(len(self.edge_list) - 1)
 
     def edmonds_karp(self, source, sink):
         max_flow = 0
@@ -418,7 +418,7 @@ class GRAPH_ALGOS():
         max_flow = 0
         while self.max_flow_bfs(source, sink):
             self.last = [0] * self.num_nodes
-            flow = self.send_one_flow(source, sink, inf)
+            flow = self.max_flow_dfs(source, sink, inf)
             while flow != 0:
                 max_flow += flow
                 flow = self.max_flow_dfs(source, sink, inf)
