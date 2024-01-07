@@ -1502,6 +1502,38 @@ class Matrix:
         self.num_cols = m
         selt.mat = [[0 for _ in range(m)] for _ in range(n)]
 
+    def get_best_sawp_row(self, row, col):
+        best, pos = 0.0, -1
+        for i in range(row, self.num_rows):
+            if abs(self.mat[i][col]) > best:
+                best, pos = abs(self.mat[i][col]), i
+        return pos
+
+    def swap_rows(self, row_a, row_b):
+        for i in range(self.num_cols):
+            self.mat[row_a][i], self.mat[row_b][i] = self.mat[row_b][i], self.mat[row_a][i]
+
+    def divide_row(self, row, div):
+        for i in range(self.num_cols):
+            self.mat[row][i] /= div
+
+    def row_reduce_helper(self, i, row, val):
+        for j in range(self.num_cols):
+            self.mat[i][j] -= (val * self.mat[row][j])
+
+    def row_reduce(self, row, col, row_begin):
+        for i in range(row_begin, self.num_rows):
+            if i != row:
+                self.row_reduce_helper(i, row, self.mat[i][col])
+
+    def row_reduce_2(self, row, col, other):
+        for i in range(self.num_rows):
+            if i != row:
+                tmp = self.mat[i][col]
+                self.mat[i][col] = 0
+                self.row_reduce_helper(i, row, tmp)
+                other.row_reduce_helper(i, row, tmp)
+
     def __mul__(self, multiplier):
         product = Matrix(self.num_rows, self.num_rows)
         for k in range(self.num_rows):
@@ -1520,6 +1552,7 @@ class Matrix:
         for i in range(new_matrix.num_rows):
             for j in range(new_matrix.num_cols):
                 self.mat[i + a][j + b] = new_matrix.mat[i][j]
+
 
     def get_augmented_matrix(self, matrix_b):
         augmented = Matrix(self.num_rows + matrix_b.num_rows, 
@@ -1572,29 +1605,65 @@ class Matrix_Algorithhms:
     def init_data(self, n, m):
         self.init_constants(n, m)
 
-    def gauss_elimination(self, aug_Ab):
-        n = aug_Ab.num_rows-1
-        for i in range(n):
-            tmp, pos = 0.0, -1
-            for j in range(i, n):
-                if abs(aug_Ab.mat[j][i]) > tmp):
-                    tmp, pos = abs(aug_Ab.mat[j][i]), j
+    def get_rank_via_reduced_row_echelon(self, aug_Ab):
+        rank = 0
+        for col in range(aug_Ab.num_cols):
+            if rank == aug_Ab.num_rows:
+                break
+            pos = aug_Ab.get_best_sawp_row(rank, col)
             if pos != -1:
-                for k in range(n + 1):
-                    aug_Ab.mat[pos][k], aug_Ab.mat[i][k] = aug_Ab.mat[i][k], aug_Ab.mat[pos][k]
-                tmp = aug_Ab.mat[i][i]
-                for k in range(n + 1):
-                    aug_Ab.mat[i][k] /= tmp
-                for j in range(i + 1, n):
-                    tmp = aug_Ab.mat[j][i]
-                    for k in range(n + 1):
-                        aug_Ab.mat[j][k] -= (tmp * aug_Ab.mat[i][k])
-        for i in range(n, -1, -1):
+                aug_Ab.swap_rows(pos, rank)
+                aug_Ab.divide_row(rank, aug_Ab.mat[row][col])
+                aug_Ab.row_reduce(rank, col, 0)
+                rank += 1
+        return rank
+            
+    def gauss_elimination(self, aug_Ab):
+        rank = 0
+        for col in range(aug_Ab.num_cols):
+            if rank == aug_Ab.num_rows:
+                break
+            pos = aug_Ab.get_best_sawp_row(rank, col)
+            if pos != -1:
+                aug_Ab.swap_rows(pos, rank)
+                aug_Ab.divide_row(rank, aug_Ab.mat[row][col])
+                aug_Ab.row_reduce(rank, col, rank + 1)
+                rank += 1
+        n = aug_Ab.num_rows
+        for i in range(n - 1, -1, -1):
             for j in range(i):
                 aug_Ab.mat[j][n] -= (aug_Ab.mat[i][n] * aug_Ab.mat[j][i])
                 aug_Ab.mat[j][i] = 0
-                
-    
+
+    def gauss_jordan_elimination(self, a, b):
+        n, m = a.num_rows, b.num_cols
+        det = 1.0
+        irow, icol, ipivj, ipivk = [0] * n, [0] * n, set(range(n)), set(range(n))
+        for i in range(n):
+            pj, pk = -1, -1
+            for j in ipivj:
+                for k in ipivk:
+                    if pj == -1 or abs(a.mat[j][k]) > abs(a.math[pj][pk]:
+                        pj, pk = j, k
+            ipivj.remove(pk)
+            ipivk.remove(pk)
+            a.swap_rows(pj, pk)
+            b.swap_rows(pj, pk)
+            if pj != pk:
+                det = -det
+            irow[i], icol[i] = pj, pk
+            div = a.mat[pk][pk]
+            det /= div
+            a.mat[pk][pk] = 1.0
+            a.divide_row(pk, div)
+            b.divide_row(pk, div)
+            a.row_reduce_2(pk, pk, b)
+        for p in range(n - 1, -1, -1):
+            if irow[p] != icol[p]:
+                for k in range(n):
+                    a.mat[k][irow[p]], a.mat[k][icol[p]] = a.mat[k][icol[p]], a.mat[k][irow[p]]
+        return det
+            
 
             
     
