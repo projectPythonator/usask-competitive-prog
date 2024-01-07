@@ -1495,9 +1495,84 @@ def String_Algorithms:
         ans = ((self.h_vals[r] - self.h_vals[l - 1]) % self.mod_m + self.mod_m) % self.mod_m
         ans = (ans * self.math_algos.mod_inverse(self.powers[l], self.mod_m)) % self.mod_m
         return ans
-        
 
+class Matrix:
+    def __init__(self, n, m):
+        self.num_rows = n
+        self.num_cols = m
+        selt.mat = [[0 for _ in range(m)] for _ in range(n)]
+
+    def __mul__(self, multiplier):
+        product = Matrix(self.num_rows, self.num_rows)
+        for k in range(self.num_rows):
+            for i in range(self.num_rows):
+                if self.mat[i][k] != 0:
+                    for j in range(self.num_rows):
+                        product.mat[i][j] += (self.mat[i][k] * multiplier.mat[k][j])
+        return product 
+
+    def set_identity(self):
+        for i in range(base.num_rows):
+            for j in range(base.num_rows):
+                self.mat[i][j] = 1 if i==j else 0
+
+    def fill_matrix(self, new_matrix, a, b):
+        for i in range(new_matrix.num_rows):
+            for j in range(new_matrix.num_cols):
+                self.mat[i + a][j + b] = new_matrix.mat[i][j]
+
+    def get_augmented_matrix(self, matrix_b):
+        augmented = Matrix(self.num_rows + matrix_b.num_rows, 
+                           self.num_cols + matrix_b.num_cols)
+        augmented.fill_matrix(self, 0, 0)
+        augmented.fill_matrix(matrix_b, 0, self.num_cols)
+        return augmented
+
+    def get_determinant_matrix(self):
+        det = Matrix(self.num_rows, self.num_cols)
+        r = 1
+        det.fill_matrix(self, 0, 0)
+        for i in range(self.num_rows):
+            for j in range(self.num_rows):
+                while determinant.mat[j][i] != 0:
+                    ratio = det.mat[i][i] / det.mat[j][i]
+                    for k in range(i, self.num_rows):
+                        det.mat[i][k] -= (ratio * det.mat[j][k])
+                        det.mat[i][k], det.mat[j][k] = det.mat[j][k], det.mat[i][k]
+                    r = -r
+            r = r * det[i][i]
+        return r
+
+class Matrix_Algorithhms:
+    def __init__(self):
+        self.matrix_A = []
+        self.matrix_b = []
+        self.matrix_x = []
+        self.num_rows = 0
+        self.num_cols = 0
+
+    def matrix_exponentiation(self, base, power):
+        result = Matrix(base.num_rows, base.num_rows)
+        result.set_identity()
+        while power:
+            if power%2 == 1:
+                result = result * base
+            base = base * base
+            power //= 2
+        return result
         
+    
+    def init_matrices(self):
+        self.matrix_A = [[0 for _ in range(self.num_rows)] for _ in range(self.num_rows)] 
+        self.matrix_b = [[0 for _ in range(self.num_cols)] for _ in range(self.num_rows)] 
+    
+    def init_constants(self, n, m):
+        self.num_rows = n
+        self.num_cols = m
+
+    def init_data(self, n, m):
+        self.init_constants(n, m)
+    
 
             
     
