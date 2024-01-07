@@ -1560,7 +1560,6 @@ class Matrix_Algorithhms:
             base = base * base
             power //= 2
         return result
-        
     
     def init_matrices(self):
         self.matrix_A = [[0 for _ in range(self.num_rows)] for _ in range(self.num_rows)] 
@@ -1572,6 +1571,29 @@ class Matrix_Algorithhms:
 
     def init_data(self, n, m):
         self.init_constants(n, m)
+
+    def gauss_elimination(self, aug_Ab):
+        n = aug_Ab.num_rows-1
+        for i in range(n):
+            tmp, pos = 0.0, -1
+            for j in range(i, n):
+                if abs(aug_Ab.mat[j][i]) > tmp):
+                    tmp, pos = abs(aug_Ab.mat[j][i]), j
+            if pos != -1:
+                for k in range(n + 1):
+                    aug_Ab.mat[pos][k], aug_Ab.mat[i][k] = aug_Ab.mat[i][k], aug_Ab.mat[pos][k]
+                tmp = aug_Ab.mat[i][i]
+                for k in range(n + 1):
+                    aug_Ab.mat[i][k] /= tmp
+                for j in range(i + 1, n):
+                    tmp = aug_Ab.mat[j][i]
+                    for k in range(n + 1):
+                        aug_Ab.mat[j][k] -= (tmp * aug_Ab.mat[i][k])
+        for i in range(n, -1, -1):
+            for j in range(i):
+                aug_Ab.mat[j][n] -= (aug_Ab.mat[i][n] * aug_Ab.mat[j][i])
+                aug_Ab.mat[j][i] = 0
+                
     
 
             
