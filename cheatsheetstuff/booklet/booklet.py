@@ -52,7 +52,7 @@ class UnionFind:
 from collections import deque
 from heapq import heappush, heappop, heapreplace
 
-class GRAPH_ALGOS():
+class Graph_Algorithms():
     INF=2**31
     UNVISITED = -1
     EXPLORED  = -2
