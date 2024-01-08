@@ -274,6 +274,46 @@ class Graph_Algorithms():
                     self.parent[v] = u
                     heappush(self.heap, (self.dist[v], v))
 
+    def articulation_point_and_bridge_helper_via_dfs(self, u): # need to rego over this and test it *** not as confident as the other code atm since have not really used it to solve a problem
+        """Auxiliary that preformas the recursive traversal for the caller.
+
+        Complexity per call: Time: O(|V|), Space O(|V|)
+        Uses: 
+        """
+        self.visited[u] = self.dfs_counter
+        self.low_values[u] = self.visited[u]
+        self.dfs_counter += 1
+        for v in self.adj_list[u]:
+            if self.visited[v] == UNVISITED:
+                self.parent[v] = u
+                if u == self.dfs_root:
+                    self.root_children += 1
+                self.articulation_point_and_bridge_helper_via_dfs(v)
+                if self.low_values[v] >= self.visited[u]:
+                    self.articulation_points[u] = 1
+                    if self.low_values[v] > self.visited[u]:
+                        print((u, v))
+                self.low_values[u] = min(self.low_values[u], self.low_values[v])
+            elif v != self.parents[u]:
+                self.low_values[u] = min(self.low_values[u], self.visited[v])
+
+    def articulation_points_and_bridges_via_dfs(self):
+        """Generates the name on an adj_list based graph.
+
+        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Uses: finding the sets of single edge and vertex removals that disconnect the graph
+        """
+        self.dfs_counter = 0
+        for u in range(self.num_nodes):
+            if self.visited[u] == UNVISITED:
+                self.dfs_root = u
+                self.root_children = 0
+                self.articulation_point_and_bridge_helper_via_dfs(u)
+                self.articulation_points[self.dfs_root] = (self.root_children > 1)
+        for i,u in enumerate(self.articulation_points):
+            if u:
+                print("vertix {}".format(i))
+
     def dfs_bipartite_checker(self):
         pass # find code for this later
 
@@ -298,38 +338,7 @@ class Graph_Algorithms():
         for u in range(self.num_nodes):
             if self.visited[u]==UNVISITED:
                 self.dfs_cycle_checker_helper(u)
-    # dfs_articulation_point_and_bridge_helper tested in advent of code for  removing 3 nodes from a graph on removing the last node 
-    # seems to work fine not sure if hidden bugs still here 
-    def dfs_articulation_point_and_bridge_helper(self, u): # need to rego over this and test it *** not as confident as the other code atm since have not really used it to solve a problem
-        self.visited[u] = self.dfs_counter
-        self.low_values[u] = self.visited[u]
-        self.dfs_counter += 1
-        for v in self.adj_list[u]:
-            if self.visited[v]==UNVISITED:
-                self.parent[v] = u
-                if u==self.dfs_root:
-                    self.root_children += 1
-                self.dfs_articulation_point_and_bridge_helper(v)
-                if self.low_values[v] >= self.visited[u]:
-                    self.articulation_points[u] = 1
-                if self.low_values[v] > self.visited[u]:
-                    print("bridge?")
-                self.low_values[u] = min(self.low_values[u], self.low_values[v])
-            elif v != self.parents[u]:
-                self.low_values[u] = min(self.low_values[u], self.visited[v])
-
-    def dfs_articulation_point_and_bridge(self):
-        self.dfs_counter = 0
-        for u in range(self.num_nodes):
-            if self.visited[u]==UNVISITED:
-                self.dfs_root = u
-                self.root_children = 0
-                self.dfs_articulation_point_and_bridge_helper(u)
-                self.articulation_points[self.dfs_root] = (self.root_children>1)
-        for i,u in enumerate(self.articulation_points):
-            if u:
-                print("vertix {}".format(i))
-
+  
     def dfs_scc_kosaraju_pass1(self, u):
         self.not_visited.remmove(u)
         for v in self.adj_list[u]:
