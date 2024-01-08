@@ -273,6 +273,25 @@ class Graph_Algorithms():
                     self.dist[v] = cur_dist + weight
                     self.parent[v] = u
                     heappush(self.heap, (self.dist[v], v))
+    
+    def all_pairs_shortest_path_floyd_warshall(self): #needs test
+        """Computes essentially a matrix operation on a graph.
+
+        Complexity per call: Time: O(|V|^3), Space O(|V|^2)
+        Uses: name, transitive closure, maximin and minimax path, cheapest negative cycle
+        finding diameter of a graph, finding SCC of a directed graph
+        """
+        for k in range(self.num_nodes):
+            for i in range(self.num_nodes):
+                for j in range(self.num_nodes):
+                    self.matrix[i][j] = min(self.matrix[i][j], self.matrix[i][k]+self.matrix[k][j])
+
+    def apsp_floyd_warshall_neg_cycles(self): #needs test
+        for i in range(self.num_nodes):
+            for j in range(self.num_nodes):
+                for k in range(self.num_nodes):
+                    if self.matrix[k][k]<0 and self.matrix[i][k]!=INF and self.matrix[k][j]!=INF:
+                        self.matrix[i][j]=-INF
 
     def articulation_point_and_bridge_helper_via_dfs(self, u): # need to rego over this and test it *** not as confident as the other code atm since have not really used it to solve a problem
         """Auxiliary that preformas the recursive traversal for the caller.
@@ -410,19 +429,6 @@ class Graph_Algorithms():
 
     def bfs_cycle_checker(self):
         pass #need to get the implimentation 
-
-    def apsp_floyd_warshall(self): #needs test
-        for k in range(self.num_nodes):
-            for i in range(self.num_nodes):
-                for j in range(self.num_nodes):
-                    self.matrix[i][j] = min(self.matrix[i][j], self.matrix[i][k]+self.matrix[k][j])
-
-    def apsp_floyd_warshall_neg_cycles(self): #needs test
-        for i in range(self.num_nodes):
-            for j in range(self.num_nodes):
-                for k in range(self.num_nodes):
-                    if self.matrix[k][k]<0 and self.matrix[i][k]!=INF and self.matrix[k][j]!=INF:
-                        self.matrix[i][j]=-INF
 
     def max_flow_bfs(self, source, sink):
         self.dist = [-1] * self.num_nodes
