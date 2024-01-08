@@ -252,6 +252,28 @@ class Graph_Algorithms():
                 if self.in_degree[v] <= 0:
                     heappush(self.heap, v)
 
+    def single_source_shortest_path_dijkstras(self, source, sink): #needs test
+        """Its dijkstras path finder using heaps.
+
+        Complexity per call: Time: O(|E| log |V|), Space O(|E|)
+        Uses: used for finding the weighted shortest path varients
+        source: - input: can be a single nodes or list of nodes
+        sink: --- input: the goal node
+        """
+        heappush(self.heap, (0, source))
+        self.dist[source] = 0
+        self.parent[source] = source
+        while self.heap:
+            cur_dist, u = heappop(self.heap)
+            if self.dist[u] < cur_dist:
+                continue
+            # if u == sink: return cur_dist #uncomment this line for fast return
+            for v, weight in self.adj_list[u].items():
+                if (self.dist[v] > cur_dist + weight):
+                    self.dist[v] = cur_dist + weight
+                    self.parent[v] = u
+                    heappush(self.heap, (self.dist[v], v))
+
     def dfs_bipartite_checker(self):
         pass # find code for this later
 
@@ -379,23 +401,6 @@ class Graph_Algorithms():
 
     def bfs_cycle_checker(self):
         pass #need to get the implimentation 
-        
-    def sssp_dijkstras_heaps(self, start, end): #needs test
-        from heapq import heappush, heappop
-        heappush(self.heap, (0, start))
-        self.dist[start] = 0
-        self.parent[start] = start
-        while self.heap:
-            cur_dist, u = heappop(self.heap)
-            if self.dist[u]<cur_dist:
-                continue
-            #if u==end: return cur_dist #uncomment this line for fast return
-            for v, weight in self.adj_list[u].items():
-                if self.dist[v]>cur_dist+weight:
-                    self.dist[v] = cur_dist+weight
-                    self.parent[v] = u
-                    heappush(self.heap, (self.dist[v], v))
-        return self.dist[end]
 
     def apsp_floyd_warshall(self): #needs test
         for k in range(self.num_nodes):
