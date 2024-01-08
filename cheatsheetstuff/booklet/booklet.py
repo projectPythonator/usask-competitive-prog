@@ -192,6 +192,16 @@ class Graph_Algorithms():
                 nodes_taken += 1
         self.mst_node_set.sort()
 
+    def bfs_vanilla(self, start, end): #needs test
+        from collections import deque
+        self.queue.append(start); self.dist[start] = 0
+        while queue:
+            u = self.queue.popleft()
+            for v in self.adj_list[u]:
+                if self.dist[v]>self.dist[u]+1:
+                    self.dist[v]=self.dist[u]+1
+                    self.queue.append(v)
+
     def dfs_topology_sort_helper(self, u):
         self.visited[u] = VISITED
         for v,w in self.adj_list[u]:
@@ -311,16 +321,6 @@ class Graph_Algorithms():
             if self.num[u]==INF:
                 self.dfs_scc_tarjans_helper(u)
         pass
-
-    def bfs_vanilla(self, start, end): #needs test
-        from collections import deque
-        self.queue.append(start); self.dist[start] = 0
-        while queue:
-            u = self.queue.popleft()
-            for v in self.adj_list[u]:
-                if self.dist[v]>self.dist[u]+1:
-                    self.dist[v]=self.dist[u]+1
-                    self.queue.append(v)
 
     def bfs_kahns_topological_sort(self):
         from heapq import heappush, heappop
