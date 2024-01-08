@@ -132,15 +132,21 @@ class Graph_Algorithms():
                     self.queue.append((next_row, next_col))
 
     #will kill the edge list but will save memory
-    def mst_kruskals_heaps(self):  #needs test
+    def min_spanning_tree_via_kruskals_and_heaps(self):  #needs test
+        """Computes mst of graph G stored in edge_list, space optimized via heap.
+
+        Complexity: Time: O(|E| log |V|), Space O(|V|) + O(|V|) (from union find)
+        Notes: since we use a heap space is O(|V|) instead of O(|V| log |V|) from sort
+        however edge_list is consumed.
+        """
         ufds = Union_Find_Disjoint_Sets(self.num_nodes)
         heapify(self.edge_list)
-        while self.edge_list and  UF.num_sets>1:
-            w,u,v = heappop(self.edge_list) #use w, uv = ... for single cord storage
+        while self.edge_list and ufds.num_sets > 1:
+            w, u, v = heappop(self.edge_list) # use w, uv = ... for single cord storage
             #v,u = uv%self.num_nodes, uv//self.num_nodes
-            if not UF.is_same_set(u,v):
-                self.mst_node_set.append((w,u,v))
-                UF.union_set(u,v)
+            if not ufds.is_same_set(u, v):
+                self.mst_node_set.append((w, u, v))
+                ufds.union_set(u, v)
         return self.mst_node_set
         
     def mst_prims_process_complete(self, u):  #needs test
