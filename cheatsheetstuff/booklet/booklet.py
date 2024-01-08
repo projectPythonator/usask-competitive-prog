@@ -209,7 +209,7 @@ class Graph_Algorithms():
                     self.queue.append(v)
 
     def topology_sort_via_tarjan_helper(self, u):
-        """auxiliary topology sort function used to recursively explore via dfs
+        """auxiliary function used to recursively explore via dfs
 
         Complexity per call: Time: O(|V|), Space O(|V|) at deepest point
         Uses: to build our node set in post order traversal
@@ -224,7 +224,7 @@ class Graph_Algorithms():
         """Compute a topology sort via tarjan method, on adj_list.
 
         Complexity per call: Time: O(|V| + |E|), Space O(|V|)
-        Uses: produces a DAG, topology sorted graph, think of dependancies
+        Uses: produces a DAG, topology sorted graph, build dependancies
         """
         self.topo_sort_node_set = []
         for u in range(self.num_nodes):
@@ -278,8 +278,8 @@ class Graph_Algorithms():
         """Computes essentially a matrix operation on a graph.
 
         Complexity per call: Time: O(|V|^3), Space O(|V|^2)
-        Uses: name, transitive closure, maximin and minimax path, cheapest negative cycle
-        finding diameter of a graph, finding SCC of a directed graph
+        Uses: Shortest path, Transitive closure, Maximin and Minimax path, Cheapest negative cycle, 
+        Finding diameter of a graph, Finding SCC of a directed graph.
         """
         for k in range(self.num_nodes):
             for i in range(self.num_nodes):
