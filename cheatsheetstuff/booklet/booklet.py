@@ -50,7 +50,7 @@ class Union_Find_Disjoint_Sets:
 ######################################################################################
 #
 from collections import deque
-from heapq import heappush, heappop, heapreplace
+from heapq import heappush, heappop, heapreplace, heapify
 
 class Graph_Algorithms():
     INF=2**31
@@ -133,7 +133,7 @@ class Graph_Algorithms():
 
     #will kill the edge list but will save memory
     def mst_kruskals_heaps(self):  #needs test
-        UF=UnionFind(self.num_nodes)
+        ufds = Union_Find_Disjoint_Sets(self.num_nodes)
         heapify(self.edge_list)
         while self.edge_list and  UF.num_sets>1:
             w,u,v = heappop(self.edge_list) #use w, uv = ... for single cord storage
