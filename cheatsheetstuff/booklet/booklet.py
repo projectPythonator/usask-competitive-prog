@@ -119,7 +119,7 @@ class Graph_Algorithms():
         """Computes flood fill graph traversal via recursive breadth first search.
 
         Complexity: Time: O(|V| + |E|), Space O(|V|)
-        Uses: For Grids and 2d space: same as dfs plus shortest connected path 
+        Uses: For Grids and 2d space: same as dfs with addition of shortest connected path 
         """
         self.queue = deque([(start_row, start_col)])
         while self.queue:
