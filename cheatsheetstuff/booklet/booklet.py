@@ -2,7 +2,7 @@
 #union find 
 class UnionFind:
     ''' 
-    
+    Union find disjoint sets 
     space O(n) --> N*3 or N*2 for now 
     search time α(n) -->  inverse ackerman practically constant 
     insert time O(1) --> 
@@ -86,24 +86,50 @@ class Graph_Algorithms():
         #self.topo_sort_node_set = []
         #self.articulation_points = []
     
-    def append_edge_list(self, w, u, v):
-        self.edge_list.append((w,u,v))
+    def add_directed_edge_to_edge_list(self, w, u, v):
+        """Adds edge to edge_list and updates num_edges."""
+        self.edge_list.append((w, u, v))
         self.num_edges += 1
 
-    def update_adj_list(self, w, u, v):
+    def add_directed_edge_to_adj_list(self, w, u, v):
+        """Adds or updates an edge in the adj_list."""
         self.adj_list[u][v] = w
     
-    def update_edge_list(self, edge, w, u, v):
+    def update_directed_edge_to_edge_list(self, edge, w, u, v):
+        """Updates edge in edge_list with a different one."""
         self.edge_list[edge] = (w,u,v)
-        #uv = u*self.num_nodes + v; self.edge_list[edge] = (w,uv)
 
-    def dfs_flood_fill(self, row, col, old_val, new_val): #needs test
-        ans,self.matrix[row][col]=1,new_val
-        for row_mod,col_mod in dir_rc:
-            if 0<=row<self.num_rows and 0<=col<self.num_cols:
-                if self.matrix[row][col]==old_val:
-                    ans += self.dfs_flood_fill(row+row_mod, col+col_mod, old_val, new_val)
-        return ans
+    def flood_fill_via_dfs(self, row, col, old_val, new_val): #needs test
+        """Computes flood fill graph traversal via recursive depth first search.
+
+        Complexity: Time: O(|V| + |E|), Space O(|V|) stack space
+        Uses: For Grids and 2d space: region colouring, connectivity, area/island size, misc 
+        row, col: --------- input: integer pair representing current grid position 
+        old_val, new_val: - input: unexplored state, the value of an explored state
+        """
+        self.matrix[row][col] = new_val
+        for row_mod, col_mod in self.dir_rc:
+            next_row, next_col = row + row_mod, col + col_mod
+            if (0 <= next_row < self.num_rows 
+                and 0 <= next_col < self.num_cols 
+                and self.matrix[next_row][next_col] == old_val):
+                self.dfs_flood_fill(next_row, next_col, old_val, new_val)
+
+    def flood_fill_via_bfs(self, start_row, start_col, old_val, new_val):  #needs test
+        """Computes flood fill graph traversal via recursive breadth first search.
+
+        Complexity: Time: O(|V| + |E|), Space O(|V|)
+        Uses: For Grids and 2d space: same as dfs plus shortest connected path 
+        """
+        self.queue = deque([(start_row, start_col)])
+        while self.queue:
+            row, col = self.queue.popleft()
+            for row_mod, col_mod in self.dir_rc:
+                next_row, next_col = row + row_mod, col + col_mod
+                if (0 <= next_row < self.num_rows 
+                    and 0 <= next_col < self.num_cols
+                    and self.matrx[next_row][next_col] == old_val):
+                    self.queue.append((next_row, next_col))
 
     def dfs_topology_sort_helper(self, u):
         self.visited[u] = VISITED
@@ -234,16 +260,6 @@ class Graph_Algorithms():
                 if self.dist[v]>self.dist[u]+1:
                     self.dist[v]=self.dist[u]+1
                     self.queue.append(v)
-
-    def bfs_flood_fill(self, start_row, start_col, old_val, new_val):  #needs test
-        self.stk.append(start_row, start_col)
-        while self.stk:
-            row,col = self.stk.pop()
-            if 0<=row<self.num_rows and 0<=col<self.num_cols:
-                if self.matrx[row][col]==old_val:
-                    self.matrx[row][col] = new_val
-                    for row_mod,col_mod in dir_rc:
-                        self.stkk.append((row+row_mod, col+col_mod))
 
     def bfs_kahns_topological_sort(self):
         from heapq import heappush, heappop
