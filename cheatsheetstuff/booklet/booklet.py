@@ -1,6 +1,6 @@
 #data structurea
 #union find 
-class UnionFind:
+class Union_Find_Disjoint_Sets:
     ''' 
     Union find disjoint sets 
     space O(n) --> N*3 or N*2 for now 
@@ -130,6 +130,45 @@ class Graph_Algorithms():
                     and 0 <= next_col < self.num_cols
                     and self.matrx[next_row][next_col] == old_val):
                     self.queue.append((next_row, next_col))
+
+    #will kill the edge list but will save memory
+    def mst_kruskals_heaps(self):  #needs test
+        UF=UnionFind(self.num_nodes)
+        heapify(self.edge_list)
+        while self.edge_list and  UF.num_sets>1:
+            w,u,v = heappop(self.edge_list) #use w, uv = ... for single cord storage
+            #v,u = uv%self.num_nodes, uv//self.num_nodes
+            if not UF.is_same_set(u,v):
+                self.mst_node_set.append((w,u,v))
+                UF.union_set(u,v)
+        return self.mst_node_set
+        
+    def mst_prims_process_complete(self, u):  #needs test
+        self.not_visited.remove(u)
+        for v in self.not_visited:
+            uv_dist = get_dist(u, v)
+            if uv_dist<=self.dist[v]:
+                self.dist[v] = uv_dist
+                heappush(self.heap, (uv_dist, v, u))
+    
+    def mst_prims_process(self, u): #needs test
+        self.not_visited.remove(u)
+        for v, w in self.adj_list[u].items():
+            if v in self.not_visited and w<=self.dist[v]:
+                self.dist[v] = w
+                heappush(self.heap, (w, v, u))
+    
+    def mst_prims(self):  #needs test
+        self.prims_process(0)
+        nodes_taken = 0
+        while self.heap and nodes_taken<self.num_nodes:
+            w,v,u = heappop(self.heap)
+            if v in self.not_visited:
+                self.prims_process(v)
+                self.mst_node_set.append((w,v,u))
+                nodes_taken += 1
+        self.mst_node_set.sort()
+        return self.mst_node_set
 
     def dfs_topology_sort_helper(self, u):
         self.visited[u] = VISITED
@@ -327,49 +366,6 @@ class Graph_Algorithms():
                 for k in range(self.num_nodes):
                     if self.matrix[k][k]<0 and self.matrix[i][k]!=INF and self.matrix[k][j]!=INF:
                         self.matrix[i][j]=-INF
-
-    #will kill the edge list but will save memory
-    def mst_kruskals_heaps(self):  #needs test
-        from heapq import heapify, heappop
-        UF=UnionFind(self.num_nodes)
-        heapify(self.edge_list)
-        while self.edge_list and  UF.num_sets>1:
-            w,u,v = heappop(self.edge_list) #use w, uv = ... for single cord storage
-            #v,u = uv%self.num_nodes, uv//self.num_nodes
-            if not UF.is_same_set(u,v):
-                self.mst_node_set.append((w,u,v))
-                UF.union_set(u,v)
-        return self.mst_node_set
-        
-    def mst_prims_process_complete(self, u):  #needs test
-        from heapq import heappush
-        self.not_visited.remove(u)
-        for v in self.not_visited:
-            uv_dist = get_dist(u, v)
-            if uv_dist<=self.dist[v]:
-                self.dist[v] = uv_dist
-                heappush(self.heap, (uv_dist, v, u))
-    
-    def mst_prims_process(self, u): #needs test
-        from heapq import heappush
-        self.not_visited.remove(u)
-        for v, w in self.adj_list[u].items():
-            if v in self.not_visited and w<=self.dist[v]:
-                self.dist[v] = w
-                heappush(self.heap, (w, v, u))
-    
-    def mst_prims(self):  #needs test
-        from heapq import heappop
-        self.prims_process(0)
-        nodes_taken = 0
-        while self.heap and nodes_taken<self.num_nodes:
-            w,v,u = heappop(self.heap)
-            if v in self.not_visited:
-                self.prims_process(v)
-                self.mst_node_set.append((w,v,u))
-                nodes_taken += 1
-        self.mst_node_set.sort()
-        return self.mst_node_set
 
     def max_flow_bfs(self, source, sink):
         self.dist = [-1] * self.num_nodes
