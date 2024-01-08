@@ -192,8 +192,7 @@ class Graph_Algorithms():
                 nodes_taken += 1
         self.mst_node_set.sort()
 
-    def bfs_vanilla(self, start, end): #needs test
-        from collections import deque
+    def breadth_first_search_vanilla_template(self, start, end): #needs test
         self.queue.append(start); self.dist[start] = 0
         while queue:
             u = self.queue.popleft()
