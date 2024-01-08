@@ -208,19 +208,49 @@ class Graph_Algorithms():
                     self.dist[v] = self.dist[u] + 1
                     self.queue.append(v)
 
-    def dfs_topology_sort_helper(self, u):
+    def topology_sort_via_tarjan_helper(self, u):
+        """auxiliary topology sort function used to recursively explore via dfs
+
+        Complexity per call: Time: O(|V|), Space O(|V|) at deepest point
+        Uses: to build our node set in post order traversal
+        """
         self.visited[u] = VISITED
-        for v,w in self.adj_list[u]:
-            if self.visited[v]==UNVISITED:
-                self.dfs_topology_sort_helper(v)
+        for v in self.adj_list[u]:
+            if self.visited[v] == UNVISITED:
+                self.topology_sort_via_tarjan_helper(v)
         self.topo_sort_node_set.append(u)
         
-    def dfs_topology_sort(self):
+    def topology_sort_via_tarjan(self):
+        """Compute a topology sort via tarjan method, on adj_list.
+
+        Complexity per call: Time: O(|V| + |E|), Space O(|V|)
+        Uses: produces a DAG, topology sorted graph, think of dependancies
+        """
         self.topo_sort_node_set = []
         for u in range(self.num_nodes):
-            if self.visited[v]==UNVISITED:
-                self.dfs_topology_sort_helper(u)
+            if self.visited[v] == UNVISITED:
+                self.topology_sort_via_tarjan_helper(u)
         self.topo_sort_node_set = self.topo_sort_node_set[::-1]
+
+    def topology_sort_via_kahns(self):
+        """Compute a topology sort via kahns method, on adj_list.
+
+        Complexity per call: Time: O(|E| log |V|), Space O(|V|)
+        Uses: same as tarjans version however the ordering is different
+        bonus: heaps allow for custom ordering (i.e use lowest indices first)
+        """
+        for list_of_u in self.adj_list:
+            for v in list_of_u:
+                self.in_degree[v] += 1
+        for u in range(self.num_nodes):
+            if 0 == self.in_degree[u]:
+                heapppush(self.heap, u)
+        while self.heap:
+            u = heappop(self.heap)
+            for v in self.adj_list[u]:
+                self.in_degree[v] -= 1
+                if self.in_degree[v] <= 0:
+                    heappush(self.heap, v)
 
     def dfs_bipartite_checker(self):
         pass # find code for this later
@@ -327,21 +357,6 @@ class Graph_Algorithms():
             if self.num[u]==INF:
                 self.dfs_scc_tarjans_helper(u)
         pass
-
-    def bfs_kahns_topological_sort(self):
-        from heapq import heappush, heappop
-        for list_of_u in self.adj_list:
-            for v in list_of_u:
-                self.in_degree[v] += 1
-        for u in range(self.num_nodes):
-            if 0==self.in_degree[u]:
-                heapppush(self.heap, u)
-        while self.heap:
-            u = heappop(self.heap)
-            for v in adj_list[u]:
-                self.in_degree[v] -= 1
-                if self.in_degree[v] <= 0:
-                    heappush(self.heap, v)
 
     def bfs_bipartite_check_helper(self, start):
         from collections import deque
