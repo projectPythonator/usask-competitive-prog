@@ -135,8 +135,9 @@ class Graph_Algorithms():
     def min_spanning_tree_via_kruskals_and_heaps(self):  #needs test
         """Computes mst of graph G stored in edge_list, space optimized via heap.
 
-        Complexity: Time: O(|E| log |V|), Space O(|V|) + O(|V|) (from union find)
-        Notes: since we use a heap space is O(|V|) instead of O(|V| log |V|) from sort
+        Complexity: Time: O(|E| log |V|), Space O(|E|) + Union_Find
+        Usage: finding min spanning tree, subgraph, forest. max span tree, 2nd best span tree
+        Notes: since we use a heap space is O(|E|) instead of O(|E| log |E|) from sort
         however edge_list is consumed.
         """
         ufds = Union_Find_Disjoint_Sets(self.num_nodes)
@@ -147,34 +148,49 @@ class Graph_Algorithms():
             if not ufds.is_same_set(u, v):
                 self.mst_node_set.append((w, u, v))
                 ufds.union_set(u, v)
-        return self.mst_node_set
         
-    def mst_prims_process_complete(self, u):  #needs test
+    def min_spanning_tree_prims_process_complete(self, u):  #needs test
+        """auxiliary mst prims function for visiting all neighbours of node u on complete graph.
+
+        Complexity per call: Time: O(|V|), Space: O(1)
+        Usage: when we are using adj matrix this is probably a better function
+        u: input: a node which we observe its neibhours
+        """
         self.not_visited.remove(u)
         for v in self.not_visited:
-            uv_dist = get_dist(u, v)
-            if uv_dist<=self.dist[v]:
-                self.dist[v] = uv_dist
-                heappush(self.heap, (uv_dist, v, u))
-    
-    def mst_prims_process(self, u): #needs test
-        self.not_visited.remove(u)
-        for v, w in self.adj_list[u].items():
-            if v in self.not_visited and w<=self.dist[v]:
+            w = self.matrix[u][v]
+            if w <= self.dist[v]:
                 self.dist[v] = w
                 heappush(self.heap, (w, v, u))
     
-    def mst_prims(self):  #needs test
-        self.prims_process(0)
+    def min_spanning_tree_prims_process(self, u): #needs test
+        """auxiliary mst prims function for visiting all neighbours of node u.
+
+        Complexity per call: Time: O(|V| log |V|), Space: O(|V|) increase
+        Usage: when we are using adj_list
+        u: input: a node which we observe its neibhours
+        """
+        self.not_visited.remove(u)
+        for v, w in self.adj_list[u].items():
+            if w <= self.dist[v] and v in self.not_visited:
+                self.dist[v] = w
+                heappush(self.heap, (w, v, u))
+    
+    def min_spanning_tree_via_prims(self):  #needs test
+        """Computes mst of graph G stored in adj_list.
+
+        Complexity: Time: O(|E| log |V|) or O(|V|^2), Space: O(|E|) or O(|V|^2)
+        Usage: same as kruskals
+        """
+        self.min_spanning_tree_prims_process(0)
         nodes_taken = 0
-        while self.heap and nodes_taken<self.num_nodes:
-            w,v,u = heappop(self.heap)
+        while self.heap and nodes_taken < self.num_nodes:
+            w, v, u = heappop(self.heap)
             if v in self.not_visited:
-                self.prims_process(v)
-                self.mst_node_set.append((w,v,u))
+                self.min_spanning_tree_prims_process(v)
+                self.mst_node_set.append((w, v, u))
                 nodes_taken += 1
         self.mst_node_set.sort()
-        return self.mst_node_set
 
     def dfs_topology_sort_helper(self, u):
         self.visited[u] = VISITED
