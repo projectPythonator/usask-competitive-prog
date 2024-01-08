@@ -192,13 +192,20 @@ class Graph_Algorithms():
                 nodes_taken += 1
         self.mst_node_set.sort()
 
-    def breadth_first_search_vanilla_template(self, start, end): #needs test
-        self.queue.append(start); self.dist[start] = 0
-        while queue:
+    def breadth_first_search_vanilla_template(self, source): #needs test
+        """Template for distance based bfs traversal from node source
+
+        Complexity per call: Time: O(|V| + |E|), Space O(|V|)
+        Uses: connectivity, shortest path on unweighted graphs, 
+        source: input: is the node we start from
+        """
+        self.queue.append(start)
+        self.dist[start] = 0
+        while self.queue:
             u = self.queue.popleft()
             for v in self.adj_list[u]:
-                if self.dist[v]>self.dist[u]+1:
-                    self.dist[v]=self.dist[u]+1
+                if (self.dist[v] > self.dist[u] + 1):
+                    self.dist[v] = self.dist[u] + 1
                     self.queue.append(v)
 
     def dfs_topology_sort_helper(self, u):
