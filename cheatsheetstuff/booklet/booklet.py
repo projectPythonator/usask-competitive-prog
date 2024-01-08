@@ -2,6 +2,7 @@
 #union find 
 class UnionFind:
     ''' 
+    
     space O(n) --> N*3 or N*2 for now 
     search time α(n) -->  inverse ackerman practically constant 
     insert time O(1) --> 
