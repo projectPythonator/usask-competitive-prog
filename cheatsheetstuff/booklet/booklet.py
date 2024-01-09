@@ -516,6 +516,11 @@ class Graph_Algorithms():
         self.adj_list[v].append(len(self.edge_list) - 1)
 
     def edmonds_karp(self, source, sink):
+        """Compute max flow using edmonds_karp' method.
+
+        Complexity per call: Time: O(|V| * |E|^2), Space O(|V|)
+        Uses: max flow of the graph, min cut of the graph 
+        """
         max_flow = 0
         while self.max_flow_bfs(source, sink):
             flow = self.max_flow_send_one_flow(source, sink, inf)
@@ -525,6 +530,11 @@ class Graph_Algorithms():
         return max_flow
 
     def dinic(self, source, sink):
+        """Compute max flow using dinics method.
+
+        Complexity per call: Time: O(|E| * |V|^2), Space O(|V|)
+        Uses: 
+        """
         max_flow = 0
         while self.max_flow_bfs(source, sink):
             self.last = [0] * self.num_nodes
