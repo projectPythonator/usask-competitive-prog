@@ -438,7 +438,6 @@ class Graph_Algorithms():
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
 
     def bfs_bipartite_check_helper(self, start):
-        from collections import deque
         self.queue.clear()
         self.color[start] = 0
         self.queue.append(start)
@@ -446,14 +445,14 @@ class Graph_Algorithms():
         while self.queue and is_bipartite:
             u = self.queue.popleft()
             for v in self.adj_list[u]:
-                if self.color[v]!=INF:
+                if self.color[v] != UNVISITED:
                     is_bipartite = False
                     break
                 self.color[v] = not self.color[u]
 
     def bfs_bipartite_check(self):
-        for u in self.adj_list:
-            if self.color[u] == INF:
+        for u in range(self.num_nodes):
+            if self.color[u] == UNVISITED:
                 self.bfs_bipartite_check_helper(u)
 
     def bfs_cycle_checker(self):
