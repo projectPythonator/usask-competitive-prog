@@ -88,6 +88,9 @@ class Graph_Algorithms():
         # self.mst_node_set = []
         # self.topo_sort_node_set = []
         # self.articulation_points = []
+
+        # self.num_scc = 0
+        # self.dfs_counter = 0
     
     def add_directed_edge_to_edge_list(self, w, u, v):
         """Adds edge to edge_list and updates num_edges."""
@@ -377,7 +380,7 @@ class Graph_Algorithms():
         pass_one: - input: True if first pass false otherwise.
         """
         self.visited[u] = VISITED
-        self.scc[u] = self.cur_num
+        self.scc[u] = self.num_scc
         neighbours = self.adj_list[u] if pass_one else self.adj_list_trans[u]
         for v in neighbours:
             if self.visited[v] == UNVISITED:
@@ -395,30 +398,34 @@ class Graph_Algorithms():
             if self.visited[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_kosaraju(u, True)
         self.visited = [UNVISITED] * self.num_nodes
-        self.cur_num = 1
+        self.num_scc = 1
         for u in reversed(self.stk):
             if self.visited[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_kosaraju(u, False)
-                self.cur_num += 1
+                self.num_scc += 1
     
     def strongly_connected_components_of_graph_tarjans_helper(self, u):
-        self.num_cmp += 1
-        self.low_values[u]=self.visited[u]=self.num_cmp
+        self.low_values[u] = self.node_state[u] = self.dfs_counter
+        self.dfs_counter += 1
         self.stk.append(u)
-        self.not_visited.add(u)
+        self.visited[u] = VISITED
         for v in self.adj_list[u]:
-            if self.visited[v]==INF:
+            if self.node_state[v] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(v)
+            if self.visited[v] == VISITED:
                 self.low_values[u] = min(self.low_values[u], self.low_values[v])
-            elif self.v in self.not_visited:
-                self.low_values[u] = min(self.low_values[u], self.visited[v])
-        if self.low_values[u]==self.visited[u]:
-            self.scc.append(set(self.stk))
-            self.stk=[]
+        if self.low_values[u] == self.node_state[u]:
+            self.num_scc += 1
+            while True:
+                v = self.stk.pop()
+                self.visited[v] = UNVISITED
+                self.scc[v] = self.num_scc
+                if u == v:
+                    break
 
     def strongly_connected_components_of_graph_tarjans(self):
-        for u in self.adj_list:
-            if self.num[u]==INF:
+        for u in range(self.num_nodes):
+            if self.node_state[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
         pass
 
