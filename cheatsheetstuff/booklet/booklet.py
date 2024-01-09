@@ -437,7 +437,7 @@ class Graph_Algorithms():
             if self.node_state[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
 
-    def bfs_bipartite_check_helper(self, start):
+    def bipartite_check_on_graph_helper(self, start):
         self.queue.clear()
         self.color[start] = 0
         self.queue.append(start)
@@ -450,7 +450,7 @@ class Graph_Algorithms():
                     break
                 self.color[v] = not self.color[u]
 
-    def bfs_bipartite_check(self):
+    def bipartite_check_on_graph(self):
         for u in range(self.num_nodes):
             if self.color[u] == UNVISITED:
                 self.bfs_bipartite_check_helper(u)
