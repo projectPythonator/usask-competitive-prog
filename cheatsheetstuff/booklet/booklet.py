@@ -69,25 +69,25 @@ class Graph_Algorithms():
     def init_structures(self): #take what you need and leave the rest
         from collections import deque
         self.adj_list = [{} for _ in range(self.num_nodes)]
-        #self.edge_list = [(0,0,0)]*self.num_edges
-        #self.matrix = [[0]*self.num_cols for _ in range(self.num_rows)]
+        # self.edge_list = [(0,0,0)]*self.num_edges
+        # self.matrix = [[0]*self.num_cols for _ in range(self.num_rows)]
     
-        #self.queue = deque()
-        #self.not_visited = set(list(range(self.num_nodes)))
-        #self.visited = [UNVISITED]*self.num_nodes
+        # self.queue = deque()
+        # self.not_visited = set(list(range(self.num_nodes)))
+        # self.visited = [UNVISITED]*self.num_nodes
         # self.node_state = [UNVISITED] * self.num_nodes
-        #self.stk = []
-        #self.heap = []
-        #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
-        #self.in_degree = [0]*self.num_nodes
-        #self.color = [INF]*self.num_nodes
-        #self.low_values = [0]*self.num_nodes
-        #self.parent = [-1]*self.num_nodes
+        # self.stk = []
+        # self.heap = []
+        # self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
+        # self.in_degree = [0]*self.num_nodes
+        # self.color = [INF]*self.num_nodes
+        # self.low_values = [0]*self.num_nodes
+        # self.parent = [-1]*self.num_nodes
     
-        #self.dist = [INF]*self.num_nodes
-        #self.mst_node_set = []
-        #self.topo_sort_node_set = []
-        #self.articulation_points = []
+        # self.dist = [INF]*self.num_nodes
+        # self.mst_node_set = []
+        # self.topo_sort_node_set = []
+        # self.articulation_points = []
     
     def add_directed_edge_to_edge_list(self, w, u, v):
         """Adds edge to edge_list and updates num_edges."""
