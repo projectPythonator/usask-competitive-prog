@@ -405,6 +405,11 @@ class Graph_Algorithms():
                 self.num_scc += 1
     
     def strongly_connected_components_of_graph_tarjans_helper(self, u):
+        """Auxiliary function for computing the recursion part of tarjans
+
+        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Uses: Preorder explores and finds SCC and Postorder we will mark the regions.
+        """
         self.low_values[u] = self.node_state[u] = self.dfs_counter
         self.dfs_counter += 1
         self.stk.append(u)
@@ -418,16 +423,19 @@ class Graph_Algorithms():
             self.num_scc += 1
             while True:
                 v = self.stk.pop()
-                self.visited[v] = UNVISITED
-                self.scc[v] = self.num_scc
+                self.visited[v], self.scc[v] = UNVISITED, self.num_scc
                 if u == v:
                     break
 
     def strongly_connected_components_of_graph_tarjans(self):
+        """Marks the SCC of a directed graph using tarjan's method.
+
+        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Uses: Labeling and Identifying SCC regions(marks regions by numbers).
+        """
         for u in range(self.num_nodes):
             if self.node_state[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
-        pass
 
     def bfs_bipartite_check_helper(self, start):
         from collections import deque
