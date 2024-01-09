@@ -437,23 +437,29 @@ class Graph_Algorithms():
             if self.node_state[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
 
-    def bipartite_check_on_graph_helper(self, start):
-        self.queue.clear()
-        self.color[start] = 0
-        self.queue.append(start)
+    def bipartite_check_on_graph_helper(self, source):
+        self.queue = deque([source])
+        self.color[source] = 0
         is_bipartite = True
         while self.queue and is_bipartite:
             u = self.queue.popleft()
             for v in self.adj_list[u]:
-                if self.color[v] != UNVISITED:
+                if self.color[v] == UNVISITED:
+                    self.color[v] = not self.color[u]
+                    self.queue.append(v)
+                elif self.color[v] == self.color[u]:
                     is_bipartite = False
                     break
-                self.color[v] = not self.color[u]
 
     def bipartite_check_on_graph(self):
+        """Checks if a graph has the bipartite property.
+
+        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Uses: check bipartite, labeling a graph for 2 coloring, 
+        """
         for u in range(self.num_nodes):
             if self.color[u] == UNVISITED:
-                self.bfs_bipartite_check_helper(u)
+                self.bipartite_check_on_graph_helper(u)
 
     def bfs_cycle_checker(self):
         pass #need to get the implimentation 
