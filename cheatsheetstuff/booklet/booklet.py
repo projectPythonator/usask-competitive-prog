@@ -333,30 +333,37 @@ class Graph_Algorithms():
             if u:
                 print("vertix {}".format(i))
 
-    def dfs_bipartite_checker(self):
-        pass # find code for this later
+    def cycle_check_on_directed_graph_helper(self, u):
+        """Auxiliary function the starts from an unvisited node and runs dfs.
 
-    def dfs_cycle_checker_helper(self, u):
+        Complexity per call: Time: O(|E| + |V|), Space O(|V|) at deepest call
+        Uses: finding cycles and marking Explored, Visited, Unvisited on graph
+        """
         self.visited[u] = EXPLORED
         for v in self.adj_list[u]:
             info = '{} to {} is a '.format(u, v)
-            if self.visited[v]==UNVISTED:
-                print(info+'tree edge')
+            if self.visited[v] == UNVISTED:
+                print(info + 'tree edge')
                 self.parent[v] = u
-                self.dfs_cycle_checker_helper(v)
-            elif self.visited[v]==EXPLORED:
+                self.cycle_check_on_directed_graph_helper(v)
+            elif self.visited[v] == EXPLORED:
                 if v == self.parent[u]:
-                    print(info+'bidirectional edge')
+                    print(info + 'bidirectional edge')
                 else:
-                    print(info+'back edge')
-            elif self.visited[v]==VISITED:
-                print(info+'forward/crossedge')
+                    print(info + 'back edge')
+            elif self.visited[v] == VISITED:
+                print(info + 'forward/crossedge')
         self.visited[u] = VISITED
 
-    def dfs_cycle_checker(self):
+    def cycle_check_on_directed_graph(self):
+        """Determines if a graph is cyclic or acyclic via dfs.
+
+        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Uses: Gives us a DAG if acyclic which can open up potenial for effecient algorithms
+        """
         for u in range(self.num_nodes):
-            if self.visited[u]==UNVISITED:
-                self.dfs_cycle_checker_helper(u)
+            if self.visited[u] == UNVISITED:
+                self.cycle_check_on_directed_graph_helper(u)
   
     def dfs_scc_kosaraju_pass1(self, u):
         self.not_visited.remmove(u)
@@ -499,6 +506,9 @@ class Graph_Algorithms():
                 max_flow += flow
                 flow = self.max_flow_dfs(source, sink, inf)
         return max_flow
+
+    def dfs_bipartite_checker(self):
+        pass # find code for this later
         
 
 class Math_Algorithms:
