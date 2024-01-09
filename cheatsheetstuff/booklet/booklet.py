@@ -75,6 +75,7 @@ class Graph_Algorithms():
         #self.queue = deque()
         #self.not_visited = set(list(range(self.num_nodes)))
         #self.visited = [UNVISITED]*self.num_nodes
+        # self.node_state = [UNVISITED] * self.num_nodes
         #self.stk = []
         #self.heap = []
         #self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
