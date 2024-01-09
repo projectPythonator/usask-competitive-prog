@@ -400,14 +400,14 @@ class Graph_Algorithms():
                 self.strongly_connected_components_of_graph_kosaraju(u, False)
                 self.cur_num += 1
     
-    def dfs_scc_tarjans_helper(self, u):
+    def strongly_connected_components_of_graph_tarjans_helper(self, u):
         self.num_cmp += 1
         self.low_values[u]=self.visited[u]=self.num_cmp
         self.stk.append(u)
         self.not_visited.add(u)
         for v in self.adj_list[u]:
             if self.visited[v]==INF:
-                self.dfs_scc_tarjans_helper(v)
+                self.strongly_connected_components_of_graph_tarjans_helper(v)
                 self.low_values[u] = min(self.low_values[u], self.low_values[v])
             elif self.v in self.not_visited:
                 self.low_values[u] = min(self.low_values[u], self.visited[v])
@@ -415,10 +415,10 @@ class Graph_Algorithms():
             self.scc.append(set(self.stk))
             self.stk=[]
 
-    def dfs_scc_tarjans(self):
+    def strongly_connected_components_of_graph_tarjans(self):
         for u in self.adj_list:
             if self.num[u]==INF:
-                self.dfs_scc_tarjans_helper(u)
+                self.strongly_connected_components_of_graph_tarjans_helper(u)
         pass
 
     def bfs_bipartite_check_helper(self, start):
