@@ -51,6 +51,8 @@ class Union_Find_Disjoint_Sets:
 #
 from collections import deque
 from heapq import heappush, heappop, heapreplace, heapify
+from sys import setrecursionlimit
+setrecursionlimit(100000) 
 
 class Graph_Algorithms():
     INF=2**31
@@ -414,8 +416,6 @@ class Graph_Algorithms():
             self.stk=[]
 
     def dfs_scc_tarjans(self):
-        from sys import setrecursionlimit
-        setrecursionlimit(100000) 
         for u in self.adj_list:
             if self.num[u]==INF:
                 self.dfs_scc_tarjans_helper(u)
