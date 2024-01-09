@@ -464,7 +464,15 @@ class Graph_Algorithms():
     def bfs_cycle_checker(self):
         pass #need to get the implimentation 
 
-    def max_flow_bfs(self, source, sink):
+    def max_flow_find_augmenting_path_helper(self, source, sink):
+        """Auxiliary function to find an augmenting path in the graph from source to sink.
+
+        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Uses: checking path existance.
+        source: - input: the node which we are starting from
+        sink: --- input: the node which we are ending on
+        returns True if a path exists False otherwise
+        """
         self.dist = [-1] * self.num_nodes
         self.path = [[-1, -1] for _ in range(self.num_nodes)]
         self.queue = deque([source])
@@ -472,16 +480,44 @@ class Graph_Algorithms():
         while self.queue:
             u = self.queue.pop_left()
             if u == sink:
-                break
+                return True
             for idx in self.adj_list[u]:
                 v, cap, flow = self.edge_list[idx]
                 if cap - flow > 0 and self.dist[v] == -1:
                     self.dist[v] = self.dist[u] + 1
                     self.queue.append(v)
                     self.path[v] = [u, idx]
-        return self.dist[sink] != -1
+        return False
+
+    def max_flow_send_flow_down_augmenting_path(self, source, sink, flow_in):
+        """Auxiliary function to recurisively emulate sending a flow.
+
+        Complexity per call: Time: O(|V|), Space O(|V|)
+        Uses: preorder finds the min pushed_flow post order mutates edge_list based on that flow
+        source: -- input: in this function its technically the goal node
+        sink: ---- input: the current node we are observing
+        flow_in: - input: the smallest flow found on the way down
+        returns min pushed flow 
+        """
+        if source == sink:
+            return flow_in
+        u, edge_ind = self.path[sink]
+        _, edge_cap, edge_flow = self.edge_list[edge_ind]
+        pushed_flow = self.max_flow_send_one_flow(source, u, min(flow_in, edge_cap - edge_flow))
+        self.edge_list[edge_ind][2] = edge_flow + pushed_flow
+        self.edge_list[edge_ind ^ 1][2] -= pushed_flow
+        return pushed_flow
 
     def max_flow_dfs(self, u, sink, flow_in):
+        """Auxiliary function to recurisively emulate sending a flow.
+
+        Complexity per call: Time: O(|E| * |V|), Space O(|V|)
+        Uses: a more effcient way of sending a flow 
+        u: ------- input: is the current node to be observed
+        sink: ---- input: is the goal node (we might be able to just put it as instance var?)
+        flow_in: - input: the smallest flow found on the way down
+        returns min pushed flow 
+        """
         if u == sink or flow_in == 0:
             return flow_in
         for i in range(self.last[u], len(self.adj_list[u])):
@@ -496,16 +532,6 @@ class Graph_Algorithms():
                 self.edge_list[self.adj_list[u][i] ^ 1][2] -= pushed_flow
                 return pushed_flow
         return 0
-
-    def max_flow_send_one_flow(self, source, sink, flow_in):
-        if source == sink:
-            return flow_in
-        u, edge_ind = self.path[sink]
-        _, edge_cap, edge_flow = self.edge_list[edge_ind]
-        pushed_flow = self.max_flow_send_one_flow(sink, u, min(flow_in, edge_cap - edge_flow))
-        self.edge_list[edge_ind][2] = edge_flow + pushed_flow
-        self.edge_list[edge_ind ^ 1][2] -= pushed_flow
-        return pushed_flow
 
     def max_flow_add_edge(self, u, v, capacity, directed):
         if u == v:
@@ -522,8 +548,8 @@ class Graph_Algorithms():
         Uses: max flow of the graph, min cut of the graph 
         """
         max_flow = 0
-        while self.max_flow_bfs(source, sink):
-            flow = self.max_flow_send_one_flow(source, sink, inf)
+        while self.max_flow_find_augmenting_path_helper(source, sink):
+            flow = self.max_flow_send_flow_down_augmenting_path(source, sink, inf)
             if flow == 0:
                 break
             max_flow += flow
@@ -536,7 +562,7 @@ class Graph_Algorithms():
         Uses: 
         """
         max_flow = 0
-        while self.max_flow_bfs(source, sink):
+        while self.max_flow_find_augmenting_path_helper(source, sink):
             self.last = [0] * self.num_nodes
             flow = self.max_flow_dfs(source, sink, inf)
             while flow != 0:
