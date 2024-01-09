@@ -336,7 +336,7 @@ class Graph_Algorithms():
     def cycle_check_on_directed_graph_helper(self, u):
         """Auxiliary function the starts from an unvisited node and runs dfs.
 
-        Complexity per call: Time: O(|E| + |V|), Space O(|V|) at deepest call
+        Complexity per call: Time: O(|E|), Space O(|V|) at deepest call
         Uses: finding cycles and marking Explored, Visited, Unvisited on graph
         """
         self.visited[u] = EXPLORED
@@ -365,31 +365,34 @@ class Graph_Algorithms():
             if self.visited[u] == UNVISITED:
                 self.cycle_check_on_directed_graph_helper(u)
   
-    def dfs_scc_kosaraju_pass1(self, u):
-        self.not_visited.remmove(u)
+    def strongly_connected_components_of_graph_kosaraju_pass_1(self, u):
+        self.visited[u] = VISITED
         for v in self.adj_list[u]:
-            if v  in self.not_visited:
-                self.dfs_scc_kosaraju_pass1(v)
+            if self.visited[v] == UNVISITED:
+                self.strongly_connected_components_of_graph_kosaraju_pass_1(v)
         self.stk.append(u)
 
-    def dfs_scc_kosaraju_pass2(self, u):
-        self.not_visited.remove(u)
+    def strongly_connected_components_of_graph_kosaraju_pass_2(self, u):
+        self.visited[u] = VISITED
         self.scc[u] = self.cur_num
         for v in self.adj_list_trans:
-            if v in self.not_visited:
-                self.dfs_scc_kosaraju_pass2(v)
+            if self.visited[v] == UNVISITED:
+                self.strongly_connected_components_of_graph_kosaraju_pass_2(v)
 
-    def dfs_scc_kosaraju(self):
-        for u in self.adj_list:
-            if v not in self.not_seen:
-                self.dfs_scc_kosaraju_pass1(u)
-        self.not_visited = set(list(self.adj_list))
+    def strongly_connected_components_of_graph_kosaraju(self):
+        """Marks the SCC of a directed graph using kosaraju's method.
+
+        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Uses: Labeling and Identifying SCC regions
+        """
+        for u in range(self.num_nodes):
+            if self.visited[u] == UNVISITED:
+                self.strongly_connected_components_of_graph_kosaraju_pass_1(u)
+        self.visited = [UNVISITED] * self.num_nodes
         self.cur_num = 0
-        while self.stk:
-            while self.stk and self.stk[-1] not in self.not_visited: 
-                self.stk.pop()
-            if self.stk:
-                self.dfs_scc_kosaraju_pass2(self.stk[-1])
+        for u in reversed(self.stk):
+            if self.visited[u] == UNVISITED:
+                self.strongly_connected_components_of_graph_kosaraju_pass_2(u)
                 self.cur_num += 1
     
     def dfs_scc_tarjans_helper(self, u):
