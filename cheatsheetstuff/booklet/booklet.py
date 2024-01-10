@@ -593,11 +593,7 @@ class Math_Algorithms:
         self.prime_factors = []
         
     def is_prime_triv(self, n):
-        """Tests if n is prime via divisors up to sqrt(n).
-
-        Complexity per call: Time: O(sqrt(n)), Space O(1)
-        Uses: primality testing that is easy to implement 
-        """
+        """Tests if n is prime via divisors up to sqrt(n)."""
         if n <= 3:
             return n > 1
         if n%2 == 0 or n%3 == 0:
@@ -608,16 +604,23 @@ class Math_Algorithms:
                 return False
         return True
         
-    def sieve_primes(self, n):
+    def sieve_of_eratosthenes_odd_only(self, n):
+        """Generates list of primes up to n via eratosthenes method.
+
+        Complexity: Time: O(max(n ln(ln(sqrt(n))), n)), 
+                    Space: O(n/ln(n)) final, O(n/2) aux for sieve
+        Uses: prime generation, prime testing later, phi with mods
+        notes: primes_sieve is local(add self for instance)
+        """
         sqrt_n, limit = ((isqrt(n) - 3)//2) + 1, ((n - 3)//2) + 1
-        self.primes_sieve = [True] * limit
+        primes_sieve = [True] * limit
         for i in range(sqrt_n):
-            if self.primes_sieve[i]:
+            if primes_sieve[i]:
                 prime = 2 * i + 3
                 start = (p * p - 3)//2
-                for j in range(start, k, prime):
-                    self.primes_sieve[j] = False
-        self.primes_list = [2] + [2 * i + 3 for i, el in enumerate(self.primes_sieve) if el]
+                for j in range(start, limit, prime):
+                    primes_sieve[j] = False
+        self.primes_list = [2] + [2 * i + 3 for i, el in enumerate(primes_sieve) if el]
     
     def gen_set_primes(self):
         self.primes_set=set(self.primes_list)
