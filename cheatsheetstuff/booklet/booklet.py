@@ -572,7 +572,7 @@ class Graph_Algorithms():
 
     def dfs_bipartite_checker(self):
         pass # find code for this later
-        
+from math import isqrt
 
 class Math_Algorithms:
     def __init__(self):
@@ -593,26 +593,31 @@ class Math_Algorithms:
         self.prime_factors = []
         
     def is_prime_triv(self, n):
+        """Tests if n is prime via divisors up to sqrt(n).
+
+        Complexity per call: Time: O(sqrt(n)), Space O(1)
+        Uses: primality testing that is easy to implement 
+        """
         if n <= 3:
             return n > 1
-        elif n%2 == 0 or n%3 == 0:
+        if n%2 == 0 or n%3 == 0:
             return False
-        p=5
-        while p*p <= n:
-            if n%p == 0 or n%(p+2) == 0:
+        limit = isqrt(n)
+        for p in range(5, limit+1, 6):
+            if n % p == 0 or n % (p+2) == 0:
                 return False
-            p+=6
         return True
         
     def sieve_primes(self, n):
-        self.primes_list = [2]
-        for i in range(4, n, 2):
-            self.primes_sieve[i] = False
-        for i in range(3, n, 2):
+        sqrt_n, limit = ((isqrt(n) - 3)//2) + 1, ((n - 3)//2) + 1
+        self.primes_sieve = [True] * limit
+        for i in range(sqrt_n):
             if self.primes_sieve[i]:
-                self.primes_list.append(i)
-                for j in range(i*i, n, 2*i):
+                prime = 2 * i + 3
+                start = (p * p - 3)//2
+                for j in range(start, k, prime):
                     self.primes_sieve[j] = False
+        self.primes_list = [2] + [2 * i + 3 for i, el in enumerate(self.primes_sieve) if el]
     
     def gen_set_primes(self):
         self.primes_set=set(self.primes_list)
