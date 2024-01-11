@@ -621,6 +621,27 @@ class Math_Algorithms:
                 for j in range(start, limit, prime):
                     primes_sieve[j] = False
         self.primes_list = [2] + [2 * i + 3 for i, el in enumerate(primes_sieve) if el]
+
+    def sieve_of_eratosthenes_varients(self, n):
+        """Generates list of primes up to n via eratosthenes method.
+
+        Complexity: Time: O(n ln(ln(n))), Space: O(n/ln(n)) final, O(n) aux for sieve
+        Uses: prime generation, prime testing later, phi with mods
+        notes: primes_sieve is local(add self for instance)
+        """
+        def number_of_diff_prime_factors(limit):
+            self.num_diff_prime_factos = [0] * limit
+            for i in range(2, limit):
+                if self.num_diff_prime_factos[i] == i:
+                    for j in range(i, limit, i):
+                        self.num_diff_prime_factos[j] += 1
+
+        def euler_phi_function(limit):
+            self.euler_phi = [i for i in range(limit)]
+            for i in range(2, limit):
+                if self.euler_phi[i] == 0:
+                    for j in range(i, limit, i):
+                        self.euler_phi[j] = (self.euler_phi[j]/i) * (i-1)
     
     def gen_set_primes(self):
         self.primes_set=set(self.primes_list)
