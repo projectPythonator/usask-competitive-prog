@@ -572,7 +572,7 @@ class Graph_Algorithms():
 
     def dfs_bipartite_checker(self):
         pass # find code for this later
-from math import isqrt
+from math import isqrt, log
 
 class Math_Algorithms:
     def __init__(self):
@@ -630,18 +630,39 @@ class Math_Algorithms:
         notes: primes_sieve is local(add self for instance)
         """
         def number_of_diff_prime_factors(limit):
-            self.num_diff_prime_factos = [0] * limit
+            self.num_diff_prime_factos = [0] * (limit + 1)
             for i in range(2, limit):
                 if self.num_diff_prime_factos[i] == i:
                     for j in range(i, limit, i):
                         self.num_diff_prime_factos[j] += 1
 
         def euler_phi_function(limit):
-            self.euler_phi = [i for i in range(limit)]
+            self.euler_phi = [i for i in range(limit + 1)]
             for i in range(2, limit):
                 if self.euler_phi[i] == 0:
                     for j in range(i, limit, i):
                         self.euler_phi[j] = (self.euler_phi[j]/i) * (i-1)
+
+        def num_and_sum_of_divisors(limit):
+            self.num_divisors = [1] * (limit + 1)
+            self.sum_divisors = [1] * (limit + 1)
+            for i in range(2, limit):
+                for j in range(i, limit, i):
+                    self.num_divisors[j] += 1
+                    self.sum_divisors[j] += i
+
+        def num_and_sum_of_prime_factors(limit):
+            self.num_prime_factors = [0] * (limit + 1)
+            self.sum_prime_factors = [0] * (limit + 1)
+            for prime in range(2, limit):
+                if self.sum_prime_factors[prime] == 0:
+                    exponent_limit = int(log(limit, prime)) + 1
+                    for exponent in range(1, exponent_limit):
+                        prime_to_exponent = prime**exponent
+                        for i in range(prime_to_exponent, limit, prime_to_exponent):
+                            self.sum_prime_factors[i] += prime
+                            self.num_prime_factors[i] += 1
+            
     
     def gen_set_primes(self):
         self.primes_set=set(self.primes_list)
