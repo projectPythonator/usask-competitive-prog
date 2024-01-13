@@ -143,8 +143,8 @@ class Graph_Algorithms():
 
         Complexity: Time: O(|E| log |V|), Space O(|E|) + Union_Find
         Usage: finding min spanning tree, subgraph, forest. max span tree, 2nd best span tree
-        Notes: since we use a heap space is O(|E|) instead of O(|E| log |E|) from sort
-        however edge_list is consumed.
+        Optimization: We use a heap to make space comp. O(|E|) 
+        instead of O(|E| log |E|) when using sort, however edge_list is CONSUMED.
         """
         ufds = Union_Find_Disjoint_Sets(self.num_nodes)
         heapify(self.edge_list)
@@ -155,26 +155,25 @@ class Graph_Algorithms():
                 self.mst_node_set.append((w, u, v))
                 ufds.union_set(u, v)
         
-    def min_spanning_tree_prims_process_complete(self, u):  #needs test
-        """auxiliary mst prims function for visiting all neighbours of node u on complete graph.
+    def prims_visit_adj_matrix(self, u):  
+        """Find min weight edge in adjcency matrix implementation of prims.
 
         Complexity per call: Time: O(|V|), Space: O(1)
-        Usage: when we are using adj matrix this is probably a better function
         u: input: a node which we observe its neibhours
         """
+        # NEEDS FIXING 
         self.not_visited.remove(u)
         for v in self.not_visited:
             w = self.matrix[u][v]
             if w <= self.dist[v]:
                 self.dist[v] = w
-                heappush(self.heap, (w, v, u))
+                heappush(self.heap, (w, v, u)) # fix this
     
-    def min_spanning_tree_prims_process(self, u): #needs test
-        """auxiliary mst prims function for visiting all neighbours of node u.
+    def prims_visit_adj_list(self, u): #needs test
+        """Find min weight edge in adjcency list implementation of prims.
 
-        Complexity per call: Time: O(|V| log |V|), Space: O(|V|) increase
-        Usage: when we are using adj_list
-        u: input: a node which we observe its neibhours
+        Complexity per call: Time: O(|V| log |V|), Space: increase by O(|V|)
+        u: a node which we observe its neibhours
         """
         self.not_visited.remove(u)
         for v, w in self.adj_list[u].items():
@@ -261,7 +260,7 @@ class Graph_Algorithms():
     def single_source_shortest_path_dijkstras(self, source, sink): #needs test
         """Its dijkstras path finder using heaps.
 
-        Complexity per call: Time: O(|E| log |V|), Space O(|E|)
+        Complexity per call: Time: O(|E|log |V|), Space O(|E|)
         Uses: used for finding the weighted shortest path varients
         source: - input: can be a single nodes or list of nodes
         sink: --- input: the goal node
@@ -284,8 +283,8 @@ class Graph_Algorithms():
         """Computes essentially a matrix operation on a graph.
 
         Complexity per call: Time: O(|V|^3), Space O(|V|^2)
-        Uses: Shortest path, Transitive closure, Maximin and Minimax path, Cheapest negative cycle, 
-        Finding diameter of a graph, Finding SCC of a directed graph.
+        More uses: Shortest path and Transitive closure.
+        Variants: Maximin and Minimax path, Cheapest negative cycle, Finding diameter of a graph, Finding SCC of a directed graph.
         """
         for k in range(self.num_nodes):
             for i in range(self.num_nodes):
@@ -607,34 +606,35 @@ class Math_Algorithms:
     def sieve_of_eratosthenes_odd_only(self, n):
         """Generates list of primes up to n via eratosthenes method.
 
-        Complexity: Time: O(max(n ln(ln(sqrt(n))), n)), 
+        Complexity: Time: O(max(n lnln(sqrt(n)), n)),
                     Space: O(n/ln(n)) final, O(n/2) aux for sieve
         Uses: prime generation, prime testing later, phi with mods
         notes: primes_sieve is local(add self for instance)
         """
         sqrt_n, limit = ((isqrt(n) - 3)//2) + 1, ((n - 3)//2) + 1
-        primes_sieve = [True] * limit
+        self.primes_sieve = [True] * limit
         for i in range(sqrt_n):
-            if primes_sieve[i]:
+            if self.primes_sieve[i]:
                 prime = 2 * i + 3
                 start = (p * p - 3)//2
                 for j in range(start, limit, prime):
-                    primes_sieve[j] = False
+                    self.primes_sieve[j] = False
         self.primes_list = [2] + [2 * i + 3 for i, el in enumerate(primes_sieve) if el]
 
     def sieve_of_eratosthenes_varients(self, n):
         """Generates list of primes up to n via eratosthenes method.
 
-        Complexity: Time: O(n ln(ln(n))), Space: O(n/ln(n)) final, O(n) aux for sieve
+        Complexity: Time: O(n lnln(n)), Space: O(n/ln(n)) final, O(n) aux for sieve
         Uses: prime generation, prime testing later, phi with mods
         notes: primes_sieve is local(add self for instance)
         """
         def number_of_diff_prime_factors(limit):
-            self.num_diff_prime_factos = [0] * (limit + 1)
+            num_diff_prime_factos = [0] * (limit + 1)
             for i in range(2, limit):
-                if self.num_diff_prime_factos[i] == i:
+                if num_diff_prime_factos[i] == i:
                     for j in range(i, limit, i):
-                        self.num_diff_prime_factos[j] += 1
+                        num_diff_prime_factos[j] += 1
+            self.num_diff_prime_factos 
 
         def euler_phi_function(limit):
             self.euler_phi = [i for i in range(limit + 1)]
@@ -654,14 +654,14 @@ class Math_Algorithms:
         def num_and_sum_of_prime_factors(limit):
             self.num_prime_factors = [0] * (limit + 1)
             self.sum_prime_factors = [0] * (limit + 1)
-            for prime in range(2, limit):
-                if self.sum_prime_factors[prime] == 0:
-                    exponent_limit = int(log(limit, prime)) + 1
-                    for exponent in range(1, exponent_limit):
-                        prime_to_exponent = prime**exponent
-                        for i in range(prime_to_exponent, limit, prime_to_exponent):
-                            self.sum_prime_factors[i] += prime
-                            self.num_prime_factors[i] += 1
+            self.sieve_of_eratosthenes_odd_only(limit)
+            for prime in self.prime_list:
+                exponent_limit = int(log(limit, prime)) + 1
+                for exponent in range(1, exponent_limit):
+                    prime_to_exponent = prime**exponent
+                    for i in range(prime_to_exponent, limit, prime_to_exponent):
+                        self.sum_prime_factors[i] += prime
+                        self.num_prime_factors[i] += 1
             
     
     def gen_set_primes(self):
