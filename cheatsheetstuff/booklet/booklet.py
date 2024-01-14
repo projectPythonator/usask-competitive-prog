@@ -4,6 +4,7 @@ from sys import setrecursionlimit
 setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
 
 class UnionFindDisjointSets:
+    """This Data structure is for none directional disjoint sets."""
     def __init__(self, n):
         self.parent = list(range(n))
         self.rank = [0] * n        # optional optimization
@@ -53,9 +54,50 @@ from sys import setrecursionlimit
 setrecursionlimit(100000)
 
 class Graph:
-    def __init__(self):
-        self.num_edges = 0
-        self.num_nodes = 0
+    def __init__(self, v, e, r=None, c=None):
+        self.num_edges = e
+        self.num_nodes = v
+        self.num_rows = r
+        self.num_cols = c
+
+        self.adj_list = []
+        self.adj_matrix = []
+        self.edge_list = []
+        self.grid = []
+
+        self.data_to_code = {}
+        self.code_to_data = []
+
+    def convert_data_to_code(self, data):
+        """Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair, then return u."""
+        if data not in self.data_to_code:
+            self.data_to_code[data] = len(self.code_to_data)
+            self.code_to_data.append(data) # can be replaced with a count variable if space needed
+        return self.data_to_code[data]
+
+    def add_edge_u_v_wt_into_directed_graph(self, u, v, wt=None, data=None):
+        """A pick and choose function will convert u, v into index form then add it to the structure
+        you choose.
+        """
+        u = self.convert_data_to_code(u) # omit if u,v is in the form: int u | 0 <= u < |V|
+        v = self.convert_data_to_code(v) # omit if u,v is in the form: int u | 0 <= u < |V|
+
+        self.adj_list[u].append((v, wt))    # Adjacency list usage
+        self.adj_matrix[u][v] = wt          # Adjacency matrix usage
+        self.edge_list.append((wt, u, v))   # Edge list usage
+        # the following lines come as a pair-set used in max flow algorithm and are used in tandem.
+        self.edge_list.append((v, wt, data))
+        self.adj_list[u].append(len(self.edge_list)-1)
+
+    def add_edge_u_v_wt_into_undirected_graph(self, u, v, wt=None):
+        """undirected graph version of the previous function"""
+        self.add_edge_u_v_wt_into_undirected_graph(u, v, wt)
+        self.add_edge_u_v_wt_into_undirected_graph(v, u, wt)
+
+    def fill_grid_graph(self, new_grid):
+        self.num_rows = len(new_grid)
+        self.num_cols = len(new_grid[0])
+        self.grid = [[self.convert_data_to_code(el) for el in row] for row in new_grid]
 
 class GraphAlgorithms:
     INF=2**31
@@ -63,11 +105,10 @@ class GraphAlgorithms:
     EXPLORED  = -2
     VISITED   = -3
     
-    def __init__(self, V, E, N=None, M=None):
-        self.num_edges = E
-        self.num_nodes = V
-        self.num_rows = N
-        self.num_cols = M
+    def __init__(self, new_graph):
+        self.graph = new_graph
+
+        self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
 
     def init_structures(self): #take what you need and leave the rest
         from collections import deque
@@ -94,51 +135,39 @@ class GraphAlgorithms:
 
         # self.num_scc = 0
         # self.dfs_counter = 0
-    
-    def add_directed_edge_to_edge_list(self, w, u, v):
-        """Adds edge to edge_list and updates num_edges."""
-        self.edge_list.append((w, u, v))
-        self.num_edges += 1
-
-    def add_directed_edge_to_adj_list(self, w, u, v):
-        """Adds or updates an edge in the adj_list."""
-        self.adj_list[u][v] = w
-    
-    def update_directed_edge_to_edge_list(self, edge, w, u, v):
-        """Updates edge in edge_list with a different one."""
-        self.edge_list[edge] = (w,u,v)
 
     def flood_fill_via_dfs(self, row, col, old_val, new_val): #needs test
-        """Computes flood fill graph traversal via recursive depth first search.
+        """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
 
-        Complexity: Time: O(|V| + |E|), Space O(|V|) stack space
-        Uses: For Grids and 2d space: region colouring, connectivity, area/island size, misc 
+        Complexity: Time: O(|V| + |E|), Space O(|V|): for grids usually |V|=row*col and |E|=4*|V|
+        More uses: Region Colouring, Connectivity, Area/island Size, misc
         row, col: --------- input: integer pair representing current grid position 
         old_val, new_val: - input: unexplored state, the value of an explored state
         """
-        self.matrix[row][col] = new_val
+        self.graph.grid[row][col] = new_val
         for row_mod, col_mod in self.dir_rc:
-            next_row, next_col = row + row_mod, col + col_mod
-            if (0 <= next_row < self.num_rows 
-                and 0 <= next_col < self.num_cols 
-                and self.matrix[next_row][next_col] == old_val):
-                self.dfs_flood_fill(next_row, next_col, old_val, new_val)
+            new_row, new_col = row + row_mod, col + col_mod
+            if (0 <= new_row < self.graph.num_rows
+                    and 0 <= new_col < self.graph.num_cols
+                    and self.graph.grid[new_row][new_col] == old_val):
+                self.flood_fill_via_dfs(new_row, new_col, old_val, new_val)
 
     def flood_fill_via_bfs(self, start_row, start_col, old_val, new_val):  #needs test
-        """Computes flood fill graph traversal via recursive breadth first search.
+        """Computes flood fill graph traversal via breadth first search. Use on grid graphs.
 
-        Complexity: Time: O(|V| + |E|), Space O(|V|)
-        Uses: For Grids and 2d space: same as dfs with addition of shortest connected path 
+        Complexity: Time: O(|V| + |E|), Space O(|V|): for grids usually |V|=row*col and |E|=4*|V|
+        More uses: previous uses plus shortest connected path
         """
-        self.queue = deque([(start_row, start_col)])
-        while self.queue:
-            row, col = self.queue.popleft()
+        queue = deque([(start_row, start_col)])
+        while queue:
+            row, col = queue.popleft()
             for row_mod, col_mod in self.dir_rc:
-                next_row, next_col = row + row_mod, col + col_mod
-                if (0 <= next_row < self.num_rows 
-                    and 0 <= next_col < self.num_cols
-                    and self.matrx[next_row][next_col] == old_val):
-                    self.queue.append((next_row, next_col))
+                new_row, new_col = row + row_mod, col + col_mod
+                if (0 <= new_row < self.graph.num_rows
+                    and 0 <= new_col < self.graph.num_cols
+                    and self.graph.grid[new_row][new_col] == old_val):
+                    self.graph.grid[new_row][new_col] = new_val
+                    queue.append((new_row, new_col))
 
     #will kill the edge list but will save memory
     def min_spanning_tree_via_kruskals_and_heaps(self):  #needs test
