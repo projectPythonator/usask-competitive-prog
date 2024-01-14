@@ -109,6 +109,7 @@ class GraphAlgorithms:
         self.graph = new_graph
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        self.mst_node_set = None
 
     def init_structures(self): #take what you need and leave the rest
         from collections import deque
@@ -174,18 +175,21 @@ class GraphAlgorithms:
         """Computes mst of graph G stored in edge_list, space optimized via heap.
 
         Complexity: Time: O(|E| log |V|), Space O(|E|) + Union_Find
-        Usage: finding min spanning tree, subgraph, forest. max span tree, 2nd best span tree
+        More uses: finding min spanning tree
+        Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning tree
         Optimization: We use a heap to make space comp. O(|E|) 
         instead of O(|E| log |E|) when using sort, however edge_list is CONSUMED.
         """
-        ufds = UnionFindDisjointSets(self.num_nodes)
-        heapify(self.edge_list)
-        while self.edge_list and ufds.num_sets > 1:
-            w, u, v = heappop(self.edge_list) # use w, uv = ... for single cord storage
+        heapify(self.graph.edge_list)
+        ufds = UnionFindDisjointSets(self.graph.num_nodes)
+        min_spanning_tree = []
+        while self.graph.edge_list and ufds.num_sets > 1:
+            wt, u, v = heappop(self.graph.edge_list) # use w, uv = ... for single cord storage
             #v,u = uv%self.num_nodes, uv//self.num_nodes
             if not ufds.is_same_set(u, v):
-                self.mst_node_set.append((w, u, v))
+                min_spanning_tree.append((wt, u, v))
                 ufds.union_set(u, v)
+        self.mst_node_set = min_spanning_tree
         
     def prims_visit_adj_matrix(self, u):  
         """Find min weight edge in adjcency matrix implementation of prims.
