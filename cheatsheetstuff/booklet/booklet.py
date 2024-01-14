@@ -110,12 +110,10 @@ class GraphAlgorithms:
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.mst_node_set = None
+        self.dist = None
 
     def init_structures(self): #take what you need and leave the rest
         from collections import deque
-        self.adj_list = [{} for _ in range(self.num_nodes)]
-        # self.edge_list = [(0,0,0)]*self.num_edges
-        # self.matrix = [[0]*self.num_cols for _ in range(self.num_rows)]
     
         # self.queue = deque()
         # self.not_visited = set(list(range(self.num_nodes)))
@@ -234,20 +232,21 @@ class GraphAlgorithms:
         self.mst_node_set.sort()
 
     def breadth_first_search_vanilla_template(self, source): #needs test
-        """Template for distance based bfs traversal from node source
+        """Template for distance based bfs traversal from node source.
 
         Complexity per call: Time: O(|V| + |E|), Space O(|V|)
-        Uses: connectivity, shortest path on unweighted graphs, 
+        More uses: connectivity, shortest path on monotone weighted graphs
         source: input: is the node we start from
         """
-        self.queue.append(start)
-        self.dist[start] = 0
-        while self.queue:
-            u = self.queue.popleft()
-            for v in self.adj_list[u]:
-                if (self.dist[v] > self.dist[u] + 1):
-                    self.dist[v] = self.dist[u] + 1
-                    self.queue.append(v)
+        distance = [UNVISITED] * self.graph.num_nodes
+        queue, distance[source] = deque([source]), 0
+        while queue:
+            u = queue.popleft()
+            for v in self.graph.adj_list[u]:
+                if distance[v] == UNVISITED:
+                    distance[v] = distance[u] + 1
+                    queue.append(v)
+        self.dist = distance
 
     def topology_sort_via_tarjan_helper(self, u):
         """auxiliary function used to recursively explore via dfs
