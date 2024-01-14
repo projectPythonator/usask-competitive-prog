@@ -1,6 +1,6 @@
 #data structurea
 #union find 
-class Union_Find_Disjoint_Sets:
+class UnionFindDisjointSets:
     ''' 
     Union find disjoint sets 
     space O(n) --> N*3 or N*2 for now 
@@ -52,9 +52,14 @@ class Union_Find_Disjoint_Sets:
 from collections import deque
 from heapq import heappush, heappop, heapreplace, heapify
 from sys import setrecursionlimit
-setrecursionlimit(100000) 
+setrecursionlimit(100000)
 
-class Graph_Algorithms():
+class Graph:
+    def __init__(self):
+        self.num_edges = 0
+        self.num_nodes = 0
+
+class GraphAlgorithms:
     INF=2**31
     UNVISITED = -1
     EXPLORED  = -2
@@ -146,7 +151,7 @@ class Graph_Algorithms():
         Optimization: We use a heap to make space comp. O(|E|) 
         instead of O(|E| log |E|) when using sort, however edge_list is CONSUMED.
         """
-        ufds = Union_Find_Disjoint_Sets(self.num_nodes)
+        ufds = UnionFindDisjointSets(self.num_nodes)
         heapify(self.edge_list)
         while self.edge_list and ufds.num_sets > 1:
             w, u, v = heappop(self.edge_list) # use w, uv = ... for single cord storage
@@ -258,7 +263,7 @@ class Graph_Algorithms():
                     heappush(self.heap, v)
 
     def single_source_shortest_path_dijkstras(self, source, sink): #needs test
-        """Its dijkstras path finder using heaps.
+        """It is Dijkstra's pathfinder using heaps.
 
         Complexity per call: Time: O(|E|log |V|), Space O(|E|)
         Uses: used for finding the weighted shortest path varients
@@ -284,7 +289,8 @@ class Graph_Algorithms():
 
         Complexity per call: Time: O(|V|^3), Space O(|V|^2)
         More uses: Shortest path and Transitive closure.
-        Variants: Maximin and Minimax path, Cheapest negative cycle, Finding diameter of a graph, Finding SCC of a directed graph.
+        Variants: Maximin and Minimax path, Cheapest negative cycle,
+                  Finding diameter of a graph, Finding SCC of a directed graph.
         """
         for k in range(self.num_nodes):
             for i in range(self.num_nodes):
@@ -1564,7 +1570,7 @@ class Geometry_Algorithms:
         
 
 
-def String_Algorithms:
+class String_Algorithms:
     def __init__(self):
         self.n = 0
         self.text = ''
@@ -1737,7 +1743,7 @@ class Matrix:
     def __init__(self, n, m):
         self.num_rows = n
         self.num_cols = m
-        selt.mat = [[0 for _ in range(m)] for _ in range(n)]
+        self.mat = [[0 for _ in range(m)] for _ in range(n)]
 
     def get_best_sawp_row(self, row, col):
         best, pos = 0.0, -1
