@@ -1,51 +1,49 @@
 #data structurea
-#union find 
+#union find
+from sys import setrecursionlimit
+setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
+
 class UnionFindDisjointSets:
-    ''' 
-    Union find disjoint sets 
-    space O(n) --> N*3 or N*2 for now 
-    search time α(n) -->  inverse ackerman practically constant 
-    insert time O(1) --> 
-    '''
     def __init__(self, n):
-        self.parents = list(range(n))
-        self.ranks = [0]*n #optional optimzation 
-        self.sizes = [1]*n #optional information
-        self.num_sets = n #optional information
+        self.parent = list(range(n))
+        self.rank = [0] * n        # optional optimization
+        self.set_sizes = [1] * n   # optional information
+        self.num_sets = n          # optional information
         
     def find_set(self, u):
-        u_parent = u
-        u_children = []
-        while u_parent != self.parents[u_parent]:
-            u_children.append(u_parent)
-            u_parent = self.parents[u_parent]
-        for child in u_children:
-            self.parents[child] = u_parent
-        return u_parent
+        """Recursively find which set u belongs to. Memoize on the way back up.
+
+        Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
+                    Space: Amortized O(1) stack space
+        """
+        root_parent = u if self.parent[u] == u else self.find_set(self.parent[u])
+        self.parent[u] = root_parent
+        return root_parent
         
     def is_same_set(self, u, v):
-        return self.find_set(u)==self.find_set(v)
+        """Checks if u and v in same set. TIME and SPACE Complexity is the same as find_set"""
+        return self.find_set(u) == self.find_set(v)
 
-    def union_set(self, u, v): # BUG sizes not working needs a fix probably just revert back to book implementtion from steven and felix
-        up = self.find_set(u)
-        vp = self.find_set(v)
-        if up==vp:
-            return
+    def union_set(self, u, v):
+        """Join the set that contains u with the set that contains v.
 
-        if self.ranks[up] < self.ranks[vp]:
-            self.parents[up] = vp
-            self.sizes[vp] += self.sizes[up]
-        elif self.ranks[vp] < self.ranks[up]:
-            self.parents[vp] = up
-            self.sizes[up] += self.sizes[vp]
-        else:
-            self.parents[vp] = up
-            self.ranks[up] += 1
-            self.sizes[up] += self.sizes[vp]
-        self.num_sets -= 1
+        Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
+                    Space: Amortized O(1) stack space
+        """
+        if not self.is_same_set(u, v):
+            u_parent, v_parent = self.find_set(u), self.find_set(v)
+            if self.rank[u_parent] > self.rank[v_parent]:   # keep u_parent shorter than v_parent
+                u_parent, v_parent = v_parent, u_parent
+
+            self.parent[u_parent] = v_parent                     # this line joins u with v
+            if self.rank[u_parent] == self.rank[v_parent]:       # an optional speedup
+                self.rank[v_parent] += 1
+            self.set_sizes[v_parent] += self.set_sizes[u_parent] # u -> v so add size_u to size_v
+            self.num_sets -= 1
 
     def size_of_u(self, u): #optional information
-        return self.sizes[self.find_set(u)]
+        """Gives you the size of set u. TIME and SPACE Complexity is the same as find_set"""
+        return self.set_sizes[self.find_set(u)]
 
 ######################################################################################
 #
