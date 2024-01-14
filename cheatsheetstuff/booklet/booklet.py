@@ -99,11 +99,11 @@ class Graph:
         self.num_cols = len(new_grid[0])
         self.grid = [[self.convert_data_to_code(el) for el in row] for row in new_grid]
 
+INF=2**31
+UNVISITED = -1
+EXPLORED  = -2
+VISITED   = -3
 class GraphAlgorithms:
-    INF=2**31
-    UNVISITED = -1
-    EXPLORED  = -2
-    VISITED   = -3
     
     def __init__(self, new_graph):
         self.graph = new_graph
@@ -191,31 +191,29 @@ class GraphAlgorithms:
                 ufds.union_set(u, v)
         self.mst_node_set = min_spanning_tree
         
-    def prims_visit_adj_matrix(self, u):  
-        """Find min weight edge in adjcency matrix implementation of prims.
+    def prims_visit_adj_matrix(self, u, not_visited, mst_best_dist, heap):
+        """Find min weight edge in adjacency matrix implementation of prims.
 
         Complexity per call: Time: O(|V|), Space: O(1)
-        u: input: a node which we observe its neibhours
         """
         # NEEDS FIXING 
-        self.not_visited.remove(u)
-        for v in self.not_visited:
-            w = self.matrix[u][v]
-            if w <= self.dist[v]:
-                self.dist[v] = w
-                heappush(self.heap, (w, v, u)) # fix this
+        not_visited.remove(u)
+        for v in not_visited:
+            wt = self.graph.adj_matrix[u][v]
+            if wt <= mst_best_dist[v]:
+                mst_best_dist[v] = wt
+                heappush(heap, (wt, v, u)) # fix this
     
-    def prims_visit_adj_list(self, u): #needs test
-        """Find min weight edge in adjcency list implementation of prims.
+    def prims_visit_adj_list(self, u, not_visited, mst_best_dist, heap): #needs test
+        """Find min weight edge in adjacency list implementation of prims.
 
         Complexity per call: Time: O(|V| log |V|), Space: increase by O(|V|)
-        u: a node which we observe its neibhours
         """
-        self.not_visited.remove(u)
-        for v, w in self.adj_list[u].items():
-            if w <= self.dist[v] and v in self.not_visited:
-                self.dist[v] = w
-                heappush(self.heap, (w, v, u))
+        not_visited[u] = False
+        for v, wt in self.graph.adj_list[u]:
+            if wt <= mst_best_dist[v] and not_visited[v]:
+                mst_best_dist[v] = wt
+                heappush(heap, (wt, v, u))
     
     def min_spanning_tree_via_prims(self):  #needs test
         """Computes mst of graph G stored in adj_list.
@@ -223,13 +221,15 @@ class GraphAlgorithms:
         Complexity: Time: O(|E| log |V|) or O(|V|^2), Space: O(|E|) or O(|V|^2)
         Usage: same as kruskals
         """
-        self.min_spanning_tree_prims_process(0)
-        nodes_taken = 0
-        while self.heap and nodes_taken < self.num_nodes:
-            w, v, u = heappop(self.heap)
-            if v in self.not_visited:
-                self.min_spanning_tree_prims_process(v)
-                self.mst_node_set.append((w, v, u))
+        not_visited = [True] * self.graph.num_nodes
+        mst_best_dist = [INF] * self.graph.num_nodes
+        heap, min_spanning_tree, nodes_taken = [], [], 0
+        self.prims_visit_adj_list(0, not_visited, mst_best_dist, heap)
+        while heap and nodes_taken < self.graph.num_nodes:
+            wt, v, u = heappop(heap)
+            if not_visited[v]:
+                self.prims_visit_adj_list(v, not_visited, mst_best_dist, heap)
+                min_spanning_tree.append((wt, v, u))
                 nodes_taken += 1
         self.mst_node_set.sort()
 
