@@ -571,7 +571,9 @@ class Graph_Algorithms():
 
     def dfs_bipartite_checker(self):
         pass # find code for this later
+
 from math import isqrt, log
+from itertools import takewhile
 
 class Math_Algorithms:
     def __init__(self):
@@ -602,82 +604,118 @@ class Math_Algorithms:
             if n % p == 0 or n % (p+2) == 0:
                 return False
         return True
-        
-    def sieve_of_eratosthenes_odd_only(self, n):
+
+    def sieve_of_eratosthenes(self, n):
         """Generates list of primes up to n via eratosthenes method.
 
+        Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid call O(n)
+        Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi.
+        """
+        limit, prime_sieve = isqrt(n) + 1, [True] * (n + 1)
+        prime_sieve[0] = prime_sieve[1] = False
+        for i in range(2, limit):
+            if primes_sieve[i]:
+                for j in range(i*i, n+1, i):
+                    primes_sieve[j] = False
+        self.primes_list = [2] + [i for i in enumerate(prime_sieve) if el]
+    
+    def sieve_of_eratosthenes_optimized(self, n):
+        """Odds only optimized version of the previous method
+
         Complexity: Time: O(max(n lnln(sqrt(n)), n)),
-                    Space: O(n/ln(n)) final, O(n/2) aux for sieve
-        Uses: prime generation, prime testing later, phi with mods
-        notes: primes_sieve is local(add self for instance)
+                    Space: post call O(n/ln(n)), mid call O(n/2)
         """
         sqrt_n, limit = ((isqrt(n) - 3)//2) + 1, ((n - 3)//2) + 1
-        self.primes_sieve = [True] * limit
+        primes_sieve = [True] * limit
         for i in range(sqrt_n):
-            if self.primes_sieve[i]:
+            if primes_sieve[i]:
                 prime = 2 * i + 3
                 start = (p * p - 3)//2
                 for j in range(start, limit, prime):
-                    self.primes_sieve[j] = False
+                    primes_sieve[j] = False
         self.primes_list = [2] + [2 * i + 3 for i, el in enumerate(primes_sieve) if el]
 
     def sieve_of_eratosthenes_varients(self, n):
-        """Generates list of primes up to n via eratosthenes method.
+        """Seven variants of prime sieve listed above.
 
-        Complexity: Time: O(n lnln(n)), Space: O(n/ln(n)) final, O(n) aux for sieve
-        Uses: prime generation, prime testing later, phi with mods
-        notes: primes_sieve is local(add self for instance)
+        Complexity: 
+            function 1: Time: O(n lnln(n)), Space: O(n)
+            function 3: Time: O(n log(n)), Space: O(n)
+            function 2: Time: O(n lnln(n) log(n)), Space: O(n)
         """
-        def number_of_diff_prime_factors(limit):
-            num_diff_prime_factos = [0] * (limit + 1)
+        def euler_phi_plus_sum_and_number_of_diff_prime_factors(limit):
+            num_diff_pf = [0] * (limit + 1)
+            sum_diff_pf = [0] * (limit + 1)
+            phi = [i for i in range(limit + 1)]
             for i in range(2, limit):
-                if num_diff_prime_factos[i] == i:
+                if num_diff_pf[i] == i:
                     for j in range(i, limit, i):
-                        num_diff_prime_factos[j] += 1
-            self.num_diff_prime_factos 
-
-        def euler_phi_function(limit):
-            self.euler_phi = [i for i in range(limit + 1)]
-            for i in range(2, limit):
-                if self.euler_phi[i] == 0:
-                    for j in range(i, limit, i):
-                        self.euler_phi[j] = (self.euler_phi[j]/i) * (i-1)
-
+                        num_diff_pf[j] += 1
+                        sum_diff_pf[j] += i
+                        phi[j] = (phi[j]/i) * (i-1)
+            self.num_diff_prime_factors = sum_diff_pf
+            self.sum_diff_prime_factors = sum_diff_pf
+            self.euler_phi = phi
+            
         def num_and_sum_of_divisors(limit):
-            self.num_divisors = [1] * (limit + 1)
-            self.sum_divisors = [1] * (limit + 1)
+            num_div = [1] * (limit + 1)
+            sum_div = [1] * (limit + 1)
             for i in range(2, limit):
                 for j in range(i, limit, i):
-                    self.num_divisors[j] += 1
-                    self.sum_divisors[j] += i
+                    num_div[j] += 1
+                    sum_div[j] += i
+            self.num_divisors = num_div
+            self.sum_divisors = sum_div
 
         def num_and_sum_of_prime_factors(limit):
-            self.num_prime_factors = [0] * (limit + 1)
-            self.sum_prime_factors = [0] * (limit + 1)
+            num_pf = [0] * (limit + 1)
+            sum_pf = [0] * (limit + 1)
             self.sieve_of_eratosthenes_odd_only(limit)
             for prime in self.prime_list:
                 exponent_limit = int(log(limit, prime)) + 1
                 for exponent in range(1, exponent_limit):
                     prime_to_exponent = prime**exponent
                     for i in range(prime_to_exponent, limit, prime_to_exponent):
-                        self.sum_prime_factors[i] += prime
-                        self.num_prime_factors[i] += 1
-            
+                        sum_pf[i] += prime
+                        num_pf[i] += 1
+            self.num_prime_factors = num_pf
+            self.sum_prime_factors = sum_pf
     
     def gen_set_primes(self):
         self.primes_set=set(self.primes_list)
 
+    def prime_factorize_n(self, n):
+        prime_factors = []
+        for prime in takewhile(lambda x: x*x <= n, self.primes_list):
+            if n % prime == 0:
+                while n % prime == 0:
+                    n //= prime
+                    prime_factors.append(prime)
+        return [n] if n > 1 else prime_factors
+
     def prime_factorize(self, n):
-        self.prime_factors = [] # clobbers the previous prime factors so save before calling this func
-        for p in self.primes_list:
-            if p*p > n:
-                break
-            if n%p == 0:
-                while n%p == 0:
-                    n//=p
-                    self.prime_factors.append(p)
-        if n > 1:
-            self.prime_factors.append(n)
+        sum_diff_prime_factors, num_diff_prime_factors = 0, 0
+        sum_prime_factors, num_prime_factors = 0, 0
+        sum_divisors, num_divsors = 1, 1
+        for prime in takewhile(lambda x: x*x <= n, self.primes_list):
+            if n % prime == 0:
+                mul, total = prime, 1  # for sum of divisors
+                power = 0              # for num of divisors
+                while n % prime == 0:
+                    n //= prime
+                    power += 1
+                    total += mul
+                    mul *= prime
+                sum_diff_prime_factors += prime
+                num_diff_prime_factors += 1
+                sum_prime_factors += (power * prime)
+                num_prime_factors += power
+                num_divisors *= (power + 1)
+                sum_divisors *= total
+        if n > 1: # n was prime
+            sum_diff_prime_factors, num_diff_prime_factors = n, 1
+            sum_prime_factors, num_prime_factors = n, 1
+            sum_divisors, num_divsors = n + 1, n + 1
 
    def is_composite(self, a, d, n, s):
         if pow(a, d, n)==1:
