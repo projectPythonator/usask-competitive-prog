@@ -47,7 +47,6 @@ class UnionFindDisjointSets:
         return self.set_sizes[self.find_set(u)]
 
 ######################################################################################
-#
 from collections import deque
 from heapq import heappush, heappop, heapreplace, heapify
 from sys import setrecursionlimit
@@ -111,6 +110,8 @@ class GraphAlgorithms:
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.mst_node_set = None
         self.dist = None
+        self.visited = None
+        self.topo_sort_node_set = None
 
     def init_structures(self): #take what you need and leave the rest
         from collections import deque
@@ -140,8 +141,9 @@ class GraphAlgorithms:
 
         Complexity: Time: O(|V| + |E|), Space O(|V|): for grids usually |V|=row*col and |E|=4*|V|
         More uses: Region Colouring, Connectivity, Area/island Size, misc
-        row, col: --------- input: integer pair representing current grid position 
-        old_val, new_val: - input: unexplored state, the value of an explored state
+        Input
+            row, col: integer pair representing current grid position
+            old_val, new_val: unexplored state, the value of an explored state
         """
         self.graph.grid[row][col] = new_val
         for row_mod, col_mod in self.dir_rc:
@@ -155,7 +157,7 @@ class GraphAlgorithms:
         """Computes flood fill graph traversal via breadth first search. Use on grid graphs.
 
         Complexity: Time: O(|V| + |E|), Space O(|V|): for grids usually |V|=row*col and |E|=4*|V|
-        More uses: previous uses plus shortest connected path
+        More uses: previous uses tplus shortest connected pah
         """
         queue = deque([(start_row, start_col)])
         while queue:
@@ -172,11 +174,11 @@ class GraphAlgorithms:
     def min_spanning_tree_via_kruskals_and_heaps(self):  #needs test
         """Computes mst of graph G stored in edge_list, space optimized via heap.
 
-        Complexity: Time: O(|E| log |V|), Space O(|E|) + Union_Find
+        Complexity: Time: O(|E|log |V|), Space O(|E|) + Union_Find
         More uses: finding min spanning tree
         Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning tree
         Optimization: We use a heap to make space comp. O(|E|) 
-        instead of O(|E| log |E|) when using sort, however edge_list is CONSUMED.
+        instead of O(|E|log |E|) when using sort, however edge_list is CONSUMED.
         """
         heapify(self.graph.edge_list)
         ufds = UnionFindDisjointSets(self.graph.num_nodes)
@@ -205,7 +207,7 @@ class GraphAlgorithms:
     def prims_visit_adj_list(self, u, not_visited, mst_best_dist, heap): #needs test
         """Find min weight edge in adjacency list implementation of prims.
 
-        Complexity per call: Time: O(|V| log |V|), Space: increase by O(|V|)
+        Complexity per call: Time: O(|V|log |V|), Space: increase by O(|V|)
         """
         not_visited[u] = False
         for v, wt in self.graph.adj_list[u]:
@@ -216,7 +218,7 @@ class GraphAlgorithms:
     def min_spanning_tree_via_prims(self):  #needs test
         """Computes mst of graph G stored in adj_list.
 
-        Complexity: Time: O(|E| log |V|) or O(|V|^2), Space: O(|E|) or O(|V|^2)
+        Complexity: Time: O(|E|log |V|) or O(|V|^2), Space: O(|E|) or O(|V|^2)
         Usage: same as kruskals
         """
         not_visited = [True] * self.graph.num_nodes
@@ -236,7 +238,8 @@ class GraphAlgorithms:
 
         Complexity per call: Time: O(|V| + |E|), Space O(|V|)
         More uses: connectivity, shortest path on monotone weighted graphs
-        source: input: is the node we start from
+        Input:
+            source: is the node we start from
         """
         distance = [UNVISITED] * self.graph.num_nodes
         queue, distance[source] = deque([source]), 0
@@ -249,13 +252,12 @@ class GraphAlgorithms:
         self.dist = distance
 
     def topology_sort_via_tarjan_helper(self, u):
-        """auxiliary function used to recursively explore via dfs
+        """Recursively explore unvisited graph via dfs.
 
         Complexity per call: Time: O(|V|), Space O(|V|) at deepest point
-        Uses: to build our node set in post order traversal
         """
         self.visited[u] = VISITED
-        for v in self.adj_list[u]:
+        for v in self.graph.adj_list[u]:
             if self.visited[v] == UNVISITED:
                 self.topology_sort_via_tarjan_helper(v)
         self.topo_sort_node_set.append(u)
@@ -264,33 +266,36 @@ class GraphAlgorithms:
         """Compute a topology sort via tarjan method, on adj_list.
 
         Complexity per call: Time: O(|V| + |E|), Space O(|V|)
-        Uses: produces a DAG, topology sorted graph, build dependancies
+        More Uses: produces a DAG, topology sorted graph, build dependencies
         """
+        self.visited = [UNVISITED] * self.graph.num_nodes
         self.topo_sort_node_set = []
-        for u in range(self.num_nodes):
-            if self.visited[v] == UNVISITED:
+        for u in range(self.graph.num_nodes):
+            if self.visited[u] == UNVISITED:
                 self.topology_sort_via_tarjan_helper(u)
         self.topo_sort_node_set = self.topo_sort_node_set[::-1]
 
     def topology_sort_via_kahns(self):
-        """Compute a topology sort via kahns method, on adj_list.
+        """Compute a topology sort via kahn's method, on adj_list.
 
-        Complexity per call: Time: O(|E| log |V|), Space O(|V|)
-        Uses: same as tarjans version however the ordering is different
-        bonus: heaps allow for custom ordering (i.e use lowest indices first)
+        Complexity per call: Time: O(|E|log|V|), Space O(|V|)
+        Uses: same as tarjan's version however the ordering is different
+        bonus: heaps allow for custom ordering (i.e. use lowest indices first)
         """
-        for list_of_u in self.adj_list:
+        in_degree = [0] * self.graph.num_nodes
+        topo_sort = []
+        for list_of_u in self.graph.adj_list:
             for v in list_of_u:
-                self.in_degree[v] += 1
-        for u in range(self.num_nodes):
-            if 0 == self.in_degree[u]:
-                heapppush(self.heap, u)
-        while self.heap:
-            u = heappop(self.heap)
-            for v in self.adj_list[u]:
-                self.in_degree[v] -= 1
-                if self.in_degree[v] <= 0:
-                    heappush(self.heap, v)
+                in_degree[v] += 1
+        heap = [u for u, el in enumerate(in_degree) if el == 0]
+        heapify(heap)
+        while heap:
+            u = heappop(heap)
+            topo_sort.append(u)
+            for v in self.graph.adj_list[u]:
+                in_degree[v] -= 1
+                if in_degree[v] <= 0:
+                    heappush(heap, v)
 
     def single_source_shortest_path_dijkstras(self, source, sink): #needs test
         """It is Dijkstra's pathfinder using heaps.
@@ -608,7 +613,7 @@ class GraphAlgorithms:
     def dfs_bipartite_checker(self):
         pass # find code for this later
 
-from math import isqrt, log
+from math import isqrt, log, gcd
 from itertools import takewhile
 
 class Math_Algorithms:
@@ -644,16 +649,16 @@ class Math_Algorithms:
     def sieve_of_eratosthenes(self, n):
         """Generates list of primes up to n via eratosthenes method.
 
-        Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid call O(n)
+        Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
         Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi.
         """
         limit, prime_sieve = isqrt(n) + 1, [True] * (n + 1)
         prime_sieve[0] = prime_sieve[1] = False
         for i in range(2, limit):
-            if primes_sieve[i]:
+            if prime_sieve[i]:
                 for j in range(i*i, n+1, i):
-                    primes_sieve[j] = False
-        self.primes_list = [2] + [i for i in enumerate(prime_sieve) if el]
+                    prime_sieve[j] = False
+        self.primes_list = [2] + [i for i in enumerate(prime_sieve) if i]
     
     def sieve_of_eratosthenes_optimized(self, n):
         """Odds only optimized version of the previous method
@@ -665,13 +670,13 @@ class Math_Algorithms:
         primes_sieve = [True] * limit
         for i in range(sqrt_n):
             if primes_sieve[i]:
-                prime = 2 * i + 3
-                start = (p * p - 3)//2
+                prime = 2*i + 3
+                start = (prime * prime - 3)//2
                 for j in range(start, limit, prime):
                     primes_sieve[j] = False
-        self.primes_list = [2] + [2 * i + 3 for i, el in enumerate(primes_sieve) if el]
+        self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
-    def sieve_of_eratosthenes_varients(self, n):
+    def sieve_of_eratosthenes_variants(self, n):
         """Seven variants of prime sieve listed above.
 
         Complexity: 
@@ -684,7 +689,7 @@ class Math_Algorithms:
             sum_diff_pf = [0] * (limit + 1)
             phi = [i for i in range(limit + 1)]
             for i in range(2, limit):
-                if num_diff_pf[i] == i:
+                if num_diff_pf[i] == 0:
                     for j in range(i, limit, i):
                         num_diff_pf[j] += 1
                         sum_diff_pf[j] += i
@@ -721,8 +726,9 @@ class Math_Algorithms:
         self.primes_set=set(self.primes_list)
 
     def prime_factorize_n(self, n):
+        limit = isqrt(n) + 1
         prime_factors = []
-        for prime in takewhile(lambda x: x*x <= n, self.primes_list):
+        for prime in takewhile(lambda x: x < limit, self.primes_list):
             if n % prime == 0:
                 while n % prime == 0:
                     n //= prime
@@ -730,10 +736,11 @@ class Math_Algorithms:
         return [n] if n > 1 else prime_factors
 
     def prime_factorize(self, n):
+        limit = isqrt(n) + 1
         sum_diff_prime_factors, num_diff_prime_factors = 0, 0
         sum_prime_factors, num_prime_factors = 0, 0
-        sum_divisors, num_divsors = 1, 1
-        for prime in takewhile(lambda x: x*x <= n, self.primes_list):
+        sum_divisors, num_divisors = 1, 1
+        for prime in takewhile(lambda x: x < limit, self.primes_list):
             if n % prime == 0:
                 mul, total = prime, 1  # for sum of divisors
                 power = 0              # for num of divisors
@@ -751,15 +758,15 @@ class Math_Algorithms:
         if n > 1: # n was prime
             sum_diff_prime_factors, num_diff_prime_factors = n, 1
             sum_prime_factors, num_prime_factors = n, 1
-            sum_divisors, num_divsors = n + 1, n + 1
+            sum_divisors, num_divisors = n + 1, n + 1
 
-   def is_composite(self, a, d, n, s):
-        if pow(a, d, n)==1:
-            return False
-        for i in range(s):
-            if pow(a, 2**i * d, n)==n-1:
+        def is_composite(self, a, d, n, s):
+            if pow(a, d, n)==1:
                 return False
-        return True 
+            for i in range(s):
+                if pow(a, 2**i * d, n)==n-1:
+                    return False
+            return True
     
     def is_prime_mrpt(self, n, precision_for_huge_n=16):
         if n in self.primes_set:
@@ -831,7 +838,7 @@ class Math_Algorithms:
     #test this its from stanford icpc 2013-14
     #computes x and y in ax+by=c failure x=y=-1
     def linear_diophantine(self, a, b, c):
-        d = math.gcd(a,b)
+        d = gcd(a,b)
         if c%d == 0:
             x = c//d * self.mod_inverse(a//b, b//d)
             return (x, (c - a*x//b))
@@ -985,7 +992,7 @@ class Quad_Edge:
     def o_prev(self): return self.rot.o_next.rot
     def dest(self): return self.rev().origin
 
-class Quad_edge_data_structure:
+class QuadEdgeDataStructure:
     def __init__(self):
         pass
 
@@ -1028,7 +1035,7 @@ class Quad_edge_data_structure:
 
 class Geometry_Algorithms:
     def __init__(self):
-        self.quad_edges = Quad_Edge_Data_Structure()
+        self.quad_edges = QuadEdgeDataStructure()
         
     # replacing epscmp and c_cmp for epscmp simply use compare_ab(a, 0) or math.isclose(a, 0)
     def compare_ab(self, a, b): return 0 if isclose(a, b) else -1 if a<b else 1
@@ -1131,8 +1138,8 @@ class Geometry_Algorithms:
 
     def pts_two_circles_intersect_ar1_br1_2d(self, c1, c2, r1, r2):
         center_dist = self.distance_normalized_2d(c1, c2)
-        if self.compare_ab(center_dist, r1+r2) <= 0 \
-        and self.compare_ab(center_dist+min(r1, r2), max(r1, r2)) >= 0:
+        if (self.compare_ab(center_dist, r1+r2) <= 0
+            and self.compare_ab(center_dist+min(r1, r2), max(r1, r2)) >= 0):
             x = (center_dist*center_dist - r2*r2 + r1*r1)/(2*center_dist)
             y = sqrt(r1*r1 - x*x)
             v = (b-a)/center_dist
@@ -1387,8 +1394,8 @@ class Geometry_Algorithms:
     def convex_hull_monotone_chain(self, pts):
         def func(points, r, lim):
             for p in points:
-                while len(r) > lim and \
-                    self.point_c_rotation_wrt_line_ab_2d(r[-2], r[-1], p)) == -1:
+                while (len(r) > lim and
+                    self.point_c_rotation_wrt_line_ab_2d(r[-2], r[-1], p) == -1):
                     r.pop()
                 r.append(p)
             r.pop()
@@ -1396,8 +1403,8 @@ class Geometry_Algorithms:
         if len(ans) < 2: 
             return ans
         func(ans, convex, 1)
-        func(ans[::-1], convex, len(r)+1)
-        return r
+        func(ans[::-1], convex, len(convex)+1)
+        return convex
     
     def rotating_caliper_of_polygon_pts_2d(self, pts):
         n, t, ans = len(pts)-1, 0, 0.0
@@ -1515,7 +1522,7 @@ class Geometry_Algorithms:
         # kek = angle(a, b, c) + angle(c, d, a) - angle(b, c, d) - angle(d, a, b)
         # return self.compare_ab(kek, 0.0) > 0
 
-    def build_triangulation(l, r, pts):
+    def build_triangulation(self, l, r, pts):
         if r - l + 1 == 2:
             res = self.quad_edges.make_edge(pts[l], pts[r])
             return (res, res.rev())
@@ -1542,7 +1549,7 @@ class Geometry_Algorithms:
         base_edge_l = self.quad_edges.connect(rdi.rev(), ldi)
         if ldi.origin == ldo.origin:
             ldo = base_edge_l.rev()
-        if rdi.origin == rlo.origin:
+        if rdi.origin == rdo.origin:
             rdo = base_edge_l
         while True:
             l_cand_edge = base_edge_l.rev().o_next
@@ -1916,7 +1923,7 @@ class Matrix_Algorithhms:
             pj, pk = -1, -1
             for j in ipivj:
                 for k in ipivk:
-                    if pj == -1 or abs(a.mat[j][k]) > abs(a.math[pj][pk]:
+                    if pj == -1 or abs(a.mat[j][k]) > abs(a.math[pj][pk]):
                         pj, pk = j, k
             ipivj.remove(pk)
             ipivk.remove(pk)
