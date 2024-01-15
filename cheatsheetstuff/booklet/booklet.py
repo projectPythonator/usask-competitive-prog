@@ -107,12 +107,19 @@ class GraphAlgorithms:
     
     def __init__(self, new_graph):
         self.graph = new_graph
+        self.dfs_counter = None
+        self.dfs_root = None
+        self.root_children = None
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.mst_node_set = None
         self.dist = None
         self.visited = None
         self.topo_sort_node_set = None
+        self.parent = None
+        self.low_values = None
+        self.articulation_nodes = None
+        self.bridge_edges = None
 
     #def init_structures(self): #take what you need and leave the rest
     
@@ -330,66 +337,68 @@ class GraphAlgorithms:
                     distance[v] = cur_dist + wt
                     parents[v] = u
                     heappush(heap, (distance[v], v))
+        self.dist = distance
+        self.parent = parents
     
     def all_pairs_shortest_path_floyd_warshall(self): #needs test
         """Computes essentially a matrix operation on a graph.
 
         Complexity per call: Time: O(|V|^3), Space O(|V|^2)
-        More uses: Shortest path and Transitive closure.
-        Variants: Maximin and Minimax path, Cheapest negative cycle,
+        More uses: Shortest path, Connectivity.
+        Variants: Transitive closure, Maximin and Minimax path, Cheapest negative cycle,
                   Finding diameter of a graph, Finding SCC of a directed graph.
         """
-        for k in range(self.num_nodes):
-            for i in range(self.num_nodes):
-                for j in range(self.num_nodes):
-                    self.matrix[i][j] = min(self.matrix[i][j], self.matrix[i][k]+self.matrix[k][j])
+        matrix = self.graph.adj_matrix
+        for k in range(self.graph.num_nodes):
+            for i in range(self.graph.num_nodes):
+                for j in range(self.graph.num_nodes):
+                    matrix[i][j] = min(matrix[i][j], matrix[i][k] + matrix[k][j])
 
     def apsp_floyd_warshall_neg_cycles(self): #needs test
-        for i in range(self.num_nodes):
-            for j in range(self.num_nodes):
-                for k in range(self.num_nodes):
-                    if self.matrix[k][k]<0 and self.matrix[i][k]!=INF and self.matrix[k][j]!=INF:
-                        self.matrix[i][j]=-INF
+        matrix = self.graph.adj_matrix
+        for i in range(self.graph.num_nodes):
+            for j in range(self.graph.num_nodes):
+                for k in range(self.graph.num_nodes):
+                    if matrix[k][k] < 0 and matrix[i][k] != INF and matrix[k][j] != INF:
+                        matrix[i][j] = -INF
 
-    def articulation_point_and_bridge_helper_via_dfs(self, u): # need to rego over this and test it *** not as confident as the other code atm since have not really used it to solve a problem
-        """Auxiliary that preformas the recursive traversal for the caller.
+    def articulation_point_and_bridge_helper_via_dfs(self, u):
+        # need to rego over this and test it *** not as confident as the other code atm since have
+        # not really used it to solve a problem
+        """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
         Complexity per call: Time: O(|V|), Space O(|V|)
-        Uses: 
         """
         self.visited[u] = self.dfs_counter
         self.low_values[u] = self.visited[u]
         self.dfs_counter += 1
-        for v in self.adj_list[u]:
+        for v in self.graph.adj_list[u]:
             if self.visited[v] == UNVISITED:
                 self.parent[v] = u
                 if u == self.dfs_root:
                     self.root_children += 1
                 self.articulation_point_and_bridge_helper_via_dfs(v)
                 if self.low_values[v] >= self.visited[u]:
-                    self.articulation_points[u] = 1
+                    self.articulation_nodes[u] = True
                     if self.low_values[v] > self.visited[u]:
-                        print((u, v))
+                        self.bridge_edges.append((u, v))
                 self.low_values[u] = min(self.low_values[u], self.low_values[v])
-            elif v != self.parents[u]:
+            elif v != self.parent[u]:
                 self.low_values[u] = min(self.low_values[u], self.visited[v])
 
     def articulation_points_and_bridges_via_dfs(self):
         """Generates the name on an adj_list based graph.
 
         Complexity per call: Time: O(|E| + |V|), Space O(|V|)
-        Uses: finding the sets of single edge and vertex removals that disconnect the graph
+        More uses: finding the sets of single edge and vertex removals that disconnect the graph.
         """
         self.dfs_counter = 0
-        for u in range(self.num_nodes):
+        for u in range(self.graph.num_nodes):
             if self.visited[u] == UNVISITED:
                 self.dfs_root = u
                 self.root_children = 0
                 self.articulation_point_and_bridge_helper_via_dfs(u)
-                self.articulation_points[self.dfs_root] = (self.root_children > 1)
-        for i,u in enumerate(self.articulation_points):
-            if u:
-                print("vertix {}".format(i))
+                self.articulation_nodes[self.dfs_root] = (self.root_children > 1)
 
     def cycle_check_on_directed_graph_helper(self, u):
         """Auxiliary function the starts from an unvisited node and runs dfs.
