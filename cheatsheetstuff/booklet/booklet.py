@@ -130,6 +130,7 @@ class GraphAlgorithms:
         self.decrease_finish_order = None
         self.nodes_on_stack = None
         self.node_state = None
+        self.bipartite_colouring = None
 
     def flood_fill_via_dfs(self, row, col, old_val, new_val): #needs test
         """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
@@ -491,32 +492,39 @@ class GraphAlgorithms:
             if self.node_state[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
 
-    def bipartite_check_on_graph_helper(self, source):
-        self.queue = deque([source])
-        self.color[source] = 0
+    def bipartite_check_on_graph_helper(self, source, color):
+        """Uses bfs to check if the graph region connected to source is bipartite.
+
+        Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
+        """
+        queue = deque([source])
+        color[source] = 0
         is_bipartite = True
-        while self.queue and is_bipartite:
-            u = self.queue.popleft()
-            for v in self.adj_list[u]:
-                if self.color[v] == UNVISITED:
-                    self.color[v] = not self.color[u]
-                    self.queue.append(v)
-                elif self.color[v] == self.color[u]:
+        while queue and is_bipartite:
+            u = queue.popleft()
+            for v in self.graph.adj_list[u]:
+                if color[v] == UNVISITED:
+                    color[v] = not color[u]
+                    queue.append(v)
+                elif color[v] == color[u]:
                     is_bipartite = False
                     break
+        return is_bipartite
 
     def bipartite_check_on_graph(self):
         """Checks if a graph has the bipartite property.
 
-        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
-        Uses: check bipartite, labeling a graph for 2 coloring, 
+        Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
+        More Uses: check bipartite property, labeling a graph for 2 coloring if it is bipartite.
         """
-        for u in range(self.num_nodes):
-            if self.color[u] == UNVISITED:
-                self.bipartite_check_on_graph_helper(u)
+        is_bipartite, color = True, [UNVISITED] * self.graph.num_nodes
+        for u in range(self.graph.num_nodes):
+            if color[u] == UNVISITED:
+                is_bipartite = is_bipartite and self.bipartite_check_on_graph_helper(u, color)
+                if not is_bipartite:
+                    break
+        self.bipartite_colouring = color if is_bipartite else None
 
-    def bfs_cycle_checker(self):
-        pass #need to get the implimentation 
 
     def max_flow_find_augmenting_path_helper(self, source, sink):
         """Auxiliary function to find an augmenting path in the graph from source to sink.
