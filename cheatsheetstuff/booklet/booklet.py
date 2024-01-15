@@ -47,8 +47,9 @@ class UnionFindDisjointSets:
         return self.set_sizes[self.find_set(u)]
 
 ######################################################################################
+from math import log2
 from collections import deque
-from heapq import heappush, heappop, heapreplace, heapify
+from heapq import heappush, heappop, heapify
 from sys import setrecursionlimit
 setrecursionlimit(100000)
 
@@ -113,8 +114,7 @@ class GraphAlgorithms:
         self.visited = None
         self.topo_sort_node_set = None
 
-    def init_structures(self): #take what you need and leave the rest
-        from collections import deque
+    #def init_structures(self): #take what you need and leave the rest
     
         # self.queue = deque()
         # self.not_visited = set(list(range(self.num_nodes)))
@@ -219,7 +219,7 @@ class GraphAlgorithms:
         """Computes mst of graph G stored in adj_list.
 
         Complexity: Time: O(|E|log |V|) or O(|V|^2), Space: O(|E|) or O(|V|^2)
-        Usage: same as kruskals
+        More uses: gets a different min spamming tree than kruskal's
         """
         not_visited = [True] * self.graph.num_nodes
         mst_best_dist = [INF] * self.graph.num_nodes
@@ -279,14 +279,14 @@ class GraphAlgorithms:
         """Compute a topology sort via kahn's method, on adj_list.
 
         Complexity per call: Time: O(|E|log|V|), Space O(|V|)
-        Uses: same as tarjan's version however the ordering is different
+        More uses: different ordering as tarjan's method
         bonus: heaps allow for custom ordering (i.e. use lowest indices first)
         """
         in_degree = [0] * self.graph.num_nodes
-        topo_sort = []
         for list_of_u in self.graph.adj_list:
             for v in list_of_u:
                 in_degree[v] += 1
+        topo_sort = []
         heap = [u for u, el in enumerate(in_degree) if el == 0]
         heapify(heap)
         while heap:
@@ -297,27 +297,39 @@ class GraphAlgorithms:
                 if in_degree[v] <= 0:
                     heappush(heap, v)
 
+    def amortized_heap_fix(self, heap):
+        """Should we need |V| space this will ensure that while still being O(log|V|)"""
+        tmp = [-1] * self.graph.num_nodes
+        for wt, v in heap:
+            if tmp[v] == -1:
+                tmp[v] = wt
+        heap = [(wt, v) for v, wt in enumerate(tmp) if wt != -1]
+        heapify(heap)
+
     def single_source_shortest_path_dijkstras(self, source, sink): #needs test
         """It is Dijkstra's pathfinder using heaps.
 
-        Complexity per call: Time: O(|E|log |V|), Space O(|E|)
-        Uses: used for finding the weighted shortest path varients
-        source: - input: can be a single nodes or list of nodes
-        sink: --- input: the goal node
+        Complexity per call: Time: O(|E|log |V|), Space O(|V|)
+        More uses: shortest path on state based graphs
+        Input:
+            source: can be a single nodes or list of nodes
+            sink: the goal node
         """
-        heappush(self.heap, (0, source))
-        self.dist[source] = 0
-        self.parent[source] = source
-        while self.heap:
-            cur_dist, u = heappop(self.heap)
-            if self.dist[u] < cur_dist:
+        distance, parents = [INF] * self.graph.num_nodes, [UNVISITED] * self.graph.num_nodes
+        distance[source], parents[source] = 0, source
+        heap, limit = [(0, source)], 2**(int(log2(self.graph.num_nods)) + 4)
+        while heap:
+            # if len(heap) > limit:
+            #     self.amortized_heap_fix(heap)
+            cur_dist, u = heappop(heap)
+            if distance[u] < cur_dist:
                 continue
             # if u == sink: return cur_dist #uncomment this line for fast return
-            for v, weight in self.adj_list[u].items():
-                if (self.dist[v] > cur_dist + weight):
-                    self.dist[v] = cur_dist + weight
-                    self.parent[v] = u
-                    heappush(self.heap, (self.dist[v], v))
+            for v, wt in self.graph.adj_list[u]:
+                if distance[v] > cur_dist + wt:
+                    distance[v] = cur_dist + wt
+                    parents[v] = u
+                    heappush(heap, (distance[v], v))
     
     def all_pairs_shortest_path_floyd_warshall(self): #needs test
         """Computes essentially a matrix operation on a graph.
