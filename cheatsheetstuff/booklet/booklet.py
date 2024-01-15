@@ -114,6 +114,7 @@ class GraphAlgorithms:
         self.dfs_counter = None
         self.dfs_root = None
         self.root_children = None
+        self.region_num = None
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.mst_node_set = None
@@ -125,6 +126,8 @@ class GraphAlgorithms:
         self.articulation_nodes = None
         self.bridge_edges = None
         self.directed_edge_type = None
+        self.component_region = None
+        self.decrease_finish_order = None
 
     #def init_structures(self): #take what you need and leave the rest
     
@@ -440,38 +443,37 @@ class GraphAlgorithms:
             if self.visited[u] == UNVISITED:
                 self.cycle_check_on_directed_graph_helper(u)
   
-    def strongly_connected_components_of_graph_kosaraju(self, u, pass_one):
-        """Double use auxiliary function compressed into 1 for marking edges.
+    def strongly_connected_components_of_graph_kosaraju_helper(self, u, pass_one):
+        """Pass one explore G and build stack, Pass two mark the SCC regions on transposition of G.
 
-        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
-        Uses: exploring SCC to build stack(pass one), marking SCC pass two.
-        u: -------- input: the current node u we are observing.
-        pass_one: - input: True if first pass false otherwise.
+        Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
         """
         self.visited[u] = VISITED
-        self.scc[u] = self.num_scc
-        neighbours = self.adj_list[u] if pass_one else self.adj_list_trans[u]
+        self.component_region[u] = self.region_num
+        neighbours = self.graph.adj_list[u] if pass_one else self.graph.adj_list_trans[u]
         for v in neighbours:
             if self.visited[v] == UNVISITED:
-                self.strongly_connected_components_of_graph_kosaraju(v, pass_one)
+                self.strongly_connected_components_of_graph_kosaraju_helper(v, pass_one)
         if pass_one:
-            self.stk.append(u)
+            self.decrease_finish_order.append(u)
 
     def strongly_connected_components_of_graph_kosaraju(self):
-        """Marks the SCC of a directed graph using kosaraju's method.
+        """Marks the SCC of a directed graph using Kosaraju's method.
 
         Complexity per call: Time: O(|E| + |V|), Space O(|V|)
-        Uses: Labeling and Identifying SCC regions(marks regions by numbers).
+        More Uses: Labeling and Identifying SCC regions(marks regions by numbers).
         """
-        for u in range(self.num_nodes):
+        self.visited = [UNVISITED] * self.graph.num_nodes
+        self.component_region = [0] * self.graph.num_nodes
+        for u in range(self.graph.num_nodes):
             if self.visited[u] == UNVISITED:
-                self.strongly_connected_components_of_graph_kosaraju(u, True)
-        self.visited = [UNVISITED] * self.num_nodes
-        self.num_scc = 1
-        for u in reversed(self.stk):
+                self.strongly_connected_components_of_graph_kosaraju_helper(u, True)
+        self.visited = [UNVISITED] * self.graph.num_nodes
+        self.region_num = 1
+        for u in reversed(self.decrease_finish_order):
             if self.visited[u] == UNVISITED:
-                self.strongly_connected_components_of_graph_kosaraju(u, False)
-                self.num_scc += 1
+                self.strongly_connected_components_of_graph_kosaraju_helper(u, False)
+                self.region_num += 1
     
     def strongly_connected_components_of_graph_tarjans_helper(self, u):
         """Auxiliary function for computing the recursion part of tarjans
