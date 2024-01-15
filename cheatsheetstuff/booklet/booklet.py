@@ -128,33 +128,13 @@ class GraphAlgorithms:
         self.directed_edge_type = None
         self.component_region = None
         self.decrease_finish_order = None
-
-    #def init_structures(self): #take what you need and leave the rest
-    
-        # self.queue = deque()
-        # self.not_visited = set(list(range(self.num_nodes)))
-        # self.visited = [UNVISITED]*self.num_nodes
-        # self.node_state = [UNVISITED] * self.num_nodes
-        # self.stk = []
-        # self.heap = []
-        # self.dir_rc = [(1,0), (0,1), (-1,0), (0,-1)]
-        # self.in_degree = [0]*self.num_nodes
-        # self.color = [INF]*self.num_nodes
-        # self.low_values = [0]*self.num_nodes
-        # self.parent = [-1]*self.num_nodes
-    
-        # self.dist = [INF]*self.num_nodes
-        # self.mst_node_set = []
-        # self.topo_sort_node_set = []
-        # self.articulation_points = []
-
-        # self.num_scc = 0
-        # self.dfs_counter = 0
+        self.nodes_on_stack = None
+        self.node_state = None
 
     def flood_fill_via_dfs(self, row, col, old_val, new_val): #needs test
         """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
 
-        Complexity: Time: O(|V| + |E|), Space O(|V|): for grids usually |V|=row*col and |E|=4*|V|
+        Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
         More uses: Region Colouring, Connectivity, Area/island Size, misc
         Input
             row, col: integer pair representing current grid position
@@ -171,7 +151,7 @@ class GraphAlgorithms:
     def flood_fill_via_bfs(self, start_row, start_col, old_val, new_val):  #needs test
         """Computes flood fill graph traversal via breadth first search. Use on grid graphs.
 
-        Complexity: Time: O(|V| + |E|), Space O(|V|): for grids usually |V|=row*col and |E|=4*|V|
+        Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
         More uses: previous uses tplus shortest connected pah
         """
         queue = deque([(start_row, start_col)])
@@ -189,7 +169,7 @@ class GraphAlgorithms:
     def min_spanning_tree_via_kruskals_and_heaps(self):  #needs test
         """Computes mst of graph G stored in edge_list, space optimized via heap.
 
-        Complexity: Time: O(|E|log |V|), Space O(|E|) + Union_Find
+        Complexity: Time: O(|E|log |V|), Space: O(|E|) + Union_Find
         More uses: finding min spanning tree
         Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning tree
         Optimization: We use a heap to make space comp. O(|E|) 
@@ -251,7 +231,7 @@ class GraphAlgorithms:
     def breadth_first_search_vanilla_template(self, source): #needs test
         """Template for distance based bfs traversal from node source.
 
-        Complexity per call: Time: O(|V| + |E|), Space O(|V|)
+        Complexity per call: Time: O(|V| + |E|), Space: O(|V|)
         More uses: connectivity, shortest path on monotone weighted graphs
         Input:
             source: is the node we start from
@@ -269,7 +249,7 @@ class GraphAlgorithms:
     def topology_sort_via_tarjan_helper(self, u):
         """Recursively explore unvisited graph via dfs.
 
-        Complexity per call: Time: O(|V|), Space O(|V|) at deepest point
+        Complexity per call: Time: O(|V|), Space: O(|V|) at deepest point
         """
         self.visited[u] = VISITED
         for v in self.graph.adj_list[u]:
@@ -280,7 +260,7 @@ class GraphAlgorithms:
     def topology_sort_via_tarjan(self):
         """Compute a topology sort via tarjan method, on adj_list.
 
-        Complexity per call: Time: O(|V| + |E|), Space O(|V|)
+        Complexity per call: Time: O(|V| + |E|), Space: O(|V|)
         More Uses: produces a DAG, topology sorted graph, build dependencies
         """
         self.visited = [UNVISITED] * self.graph.num_nodes
@@ -293,7 +273,7 @@ class GraphAlgorithms:
     def topology_sort_via_kahns(self):
         """Compute a topology sort via kahn's method, on adj_list.
 
-        Complexity per call: Time: O(|E|log|V|), Space O(|V|)
+        Complexity per call: Time: O(|E|log|V|), Space: O(|V|)
         More uses: different ordering as tarjan's method
         bonus: heaps allow for custom ordering (i.e. use lowest indices first)
         """
@@ -324,7 +304,7 @@ class GraphAlgorithms:
     def single_source_shortest_path_dijkstras(self, source, sink): #needs test
         """It is Dijkstra's pathfinder using heaps.
 
-        Complexity per call: Time: O(|E|log |V|), Space O(|V|)
+        Complexity per call: Time: O(|E|log |V|), Space: O(|V|)
         More uses: shortest path on state based graphs
         Input:
             source: can be a single nodes or list of nodes
@@ -351,7 +331,7 @@ class GraphAlgorithms:
     def all_pairs_shortest_path_floyd_warshall(self): #needs test
         """Computes essentially a matrix operation on a graph.
 
-        Complexity per call: Time: O(|V|^3), Space O(|V|^2)
+        Complexity per call: Time: O(|V|^3), Space: O(|V|^2)
         More uses: Shortest path, Connectivity.
         Variants: Transitive closure, Maximin and Minimax path, Cheapest negative cycle,
                   Finding diameter of a graph, Finding SCC of a directed graph.
@@ -375,7 +355,7 @@ class GraphAlgorithms:
         # not really used it to solve a problem
         """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
-        Complexity per call: Time: O(|E|), Space O(|V|)
+        Complexity per call: Time: O(|E|), Space: O(|V|)
         """
         self.visited[u] = self.dfs_counter
         self.low_values[u] = self.visited[u]
@@ -397,7 +377,7 @@ class GraphAlgorithms:
     def articulation_points_and_bridges_via_dfs(self):
         """Generates the name on an adj_list based graph.
 
-        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
         More uses: finding the sets of single edge and vertex removals that disconnect the graph.
         Bridges stored as edges and points are True values in articulation_nodes.
         """
@@ -412,7 +392,7 @@ class GraphAlgorithms:
     def cycle_check_on_directed_graph_helper(self, u):
         """Recursion part of the dfs. It is modified to list various types of edges.
 
-        Complexity per call: Time: O(|E|), Space O(|V|) at deepest call
+        Complexity per call: Time: O(|E|), Space: O(|V|) at deepest call
         More uses: listing edge types: Tree, Bidirectional, Back, Forward/Cross edge. On top of
         listing Explored, Visited, and Unvisited.
         """
@@ -460,7 +440,7 @@ class GraphAlgorithms:
     def strongly_connected_components_of_graph_kosaraju(self):
         """Marks the SCC of a directed graph using Kosaraju's method.
 
-        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
+        Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
         More Uses: Labeling and Identifying SCC regions(marks regions by numbers).
         """
         self.visited = [UNVISITED] * self.graph.num_nodes
@@ -476,35 +456,38 @@ class GraphAlgorithms:
                 self.region_num += 1
     
     def strongly_connected_components_of_graph_tarjans_helper(self, u):
-        """Auxiliary function for computing the recursion part of tarjans
+        """Recursive part of tarjan's, pre-order finds the SCC regions, marks regions post-order.
 
-        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
-        Uses: Preorder explores and finds SCC and Postorder we will mark the regions.
+        Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
         """
         self.low_values[u] = self.node_state[u] = self.dfs_counter
         self.dfs_counter += 1
-        self.stk.append(u)
+        self.nodes_on_stack.append(u)
         self.visited[u] = VISITED
-        for v in self.adj_list[u]:
+        for v in self.graph.adj_list[u]:
             if self.node_state[v] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(v)
             if self.visited[v] == VISITED:
                 self.low_values[u] = min(self.low_values[u], self.low_values[v])
         if self.low_values[u] == self.node_state[u]:
-            self.num_scc += 1
+            self.region_num += 1
             while True:
-                v = self.stk.pop()
-                self.visited[v], self.scc[v] = UNVISITED, self.num_scc
+                v = self.nodes_on_stack.pop()
+                self.visited[v], self.component_region[v] = UNVISITED, self.region_num
                 if u == v:
                     break
 
     def strongly_connected_components_of_graph_tarjans(self):
-        """Marks the SCC of a directed graph using tarjan's method.
+        """Marks the SCC regions of a directed graph using tarjan's method.
 
-        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
-        Uses: Labeling and Identifying SCC regions(marks regions by numbers).
+        Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
+        More uses: Labeling and Identifying SCC regions(marks regions by numbers).
         """
-        for u in range(self.num_nodes):
+        max_v = self.graph.num_nodes
+        self.visited, self.node_state = [UNVISITED] * max_v, [UNVISITED] * max_v
+        self.low_values, self.component_region = [0] * max_v, [0] * max_v
+        self.nodes_on_stack, self.region_num, self.dfs_counter = [], 0, 0
+        for u in range(self.graph.num_nodes):
             if self.node_state[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
 
