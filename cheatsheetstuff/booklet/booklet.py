@@ -103,6 +103,10 @@ INF=2**31
 UNVISITED = -1
 EXPLORED  = -2
 VISITED   = -3
+TREE = 0
+BIDIRECTIONAL = 1
+BACK = 2
+FORWARD = 3
 class GraphAlgorithms:
     
     def __init__(self, new_graph):
@@ -120,6 +124,7 @@ class GraphAlgorithms:
         self.low_values = None
         self.articulation_nodes = None
         self.bridge_edges = None
+        self.directed_edge_type = None
 
     #def init_structures(self): #take what you need and leave the rest
     
@@ -367,7 +372,7 @@ class GraphAlgorithms:
         # not really used it to solve a problem
         """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
-        Complexity per call: Time: O(|V|), Space O(|V|)
+        Complexity per call: Time: O(|E|), Space O(|V|)
         """
         self.visited[u] = self.dfs_counter
         self.low_values[u] = self.visited[u]
@@ -391,6 +396,7 @@ class GraphAlgorithms:
 
         Complexity per call: Time: O(|E| + |V|), Space O(|V|)
         More uses: finding the sets of single edge and vertex removals that disconnect the graph.
+        Bridges stored as edges and points are True values in articulation_nodes.
         """
         self.dfs_counter = 0
         for u in range(self.graph.num_nodes):
@@ -401,34 +407,36 @@ class GraphAlgorithms:
                 self.articulation_nodes[self.dfs_root] = (self.root_children > 1)
 
     def cycle_check_on_directed_graph_helper(self, u):
-        """Auxiliary function the starts from an unvisited node and runs dfs.
+        """Recursion part of the dfs. It is modified to list various types of edges.
 
         Complexity per call: Time: O(|E|), Space O(|V|) at deepest call
-        Uses: finding cycles and marking Explored, Visited, Unvisited on graph
+        More uses: listing edge types: Tree, Bidirectional, Back, Forward/Cross edge. On top of
+        listing Explored, Visited, and Unvisited.
         """
         self.visited[u] = EXPLORED
-        for v in self.adj_list[u]:
-            info = '{} to {} is a '.format(u, v)
-            if self.visited[v] == UNVISTED:
-                print(info + 'tree edge')
+        for v in self.graph.adj_list[u]:
+            edge_type = None
+            if self.visited[v] == UNVISITED:
+                edge_type = TREE
                 self.parent[v] = u
                 self.cycle_check_on_directed_graph_helper(v)
             elif self.visited[v] == EXPLORED:
-                if v == self.parent[u]:
-                    print(info + 'bidirectional edge')
-                else:
-                    print(info + 'back edge')
+                edge_type = BIDIRECTIONAL if v == self.parent[u] else BACK # graph is not DAG.
             elif self.visited[v] == VISITED:
-                print(info + 'forward/crossedge')
+                edge_type = FORWARD
+            self.directed_edge_type.append((u, v, edge_type))
         self.visited[u] = VISITED
 
     def cycle_check_on_directed_graph(self):
         """Determines if a graph is cyclic or acyclic via dfs.
 
-        Complexity per call: Time: O(|E| + |V|), Space O(|V|)
-        Uses: Gives us a DAG if acyclic which can open up potenial for effecient algorithms
+        Complexity per call: Time: O(|E| + |V|),
+                            Space: O(|E|) if you label each edge O(|V|) otherwise.
+        More uses: Checks if graph is acyclic(DAG) which can open potential for efficient algorithms
         """
-        for u in range(self.num_nodes):
+        self.visited = [UNVISITED] * self.graph.num_nodes
+        self.directed_edge_type = [] # can be swapped out for a marked variable
+        for u in range(self.graph.num_nodes):
             if self.visited[u] == UNVISITED:
                 self.cycle_check_on_directed_graph_helper(u)
   
