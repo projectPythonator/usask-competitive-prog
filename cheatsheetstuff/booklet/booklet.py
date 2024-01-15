@@ -87,7 +87,7 @@ class Graph:
         self.edge_list.append((wt, u, v))   # Edge list usage
         # the following lines come as a pair-set used in max flow algorithm and are used in tandem.
         self.edge_list.append((v, wt, data))
-        self.adj_list[u].append(len(self.edge_list)-1)
+        self.adj_list[u].append(len(self.edge_list) - 1)
 
     def add_edge_u_v_wt_into_undirected_graph(self, u, v, wt=None):
         """undirected graph version of the previous function"""
@@ -118,7 +118,7 @@ class GraphAlgorithms:
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.mst_node_set = None
-        self.dist = None
+        self.dist = []
         self.visited = None
         self.topo_sort_node_set = None
         self.parent = None
@@ -131,6 +131,7 @@ class GraphAlgorithms:
         self.nodes_on_stack = None
         self.node_state = None
         self.bipartite_colouring = None
+        self.last = None
 
     def flood_fill_via_dfs(self, row, col, old_val, new_val): #needs test
         """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
@@ -527,109 +528,101 @@ class GraphAlgorithms:
 
 
     def max_flow_find_augmenting_path_helper(self, source, sink):
-        """Auxiliary function to find an augmenting path in the graph from source to sink.
+        """Will check if augmenting path in the graph from source to sink exists via bfs.
 
         Complexity per call: Time: O(|E| + |V|), Space O(|V|)
-        Uses: checking path existance.
-        source: - input: the node which we are starting from
-        sink: --- input: the node which we are ending on
-        returns True if a path exists False otherwise
+        Input
+            source: the node which we are starting from.
+            sink: the node which we are ending on.
         """
-        self.dist = [-1] * self.num_nodes
-        self.path = [[-1, -1] for _ in range(self.num_nodes)]
-        self.queue = deque([source])
-        self.dist[s] = 0
-        while self.queue:
-            u = self.queue.pop_left()
+        distance, parents = [-1] * self.graph.num_nodes, [(-1, -1)] * self.graph.num_nodes
+        queue, distance[source] = deque([source]), 0
+        while queue:
+            u = queue.popleft()
             if u == sink:
+                self.dist, self.parent = distance, [el for el in parents]
                 return True
-            for idx in self.adj_list[u]:
-                v, cap, flow = self.edge_list[idx]
-                if cap - flow > 0 and self.dist[v] == -1:
-                    self.dist[v] = self.dist[u] + 1
-                    self.queue.append(v)
-                    self.path[v] = [u, idx]
+            for idx in self.graph.adj_list[u]:
+                v, cap, flow = self.graph.edge_list[idx]
+                if cap - flow > 0 and distance[v] == -1:
+                    distance[v] = distance[u] + 1
+                    parents[v] = (u, idx)
+                    queue.append(v)
+        self.dist, self.parent = [], []
         return False
 
-    def max_flow_send_flow_down_augmenting_path(self, source, sink, flow_in):
-        """Auxiliary function to recurisively emulate sending a flow.
+    def send_flow_via_augmenting_path(self, source, sink, flow_in):
+        """Function to recursively emulate sending a flow. returns min pushed flow.
 
         Complexity per call: Time: O(|V|), Space O(|V|)
-        Uses: preorder finds the min pushed_flow post order mutates edge_list based on that flow
-        source: -- input: in this function its technically the goal node
-        sink: ---- input: the current node we are observing
-        flow_in: - input: the smallest flow found on the way down
-        returns min pushed flow 
+        Uses: preorder finds the min pushed_flow post order mutates edge_list based on that flow.
+        Input:
+            source: in this function it's technically the goal node
+            sink: the current node we are observing
+            flow_in: the smallest flow found on the way down
         """
         if source == sink:
             return flow_in
-        u, edge_ind = self.path[sink]
-        _, edge_cap, edge_flow = self.edge_list[edge_ind]
-        pushed_flow = self.max_flow_send_one_flow(source, u, min(flow_in, edge_cap - edge_flow))
-        self.edge_list[edge_ind][2] = edge_flow + pushed_flow
-        self.edge_list[edge_ind ^ 1][2] -= pushed_flow
+        u, edge_ind = self.parent[sink]
+        _, edge_cap, edge_flow = self.graph.edge_list[edge_ind]
+        pushed_flow = self.send_flow_via_augmenting_path(
+            source, u, min(flow_in, edge_cap - edge_flow))
+        self.graph.edge_list[edge_ind][2] = edge_flow + pushed_flow
+        self.graph.edge_list[edge_ind ^ 1][2] -= pushed_flow
         return pushed_flow
 
-    def max_flow_dfs(self, u, sink, flow_in):
-        """Auxiliary function to recurisively emulate sending a flow.
+    def send_max_flow_via_dfs(self, u, sink, flow_in):
+        """Function to recursively emulate sending a flow via dfs. Returns min pushed flow.
 
         Complexity per call: Time: O(|E| * |V|), Space O(|V|)
-        Uses: a more effcient way of sending a flow 
-        u: ------- input: is the current node to be observed
-        sink: ---- input: is the goal node (we might be able to just put it as instance var?)
-        flow_in: - input: the smallest flow found on the way down
-        returns min pushed flow 
+        More uses: a more efficient way of sending a flow
+        Input:
+            u: is the current node to be observed.
+            sink: is the goal node (we might be able to just put it as instance var?).
+            flow_in: the smallest flow found on the way down.
         """
         if u == sink or flow_in == 0:
             return flow_in
-        for i in range(self.last[u], len(self.adj_list[u])):
-            self.last[u] = i
-            v, edge_cap, edge_flow = self.edge_list[self.adj_list[u][i]]
+        start, end = self.last[u], len(self.graph.adj_list[u])
+        for i in range(start, end):
+            self.last[u], edge_ind = i, self.graph.adj_list[u][i]
+            v, edge_cap, edge_flow = self.graph.edge_list[edge_ind]
             if self.dist[v] != self.dist[u] + 1:
                 continue
-            pushed_flow = self.max_flow_dfs(v, sink, min(flow_in, edge_cap - edge_flow))
+            pushed_flow = self.send_max_flow_via_dfs(v, sink, min(flow_in, edge_cap - edge_flow))
             if pushed_flow != 0:
-                flow_in += pushed_flow
-                self.edge_list[self.adj_list[u][i]][2] = edge_flow
-                self.edge_list[self.adj_list[u][i] ^ 1][2] -= pushed_flow
+                self.graph.edge_list[edge_ind][2] = edge_flow + pushed_flow
+                self.graph.edge_list[edge_ind ^ 1][2] -= pushed_flow
                 return pushed_flow
         return 0
 
-    def max_flow_add_edge(self, u, v, capacity, directed):
-        if u == v:
-            return
-        self.edge_list.append([v, capacity, 0])
-        self.adj_list[u].append(len(self.edge_list) - 1)
-        self.edge_list.append([u, 0 if directed else capacity, 0])
-        self.adj_list[v].append(len(self.edge_list) - 1)
-
-    def edmonds_karp(self, source, sink):
-        """Compute max flow using edmonds_karp' method.
+    def max_flow_via_edmonds_karp(self, source, sink):
+        """Compute max flow using edmonds karp's method.
 
         Complexity per call: Time: O(|V| * |E|^2), Space O(|V|)
-        Uses: max flow of the graph, min cut of the graph 
+        More Uses: max flow of the graph, min cut of the graph.
         """
         max_flow = 0
         while self.max_flow_find_augmenting_path_helper(source, sink):
-            flow = self.max_flow_send_flow_down_augmenting_path(source, sink, inf)
+            flow = self.send_flow_via_augmenting_path(source, sink, INF)
             if flow == 0:
                 break
             max_flow += flow
         return max_flow
 
-    def dinic(self, source, sink):
-        """Compute max flow using dinics method.
+    def max_flow_via_dinic(self, source, sink):
+        """Compute max flow using Dinic's method.
 
         Complexity per call: Time: O(|E| * |V|^2), Space O(|V|)
-        Uses: 
+        More Uses: faster than the one above for most cases.
         """
         max_flow = 0
         while self.max_flow_find_augmenting_path_helper(source, sink):
-            self.last = [0] * self.num_nodes
-            flow = self.max_flow_dfs(source, sink, inf)
+            self.last = [0] * self.graph.num_nodes
+            flow = self.send_max_flow_via_dfs(source, sink, INF)
             while flow != 0:
                 max_flow += flow
-                flow = self.max_flow_dfs(source, sink, inf)
+                flow = self.send_max_flow_via_dfs(source, sink, INF)
         return max_flow
 
     def dfs_bipartite_checker(self):
@@ -638,7 +631,7 @@ class GraphAlgorithms:
 from math import isqrt, log, gcd
 from itertools import takewhile
 
-class Math_Algorithms:
+class MathAlgorithms:
     def __init__(self):
         self.n=None
         self.primes_sieve = []
@@ -1658,7 +1651,7 @@ class String_Algorithms:
         self.mod_m = 10**9 - 7
         self.powers = [0] * self.text_len
         self.h_vals = [0] * self.text_len
-        self.math_algos = Math_Algorithms()
+        self.math_algos = MathAlgorithms()
 
     def kmp_preprocess(self, target):
         self.prepare_pattern_data(target)
