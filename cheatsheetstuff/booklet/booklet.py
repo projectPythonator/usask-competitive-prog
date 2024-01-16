@@ -740,66 +740,81 @@ class MathAlgorithms:
         self.primes_set=set(self.primes_list)
 
     def prime_factorize_n(self, n):
-        limit = isqrt(n) + 1
-        prime_factors = []
+        """A basic prime factorization of n function. without primes its just O(sqrt(n))
+
+        Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
+        Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
+        """
+        limit, prime_factors = isqrt(n) + 1, []
         for prime in takewhile(lambda x: x < limit, self.primes_list):
             if n % prime == 0:
                 while n % prime == 0:
                     n //= prime
                     prime_factors.append(prime)
-        return [n] if n > 1 else prime_factors
+        if n > 1: prime_factors.append(n)
+        return prime_factors
 
-    def prime_factorize(self, n):
+    def prime_factorize_n_variants(self, n):
+        """Covers all the variants listed above, holds the same time complexity with O(1) space."""
         limit = isqrt(n) + 1
         sum_diff_prime_factors, num_diff_prime_factors = 0, 0
         sum_prime_factors, num_prime_factors = 0, 0
-        sum_divisors, num_divisors = 1, 1
+        sum_divisors, num_divisors, euler_phi = 1, 1, n
         for prime in takewhile(lambda x: x < limit, self.primes_list):
             if n % prime == 0:
                 mul, total = prime, 1  # for sum of divisors
                 power = 0              # for num of divisors
                 while n % prime == 0:
                     n //= prime
-                    power += 1
-                    total += mul
-                    mul *= prime
+                    power += 1         # for num prime factors, num divisors, and sum prime factors
+                    total += mul       # for sum divisors
+                    mul *= prime       # for sum divisors
                 sum_diff_prime_factors += prime
                 num_diff_prime_factors += 1
-                sum_prime_factors += (power * prime)
+                sum_prime_factors += (prime * power)
                 num_prime_factors += power
                 num_divisors *= (power + 1)
                 sum_divisors *= total
-        if n > 1: # n was prime
-            sum_diff_prime_factors, num_diff_prime_factors = n, 1
-            sum_prime_factors, num_prime_factors = n, 1
-            sum_divisors, num_divisors = n + 1, n + 1
+                euler_phi -= (euler_phi//prime)
+        if n > 1:
+            num_diff_prime_factors += 1
+            sum_diff_prime_factors += n
+            num_prime_factors += 1
+            sum_prime_factors += n
+            num_divisors *= 2
+            sum_divisors *= (n + 1)
+            euler_phi -= (euler_phi // n)
+        return num_diff_prime_factors
 
-        def is_composite(self, a, d, n, s):
-            if pow(a, d, n)==1:
+    def is_composite(self, a, d, n, s):
+        if 1 == pow(a, d, n):
+            return False
+        for i in range(s):
+            if n-1 == pow(a, d * 2**i, n):
                 return False
-            for i in range(s):
-                if pow(a, 2**i * d, n)==n-1:
-                    return False
-            return True
-    
-    def is_prime_mrpt(self, n, precision_for_huge_n=16):
+        return True
+
+    def miller_rabin_primality_test(self, n, precision_for_huge_n=16):
         if n in self.primes_set:
             return True
         if any((n%self.primes_list[p] == 0) for p in range(50)) or n < 2 or n == 3215031751:
             return False
         d, s = n-1, 0
-        while not d % 2:
+        while d % 2 == 0:
             d, s = d//2, s+1
         for i, bound in enumerate(self.mrpt_known_bounds):
             if n < bound:
-                return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s) for j in range(i))
-        return not any(self.is_composite(self.primes_list[j], d, n, s) for j in range(precision_for_huge_n))
+                return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s)
+                               for j in range(i))
+        return not any(self.is_composite(self.primes_list[j], d, n, s)
+                       for j in range(precision_for_huge_n))
     
     def prep_mrpt(self):
-        self.mrpt_known_bounds = [1373653, 25326001, 118670087467, 2152302898747, 3474749660383, 341550071728321]
+        self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
+                                  2152302898747, 3474749660383, 341550071728321]
         self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
-        self.sieve_primes(1000) #comment out if different size needed
-        self.gen_set_primes() #comment out if already have bigger size
+        self.sieve_of_eratosthenes(1000) # comment out if different size needed
+        self.gen_set_primes() # comment out if already have bigger size
 
     #test this against stevens
     def extended_euclid(self, a, b):
