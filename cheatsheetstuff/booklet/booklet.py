@@ -948,14 +948,18 @@ class MathAlgorithms:
                 break
         return z_m
 
-    def fibonacci_n_iter(self, n):
-        self.fibonacci_list = [0] * (n+1)
-        self.fibonacci_list[1] = 1
-        for i in range(2, n+1):
-            self.fibonacci_list[i] = self.fibonacci_list[i-1] + self.fibonacci_list[i-2]
-        return self.fibonacci_list[n]
+    def fibonacci_n_iterative(self, n):
+        """Classic fibonacci solver. Generates answers from 0 to n inclusive.
 
-    def fibonacci_n_dp_helper(self, n):
+        Complexity per call: Time O(n), Space: O(n).
+        """
+        fib_list = [0] * (n + 1)
+        fib_list[1] = 1
+        for i in range(2, n+1):
+            fib_list[i] = fib_list[i - 1] + fib_list[i - 2]
+        self.fibonacci_list = fib_list
+
+    def fibonacci_n_dp_log_n(self, n):
         if n == 0:
             return 0
         if n < 3:
@@ -977,7 +981,7 @@ class MathAlgorithms:
 
     def fibonacci_n_dp(self, n):
         self.fibonacci_dict = {}
-        return self.fibonacci_n_dp_helper(n)
+        return self.fibonacci_n_dp_log_n(n)
     
     #this needs testing 
     def generate_catalan_n(self, n):
