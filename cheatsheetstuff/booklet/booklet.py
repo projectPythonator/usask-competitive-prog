@@ -858,15 +858,51 @@ class MathAlgorithms:
         return ((a % n) + n) % n
 
     def modular_linear_equation_solver(self, a, b, n): #needs test
+        """Solves gives the solution x in ax = b(mod n).
+
+        Complexity per call: Time: O(log n), Space O(d)
+        """
         x, y, d = self.extended_euclid_recursive(a, n)
         if 0 == b % d:
-            x = self.mod(x*(b//d), n)
-            return [self.mod(x+i*(n//d), n) for i in range(d)]
+            x = self.mod(x * (b//d), n)
+            return [self.mod(x + i*(n//d), n) for i in range(d)]
         return []
 
-    def mod_inverse(self, a, n): #needs test
-        x, y, d = self.extended_euclid_recursive(a, n)
-        return -1 if d > 1 else (x + n) % n
+    def linear_diophantine_1(self, a, b, c):
+        """Solves for x, y in ax + by = c.
+
+        Complexity per call: Time: O(log n), Space O(1).
+        Notes: order matters? 25x + 18y = 839 != 18x + 25y = 839
+        """
+        d = gcd(a, b)
+        if c % d == 0:
+            x = c//d * self.mod_inverse(a//d, b//d)
+            return x, (c - a * x) // b
+        return -1, -1
+
+    def linear_diophantine_2(self, a, b, c):
+        """Solves for x0, y0 in x = x0 + (b/d)n, y = y0 - (a/d)n.
+        derived from ax + by = c, d = gcd(a, b), and d|c.
+        Can further derive into: n = x0 (d/b), and n = y0 (d/a).
+
+        Complexity per call: Time: O(log n), Space O(1).
+        Notes: if a != b order doesn't matter if a == b sometimes they gave the same x, y rather
+        than it being swapped when a, b is swapped.
+        """
+        d = gcd(a, b)
+        if c % d == 0:
+            x, y, d = self.extended_euclid_recursive(a, b)
+            return (x * (c // d)), (y * (c // d))
+        return -1, -1
+
+
+    def mod_inverse(self, b, m): #needs test
+        """Solves b^(-1) (mod m).
+
+        Complexity per call: Time: O(log n), Space O(1)
+        """
+        x, y, d = self.extended_euclid_recursive(b, m)
+        return -1 if d != 1 else (x + m) % m
 
     # stanford icpc 2013-14
     def crt_helper(self, x, a, y, b): #needs test
@@ -887,8 +923,8 @@ class MathAlgorithms:
     def linear_diophantine(self, a, b, c):
         d = gcd(a,b)
         if c%d == 0:
-            x = c//d * self.mod_inverse(a//b, b//d)
-            return (x, (c - a*x//b))
+            x = c//d * self.mod_inverse(a//d, b//d)
+            return (x, (c - a*x)//b)
         return (-1, -1)
 
     def fibonacci_n_iter(self, n):
