@@ -787,6 +787,10 @@ class MathAlgorithms:
         return num_diff_prime_factors
 
     def is_composite(self, a, d, n, s):
+        """The witness test of miller rabin.
+
+        Complexity per call: Time O(log^3(n)), Space: O(2**s) bits
+        """
         if 1 == pow(a, d, n):
             return False
         for i in range(s):
@@ -795,6 +799,10 @@ class MathAlgorithms:
         return True
 
     def miller_rabin_primality_test(self, n, precision_for_huge_n=16):
+        """Probabilistic primality test with error rate of 4^(-k) past 341550071728321.
+
+        Complexity per call: Time O(k log^3(n)), Space: O(2**s) bits
+        """
         if n in self.primes_set:
             return True
         if any((n%self.primes_list[p] == 0) for p in range(50)) or n < 2 or n == 3215031751:
@@ -810,6 +818,7 @@ class MathAlgorithms:
                        for j in range(precision_for_huge_n))
     
     def prep_mrpt(self):
+        """This function needs to be called before miller rabin"""
         self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
                                   2152302898747, 3474749660383, 341550071728321]
         self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
@@ -817,13 +826,21 @@ class MathAlgorithms:
         self.gen_set_primes() # comment out if already have bigger size
 
     #test this against stevens
-    def extended_euclid(self, a, b):
+    def extended_euclid_recursive(self, a, b):
+        """Solves coefficients of Bezout identity: ax + by = gcd(a, b), recursively
+
+        Complexity per call: Time: O(log n), Space: O(log n) at the deepest call.
+        """
         if 0 == b:
             return 1, 0, a
-        x, y, d = self.extended_euclid(b, a%b)
+        x, y, d = self.extended_euclid_recursive(b, a%b)
         return y, x-y*(a//b), d
 
-    def extended_euclid_2(self, a, b):
+    def extended_euclid_iterative(self, a, b):
+        """Solves coefficients of Bezout identity: ax + by = gcd(a, b), iteratively.
+
+        Complexity per call: Time: O(log n) about twice as fast in python vs above, Space O(1)
+        """
         xx, yy = 0, 1
         x, y = 1, 0
         while b != 0:
@@ -831,28 +848,29 @@ class MathAlgorithms:
             a, b = b, a%b
             x, xx = xx, x-q*xx
             y, yy = yy, y-q*yy
-        return a, x, y
+        return x, y, a
 
     # use in c++ and java
     # use ((a % n) + n) % n for getting proper mod of negative value 
     # use (a + b) % --> ((a % n) + (b % n)) % n for operations sub out + for * and - 
     def mod(self, a, n): #needs test
+        """Existence is much for c++ which doesn't always handle % operator nicely."""
         return ((a % n) + n) % n
 
     def modular_linear_equation_solver(self, a, b, n): #needs test
-        x, y, d = self.extended_euclid(a, n)
+        x, y, d = self.extended_euclid_recursive(a, n)
         if 0 == b % d:
             x = self.mod(x*(b//d), n)
             return [self.mod(x+i*(n//d), n) for i in range(d)]
         return []
 
     def mod_inverse(self, a, n): #needs test
-        x, y, d = self.extended_euclid(a, n)
+        x, y, d = self.extended_euclid_recursive(a, n)
         return -1 if d > 1 else (x + n) % n
 
     # stanford icpc 2013-14
     def crt_helper(self, x, a, y, b): #needs test
-        s, t, d = self.extended_euclid(x, y)
+        s, t, d = self.extended_euclid_recursive(x, y)
         return (0, -1) if a%d != b%d else (self.mod(s*b*x + t*a*y, x*y)//d, x*y//d)
     
     # from stanford icpc 2013-14
