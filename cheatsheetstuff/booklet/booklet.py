@@ -847,7 +847,7 @@ class MathAlgorithms:
         return not any(self.is_composite(self.primes_list[j], d, n, s)
                        for j in range(precision_for_huge_n))
     
-    def prep_mrpt(self):
+    def miller_rabin_primality_test_prep(self):
         """This function needs to be called before miller rabin"""
         self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
                                   2152302898747, 3474749660383, 341550071728321]
