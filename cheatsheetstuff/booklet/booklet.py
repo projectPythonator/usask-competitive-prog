@@ -641,6 +641,7 @@ class MathAlgorithms:
         self.mrpt_known_tests = []
         self.fibonacci_list = []
         self.fibonacci_dict = {}
+        self.fibonacci_dict = {0: 0, 1: 1, 2: 1}
 
     def init_data(self, n): #call before using other functions, make a reset if needed to reset per case
         self.primes_sieve = [True] * n
@@ -959,29 +960,17 @@ class MathAlgorithms:
             fib_list[i] = fib_list[i - 1] + fib_list[i - 2]
         self.fibonacci_list = fib_list
 
-    def fibonacci_n_dp_log_n(self, n):
-        if n == 0:
-            return 0
-        if n < 3:
-            self.fibonacci_dict[n] = 1
-            return 1
+    def fibonacci_n_dp_1(self, n):
+        """Dynamic programming way to compute the nth fibonacci.
+
+        Complexity per call: Time O(log n), Space: increase by O(log n).
+        """
         if n in self.fibonacci_dict:
             return self.fibonacci_dict[n]
-        if n%2 == 1:
-            k = (n+1)//2
-            fib_1 = self.fibonacci_n_dp_log_n(k)
-            fib_2 = self.fibonacci_n_dp_log_n(k-1)
-            self.fibonacci_dict[n] = fib_1*fib_1 + fib_2*fib_2
-        else:
-            k = n//2
-            fib_1 = self.fibonacci_n_dp_log_n(k)
-            fib_2 = self.fibonacci_n_dp_log_n(k-1)
-            self.fibonacci_dict[n] = (2*fib_2 + fib_1)*fib_1
+        f1 = self.fibonacci_n_dp_1(n // 2 + 1)
+        f2 = self.fibonacci_n_dp_1((n - 1) // 2)
+        self.fibonacci_dict[n] = (f1 * f1 + f2 * f2 if n & 1 else f1 * f1 - f2 * f2)
         return self.fibonacci_dict[n]
-
-    def fibonacci_n_dp(self, n):
-        self.fibonacci_dict = {}
-        return self.fibonacci_n_dp_log_n(n)
     
     #this needs testing 
     def generate_catalan_n(self, n):
