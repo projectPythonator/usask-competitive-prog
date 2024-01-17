@@ -1055,17 +1055,6 @@ class MathAlgorithms:
         # for i in range(max_n-2, -1, -1):
         #     inverse_factorial_mod_p[i] = (inverse_factorial_mod_p[i+1] * (i+1)) % mod_p
         # self.inv_fact = inverse_factorial_mod_p
-
-    def binomial_coefficient_n_k(self, n, k):
-        """For a single n, k computes binomial_coefficient_n_k.
-
-        """
-        k = min(k, n-k)
-        res = 1
-        for i in range(k):
-            res *= (n-i)
-            res //= (i+1)
-        return res
             
     def binomial_coefficient_dp(self, n, k):
         if n == k or 0 == k:
