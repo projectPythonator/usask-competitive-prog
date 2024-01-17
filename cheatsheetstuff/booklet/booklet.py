@@ -630,7 +630,6 @@ class GraphAlgorithms:
 
 from math import isqrt, log, gcd, prod
 from itertools import takewhile
-from collections import Counter
 
 class MathAlgorithms:
     def __init__(self):
@@ -1018,42 +1017,13 @@ class MathAlgorithms:
         """Generate catalan up to n iteratively cat n % p.
 
         Complexity per call: Time: O(n log n), Space: O(n * (2^(log n)%p)).
+        Variants: use prime factors of the factorial to cancel out the primes
         """
         catalan = [0] * (n+1)
         catalan[0] = 1
         for i in range(n-1):
             catalan[i+1] = ((4*i + 2)%p * catalan[i]%p * pow(i+1, p-2, p)) % p
         self.catalan_numbers = catalan
-
-    def catalan_n_mod_p_helper(self, table, val):
-        """Generate catalan up to n iteratively cat n % p.
-
-        Complexity per call: Time: O(log n) with min prime optimization, O(sqrt(n)) without.
-                            Space: O(n * (2^(log n)%p)).
-        """
-        self.prime_factorize_n_log_n(val // 2) # div two because its even already
-        self.prime_factors.append(2)
-        factor_tally = Counter(self.prime_factors)
-        for k, v in factor_tally.items():
-            if k not in table:
-                table[k] = 0
-            table[k] += v
-
-    def catalan_n_mod_p(self, n, p):t
-        self.sieve_of_eratosthenes_optimized((4*n + 2)//2+1)
-        self.sieve_of_min_primes((4*n + 2)//2+1)
-        tpf = {}
-        bpf = {}
-        for i in range(n):
-            self.catalan_n_mod_p_helper(tpf, 4*i+2)
-            self.catalan_n_mod_p_helper(bpf, i+2)
-        for k, v in bpf.items():
-            tpf[k] -= v
-        ans = 1
-        for k, v in tpf.items():
-            if v > 0:
-                ans *= pow(k, v, p)
-        return ans % p
 
     def binomial_coefficient(self, n, k):
         k = min(k, n-k)
