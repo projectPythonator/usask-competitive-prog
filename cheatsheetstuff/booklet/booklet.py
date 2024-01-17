@@ -634,6 +634,7 @@ from collections import Counter
 
 class MathAlgorithms:
     def __init__(self):
+        self.min_primes_list = []
         self.catalan_numbers = []
         self.primes_sieve = []
         self.primes_list = []
@@ -689,6 +690,20 @@ class MathAlgorithms:
                 for j in range(start, limit, prime):
                     primes_sieve[j] = False
         self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
+
+    def sieve_of_min_primes(self, n):
+        """Stores the min prime for each number up to n.
+
+        Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
+        """
+        min_primes = [0] * (n + 1)
+        min_primes[1] = 1
+        for prime in reversed(self.primes_list):
+            min_primes[prime] = prime
+            start, end, step = prime*prime, n+1, prime if prime==2 else 2*prime
+            for j in range(start, end, step):
+                min_primes[j] = prime
+        self.min_primes_list = min_primes
 
     def sieve_of_eratosthenes_variants(self, n):
         """Seven variants of prime sieve listed above.
@@ -755,6 +770,19 @@ class MathAlgorithms:
                     n //= prime
                     prime_factors.append(prime)
         if n > 1: prime_factors.append(n)
+        return prime_factors
+
+    def prime_factorize_n_log_n(self, n):
+        """An optimized prime factorization of n function based on min primes already sieved
+
+        Complexity: Time: O(log n), Space: O(log n)
+        """
+        prime_factors = []
+        app = prime_factors.append
+        while n > 1:
+            prime = self.min_primes_list[n]
+            app(prime)
+            n = n // prime
         return prime_factors
 
     def prime_factorize_n_variants(self, n):
@@ -909,7 +937,7 @@ class MathAlgorithms:
     def chinese_remainder_theorem_1(self, remainders, modulos):
         """Steven's CRT version to solve x in x = r[0] (mod m[0]) ... x = r[n-1] (mod m[n-1]).
 
-        Complexity per call: Time O(n log n), Space: O(1)? O(mt) bit size:
+        Complexity per call: Time: O(n log n), Space: O(1)? O(mt) bit size:
         Optimizations:
             prod is used from math since 3.8,
             we use mod mt in the forloop since x might get pretty big.
@@ -927,7 +955,7 @@ class MathAlgorithms:
         Here, z is unique modulo M = lcm(m1, m2). Return (z, M).  On failure, M = -1.
         from: stanford icpc 2016
 
-        Complexity per call: Time O(log n), Space: O(1)
+        Complexity per call: Time: O(log n), Space: O(1)
         """
         s, t, d = self.extended_euclid_iterative(mod1, mod2)
         if rem1 % d != rem2 % d:
@@ -942,7 +970,7 @@ class MathAlgorithms:
         we do not require the r[i]'s to be relatively prime.
         from: stanford icpc 2016
 
-        Complexity per call: Time O(n log n), Space: O(1)? O(mt) bit size
+        Complexity per call: Time: O(n log n), Space: O(1)? O(mt) bit size
         """
         z_m = remainders[0], modulos[0]
         for i, modulo in enumerate(modulos[1:], 1):
@@ -954,7 +982,7 @@ class MathAlgorithms:
     def fibonacci_n_iterative(self, n):
         """Classic fibonacci solver. Generates answers from 0 to n inclusive.
 
-        Complexity per call: Time O(n), Space: O(n).
+        Complexity per call: Time: O(n), Space: O(n).
         """
         fib_list = [0] * (n + 1)
         fib_list[1] = 1
@@ -965,7 +993,7 @@ class MathAlgorithms:
     def fibonacci_n_dp_1(self, n):
         """Dynamic programming way to compute the nth fibonacci.
 
-        Complexity per call: Time O(log n), Space: increase by O(log n).
+        Complexity per call: Time: O(log n), Space: increase by O(log n).
         """
         if n in self.fibonacci_dict:
             return self.fibonacci_dict[n]
@@ -978,7 +1006,7 @@ class MathAlgorithms:
     def generate_catalan_n(self, n):
         """Generate catalan up to n iteratively.
 
-        Complexity per call: Time O(n), Space: O(n).
+        Complexity per call: Time: O(n), Space: O(n * 2^(log n)).
         """
         catalan = [0] * (n+1)
         catalan[0] = 1
@@ -987,24 +1015,33 @@ class MathAlgorithms:
         self.catalan_numbers = catalan
 
     def generate_catalan_n_mod_inverse(self, n, p):
+        """Generate catalan up to n iteratively cat n % p.
+
+        Complexity per call: Time: O(n log n), Space: O(n * (2^(log n)%p)).
+        """
         catalan = [0] * (n+1)
         catalan[0] = 1
         for i in range(n-1):
             catalan[i+1] = ((4*i + 2)%p * catalan[i]%p * pow(i+1, p-2, p)) % p
         self.catalan_numbers = catalan
 
-
     def catalan_n_mod_p_helper(self, table, val):
-        self.prime_factorize(val)
+        """Generate catalan up to n iteratively cat n % p.
+
+        Complexity per call: Time: O(log n) with min prime optimization, O(sqrt(n)) without.
+                            Space: O(n * (2^(log n)%p)).
+        """
+        self.prime_factorize_n_log_n(val // 2) # div two because its even already
+        self.prime_factors.append(2)
         factor_tally = Counter(self.prime_factors)
         for k, v in factor_tally.items():
             if k not in table:
                 table[k] = 0
             table[k] += v
 
-    def catalan_n_mod_p(self, n, p):
-        # from collections import counter needs to be imported
-        self.sieve_primes(int((5*n)**0.5))
+    def catalan_n_mod_p(self, n, p):t
+        self.sieve_of_eratosthenes_optimized((4*n + 2)//2+1)
+        self.sieve_of_min_primes((4*n + 2)//2+1)
         tpf = {}
         bpf = {}
         for i in range(n):
