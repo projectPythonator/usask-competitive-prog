@@ -630,6 +630,7 @@ class GraphAlgorithms:
 
 from math import isqrt, log, gcd, prod
 from itertools import takewhile
+from collections import Counter
 
 class MathAlgorithms:
     def __init__(self):
@@ -982,14 +983,16 @@ class MathAlgorithms:
         catalan = [0] * (n+1)
         catalan[0] = 1
         for i in range(n-1):
-            catalan[i + 1] = catalan[i]*(4*i + 2)//(i + 2)
+            catalan[i + 1] = catalan[i] * (4*i + 2) // (i + 2)
         self.catalan_numbers = catalan
 
     def generate_catalan_n_mod_inverse(self, n, p):
-        self.catalan = [0] * (n+1)
-        self.catalan[0] = 1
+        catalan = [0] * (n+1)
+        catalan[0] = 1
         for i in range(n-1):
-            self.catalan[i+1] = ((4*i+2)%p * self.catalan[i]%p * pow(i+1, p-2, p)) % p
+            catalan[i+1] = ((4*i + 2)%p * catalan[i]%p * pow(i+1, p-2, p)) % p
+        self.catalan_numbers = catalan
+
 
     def catalan_n_mod_p_helper(self, table, val):
         self.prime_factorize(val)
