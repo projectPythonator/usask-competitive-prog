@@ -633,6 +633,9 @@ from itertools import takewhile
 
 class MathAlgorithms:
     def __init__(self):
+        self.mod_p = None
+        self.fact = []
+        self.inv_fact = []
         self.min_primes_list = []
         self.catalan_numbers = []
         self.primes_sieve = []
@@ -1025,7 +1028,38 @@ class MathAlgorithms:
             catalan[i+1] = ((4*i + 2)%p * catalan[i]%p * pow(i+1, p-2, p)) % p
         self.catalan_numbers = catalan
 
-    def binomial_coefficient(self, n, k):
+    def c_n_k(self, n, k):
+        """Computes C(n, k) % p. From competitive programming 4.
+
+        Complexity per call: v1: Time: O(log n), v2 Time: O(1), Space: O(1).
+        v1 is uncommented and did not code inv_fact, v2 is the commented out line.
+        """
+        if n < k:
+            return 0
+        return (self.fact[n] * pow(self.fact[k], self.mod_p - 2, self.mod_p)
+                * pow(self.fact[n - k], self.mod_p - 2, self.mod_p)) % self.mod_p
+        # return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
+
+    def binomial_coefficient_n_mod_p_prep(self, max_n, mod_p):
+        """Does preprocessing for binomial coefficients. From competitive programming 4.
+
+        Complexity per call: Time: O(n), Space: O(n).
+        Optimization and notes: use uncommented lines for C(n, k) % p in O(1) time
+        """
+        factorial_mod_p = [1] * max_n
+        for i in range(1, max_n):
+            factorial_mod_p[i] = (factorial_mod_p[i - 1] * i) % mod_p
+        self.mod_p, self.fact = mod_p, factorial_mod_p
+        # inverse_factorial_mod_p = [0] * max_n
+        # inverse_factorial_mod_p[-1] = pow(factorial_mod_p[-1], mod_p-2, mod_p)
+        # for i in range(max_n-2, -1, -1):
+        #     inverse_factorial_mod_p[i] = (inverse_factorial_mod_p[i+1] * (i+1)) % mod_p
+        # self.inv_fact = inverse_factorial_mod_p
+
+    def binomial_coefficient_n_k(self, n, k):
+        """For a single n, k computes binomial_coefficient_n_k.
+
+        """
         k = min(k, n-k)
         res = 1
         for i in range(k):
