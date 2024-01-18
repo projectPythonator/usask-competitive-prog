@@ -1258,15 +1258,25 @@ class GeometryAlgorithms:
         return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab(a, b, c))
     
     def is_parallel_lines_ab_and_cd(self, a, b, c, d):
-        return self.compare_ab(self.cross_product(b - a, c - d), 0.0) == 0
+        """Two lines are parallel if the cross_product between vec_ba and vec_cd is 0."""
+        vec_ba, vec_cd = b - a, c - d
+        return self.compare_ab(self.cross_product(vec_ba, vec_cd), 0.0) == 0
 
-    def is_collinear_lines_ab_and_cd(self, a, b, c, d):
+    def is_collinear_lines_ab_and_cd_1(self, a, b, c, d):
+        """Old function. a!=b and c!=d and then returns correctly"""
         return (self.is_parallel_lines_ab_and_cd(a, b, c, d)
                 and self.is_parallel_lines_ab_and_cd(b, a, a, c)
                 and self.is_parallel_lines_ab_and_cd(d, c, c, a))
 
+    def is_collinear_lines_ab_and_cd_2(self, a, b, c, d):
+        """Two lines are collinear iff a!=b and c!=d, and both c and d are collinear to line ab."""
+        return (self.point_c_rotation_wrt_line_ab(a, b, c) == 0
+                and self.point_c_rotation_wrt_line_ab(a, b, d) == 0)
+
     def is_segments_intersect_ab_to_cd(self, a, b, c, d):
-        if self.is_collinear_lines_ab_and_cd(a, b, c, d):
+        """4 distinct points as two lines intersect if they are collinear and at least one of the
+         end points c or d are in between a and b otherwise, """
+        if self.is_collinear_lines_ab_and_cd_2(a, b, c, d):
             lo, hi = (a, b) if a < b else (b, a)
             return lo <= c <= hi or lo <= d <= hi
         a_val = self.cross_product(d - a, b - a) * self.cross_product(c - a, b - a)
@@ -1274,12 +1284,16 @@ class GeometryAlgorithms:
         return not(a_val>0 or c_val>0)
 
     def is_lines_intersect_ab_to_cd(self, a, b, c, d):
-        return (not self.is_parallel_lines_ab_and_cd(a, b, c, d) or
-                self.is_collinear_lines_ab_and_cd(a, b, c, d))
+        """Two lines intersect if they aren't parallel or if they collinear."""
+        return (not self.is_parallel_lines_ab_and_cd(a, b, c, d)
+                or self.is_collinear_lines_ab_and_cd_2(a, b, c, d))
 
     def pt_lines_intersect_ab_to_cd(self, a, b, c, d):
-        ba, ca, cd = b-a, c-a, c-d
-        return a + ba*(self.cross_product(ca, cd) / self.cross_product(ba, cd))
+        """Compute the intersection point between two lines.
+        Explain
+        """
+        vec_ba, vec_ca, vec_cd = b-a, c-a, c-d
+        return a + vec_ba*(self.cross_product(vec_ca, vec_cd) / self.cross_product(vec_ba, vec_cd))
 
     def pt_line_seg_intersect_ab_to_cd(self, a, b, c, d):
         x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product(d, c)
