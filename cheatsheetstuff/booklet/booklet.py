@@ -1168,7 +1168,7 @@ class GeometryAlgorithms:
         paste directly into code and drop isclose for runtime speedup."""
         return 0 if isclose(a, b) else -1 if a<b else 1
 
-    def dot_product_2d(self, a, b):
+    def dot_product(self, a, b):
         """Compute the scalar product a.b of a,b equivalent to: a . b"""
         return a.x*b.x + a.y*b.y
     def cross_product_2d(self, a, b):
@@ -1180,9 +1180,10 @@ class GeometryAlgorithms:
         return dist(a.get_tup(), b.get_tup())
     def distance_2d(self, a, b):
         """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
-        return self.dot_product_2d(a-b, a-b)
+        return self.dot_product(a-b, a-b)
 
     def rotate_cw_90_wrt_origin_2d(self, pt):
+        """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
         return Pt2d(pt.y, -pt.x)
     def rotate_ccw_90_wrt_origin_2d(self, pt):
         return Pt2d(-pt.y, pt.x)
@@ -1196,24 +1197,24 @@ class GeometryAlgorithms:
 
     def angle_point_c_wrt_line_ab_2d(self, a, b, c): # possibly doesn't work for some (probably overflow)
         ab, cb = a-b, c-b
-        abcb = self.dot_product_2d(ab, cb)
-        abab = self.dot_product_2d(ab, ab)
-        cbcb = self.dot_product_2d(cb, cb)
+        abcb = self.dot_product(ab, cb)
+        abab = self.dot_product(ab, ab)
+        cbcb = self.dot_product(cb, cb)
         # return acos(abcb/sqrt(abab*cbcb))
         return acos(abcb/(sqrt(abab)*sqrt(cbcb)))
 
     # projection funcs just returns closes point to obj based on a point c
     def project_pt_c_to_line_ab_2d(self, a, b, c):
         ba, ca = b-a, c-a
-        return a + ba*(self.dot_product_2d(ca, ba)/self.dot_product_2d(ba, ba))
+        return a + ba*(self.dot_product(ca, ba)/self.dot_product(ba, ba))
 
     # use compare_ab in return if this isn't good enough
     def project_pt_c_to_line_seg_ab_2d(self, a, b, c):
         ba, ca = b-a, c-a
-        u = self.dot_product_2d(ba, ba)
+        u = self.dot_product(ba, ba)
         if self.compare_ab(u, 0.0) == 0:
             return a
-        u = self.dot_product_2d(ca, ba)/u
+        u = self.dot_product(ca, ba)/u
         return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab_2d(a, b, c)
 
     def distance_pt_c_to_line_ab_2d(self, a, b, c):
@@ -1263,9 +1264,9 @@ class GeometryAlgorithms:
 
     def pts_line_ab_intersects_circle_cr_2d(self, a, b, c, r):
         ba, ac = b-a, a-c
-        bb = self.dot_product_2d(ba, ba)
-        ab = self.dot_product_2d(ac, ba)
-        aa = self.dot_product_2d(ac, ac)-r*r
+        bb = self.dot_product(ba, ba)
+        ab = self.dot_product(ac, ba)
+        aa = self.dot_product(ac, ac)-r*r
         dist = ab*ab - bb*aa
         result = self.compare_ab(dist, 0.0)
         if result >= 0:
@@ -1287,7 +1288,7 @@ class GeometryAlgorithms:
 
     def pt_tangent_to_circle_cr_2d(self, c, r, p):
         pc = p-c
-        x = self.dot_product_2d(pc, pc)
+        x = self.dot_product(pc, pc)
         dist = x - r*r
         result = self.compare_ab(dist, 0.0)
         if result >= 0:
@@ -1301,7 +1302,7 @@ class GeometryAlgorithms:
         r_tangents = []
         if self.compare_ab(r1, r2) == 0:
             c2c1 = c2 - c1
-            multiplier = r1/sqrt(self.dot_product_2d(c2c1, c2c1))
+            multiplier = r1/sqrt(self.dot_product(c2c1, c2c1))
             tangent = self.rotate_ccw_90_wrt_origin_2d(c2c1 * multiplier) # need better name
             r_tangents = [(c1+tangent, c2+tangent), (c1-tangent, c2-tangent)]
         else:
@@ -1384,7 +1385,7 @@ class GeometryAlgorithms:
         cross_product_2_1 = self.cross_product_2d(pt_2, pt_1)
         if self.compare_ab(cross_product_1_2, 0.0) == 0:
             return None
-        pt_3 = Pt2d(self.dot_product_2d(a, pt_1), self.dot_product_2d(c, pt_2))
+        pt_3 = Pt2d(self.dot_product(a, pt_1), self.dot_product(c, pt_2))
         x = ((pt_3.x * pt_2.y) - (pt_3.y * pt_1.y)) / cross_product_1_2
         y = ((pt_3.x * pt_2.x) - (pt_3.y * pt_1.x)) / cross_product_2_1
         return Pt2d(x, y)
@@ -1609,7 +1610,7 @@ class GeometryAlgorithms:
     def delaunay_triangulation_slow(self, pts):
         n = len(pts)
         ans = []
-        z = [self.dot_product_2d(el, el) for el in pts]
+        z = [self.dot_product(el, el) for el in pts]
         x = [el.x for el in pts]
         y = [el.y for el in pts]
         for i in range(n-2):
@@ -1643,10 +1644,10 @@ class GeometryAlgorithms:
                 a3 * (b1 * c2 - c1 * b2))
 
     def is_in_circle(self, a, b, c, d):
-        a_dot = self.self.dot_product_2d(a, a)
-        b_dot = self.self.dot_product_2d(b, b)
-        c_dot = self.self.dot_product_2d(c, c)
-        d_dot = self.self.dot_product_2d(d, d)
+        a_dot = self.self.dot_product(a, a)
+        b_dot = self.self.dot_product(b, b)
+        c_dot = self.self.dot_product(c, c)
+        d_dot = self.self.dot_product(d, d)
         det = -self.det3_helper(b.x, b.y, b_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
         det += self.det3_helper(a.x, a.y, a_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
         det -= self.det3_helper(a.x, a.y, a_dot, b.x, b.y, b_dot, d.x, d.y, d_dot)
