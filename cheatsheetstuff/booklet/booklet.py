@@ -635,7 +635,7 @@ class MathAlgorithms:
     def __init__(self):
         """Only take what you need. This list needs to be global or instance level or passed in."""
         self.mod_p = 0
-        self.binomial = []
+        self.binomial = {}
         self.fact = []
         self.inv_fact = []
         self.min_primes_list = []
@@ -1063,62 +1063,52 @@ class MathAlgorithms:
             self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
         return self.binomial[(n, k)]
 
-from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi, tau, atan2
+from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and 
-class PTxy:
-    def __init__(self, x_val, y_val): 
-        self.x, self.y = map(float, [x_val, y_val])
+class Pt2d:
+    def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
 
-    def __add__(self, other): return PTxy(self.x + other.x, self.y + other.y)
-    def __sub__(self, other): return PTxy(self.x - other.x, self.y - other.y)
-    def __mul__(self, scale): return PTxy(self.x * scale, self.y * scale)
-    def __truediv__(self, scale): return PTxy(self.x / scale, self.y / scale)
-    def __floordiv__(self, scale): return PTxy(self.x // scale, self.y // scale)
+    def __add__(self, other): return Pt2d(self.x + other.x, self.y + other.y)
+    def __sub__(self, other): return Pt2d(self.x - other.x, self.y - other.y)
+    def __mul__(self, scale): return Pt2d(self.x * scale, self.y * scale)
+    def __truediv__(self, scale): return Pt2d(self.x / scale, self.y / scale)
+    def __floordiv__(self, scale): return Pt2d(self.x // scale, self.y // scale)
 
     def __eq__(self, other): return isclose(self.x, other.x) and isclose(self.y, other.y)
     def __lt__(self, other): return False if self == other else (self.x, self.y) < (other.x, other.y)
 
     def __str__(self): return "{} {}".format(self.x, self.y)
-    def __str__(self): return "(x = {:20}, y = {:20})".format(self.x, self.y)
-    def __round__(self, n): return PTxy(round(self.x, n), round(self.y, n))
+    # def __str__(self): return "(x = {:20}, y = {:20})".format(self.x, self.y)
+    def __round__(self, n): return Pt2d(round(self.x, n), round(self.y, n))
     def __hash__(self): return hash((self.x, self.y))
 
-    def get_tup(self): return (self.x, self.y)
+    def get_tup(self): return self.x, self.y
 
 
-class pt_xyz:
+class Pt3d:
     def __init__(self, x_val, y_val, z_val): 
-        self.x, self.y, self.z = map(float, [x_val, y_val, z_val])
+        self.x, self.y, self.z = map(float, (x_val, y_val, z_val))
 
-    def __add__(self, other):
-        return pt_xyz(self.x+other.x, self.y+other.y, self.z+other.z)
-    def __sub__(self, other): 
-        return pt_xyz(self.x-other.x, self.y-other.y, self.z-other.z)
-    def __mul__(self, scale): 
-        return pt_xyz(self.x*scale, self.y*scale, self.z*scale)
-    def __truediv__(self, scale): 
-        return pt_xyz(self.x/scale, self.y/scale, self.z/scale)
-    def __floordiv__(self, scale): 
-        return pt_xyz(self.x//scale, self.y//scale, self.z//scale)
+    def __add__(self, other): return Pt3d(self.x + other.x, self.y + other.y, self.z + other.z)
+    def __sub__(self, other): return Pt3d(self.x - other.x, self.y - other.y, self.z - other.z)
+    def __mul__(self, scale): return Pt3d(self.x * scale, self.y * scale, self.z * scale)
+    def __truediv__(self, scale): return Pt3d(self.x / scale, self.y / scale, self.z / scale)
+    def __floordiv__(self, scale): return Pt3d(self.x // scale, self.y // scale, self.z // scale)
 
     def __eq__(self, other): 
         return isclose(self.x, other.x) and isclose(self.y, other.y) and isclose(self.z, other.z)
     def __lt__(self, other):
         return False if self == other else (self.x, self.y, self.z) < (other.x, other.y, other.y)
 
-    def __str__(self): 
-        return "{} {} {}".format(self.x, self.y, self.z)
-    def __str__(self): 
-        return "(x = {:20}, y = {:20}), z = {:20})".format(self.x, self.y, self.z)
-    def __round__(self, n): 
-        return pt_xyz(round(self.x, n), round(self.y, n), round(self.z, n)
-    def __hash__(self):
-        return hash((self.x, self.y, self.z))
+    def __str__(self): return "{} {} {}".format(self.x, self.y, self.z)
+    # def __str__(self): return "(x = {:20}, y = {:20}), z = {:20})".format(self.x, self.y, self.z)
+    def __round__(self, n): return Pt3d(round(self.x, n), round(self.y, n), round(self.z, n))
+    def __hash__(self): return hash((self.x, self.y, self.z))
 
-class Quad_Edge:
+class QuadEdge:
     def __init__(self):
-        self.origin = PTxy(0, 0)
+        self.origin = Pt2d(0, 0)
         self.rot = None
         self.o_next = None
         self.used = False
@@ -1133,14 +1123,14 @@ class QuadEdgeDataStructure:
         pass
 
     def make_edge(self, in_pt, out_pt):
-        e1 = Quad_Edge()
-        e2 = Quad_Edge()
-        e3 = Quad_Edge()
-        e4 = Quad_Edge()
+        e1 = QuadEdge()
+        e2 = QuadEdge()
+        e3 = QuadEdge()
+        e4 = QuadEdge()
         e1.origin = in_pt
         e2.origin = out_pt
-        e3.origin = PTxy(2 ** 63, 2 ** 63)
-        e4.origin = PTxy(2 ** 63, 2 ** 63)
+        e3.origin = Pt2d(2 ** 63, 2 ** 63)
+        e4.origin = Pt2d(2 ** 63, 2 ** 63)
         e1.rot = e3
         e2.rot = e4
         e3.rot = e2
@@ -1158,8 +1148,8 @@ class QuadEdgeDataStructure:
     def delete_edge(self, edge):
         self.splice(edge, edge.o_prev())
         self.splice(edge.rev(), edge.rev().o_prev())
-        del edge.rev().rot
-        del edge.rev()
+        del edge.rot.rot.rot
+        del edge.rot.rot
         del edge.rot
         del edge
 
@@ -1169,23 +1159,30 @@ class QuadEdgeDataStructure:
         self.splice(e.rev(), b)
         return e
 
-class Geometry_Algorithms:
+class GeometryAlgorithms:
     def __init__(self):
         self.quad_edges = QuadEdgeDataStructure()
         
     # replacing epscmp and c_cmp for epscmp simply use compare_ab(a, 0) or math.isclose(a, 0)
-    def compare_ab(self, a, b): return 0 if isclose(a, b) else -1 if a<b else 1
+    def compare_ab(self, a, b):
+        return 0 if isclose(a, b) else -1 if a<b else 1
 
-    def dot_product_2d(self, a, b): return a.x*b.x + a.y*b.y
-    def cross_product_2d(self, a, b): return a.x*b.y - a.y*b.x
+    def dot_product_2d(self, a, b):
+        return a.x*b.x + a.y*b.y
+    def cross_product_2d(self, a, b):
+        return a.x*b.y - a.y*b.x
 
-    def distance_normalized_2d(self, a, b): return math.dist(a.get_tup(), b.get_tup())
-    def distance_2d(self, a, b): return self.dot_product_2d(a-b, a-b)
+    def distance_normalized_2d(self, a, b):
+        return dist(a.get_tup(), b.get_tup())
+    def distance_2d(self, a, b):
+        return self.dot_product_2d(a-b, a-b)
 
-    def rotate_cw_90_wrt_origin_2d(self, pt): return PTxy(pt.y, -pt.x)
-    def rotate_ccw_90_wrt_origin_2d(self, pt): return PTxy(-pt.y, pt.x)
+    def rotate_cw_90_wrt_origin_2d(self, pt):
+        return Pt2d(pt.y, -pt.x)
+    def rotate_ccw_90_wrt_origin_2d(self, pt):
+        return Pt2d(-pt.y, pt.x)
     def rotate_ccw_rad_wrt_origin_2d(self, pt, rad):
-        return PTxy(pt.x * cos(rad) - pt.y * sin(rad),
+        return Pt2d(pt.x * cos(rad) - pt.y * sin(rad),
                     pt.x * sin(rad) + pt.y * cos(rad))
 
     # 0 if colinear else 1 if counter clock wise (ccw) else -1 if clockwise (cw) 
@@ -1248,7 +1245,7 @@ class Geometry_Algorithms:
         x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product_2d(d, c)
         u = abs(y*a.x + x*a.y + cross_prod)
         v = abs(y*b.x + x*b.y + cross_prod)
-        return PTxy((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u))
+        return Pt2d((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u))
 
     def is_point_in_circle(self, a, b, r): # use <= if you want points on the circumfrance 
         return self.compare_ab(self.distance_normalized_2d(a, b), r) < 0
@@ -1377,15 +1374,15 @@ class Geometry_Algorithms:
 
     def triangle_circle_center_pt_abcd_2d(self, a, b, c, d):
         ba, dc = b-a, d-c
-        pt_1, pt_2 = PTxy(ba.y, -ba.x), PTxy(dc.y, -dc.x)
+        pt_1, pt_2 = Pt2d(ba.y, -ba.x), Pt2d(dc.y, -dc.x)
         cross_product_1_2 = self.cross_product_2d(pt_1, pt_2)
         cross_product_2_1 = self.cross_product_2d(pt_2, pt_1)
         if self.compare_ab(cross_product_1_2, 0.0) == 0:
             return None
-        pt_3 = PTxy(self.dot_product_2d(a, pt_1), self.dot_product_2d(c, pt_2))
+        pt_3 = Pt2d(self.dot_product_2d(a, pt_1), self.dot_product_2d(c, pt_2))
         x = ((pt_3.x * pt_2.y) - (pt_3.y * pt_1.y)) / cross_product_1_2
         y = ((pt_3.x * pt_2.x) - (pt_3.y * pt_1.x)) / cross_product_2_1
-        return PTxy(x, y) 
+        return Pt2d(x, y)
 
     def angle_bisector_for_triangle_abc_2d(self, a, b, c):
         dist_ba = self.distance_normalized_2d(b, a)
@@ -1395,7 +1392,7 @@ class Geometry_Algorithms:
 
     def perpendicular_bisector_for_triangle_ab_2d(self, a, b):
         ba = b-a
-        ba = PTxy(-ba.y, ba.x)
+        ba = Pt2d(-ba.y, ba.x)
         return ba + (a+b)/2
 
     def incircle_pt_of_triangle_abc_v2_2d(self, a, b, c):
@@ -1495,7 +1492,7 @@ class Geometry_Algorithms:
                 else 1 if self.pt_p_in_polygon_pts_v2_2d(pts, p) else -1
 
     def centroid_pt_of_convex_polygon_2d(self, pts):
-        ans, n = PTxy(0, 0), len(pts)
+        ans, n = Pt2d(0, 0), len(pts)
         for i in range(n-1):
             ans = ans + (pts[i]+pts[i+1]) * self.cross_product_2d(pts[i], pts[i+1])
             return ans / (6.0 * self.signed_area_of_polygon_pts_2d(pts))
