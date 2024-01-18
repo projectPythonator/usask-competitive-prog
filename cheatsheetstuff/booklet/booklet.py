@@ -1193,23 +1193,36 @@ class GeometryAlgorithms:
     def rotate_ccw_rad_wrt_origin(self, pt, rad):
         """Compute a counterclockwise point rotation on pt. Accurate only for floating point cords.
         formula: x = (x cos(rad) - y sin(rad)), y = (x sin(rad) + y cos (rad)).
-        Complexity per call: Time: O(1) I think, Space: O(1).
+
+        Complexity per call: Time: O(1), Space: O(1).
         Optimizations: calculate cos and sin outside the return, so you don't double call each.
         """
         return Pt2d(pt.x * cos(rad) - pt.y * sin(rad),
                     pt.x * sin(rad) + pt.y * cos(rad))
 
-    # 0 if colinear else 1 if counter clock wise (ccw) else -1 if clockwise (cw) 
-    def point_c_rotation_wrt_line_ab_2d(self, a, b, c):
+    def point_c_rotation_wrt_line_ab(self, a, b, c):
+        """Determine orientation of c wrt line ab, in terms of collinear clockwise counterclockwise.
+        Since 2d cross-product is the area of the parallelogram, we can use this to accomplish this.
+
+        Complexity per call: Time: O(1), Space: O(1).
+        Returns collinear(cl): 0, counterclockwise(ccw): 1, clockwise(cw): -1
+        Optimizations: if x,y are ints, use 0 instead of 0.0 or just paste the code here directly.
+        """
         return self.compare_ab(self.cross_product(b - a, c - a), 0.0)
 
-    def angle_point_c_wrt_line_ab_2d(self, a, b, c): # possibly doesn't work for some (probably overflow)
-        ab, cb = a-b, c-b
-        abcb = self.dot_product(ab, cb)
-        abab = self.dot_product(ab, ab)
-        cbcb = self.dot_product(cb, cb)
-        # return acos(abcb/sqrt(abab*cbcb))
-        return acos(abcb/(sqrt(abab)*sqrt(cbcb)))
+    def angle_point_c_wrt_line_ab_2d(self, a, b, c):
+        """For a line ab and point c, determine the angle of a to b to c in radians.
+        formula: arc-cos(dot(vec_ab, vec_cb) / sqrt(dist_sq(vec_ab) * dist_sq(vec_cb))) = angle
+
+        Complexity per call: Time: O(1), Space: O(1).
+        Optimizations: for accuracy we sqrt both distances can remove if distances are ints.
+        """
+        vector_ab, vector_cb = a-b, c-b
+        dot_ab_cb = self.dot_product(vector_ab, vector_cb)
+        dist_sq_ab = self.dot_product(vector_ab, vector_ab)
+        dist_sq_cb = self.dot_product(vector_cb, vector_cb)
+        return acos(dot_ab_cb / (sqrt(dist_sq_ab) * sqrt(dist_sq_cb)))
+        # return acos(dot_ab_cb / sqrt(dist_sq_ab * dist_sq_cb))
 
     # projection funcs just returns closes point to obj based on a point c
     def project_pt_c_to_line_ab_2d(self, a, b, c):
@@ -1332,9 +1345,9 @@ class GeometryAlgorithms:
         return ab, bc, ca
 
     def pt_p_in_triangle_abc_2d(self, a, b, c, p):
-        return self.point_c_rotation_wrt_line_ab_2d(a, b, p) >= 0 and  \
-                self.point_c_rotation_wrt_line_ab_2d(b, c, p) >= 0 and \
-                self.point_c_rotation_wrt_line_ab_2d(c, a, p) >= 0
+        return self.point_c_rotation_wrt_line_ab(a, b, p) >= 0 and  \
+                self.point_c_rotation_wrt_line_ab(b, c, p) >= 0 and \
+                self.point_c_rotation_wrt_line_ab(c, a, p) >= 0
 
     def perimeter_of_triangle_abc_2d(self, ab, bc, ca):
         return ab + bc + ca
@@ -1435,7 +1448,7 @@ class GeometryAlgorithms:
 
     # < is counter clock wise <= includes collinear > for clock wise >= includes collinear
     def is_convex_helper(self, a, b, c):
-        return 0 < self.point_c_rotation_wrt_line_ab_2d(a, b, c)
+        return 0 < self.point_c_rotation_wrt_line_ab(a, b, c)
 
     def is_convex_polygon_pts_2d(self, pts):
         lim = len(pts)
@@ -1453,7 +1466,7 @@ class GeometryAlgorithms:
         if n > 3:
             angle_sum = 0.0
             for i in range(n-1):
-                if 1 == self.point_c_rotation_wrt_line_ab_2d(pts[i], pts[i+1], p):
+                if 1 == self.point_c_rotation_wrt_line_ab(pts[i], pts[i + 1], p):
                     angle_sum += angle_point_c_wrt_line_ab_2d(pts[i], pts[i+1], p)
                 else:
                     angle_sum -= angle_point_c_wrt_line_ab_2d(pts[i], pts[i+1], p)
@@ -1491,12 +1504,12 @@ class GeometryAlgorithms:
         left, right = 1, n
         while left < right:
             mid = (left + rigth)/2 + 1
-            side = self.point_c_rotation_wrt_line_ab_2d(pts[0], pts[mid], p)
+            side = self.point_c_rotation_wrt_line_ab(pts[0], pts[mid], p)
             left, right = mid, right if side == 1 else left, mid-1
-        side = self.point_c_rotation_wrt_line_ab_2d(pts[0], pts[left], p)
+        side = self.point_c_rotation_wrt_line_ab(pts[0], pts[left], p)
         if side == -1 or left == n:
             return False
-        side = self.point_c_rotation_wrt_line_ab_2d(pts[left], pts[left+1] - pts[left], p)
+        side = self.point_c_rotation_wrt_line_ab(pts[left], pts[left + 1] - pts[left], p)
         return side >= 0
     
     # use a set with points if possible checking on the same polygon many times    
@@ -1525,8 +1538,8 @@ class GeometryAlgorithms:
     def polygon_cut(self, pts, a, b):
         ans, n = [], len(pts)
         for i in range(n-1):
-            rot_1 = self.point_c_rotation_wrt_line_ab_2d(a, b, pts[i])
-            rot_2 = self.point_c_rotation_wrt_line_ab_2d(a, b, pts[i+1])
+            rot_1 = self.point_c_rotation_wrt_line_ab(a, b, pts[i])
+            rot_2 = self.point_c_rotation_wrt_line_ab(a, b, pts[i + 1])
             if 1 == rot_1:
                 ans.append(pts[i])
             elif 0 == rot_1:
@@ -1542,7 +1555,7 @@ class GeometryAlgorithms:
         def func(points, r, lim):
             for p in points:
                 while (len(r) > lim and
-                    self.point_c_rotation_wrt_line_ab_2d(r[-2], r[-1], p) == -1):
+                       self.point_c_rotation_wrt_line_ab(r[-2], r[-1], p) == -1):
                     r.pop()
                 r.append(p)
             r.pop()
@@ -1641,10 +1654,10 @@ class GeometryAlgorithms:
         return ans
 
     def pt_left_of_edge_2d(self, pt, edge):
-        return 1 == self.point_c_rotation_wrt_line_ab_2d(pt, edge.origin, edge.dest())
+        return 1 == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
     def pt_right_of_edge_2d(self, pt, edge):
-        return -1 == self.point_c_rotation_wrt_line_ab_2d(pt, edge.origin, edge.dest())
+        return -1 == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
     def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
         return (a1 * (b2 * c3 - c2 * b3) - 
@@ -1677,7 +1690,7 @@ class GeometryAlgorithms:
             edge_a = self.quad_edges.make_edge(pts[l], pts[l + 1])
             edge_b = self.quad_edges.make_edge(pts[l + 1], pts[r])
             self.quad_edges.splce(edge_a.rev(), edge_b)
-            sg = self.point_c_rotation_wrt_line_ab_2d(pts[l], pts[l + 1], pts[r])
+            sg = self.point_c_rotation_wrt_line_ab(pts[l], pts[l + 1], pts[r])
             if sg == 0:
                 return (edge_a, edge_b.rev())
             edge_c = self.quad_edges.connect(edge_b, edge_a)
@@ -1730,7 +1743,7 @@ class GeometryAlgorithms:
         result = self.build_triangulation(0, len(pts) - 1, p)
         edge = result[0]
         edges = [edge]
-        while self.point_c_rotation_wrt_line_ab_2d(edge.o_next.dest(), edge.dest(), edge.origin) < 0:
+        while self.point_c_rotation_wrt_line_ab(edge.o_next.dest(), edge.dest(), edge.origin) < 0:
             edge = edge.o_next
         def add_helper(pts, edge, edges):
             cur = edge
