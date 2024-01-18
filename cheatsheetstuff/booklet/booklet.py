@@ -1175,19 +1175,27 @@ class GeometryAlgorithms:
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return a.x*b.y - a.y*b.x
 
-    def distance_normalized_2d(self, a, b):
+    def distance_normalized(self, a, b):
         """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
         return dist(a.get_tup(), b.get_tup())
-    def distance_2d(self, a, b):
+    def distance(self, a, b):
         """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
         return self.dot_product(a - b, a - b)
 
-    def rotate_cw_90_wrt_origin_2d(self, pt):
-        """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
+    def rotate_cw_90_wrt_origin(self, pt):
+        """Compute a point rotation on pt. Just swap x and y and negate x."""
         return Pt2d(pt.y, -pt.x)
-    def rotate_ccw_90_wrt_origin_2d(self, pt):
+
+    def rotate_ccw_90_wrt_origin(self, pt):
+        """Compute a point rotation on pt. Just swap x and y and negate y."""
         return Pt2d(-pt.y, pt.x)
-    def rotate_ccw_rad_wrt_origin_2d(self, pt, rad):
+
+    def rotate_ccw_rad_wrt_origin(self, pt, rad):
+        """Compute a counterclockwise point rotation on pt. Accurate only for floating point cords.
+        formula: x = (x cos(rad) - y sin(rad)), y = (x sin(rad) + y cos (rad)).
+        Complexity per call: Time: O(1) I think, Space: O(1).
+        Optimizations: calculate cos and sin outside the return, so you don't double call each.
+        """
         return Pt2d(pt.x * cos(rad) - pt.y * sin(rad),
                     pt.x * sin(rad) + pt.y * cos(rad))
 
@@ -1218,10 +1226,10 @@ class GeometryAlgorithms:
         return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab_2d(a, b, c)
 
     def distance_pt_c_to_line_ab_2d(self, a, b, c):
-        return self.distance_normalized_2d(c, self.project_pt_c_to_line_ab_2d(a, b, c))
+        return self.distance_normalized(c, self.project_pt_c_to_line_ab_2d(a, b, c))
 
     def distance_pt_c_to_line_seg_ab_2d(self, a, b, c):
-        return self.distance_normalized_2d(c, self.project_pt_c_to_line_seg_ab_2d(a, b, c))
+        return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab_2d(a, b, c))
     
     def is_parallel_lines_ab_and_cd_2d(self, a, b, c, d):
         return self.compare_ab(self.cross_product(b - a, c - d), 0.0) == 0
@@ -1254,12 +1262,12 @@ class GeometryAlgorithms:
         return Pt2d((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u))
 
     def is_point_in_circle(self, a, b, r): # use <= if you want points on the circumfrance 
-        return self.compare_ab(self.distance_normalized_2d(a, b), r) < 0
+        return self.compare_ab(self.distance_normalized(a, b), r) < 0
 
     def pt_circle_center_given_pt_abc(self, a, b, c):
         ab, ac = (a+b)/2, (a+c)/2
-        ab_rot = ab+self.rotate_cw_90_wrt_origin_2d(a-ab)
-        ac_rot = ac+self.rotate_cw_90_wrt_origin_2d(a-ac)
+        ab_rot = ab+self.rotate_cw_90_wrt_origin(a - ab)
+        ac_rot = ac+self.rotate_cw_90_wrt_origin(a - ac)
         return self.pt_lines_intersect_ab_to_cd_2d(ab, ab_rot, ac, ac_rot)
 
     def pts_line_ab_intersects_circle_cr_2d(self, a, b, c, r):
@@ -1276,13 +1284,13 @@ class GeometryAlgorithms:
         return None # no intersect 
 
     def pts_two_circles_intersect_ar1_br1_2d(self, c1, c2, r1, r2):
-        center_dist = self.distance_normalized_2d(c1, c2)
+        center_dist = self.distance_normalized(c1, c2)
         if (self.compare_ab(center_dist, r1+r2) <= 0
             and self.compare_ab(center_dist+min(r1, r2), max(r1, r2)) >= 0):
             x = (center_dist*center_dist - r2*r2 + r1*r1)/(2*center_dist)
             y = sqrt(r1*r1 - x*x)
             v = (b-a)/center_dist
-            pt1, pt2 = a + v*x, self.rotate_ccw_90_wrt_origin_2d(v)*y
+            pt1, pt2 = a + v * x, self.rotate_ccw_90_wrt_origin(v) * y
             return (pt1+pt2) if self.compare_ab(y, 0.0) <= 0 else (pt1+pt2, pt1-pt2)
         return None # no overlap
 
@@ -1294,7 +1302,7 @@ class GeometryAlgorithms:
         if result >= 0:
             dist = dist if result else 0
             q1 = pa * (r*r / x)
-            q2 = self.rotate_ccw_90_wrt_origin_2d(pa * (-r * sqrt(dist)/x))
+            q2 = self.rotate_ccw_90_wrt_origin(pa * (-r * sqrt(dist) / x))
             return [a+q1-q2, a+q1+q2]
         return []
 
@@ -1303,7 +1311,7 @@ class GeometryAlgorithms:
         if self.compare_ab(r1, r2) == 0:
             c2c1 = c2 - c1
             multiplier = r1/sqrt(self.dot_product(c2c1, c2c1))
-            tangent = self.rotate_ccw_90_wrt_origin_2d(c2c1 * multiplier) # need better name
+            tangent = self.rotate_ccw_90_wrt_origin(c2c1 * multiplier) # need better name
             r_tangents = [(c1+tangent, c2+tangent), (c1-tangent, c2-tangent)]
         else:
             ref_pt = ((c1 * -r2) + (c2 * r1)) / (r1 - r2)
@@ -1318,9 +1326,9 @@ class GeometryAlgorithms:
         return r_tangents
 
     def sides_of_triangle_abc_2d(self, a, b, c):
-        ab = self.distance_normalized_2d(a, b)
-        bc = self.distance_normalized_2d(b, c)
-        ca = self.distance_normalized_2d(c, a)
+        ab = self.distance_normalized(a, b)
+        bc = self.distance_normalized(b, c)
+        ca = self.distance_normalized(c, a)
         return ab, bc, ca
 
     def pt_p_in_triangle_abc_2d(self, a, b, c, p):
@@ -1365,9 +1373,9 @@ class GeometryAlgorithms:
         radius = self.incircle_radis_of_triangle_abc_2d(a, b, c)
         if self.compare_ab(radius, 0.0):
             return (False, 0, 0)
-        dist_ab = self.distance_normalized_2d(a, b)
-        dist_bc = self.distance_normalized_2d(b, c)
-        dist_ac = self.distance_normalized_2d(a, c)
+        dist_ab = self.distance_normalized(a, b)
+        dist_bc = self.distance_normalized(b, c)
+        dist_ac = self.distance_normalized(a, c)
         ratio_1 = dist_ab/dist_ac
         ratio_2 = dist_ab/dist_bc
         pt_1 = b + (c-b) * (ratio_1/(ratio_1 + 1.0)) 
@@ -1391,8 +1399,8 @@ class GeometryAlgorithms:
         return Pt2d(x, y)
 
     def angle_bisector_for_triangle_abc_2d(self, a, b, c):
-        dist_ba = self.distance_normalized_2d(b, a)
-        dist_ca = self.distance_normalized_2d(c, a)
+        dist_ba = self.distance_normalized(b, a)
+        dist_ca = self.distance_normalized(c, a)
         ref_pt = (b-a) / dist_ba * dist_ca
         return ref_pt + (c-a) + a
 
@@ -1417,10 +1425,10 @@ class GeometryAlgorithms:
 
     # note these assume counter clockwise ordering of points
     def perimeter_of_polygon_pts_2d(self, pts):
-        return fsum([self.distance_normalized_2d(pts[i], pts[i+1]) for i in range(len(pts)-1)])
+        return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
 
     def signed_area_of_polygon_pts_2d(self, pts):
-        return fsum([self.distance_normalized_2d(pts[i], pts[i+1]) for i in range(len(pts)-1)])/2
+        return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])/2
 
     def area_of_polygon_pts_2d(self, pts):
         return abs(self.signed_area_of_polygon_pts_2d(pts))
@@ -1468,9 +1476,9 @@ class GeometryAlgorithms:
             if p in pts:
                 return True
             for i in range(n-1):
-                dist_ip = self.distance_normalized_2d(pts[i], p)
-                dist_pj = self.distance_normalized_2d(p, pts[i+1])
-                dist_ij = self.distance_normalized_2d(pts[i], pts[i+1])
+                dist_ip = self.distance_normalized(pts[i], p)
+                dist_pj = self.distance_normalized(p, pts[i + 1])
+                dist_ij = self.distance_normalized(pts[i], pts[i + 1])
                 if self.compare_ab(dist_ip+dist_pj, dist_ij) == 0:
                     return True
             return False
@@ -1557,18 +1565,18 @@ class GeometryAlgorithms:
                 if self.compare_ab(cross_1, cross_2) == -1:
                     break
                 t = (t+1) % n
-            ans = max(ans, self.distance_normalized_2d(pi, pts[t]))
-            ans = max(ans, self.distance_normalized_2d(pj, pts[t]))
+            ans = max(ans, self.distance_normalized(pi, pts[t]))
+            ans = max(ans, self.distance_normalized(pj, pts[t]))
         return ans
 
     def closest_pair_helper_2d(self, lo, hi):
-        r_closest = (self.distance_2d(self.x_ordering[lo], self.x_ordering[lo+1]),
+        r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
                      self.x_ordering[lo], 
                      self.x_ordering[lo+1])
         for i in range(lo, hi):
             for j in range(i+1, hi):
-                distance_ij = self.distance_2d(self.x_ordering[i], 
-                                               self.x_ordering[j])
+                distance_ij = self.distance(self.x_ordering[i],
+                                            self.x_ordering[j])
                 if self.compare_ab(distance_ij, r_closest):
                     r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
         return r_closest
@@ -1597,7 +1605,7 @@ class GeometryAlgorithms:
                 dist_ij = y_check[i].y - y_check[j].y
                 if self.compare_ab(dist_ij * dist_ij, best_pair[0]) > 0:
                     break
-                dist_ij = self.distance_2d(y_check[i], y_check[j])
+                dist_ij = self.distance(y_check[i], y_check[j])
                 if self.compare_ab(dist_ij, best_pair) < 0:
                     best_pair = (dist_ij, y_check[i], y_check[j])
         return best_pair
