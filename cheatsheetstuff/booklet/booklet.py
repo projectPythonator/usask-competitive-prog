@@ -1162,14 +1162,17 @@ class QuadEdgeDataStructure:
 class GeometryAlgorithms:
     def __init__(self):
         self.quad_edges = QuadEdgeDataStructure()
-        
-    # replacing epscmp and c_cmp for epscmp simply use compare_ab(a, 0) or math.isclose(a, 0)
+
     def compare_ab(self, a, b):
+        """Compare a b, for floats and ints. It is useful when you want set values to observe.
+        paste directly into code and drop isclose for runtime speedup."""
         return 0 if isclose(a, b) else -1 if a<b else 1
 
     def dot_product_2d(self, a, b):
+        """Compute the scalar product a.b of a,b equivalent to: a . b"""
         return a.x*b.x + a.y*b.y
     def cross_product_2d(self, a, b):
+        """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return a.x*b.y - a.y*b.x
 
     def distance_normalized_2d(self, a, b):
@@ -1227,7 +1230,7 @@ class GeometryAlgorithms:
 
     def is_segments_intersect_ab_to_cd_2d(self, a, b, c, d):
         if self.is_collinear_lines_ab_and_cd_2d(a, b, c, d):
-            lo, hi = a, b if a < b else b, a
+            lo, hi = (a, b) if a < b else (b, a)
             return lo <= c <= hi or lo <= d <= hi
         a_val = self.cross_product_2d(d-a, b-a)*self.cross_product_2d(c-a, b-a)
         c_val = self.cross_product_2d(a-c, d-c)*self.cross_product_2d(b-c, d-c)
