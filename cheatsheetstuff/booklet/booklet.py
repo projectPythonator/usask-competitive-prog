@@ -1180,7 +1180,7 @@ class GeometryAlgorithms:
         return dist(a.get_tup(), b.get_tup())
     def distance_2d(self, a, b):
         """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
-        return self.dot_product(a-b, a-b)
+        return self.dot_product(a - b, a - b)
 
     def rotate_cw_90_wrt_origin_2d(self, pt):
         """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
@@ -1206,7 +1206,7 @@ class GeometryAlgorithms:
     # projection funcs just returns closes point to obj based on a point c
     def project_pt_c_to_line_ab_2d(self, a, b, c):
         ba, ca = b-a, c-a
-        return a + ba*(self.dot_product(ca, ba)/self.dot_product(ba, ba))
+        return a + ba*(self.dot_product(ca, ba) / self.dot_product(ba, ba))
 
     # use compare_ab in return if this isn't good enough
     def project_pt_c_to_line_seg_ab_2d(self, a, b, c):
@@ -1214,7 +1214,7 @@ class GeometryAlgorithms:
         u = self.dot_product(ba, ba)
         if self.compare_ab(u, 0.0) == 0:
             return a
-        u = self.dot_product(ca, ba)/u
+        u = self.dot_product(ca, ba) / u
         return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab_2d(a, b, c)
 
     def distance_pt_c_to_line_ab_2d(self, a, b, c):
@@ -1266,7 +1266,7 @@ class GeometryAlgorithms:
         ba, ac = b-a, a-c
         bb = self.dot_product(ba, ba)
         ab = self.dot_product(ac, ba)
-        aa = self.dot_product(ac, ac)-r*r
+        aa = self.dot_product(ac, ac) - r * r
         dist = ab*ab - bb*aa
         result = self.compare_ab(dist, 0.0)
         if result >= 0:
@@ -1655,7 +1655,7 @@ class GeometryAlgorithms:
         return det > 0
         # use this if above doesn't work for what ever reason
         # def angle(l, mid, r):
-        #     x = self.dot_product_2d(l-mid, r-mid)
+        #     x = self.dot_product(l-mid, r-mid)
         #     y = self.cross_product_2d(l-mid, r-mid)
         #     return atan2(x, y)
         # kek = angle(a, b, c) + angle(c, d, a) - angle(b, c, d) - angle(d, a, b)
