@@ -1171,7 +1171,7 @@ class GeometryAlgorithms:
     def dot_product(self, a, b):
         """Compute the scalar product a.b of a,b equivalent to: a . b"""
         return a.x*b.x + a.y*b.y
-    def cross_product_2d(self, a, b):
+    def cross_product(self, a, b):
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return a.x*b.y - a.y*b.x
 
@@ -1193,7 +1193,7 @@ class GeometryAlgorithms:
 
     # 0 if colinear else 1 if counter clock wise (ccw) else -1 if clockwise (cw) 
     def point_c_rotation_wrt_line_ab_2d(self, a, b, c):
-        return self.compare_ab(self.cross_product_2d(b-a, c-a), 0.0)
+        return self.compare_ab(self.cross_product(b - a, c - a), 0.0)
 
     def angle_point_c_wrt_line_ab_2d(self, a, b, c): # possibly doesn't work for some (probably overflow)
         ab, cb = a-b, c-b
@@ -1224,7 +1224,7 @@ class GeometryAlgorithms:
         return self.distance_normalized_2d(c, self.project_pt_c_to_line_seg_ab_2d(a, b, c))
     
     def is_parallel_lines_ab_and_cd_2d(self, a, b, c, d):
-        return self.compare_ab(self.cross_product_2d(b-a, c-d), 0.0) == 0
+        return self.compare_ab(self.cross_product(b - a, c - d), 0.0) == 0
 
     def is_collinear_lines_ab_and_cd_2d(self, a, b, c, d):
         return (self.is_parallel_lines_ab_and_cd_2d(a, b, c, d)
@@ -1235,8 +1235,8 @@ class GeometryAlgorithms:
         if self.is_collinear_lines_ab_and_cd_2d(a, b, c, d):
             lo, hi = (a, b) if a < b else (b, a)
             return lo <= c <= hi or lo <= d <= hi
-        a_val = self.cross_product_2d(d-a, b-a)*self.cross_product_2d(c-a, b-a)
-        c_val = self.cross_product_2d(a-c, d-c)*self.cross_product_2d(b-c, d-c)
+        a_val = self.cross_product(d - a, b - a) * self.cross_product(c - a, b - a)
+        c_val = self.cross_product(a - c, d - c) * self.cross_product(b - c, d - c)
         return not(a_val>0 or c_val>0)
 
     def is_lines_intersect_ab_to_cd_2d(self, a, b, c, d):
@@ -1245,10 +1245,10 @@ class GeometryAlgorithms:
 
     def pt_lines_intersect_ab_to_cd_2d(self, a, b, c, d):
         ba, ca, cd = b-a, c-a, c-d
-        return a + ba*(self.cross_product_2d(ca, cd)/self.cross_product_2d(ba, cd))
+        return a + ba*(self.cross_product(ca, cd) / self.cross_product(ba, cd))
 
     def pt_line_seg_intersect_ab_to_cd_2d(self, a, b, c, d):
-        x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product_2d(d, c)
+        x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product(d, c)
         u = abs(y*a.x + x*a.y + cross_prod)
         v = abs(y*b.x + x*b.y + cross_prod)
         return Pt2d((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u))
@@ -1339,9 +1339,9 @@ class GeometryAlgorithms:
         return sqrt(s * (s-ab) * (s-bc) * (s-ca))
 
     def triangle_area_cross_product_abc_2d(self, a, b, c):
-        ab = self.cross_product_2d(a, b)
-        bc = self.cross_product_2d(b, c)
-        ca = self.cross_product_2d(c, a)
+        ab = self.cross_product(a, b)
+        bc = self.cross_product(b, c)
+        ca = self.cross_product(c, a)
         return (ab + bc + ca)/2
 
     def incircle_radis_of_triangle_abc_helper_2d(self, ab, bc, ca):
@@ -1381,8 +1381,8 @@ class GeometryAlgorithms:
     def triangle_circle_center_pt_abcd_2d(self, a, b, c, d):
         ba, dc = b-a, d-c
         pt_1, pt_2 = Pt2d(ba.y, -ba.x), Pt2d(dc.y, -dc.x)
-        cross_product_1_2 = self.cross_product_2d(pt_1, pt_2)
-        cross_product_2_1 = self.cross_product_2d(pt_2, pt_1)
+        cross_product_1_2 = self.cross_product(pt_1, pt_2)
+        cross_product_2_1 = self.cross_product(pt_2, pt_1)
         if self.compare_ab(cross_product_1_2, 0.0) == 0:
             return None
         pt_3 = Pt2d(self.dot_product(a, pt_1), self.dot_product(c, pt_2))
@@ -1500,7 +1500,7 @@ class GeometryAlgorithms:
     def centroid_pt_of_convex_polygon_2d(self, pts):
         ans, n = Pt2d(0, 0), len(pts)
         for i in range(n-1):
-            ans = ans + (pts[i]+pts[i+1]) * self.cross_product_2d(pts[i], pts[i+1])
+            ans = ans + (pts[i]+pts[i+1]) * self.cross_product(pts[i], pts[i + 1])
             return ans / (6.0 * self.signed_area_of_polygon_pts_2d(pts))
 
     def is_polygon_pts_simple_quadratic_2d(self, pts):
@@ -1656,7 +1656,7 @@ class GeometryAlgorithms:
         # use this if above doesn't work for what ever reason
         # def angle(l, mid, r):
         #     x = self.dot_product(l-mid, r-mid)
-        #     y = self.cross_product_2d(l-mid, r-mid)
+        #     y = self.cross_product(l-mid, r-mid)
         #     return atan2(x, y)
         # kek = angle(a, b, c) + angle(c, d, a) - angle(b, c, d) - angle(d, a, b)
         # return self.compare_ab(kek, 0.0) > 0
