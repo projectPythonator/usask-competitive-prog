@@ -1210,7 +1210,7 @@ class GeometryAlgorithms:
         """
         return self.compare_ab(self.cross_product(b - a, c - a), 0.0)
 
-    def angle_point_c_wrt_line_ab_2d(self, a, b, c):
+    def angle_point_c_wrt_line_ab(self, a, b, c):
         """For a line ab and point c, determine the angle of a to b to c in radians.
         formula: arc-cos(dot(vec_ab, vec_cb) / sqrt(dist_sq(vec_ab) * dist_sq(vec_cb))) = angle
 
@@ -1224,10 +1224,15 @@ class GeometryAlgorithms:
         return acos(dot_ab_cb / (sqrt(dist_sq_ab) * sqrt(dist_sq_cb)))
         # return acos(dot_ab_cb / sqrt(dist_sq_ab * dist_sq_cb))
 
-    # projection funcs just returns closes point to obj based on a point c
-    def project_pt_c_to_line_ab_2d(self, a, b, c):
-        ba, ca = b-a, c-a
-        return a + ba*(self.dot_product(ca, ba) / self.dot_product(ba, ba))
+    def project_pt_c_to_line_ab(self, a, b, c):
+        """Compute the point closest to c on the line ab.
+        formula: pt = a + u x vector_ba, where u is the scalar projection of vector_ca onto
+        vector_ba via dot-product
+
+        Complexity per call: Time: O(1), Space: O(1).
+        """
+        vec_ba, vec_ca = b-a, c-a
+        return a + vec_ba*(self.dot_product(vec_ca, vec_ba) / self.dot_product(vec_ba, vec_ba))
 
     # use compare_ab in return if this isn't good enough
     def project_pt_c_to_line_seg_ab_2d(self, a, b, c):
@@ -1236,10 +1241,10 @@ class GeometryAlgorithms:
         if self.compare_ab(u, 0.0) == 0:
             return a
         u = self.dot_product(ca, ba) / u
-        return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab_2d(a, b, c)
+        return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab(a, b, c)
 
     def distance_pt_c_to_line_ab_2d(self, a, b, c):
-        return self.distance_normalized(c, self.project_pt_c_to_line_ab_2d(a, b, c))
+        return self.distance_normalized(c, self.project_pt_c_to_line_ab(a, b, c))
 
     def distance_pt_c_to_line_seg_ab_2d(self, a, b, c):
         return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab_2d(a, b, c))
