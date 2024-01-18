@@ -633,7 +633,9 @@ from itertools import takewhile
 
 class MathAlgorithms:
     def __init__(self):
-        self.mod_p = None
+        """Only take what you need. This list needs to be global or instance level or passed in."""
+        self.mod_p = 0
+        self.binomial = []
         self.fact = []
         self.inv_fact = []
         self.min_primes_list = []
@@ -1051,6 +1053,10 @@ class MathAlgorithms:
         # self.inv_fact = inverse_factorial_mod_p
             
     def binomial_coefficient_dp(self, n, k):
+        """Uses the recurrence to calculate binomial coefficient.
+        
+        Complexity per call: Time: O(n*k) I think, Space: O(n*k).
+        """
         if n == k or 0 == k:
             return 1
         if (n, k) not in self.binomial:
@@ -1060,22 +1066,22 @@ class MathAlgorithms:
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi, tau, atan2
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and 
-class pt_xy:
+class PTxy:
     def __init__(self, x_val, y_val): 
         self.x, self.y = map(float, [x_val, y_val])
 
-    def __add__(self, other): return pt_xy(self.x+other.x, self.y+other.y)
-    def __sub__(self, other): return pt_xy(self.x-other.x, self.y-other.y)
-    def __mul__(self, scale): return pt_xy(self.x*scale, self.y*scale)
-    def __truediv__(self, scale): return pt_xy(self.x/scale, self.y/scale)
-    def __floordiv__(self, scale): return pt_xy(self.x//scale, self.y//scale)
+    def __add__(self, other): return PTxy(self.x + other.x, self.y + other.y)
+    def __sub__(self, other): return PTxy(self.x - other.x, self.y - other.y)
+    def __mul__(self, scale): return PTxy(self.x * scale, self.y * scale)
+    def __truediv__(self, scale): return PTxy(self.x / scale, self.y / scale)
+    def __floordiv__(self, scale): return PTxy(self.x // scale, self.y // scale)
 
     def __eq__(self, other): return isclose(self.x, other.x) and isclose(self.y, other.y)
     def __lt__(self, other): return False if self == other else (self.x, self.y) < (other.x, other.y)
 
     def __str__(self): return "{} {}".format(self.x, self.y)
     def __str__(self): return "(x = {:20}, y = {:20})".format(self.x, self.y)
-    def __round__(self, n): return pt_xy(round(self.x, n), round(self.y, n))
+    def __round__(self, n): return PTxy(round(self.x, n), round(self.y, n))
     def __hash__(self): return hash((self.x, self.y))
 
     def get_tup(self): return (self.x, self.y)
@@ -1112,7 +1118,7 @@ class pt_xyz:
 
 class Quad_Edge:
     def __init__(self):
-        self.origin = pt_xy(0, 0)
+        self.origin = PTxy(0, 0)
         self.rot = None
         self.o_next = None
         self.used = False
@@ -1133,8 +1139,8 @@ class QuadEdgeDataStructure:
         e4 = Quad_Edge()
         e1.origin = in_pt
         e2.origin = out_pt
-        e3.origin = pt_xy(2**63, 2**63)
-        e4.origin = pt_xy(2**63, 2**63)
+        e3.origin = PTxy(2 ** 63, 2 ** 63)
+        e4.origin = PTxy(2 ** 63, 2 ** 63)
         e1.rot = e3
         e2.rot = e4
         e3.rot = e2
@@ -1176,11 +1182,11 @@ class Geometry_Algorithms:
     def distance_normalized_2d(self, a, b): return math.dist(a.get_tup(), b.get_tup())
     def distance_2d(self, a, b): return self.dot_product_2d(a-b, a-b)
 
-    def rotate_cw_90_wrt_origin_2d(self, pt): return pt_xy(pt.y, -pt.x)
-    def rotate_ccw_90_wrt_origin_2d(self, pt): return pt_xy(-pt.y, pt.x)
+    def rotate_cw_90_wrt_origin_2d(self, pt): return PTxy(pt.y, -pt.x)
+    def rotate_ccw_90_wrt_origin_2d(self, pt): return PTxy(-pt.y, pt.x)
     def rotate_ccw_rad_wrt_origin_2d(self, pt, rad):
-        return pt_xy(pt.x*cos(rad) - pt.y*sin(rad), 
-                     pt.x*sin(rad) + pt.y*cos(rad))
+        return PTxy(pt.x * cos(rad) - pt.y * sin(rad),
+                    pt.x * sin(rad) + pt.y * cos(rad))
 
     # 0 if colinear else 1 if counter clock wise (ccw) else -1 if clockwise (cw) 
     def point_c_rotation_wrt_line_ab_2d(self, a, b, c):
@@ -1242,7 +1248,7 @@ class Geometry_Algorithms:
         x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product_2d(d, c)
         u = abs(y*a.x + x*a.y + cross_prod)
         v = abs(y*b.x + x*b.y + cross_prod)
-        return pt_xy((a.x*v + b.x*u)/(v + u), (a.y*v + b.y*u)/(v + u))
+        return PTxy((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u))
 
     def is_point_in_circle(self, a, b, r): # use <= if you want points on the circumfrance 
         return self.compare_ab(self.distance_normalized_2d(a, b), r) < 0
@@ -1371,15 +1377,15 @@ class Geometry_Algorithms:
 
     def triangle_circle_center_pt_abcd_2d(self, a, b, c, d):
         ba, dc = b-a, d-c
-        pt_1, pt_2 = pt_xy(ba.y, -ba.x), pt_xy(dc.y, -dc.x)
+        pt_1, pt_2 = PTxy(ba.y, -ba.x), PTxy(dc.y, -dc.x)
         cross_product_1_2 = self.cross_product_2d(pt_1, pt_2)
         cross_product_2_1 = self.cross_product_2d(pt_2, pt_1)
         if self.compare_ab(cross_product_1_2, 0.0) == 0:
             return None
-        pt_3 = pt_xy(self.dot_product_2d(a, pt_1), self.dot_product_2d(c, pt_2))
+        pt_3 = PTxy(self.dot_product_2d(a, pt_1), self.dot_product_2d(c, pt_2))
         x = ((pt_3.x * pt_2.y) - (pt_3.y * pt_1.y)) / cross_product_1_2
         y = ((pt_3.x * pt_2.x) - (pt_3.y * pt_1.x)) / cross_product_2_1
-        return pt_xy(x, y) 
+        return PTxy(x, y) 
 
     def angle_bisector_for_triangle_abc_2d(self, a, b, c):
         dist_ba = self.distance_normalized_2d(b, a)
@@ -1389,7 +1395,7 @@ class Geometry_Algorithms:
 
     def perpendicular_bisector_for_triangle_ab_2d(self, a, b):
         ba = b-a
-        ba = pt_xy(-ba.y, ba.x)
+        ba = PTxy(-ba.y, ba.x)
         return ba + (a+b)/2
 
     def incircle_pt_of_triangle_abc_v2_2d(self, a, b, c):
@@ -1489,7 +1495,7 @@ class Geometry_Algorithms:
                 else 1 if self.pt_p_in_polygon_pts_v2_2d(pts, p) else -1
 
     def centroid_pt_of_convex_polygon_2d(self, pts):
-        ans, n = pt_xy(0, 0), len(pts)
+        ans, n = PTxy(0, 0), len(pts)
         for i in range(n-1):
             ans = ans + (pts[i]+pts[i+1]) * self.cross_product_2d(pts[i], pts[i+1])
             return ans / (6.0 * self.signed_area_of_polygon_pts_2d(pts))
