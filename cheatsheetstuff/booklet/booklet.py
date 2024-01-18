@@ -647,12 +647,6 @@ class MathAlgorithms:
         self.fibonacci_list = []
         self.fibonacci_dict = {}
         self.fibonacci_dict = {0: 0, 1: 1, 2: 1}
-
-    def init_data(self, n): #call before using other functions, make a reset if needed to reset per case
-        self.primes_sieve = [True] * n
-        self.primes_list = []
-        self.primes_set = set()
-        self.prime_factors = []
         
     def is_prime_triv(self, n):
         """Tests if n is prime via divisors up to sqrt(n)."""
@@ -887,19 +881,19 @@ class MathAlgorithms:
     # use in c++ and java
     # use ((a % n) + n) % n for getting proper mod of negative value 
     # use (a + b) % --> ((a % n) + (b % n)) % n for operations sub out + for * and - 
-    def mod(self, a, n): #needs test
+    def safe_modulo(self, a, n): #needs test
         """Existence is much for c++ which doesn't always handle % operator nicely."""
         return ((a % n) + n) % n
 
-    def modular_linear_equation_solver(self, a, b, n): #needs test
+    def modular_linear_equation_solver(self, a, b, n):
         """Solves gives the solution x in ax = b(mod n).
 
         Complexity per call: Time: O(log n), Space: O(d)
         """
-        x, y, d = self.extended_euclid_recursive(a, n)
+        x, y, d = self.extended_euclid_iterative(a, n)
         if 0 == b % d:
-            x = self.mod(x * (b//d), n)
-            return [self.mod(x + i*(n//d), n) for i in range(d)]
+            x = (x * (b//d)) % n
+            return [(x + i*(n//d)) % n for i in range(d)]
         return []
 
     def linear_diophantine_1(self, a, b, c):
