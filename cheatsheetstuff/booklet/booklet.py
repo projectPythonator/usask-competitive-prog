@@ -1176,8 +1176,10 @@ class GeometryAlgorithms:
         return a.x*b.y - a.y*b.x
 
     def distance_normalized_2d(self, a, b):
+        """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
         return dist(a.get_tup(), b.get_tup())
     def distance_2d(self, a, b):
+        """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
         return self.dot_product_2d(a-b, a-b)
 
     def rotate_cw_90_wrt_origin_2d(self, pt):
