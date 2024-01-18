@@ -1161,6 +1161,7 @@ class QuadEdgeDataStructure:
 
 class GeometryAlgorithms:
     def __init__(self):
+        self.x_ordering = None
         self.quad_edges = QuadEdgeDataStructure()
 
     def compare_ab(self, a, b):
@@ -1248,37 +1249,39 @@ class GeometryAlgorithms:
         u = self.dot_product(vec_ca, vec_ba) / dist_sq_ba
         return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab(a, b, c)
 
-    def distance_pt_c_to_line_ab_2d(self, a, b, c):
+    def distance_pt_c_to_line_ab(self, a, b, c):
+        """Just return the distance between c and the projected point :)."""
         return self.distance_normalized(c, self.project_pt_c_to_line_ab(a, b, c))
 
-    def distance_pt_c_to_line_seg_ab_2d(self, a, b, c):
+    def distance_pt_c_to_line_seg_ab(self, a, b, c):
+        """Same as above, just return the distance between c and the projected point :)."""
         return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab(a, b, c))
     
-    def is_parallel_lines_ab_and_cd_2d(self, a, b, c, d):
+    def is_parallel_lines_ab_and_cd(self, a, b, c, d):
         return self.compare_ab(self.cross_product(b - a, c - d), 0.0) == 0
 
-    def is_collinear_lines_ab_and_cd_2d(self, a, b, c, d):
-        return (self.is_parallel_lines_ab_and_cd_2d(a, b, c, d)
-        and self.is_parallel_lines_ab_and_cd_2d(b, a, a, c)
-        and self.is_parallel_lines_ab_and_cd_2d(d, c, c, a))
+    def is_collinear_lines_ab_and_cd(self, a, b, c, d):
+        return (self.is_parallel_lines_ab_and_cd(a, b, c, d)
+                and self.is_parallel_lines_ab_and_cd(b, a, a, c)
+                and self.is_parallel_lines_ab_and_cd(d, c, c, a))
 
-    def is_segments_intersect_ab_to_cd_2d(self, a, b, c, d):
-        if self.is_collinear_lines_ab_and_cd_2d(a, b, c, d):
+    def is_segments_intersect_ab_to_cd(self, a, b, c, d):
+        if self.is_collinear_lines_ab_and_cd(a, b, c, d):
             lo, hi = (a, b) if a < b else (b, a)
             return lo <= c <= hi or lo <= d <= hi
         a_val = self.cross_product(d - a, b - a) * self.cross_product(c - a, b - a)
         c_val = self.cross_product(a - c, d - c) * self.cross_product(b - c, d - c)
         return not(a_val>0 or c_val>0)
 
-    def is_lines_intersect_ab_to_cd_2d(self, a, b, c, d):
-        return (not self.is_parallel_lines_ab_and_cd_2d(a, b, c, d) or 
-                self.is_collinear_lines_ab_and_cd_2d(a, b, c, d))
+    def is_lines_intersect_ab_to_cd(self, a, b, c, d):
+        return (not self.is_parallel_lines_ab_and_cd(a, b, c, d) or
+                self.is_collinear_lines_ab_and_cd(a, b, c, d))
 
-    def pt_lines_intersect_ab_to_cd_2d(self, a, b, c, d):
+    def pt_lines_intersect_ab_to_cd(self, a, b, c, d):
         ba, ca, cd = b-a, c-a, c-d
         return a + ba*(self.cross_product(ca, cd) / self.cross_product(ba, cd))
 
-    def pt_line_seg_intersect_ab_to_cd_2d(self, a, b, c, d):
+    def pt_line_seg_intersect_ab_to_cd(self, a, b, c, d):
         x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product(d, c)
         u = abs(y*a.x + x*a.y + cross_prod)
         v = abs(y*b.x + x*b.y + cross_prod)
@@ -1289,27 +1292,27 @@ class GeometryAlgorithms:
 
     def pt_circle_center_given_pt_abc(self, a, b, c):
         ab, ac = (a+b)/2, (a+c)/2
-        ab_rot = ab+self.rotate_cw_90_wrt_origin(a - ab)
-        ac_rot = ac+self.rotate_cw_90_wrt_origin(a - ac)
-        return self.pt_lines_intersect_ab_to_cd_2d(ab, ab_rot, ac, ac_rot)
+        ab_rot = self.rotate_cw_90_wrt_origin(a - ab) + ab
+        ac_rot = self.rotate_cw_90_wrt_origin(a - ac) + ac
+        return self.pt_lines_intersect_ab_to_cd(ab, ab_rot, ac, ac_rot)
 
-    def pts_line_ab_intersects_circle_cr_2d(self, a, b, c, r):
+    def pts_line_ab_intersects_circle_cr(self, a, b, c, r):
         ba, ac = b-a, a-c
         bb = self.dot_product(ba, ba)
         ab = self.dot_product(ac, ba)
         aa = self.dot_product(ac, ac) - r * r
-        dist = ab*ab - bb*aa
-        result = self.compare_ab(dist, 0.0)
+        dist_sq = ab*ab - bb*aa
+        result = self.compare_ab(dist_sq, 0.0)
         if result >= 0:
-            first_intersect = c + ac + ba*(-ab + sqrt(dist+EPS))/bb
-            second_intersect = c + ac + ba*(-ab - sqrt(dist))/bb
-            return (first_intersect) if result == 0 else (first_intersect, second_intersect)
+            first_intersect = c + ac + ba*(-ab + sqrt(dist_sq + EPS))/bb
+            second_intersect = c + ac + ba*(-ab - sqrt(dist_sq))/bb
+            return first_intersect if result == 0 else first_intersect, second_intersect
         return None # no intersect 
 
-    def pts_two_circles_intersect_ar1_br1_2d(self, c1, c2, r1, r2):
+    def pts_two_circles_intersect_ar1_br1(self, c1, c2, r1, r2):
         center_dist = self.distance_normalized(c1, c2)
-        if (self.compare_ab(center_dist, r1+r2) <= 0
-            and self.compare_ab(center_dist+min(r1, r2), max(r1, r2)) >= 0):
+        if (self.compare_ab(center_dist, r1 + r2) <= 0
+                <= self.compare_ab(center_dist + min(r1, r2), max(r1, r2))):
             x = (center_dist*center_dist - r2*r2 + r1*r1)/(2*center_dist)
             y = sqrt(r1*r1 - x*x)
             v = (b-a)/center_dist
@@ -1317,19 +1320,19 @@ class GeometryAlgorithms:
             return (pt1+pt2) if self.compare_ab(y, 0.0) <= 0 else (pt1+pt2, pt1-pt2)
         return None # no overlap
 
-    def pt_tangent_to_circle_cr_2d(self, c, r, p):
+    def pt_tangent_to_circle_cr(self, c, r, p):
         pc = p-c
         x = self.dot_product(pc, pc)
-        dist = x - r*r
-        result = self.compare_ab(dist, 0.0)
+        dist_sq = x - r*r
+        result = self.compare_ab(dist_sq, 0.0)
         if result >= 0:
-            dist = dist if result else 0
+            dist_sq = dist_sq if result else 0
             q1 = pa * (r*r / x)
-            q2 = self.rotate_ccw_90_wrt_origin(pa * (-r * sqrt(dist) / x))
+            q2 = self.rotate_ccw_90_wrt_origin(pa * (-r * sqrt(dist_sq) / x))
             return [a+q1-q2, a+q1+q2]
         return []
 
-    def tangents_between_2_circles_2d(self, c1, r1, c2, r2):
+    def tangents_between_2_circles(self, c1, r1, c2, r2):
         r_tangents = []
         if self.compare_ab(r1, r2) == 0:
             c2c1 = c2 - c1
@@ -1338,64 +1341,64 @@ class GeometryAlgorithms:
             r_tangents = [(c1+tangent, c2+tangent), (c1-tangent, c2-tangent)]
         else:
             ref_pt = ((c1 * -r2) + (c2 * r1)) / (r1 - r2)
-            ps = self.pt_tangent_to_circle_cr_2d(c1, r1, ref_pt)
-            qs = self.pt_tangent_to_circle_cr_2d(c2, r2, ref_pt)
+            ps = self.pt_tangent_to_circle_cr(c1, r1, ref_pt)
+            qs = self.pt_tangent_to_circle_cr(c2, r2, ref_pt)
             r_tangents = [(ps[i], qs[i]) for i in range(min(len(ps), len(qs)))]
         ref_pt = ((c1 * r2) + (c2 * r1)) / (r1 + r2)
-        ps = self.pt_tangent_to_circle_cr_2d(c1, r1, ref_pt)
-        qs = self.pt_tangent_to_circle_cr_2d(c2, r2, ref_pt)
+        ps = self.pt_tangent_to_circle_cr(c1, r1, ref_pt)
+        qs = self.pt_tangent_to_circle_cr(c2, r2, ref_pt)
         for i in range(min(len(ps), len(qs))):
             r_tangents.append((ps[i], qs[i]))
         return r_tangents
 
-    def sides_of_triangle_abc_2d(self, a, b, c):
+    def sides_of_triangle_abc(self, a, b, c):
         ab = self.distance_normalized(a, b)
         bc = self.distance_normalized(b, c)
         ca = self.distance_normalized(c, a)
         return ab, bc, ca
 
-    def pt_p_in_triangle_abc_2d(self, a, b, c, p):
+    def pt_p_in_triangle_abc(self, a, b, c, p):
         return self.point_c_rotation_wrt_line_ab(a, b, p) >= 0 and  \
                 self.point_c_rotation_wrt_line_ab(b, c, p) >= 0 and \
                 self.point_c_rotation_wrt_line_ab(c, a, p) >= 0
 
-    def perimeter_of_triangle_abc_2d(self, ab, bc, ca):
+    def perimeter_of_triangle_abc(self, ab, bc, ca):
         return ab + bc + ca
 
-    def triangle_area_bh_2d(self, b, h):
+    def triangle_area_bh(self, b, h):
         return b*h/2
 
-    def triangle_area_heron_abc_2d(self, ab, bc, ca):
-        s = self.perimeter_of_triangle_abc_2d(ab, bc, ca) / 2
+    def triangle_area_heron_abc(self, ab, bc, ca):
+        s = self.perimeter_of_triangle_abc(ab, bc, ca) / 2
         return sqrt(s * (s-ab) * (s-bc) * (s-ca))
 
-    def triangle_area_cross_product_abc_2d(self, a, b, c):
+    def triangle_area_cross_product_abc(self, a, b, c):
         ab = self.cross_product(a, b)
         bc = self.cross_product(b, c)
         ca = self.cross_product(c, a)
         return (ab + bc + ca)/2
 
-    def incircle_radis_of_triangle_abc_helper_2d(self, ab, bc, ca):
-        area = self.triangle_area_heron_abc_2d(ab, bc, ca)
-        perimeter = self.perimeter_of_triangle_abc_2d(ab, bc, ca)/2
+    def incircle_radis_of_triangle_abc_helper(self, ab, bc, ca):
+        area = self.triangle_area_heron_abc(ab, bc, ca)
+        perimeter = self.perimeter_of_triangle_abc(ab, bc, ca) / 2
         return area/perimeter
 
-    def incircle_radis_of_triangle_abc_2d(self, a, b, c):
-        ab, bc, ca = self.sides_of_triangle_abc_2d(a, b, c)
-        return self.incircle_radis_of_triangle_abc_helper_2d(ab, bc, ca)
+    def incircle_radis_of_triangle_abc(self, a, b, c):
+        ab, bc, ca = self.sides_of_triangle_abc(a, b, c)
+        return self.incircle_radis_of_triangle_abc_helper(ab, bc, ca)
 
-    def circumcircle_radis_of_triangle_abc_helper_2d(self, ab, bc, ca):
-        area = self.triangle_area_heron_abc_2d(ab, bc, ca)
+    def circumcircle_radis_of_triangle_abc_helper(self, ab, bc, ca):
+        area = self.triangle_area_heron_abc(ab, bc, ca)
         return (ab*bc*ca) / (4*area)
         
-    def circumcircle_radis_of_triangle_abc_2d(self, a, b, c):
-        ab, bc, ca = self.sides_of_triangle_abc_2d(a, b, c)
-        return circumcircle_radis_of_triangle_abc_helper_2d(ab, bc, ca)
+    def circumcircle_radis_of_triangle_abc(self, a, b, c):
+        ab, bc, ca = self.sides_of_triangle_abc(a, b, c)
+        return self.circumcircle_radis_of_triangle_abc_helper(ab, bc, ca)
 
-    def incircle_pt_for_triangle_abc_2d(self, a, b, c):
-        radius = self.incircle_radis_of_triangle_abc_2d(a, b, c)
+    def incircle_pt_for_triangle_abc(self, a, b, c):
+        radius = self.incircle_radis_of_triangle_abc(a, b, c)
         if self.compare_ab(radius, 0.0):
-            return (False, 0, 0)
+            return False, 0, 0
         dist_ab = self.distance_normalized(a, b)
         dist_bc = self.distance_normalized(b, c)
         dist_ac = self.distance_normalized(a, c)
@@ -1404,12 +1407,12 @@ class GeometryAlgorithms:
         pt_1 = b + (c-b) * (ratio_1/(ratio_1 + 1.0)) 
         pt_2 = a + (c-a) * (ratio_2/(ratio_2 + 1.0))
 
-        if self.is_lines_intersect_ab_to_cd_2d(a, pt_1, b, pt_2):
-            intersection_pt = self.pt_lines_intersect_ab_to_cd_2d(a, pt_1, b, pt_2)
-            return (True, radius, round(intersection_pt, 12)) # can remove the round function
-        return (False, 0, 0)
+        if self.is_lines_intersect_ab_to_cd(a, pt_1, b, pt_2):
+            intersection_pt = self.pt_lines_intersect_ab_to_cd(a, pt_1, b, pt_2)
+            return True, radius, round(intersection_pt, 12)  # can remove the round function
+        return False, 0, 0
 
-    def triangle_circle_center_pt_abcd_2d(self, a, b, c, d):
+    def triangle_circle_center_pt_abcd(self, a, b, c, d):
         ba, dc = b-a, d-c
         pt_1, pt_2 = Pt2d(ba.y, -ba.x), Pt2d(dc.y, -dc.x)
         cross_product_1_2 = self.cross_product(pt_1, pt_2)
@@ -1421,80 +1424,80 @@ class GeometryAlgorithms:
         y = ((pt_3.x * pt_2.x) - (pt_3.y * pt_1.x)) / cross_product_2_1
         return Pt2d(x, y)
 
-    def angle_bisector_for_triangle_abc_2d(self, a, b, c):
+    def angle_bisector_for_triangle_abc(self, a, b, c):
         dist_ba = self.distance_normalized(b, a)
         dist_ca = self.distance_normalized(c, a)
         ref_pt = (b-a) / dist_ba * dist_ca
         return ref_pt + (c-a) + a
 
-    def perpendicular_bisector_for_triangle_ab_2d(self, a, b):
+    def perpendicular_bisector_for_triangle_ab(self, a, b):
         ba = b-a
         ba = Pt2d(-ba.y, ba.x)
         return ba + (a+b)/2
 
-    def incircle_pt_of_triangle_abc_v2_2d(self, a, b, c):
-        abc = self.angle_bisector_for_triangle_abc_2d(a, b, c)
-        bca = self.angle_bisector_for_triangle_abc_2d(b, c, a)
-        return self.triangle_circle_center_pt_abcd_2d(a, abc, b, bca)
+    def incircle_pt_of_triangle_abc_v2(self, a, b, c):
+        abc = self.angle_bisector_for_triangle_abc(a, b, c)
+        bca = self.angle_bisector_for_triangle_abc(b, c, a)
+        return self.triangle_circle_center_pt_abcd(a, abc, b, bca)
 
-    def circumcenter_pt_of_triangle_abc_v2_2d(self, a, b, c):
-        ab = self.perpendicular_bisector_for_triangle_ab_2d(a, b)
-        bc = self.perpendicular_bisector_for_triangle_ab_2d(b, c)
+    def circumcenter_pt_of_triangle_abc_v2(self, a, b, c):
+        ab = self.perpendicular_bisector_for_triangle_ab(a, b)
+        bc = self.perpendicular_bisector_for_triangle_ab(b, c)
         ab2, bc2 = (a+b)/2, (b+c)/2
-        return self.triangle_circle_center_pt_abcd_2d(ab2, ab, bc2, bc)
+        return self.triangle_circle_center_pt_abcd(ab2, ab, bc2, bc)
 
-    def orthocenter_pt_of_triangle_abc_v2_2d(self, a, b, c):
-        return a + b + c - 2*self.circumcenter_pt_of_triangle_abc_v2_2d(a, b, c)
+    def orthocenter_pt_of_triangle_abc_v2(self, a, b, c):
+        return a + b + c - self.circumcenter_pt_of_triangle_abc_v2(a, b, c) * 2
 
     # note these assume counter clockwise ordering of points
-    def perimeter_of_polygon_pts_2d(self, pts):
+    def perimeter_of_polygon_pts(self, pts):
         return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
 
-    def signed_area_of_polygon_pts_2d(self, pts):
+    def signed_area_of_polygon_pts(self, pts):
         return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])/2
 
-    def area_of_polygon_pts_2d(self, pts):
-        return abs(self.signed_area_of_polygon_pts_2d(pts))
+    def area_of_polygon_pts(self, pts):
+        return abs(self.signed_area_of_polygon_pts(pts))
 
     # < is counter clock wise <= includes collinear > for clock wise >= includes collinear
     def is_convex_helper(self, a, b, c):
         return 0 < self.point_c_rotation_wrt_line_ab(a, b, c)
 
-    def is_convex_polygon_pts_2d(self, pts):
+    def is_convex_polygon_pts(self, pts):
         lim = len(pts)
         if lim > 3:
             is_ccw = self.is_convex_helper(pts[0], pts[1], pts[2])
-            for i in range(1, n-1):
+            for i in range(1, lim-1):
                 a, b, c = pts[i], pts[i+1], pts[i+2 if i+2<lim else 1]
-                if base != self.is_convex_helper(a, b, c):
+                if is_ccw != self.is_convex_helper(a, b, c):
                     return False
             return True 
         return False
 
-    def pt_p_in_polygon_pts_v1_2d(self, pts, p):
+    def pt_p_in_polygon_pts_v1(self, pts, p):
         n = len(pts)
         if n > 3:
             angle_sum = 0.0
             for i in range(n-1):
                 if 1 == self.point_c_rotation_wrt_line_ab(pts[i], pts[i + 1], p):
-                    angle_sum += angle_point_c_wrt_line_ab_2d(pts[i], pts[i+1], p)
+                    angle_sum += self.angle_point_c_wrt_line_ab(pts[i], pts[i+1], p)
                 else:
-                    angle_sum -= angle_point_c_wrt_line_ab_2d(pts[i], pts[i+1], p)
+                    angle_sum -= self.angle_point_c_wrt_line_ab(pts[i], pts[i+1], p)
             return self.compare_ab(abs(angle_sum), pi)
         return -1
 
-    def pt_p_in_polygon_pts_v2_2d(self, pts, p):
+    def pt_p_in_polygon_pts_v2(self, pts, p):
         ans = False
         px, py = p.get_tup()
         for i in range(len(pts)-1):
             x1, y1 = pts[i].get_tup()
             x2, y2 = pts[i+1].get_tup()
-            lo, hi = y1, y2 if y1 < y2 else y2, y1
+            lo, hi = (y1, y2) if y1 < y2 else (y2, y1)
             if lo <= py < hi and px < (x1 + (x2-x1) * (py-y1) / (y2-y1)):
                 ans = not ans
         return ans
 
-    def pt_p_on_polygon_perimeter_pts_2d(self, pts, p):
+    def pt_p_on_polygon_perimeter_pts(self, pts, p):
             n = len(pts)
             if p in pts:
                 return True
@@ -1506,16 +1509,16 @@ class GeometryAlgorithms:
                     return True
             return False
 
-    def pt_p_in_convex_polygon_pts_2d(self, pts, p):
+    def pt_p_in_convex_polygon_pts(self, pts, p):
         n = len(pts)
         if n == 2:
-            distance = self.distance_pt_c_to_line_seg_ab_2d(pts[0], pts[1], p)
+            distance = self.distance_pt_c_to_line_seg_ab(pts[0], pts[1], p)
             return self.compare_ab(distance, 0.0) == 0
         left, right = 1, n
         while left < right:
-            mid = (left + rigth)/2 + 1
+            mid = (left + right)/2 + 1
             side = self.point_c_rotation_wrt_line_ab(pts[0], pts[mid], p)
-            left, right = mid, right if side == 1 else left, mid-1
+            left, right = (mid, right) if side == 1 else (left, mid-1)
         side = self.point_c_rotation_wrt_line_ab(pts[0], pts[left], p)
         if side == -1 or left == n:
             return False
@@ -1524,24 +1527,24 @@ class GeometryAlgorithms:
     
     # use a set with points if possible checking on the same polygon many times    
     # return 0 for on 1 for in -1 for out
-    def pt_p_position_wrt_polygon_pts_2d(self, pts, p):
-        return 0 if self.pt_p_on_polygon_perimeter_pts_2d(pts, p) \
-                else 1 if self.pt_p_in_polygon_pts_v2_2d(pts, p) else -1
+    def pt_p_position_wrt_polygon_pts(self, pts, p):
+        return 0 if self.pt_p_on_polygon_perimeter_pts(pts, p) \
+                else 1 if self.pt_p_in_polygon_pts_v2(pts, p) else -1
 
-    def centroid_pt_of_convex_polygon_2d(self, pts):
+    def centroid_pt_of_convex_polygon(self, pts):
         ans, n = Pt2d(0, 0), len(pts)
         for i in range(n-1):
             ans = ans + (pts[i]+pts[i+1]) * self.cross_product(pts[i], pts[i + 1])
-            return ans / (6.0 * self.signed_area_of_polygon_pts_2d(pts))
+            return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
 
-    def is_polygon_pts_simple_quadratic_2d(self, pts):
+    def is_polygon_pts_simple_quadratic(self, pts):
         n = len(pts)
         for i in range(n-1):
             for k in range(i+1, n-1):
                 j, l = (i+1) % n, (k+1) % n
                 if i == l or j == k:
                     continue
-                if self.is_segments_intersect_ab_to_cd_2d(pts[i], pts[j], pts[k], pts[l]):
+                if self.is_segments_intersect_ab_to_cd(pts[i], pts[j], pts[k], pts[l]):
                     return False
         return True
 
@@ -1556,7 +1559,7 @@ class GeometryAlgorithms:
                 ans.append(pts[i])
                 continue
             if 1 == rot_1 and -1 == rot_2:
-                ans.append(self.pt_line_seg_intersect_ab_to_cd_2d(pts[i], pts[i+1], a, b))
+                ans.append(self.pt_line_seg_intersect_ab_to_cd(pts[i], pts[i + 1], a, b))
         if ans and ans[0] != ans[-1]:
             ans.append(ans[0])
         return ans
@@ -1576,23 +1579,23 @@ class GeometryAlgorithms:
         func(ans[::-1], convex, len(convex)+1)
         return convex
     
-    def rotating_caliper_of_polygon_pts_2d(self, pts):
+    def rotating_caliper_of_polygon_pts(self, pts):
         n, t, ans = len(pts)-1, 0, 0.0
         for i in range(n):
-            pi = pts[i]
-            pj = pts[i+1] if i+1 <= n else pts[i]
-            p = pj-pi
+            p_i = pts[i]
+            p_j = pts[i+1] if i+1 <= n else pts[i]
+            p = p_j-p_i
             while (t+1) % n != i:
-                cross_1 = self.cross_produc_2d(p, pts[t+1] - pi)
-                cross_2 = self.cross_produc_2d(p, pts[t] - pi)
+                cross_1 = self.cross_product(p, pts[t+1] - p_i)
+                cross_2 = self.cross_product(p, pts[t] - p_i)
                 if self.compare_ab(cross_1, cross_2) == -1:
                     break
                 t = (t+1) % n
-            ans = max(ans, self.distance_normalized(pi, pts[t]))
-            ans = max(ans, self.distance_normalized(pj, pts[t]))
+            ans = max(ans, self.distance_normalized(p_i, pts[t]))
+            ans = max(ans, self.distance_normalized(p_j, pts[t]))
         return ans
 
-    def closest_pair_helper_2d(self, lo, hi):
+    def closest_pair_helper(self, lo, hi):
         r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
                      self.x_ordering[lo], 
                      self.x_ordering[lo+1])
@@ -1604,18 +1607,18 @@ class GeometryAlgorithms:
                     r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
         return r_closest
 
-    def closest_pair_recursive_2d(self, lo, hi, y_ordering):
+    def closest_pair_recursive(self, lo, hi, y_ordering):
         n = hi-lo
         if n < 4: # base case 
-            return self.closest_pair_helper_2d(lo, hi)
+            return self.closest_pair_helper(lo, hi)
         left_len, right_len = lo + n - n//2, lo + n//2
         mid = round((self.x_ordering[left_len].x + self.x_ordering[right_len].x)/2)
         y_part_left = [el for el in y_ordering if self.compare_ab(el.x, mid) <= 0]
         y_part_right = [el for el in y_ordering if self.compare_ab(el.x, mid) > 0]
-        best_left = self.closest_pair_recursive_2d(lo, left_len, y_part_left)
+        best_left = self.closest_pair_recursive(lo, left_len, y_part_left)
         if self.compare_ab(best_left[0], 0.0) == 0:
             return best_left
-        best_right = self.closest_pair_recursive_2d(left_len, hi, y_part_right)
+        best_right = self.closest_pair_recursive(left_len, hi, y_part_right)
         if self.compare_ab(best_right[0], 0.0) == 0:
             return best_right
         y_part_left = None
@@ -1633,10 +1636,10 @@ class GeometryAlgorithms:
                     best_pair = (dist_ij, y_check[i], y_check[j])
         return best_pair
 
-    def compute_closest_pair_2d(self, pts):
+    def compute_closest_pair(self, pts):
         self.x_ordering = sorted(pts, key=lambda pt_xy: pt_xy.x)
         y_ordering = sorted(pts, key=lambda pt_xy: pt_xy.y)
-        return self.closest_pair_recursive_2d(0, len(pts), y_ordering)
+        return self.closest_pair_recursive(0, len(pts), y_ordering)
 
     def delaunay_triangulation_slow(self, pts):
         n = len(pts)
@@ -1663,10 +1666,10 @@ class GeometryAlgorithms:
                         ans.append((i, j, k))
         return ans
 
-    def pt_left_of_edge_2d(self, pt, edge):
+    def pt_left_of_edge(self, pt, edge):
         return 1 == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
-    def pt_right_of_edge_2d(self, pt, edge):
+    def pt_right_of_edge(self, pt, edge):
         return -1 == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
     def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
@@ -1675,10 +1678,10 @@ class GeometryAlgorithms:
                 a3 * (b1 * c2 - c1 * b2))
 
     def is_in_circle(self, a, b, c, d):
-        a_dot = self.self.dot_product(a, a)
-        b_dot = self.self.dot_product(b, b)
-        c_dot = self.self.dot_product(c, c)
-        d_dot = self.self.dot_product(d, d)
+        a_dot = self.dot_product(a, a)
+        b_dot = self.dot_product(b, b)
+        c_dot = self.dot_product(c, c)
+        d_dot = self.dot_product(d, d)
         det = -self.det3_helper(b.x, b.y, b_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
         det += self.det3_helper(a.x, a.y, a_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
         det -= self.det3_helper(a.x, a.y, a_dot, b.x, b.y, b_dot, d.x, d.y, d_dot)
@@ -1695,24 +1698,24 @@ class GeometryAlgorithms:
     def build_triangulation(self, l, r, pts):
         if r - l + 1 == 2:
             res = self.quad_edges.make_edge(pts[l], pts[r])
-            return (res, res.rev())
+            return res, res.rev()
         if r - l + 1 == 3:
             edge_a = self.quad_edges.make_edge(pts[l], pts[l + 1])
             edge_b = self.quad_edges.make_edge(pts[l + 1], pts[r])
             self.quad_edges.splce(edge_a.rev(), edge_b)
             sg = self.point_c_rotation_wrt_line_ab(pts[l], pts[l + 1], pts[r])
             if sg == 0:
-                return (edge_a, edge_b.rev())
+                return edge_a, edge_b.rev()
             edge_c = self.quad_edges.connect(edge_b, edge_a)
             return (edge_a, edge_b.rev()) if sg == 1 else (edge_c.rev(), edge_c)
         mid = (l + r) // 2
         ldo, ldi = self.build_triangulation(l, mid, p)
         rdi, rdo = self.build_triangulation(mid + 1, r, p)
         while True:
-            if self.pt_left_of_edge_2d(rdi.origin, ldi):
+            if self.pt_left_of_edge(rdi.origin, ldi):
                 ldi = ldi.l_next()
                 continue
-            if self.pt_right_of_edge_2d(ldi.origin, rdi):
+            if self.pt_right_of_edge(ldi.origin, rdi):
                 rdi = rdi.rev().o_next
                 continue
             break
@@ -1723,21 +1726,21 @@ class GeometryAlgorithms:
             rdo = base_edge_l
         while True:
             l_cand_edge = base_edge_l.rev().o_next
-            if self.right_of(l_cand_edge.dest(), base_edge_l):
+            if self.pt_right_of_edge(l_cand_edge.dest(), base_edge_l):
                 while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin, 
                                         l_cand_edge.dest(), l_cand_edge.o_next.dest()):
                     t = l_cand_edge.o_next
                     self.quad_edges.delete_edge(l_cand_edge)
                     l_cand_edge = t
             r_cand_edge = base_edge_l.o_prev()
-            if self.right_of(r_cand_edge.dest(), base_edge_l):
+            if self.pt_right_of_edge(r_cand_edge.dest(), base_edge_l):
                     while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin, 
                                             r_cand_edge.dest(), r_cand_edge.o_prev().dest()):
                     t = r_cand_edge.o_prev()
                     self.quad_edges.delete_edge(r_cand_edge)
                     r_cand_edge = t
-            l_check = self.right_of(l_cand_edge.dest(), base_edge_l)
-            r_check = self.right_of(r_cand_edge.dest(), base_edge_l)
+            l_check = self.pt_right_of_edge(l_cand_edge.dest(), base_edge_l)
+            r_check = self.pt_right_of_edge(r_cand_edge.dest(), base_edge_l)
             if not l_check and not r_check:
                 break
             if (not l_check or 
@@ -1746,11 +1749,11 @@ class GeometryAlgorithms:
                 base_edge_l = self.quad_edges.connect(r_cand_edge, base_edge_l.rev())
             else:
                 base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
-        return (ldo, rdo)        
+        return ldo, rdo
             
     def delaunay_triangulation_fast(self, pts):
         pts.sort()
-        result = self.build_triangulation(0, len(pts) - 1, p)
+        result = self.build_triangulation(0, len(pts) - 1, pts)
         edge = result[0]
         edges = [edge]
         while self.point_c_rotation_wrt_line_ab(edge.o_next.dest(), edge.dest(), edge.origin) < 0:
@@ -1783,7 +1786,7 @@ class String_Algorithms:
         self.text = ''
 
     def init_data(self, new_text):
-        self.n = len(new_text):
+        self.n = len(new_text)
         self.text = new_text
 
     def prepare_text_data(self, new_text):
