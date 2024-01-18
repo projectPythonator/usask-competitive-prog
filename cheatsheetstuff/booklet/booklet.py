@@ -1234,20 +1234,25 @@ class GeometryAlgorithms:
         vec_ba, vec_ca = b-a, c-a
         return a + vec_ba*(self.dot_product(vec_ca, vec_ba) / self.dot_product(vec_ba, vec_ba))
 
-    # use compare_ab in return if this isn't good enough
-    def project_pt_c_to_line_seg_ab_2d(self, a, b, c):
-        ba, ca = b-a, c-a
-        u = self.dot_product(ba, ba)
-        if self.compare_ab(u, 0.0) == 0:
+    def project_pt_c_to_line_seg_ab(self, a, b, c):
+        """Compute the point closest to c on the line segment ab.
+        Rule if a==b, then if c closer to a or b, otherwise we can just use the line version.
+
+        Complexity per call: Time: O(1), Space: O(1).
+        Optimizations: use compare_ab on the last line if needed better accuracy.
+        """
+        vec_ba, vec_ca = b-a, c-a
+        dist_sq_ba = self.dot_product(vec_ba, vec_ba)
+        if self.compare_ab(dist_sq_ba, 0.0) == 0: # a == b return either, maybe turn into a==b??
             return a
-        u = self.dot_product(ca, ba) / u
+        u = self.dot_product(vec_ca, vec_ba) / dist_sq_ba
         return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab(a, b, c)
 
     def distance_pt_c_to_line_ab_2d(self, a, b, c):
         return self.distance_normalized(c, self.project_pt_c_to_line_ab(a, b, c))
 
     def distance_pt_c_to_line_seg_ab_2d(self, a, b, c):
-        return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab_2d(a, b, c))
+        return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab(a, b, c))
     
     def is_parallel_lines_ab_and_cd_2d(self, a, b, c, d):
         return self.compare_ab(self.cross_product(b - a, c - d), 0.0) == 0
