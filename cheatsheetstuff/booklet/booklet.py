@@ -1347,6 +1347,9 @@ class GeometryAlgorithms:
         return None # no overlap
 
     def pt_tangent_to_circle_cr(self, c, r, p):
+        """Find the two points that create tangent lines from p to the circumference.
+        TODO add in teh formula
+        """
         pc = p-c
         x = self.dot_product(pc, pc)
         dist_sq = x - r*r
@@ -1359,6 +1362,9 @@ class GeometryAlgorithms:
         return []
 
     def tangents_between_2_circles(self, c1, r1, c2, r2):
+        """Between two circles there should be at least 4 points that make two tangent lines.
+        TODO add in teh formula
+        """
         r_tangents = []
         if self.compare_ab(r1, r2) == 0:
             c2c1 = c2 - c1
@@ -1378,33 +1384,40 @@ class GeometryAlgorithms:
         return r_tangents
 
     def sides_of_triangle_abc(self, a, b, c):
-        ab = self.distance_normalized(a, b)
-        bc = self.distance_normalized(b, c)
-        ca = self.distance_normalized(c, a)
-        return ab, bc, ca
+        """Compute the side lengths of a triangle."""
+        dist_ab = self.distance_normalized(a, b)
+        dist_bc = self.distance_normalized(b, c)
+        dist_ca = self.distance_normalized(c, a)
+        return dist_ab, dist_bc, dist_ca
 
     def pt_p_in_triangle_abc(self, a, b, c, p):
-        return self.point_c_rotation_wrt_line_ab(a, b, p) >= 0 and  \
-                self.point_c_rotation_wrt_line_ab(b, c, p) >= 0 and \
-                self.point_c_rotation_wrt_line_ab(c, a, p) >= 0
+        """Compute if a point is in or on a triangle. If all edges return the same orientation this
+        should return true and the point should be in or on the triangle."""
+        return (self.point_c_rotation_wrt_line_ab(a, b, p) >= 0
+                and self.point_c_rotation_wrt_line_ab(b, c, p) >= 0
+                and self.point_c_rotation_wrt_line_ab(c, a, p) >= 0)
 
-    def perimeter_of_triangle_abc(self, ab, bc, ca):
-        return ab + bc + ca
+    def perimeter_of_triangle_abc(self, side_ab, side_bc, side_ca):
+        """Computes the perimeter of triangle given the side lengths."""
+        return side_ab + side_bc + side_ca
 
-    def triangle_area_bh(self, b, h):
-        return b*h/2
+    def triangle_area_bh(self, base, height):
+        """Simple triangle area formula: area = b*h/2."""
+        return base*height/2
 
-    def triangle_area_heron_abc(self, ab, bc, ca):
-        s = self.perimeter_of_triangle_abc(ab, bc, ca) / 2
-        return sqrt(s * (s-ab) * (s-bc) * (s-ca))
+    def triangle_area_heron_abc(self, side_ab, side_bc, side_ca):
+        """Compute heron's formula which gives us the area of a triangle given the side lengths."""
+        s = self.perimeter_of_triangle_abc(side_ab, side_bc, side_ca) / 2
+        return sqrt(s * (s-side_ab) * (s-side_bc) * (s-side_ca))
 
     def triangle_area_cross_product_abc(self, a, b, c):
-        ab = self.cross_product(a, b)
-        bc = self.cross_product(b, c)
-        ca = self.cross_product(c, a)
-        return (ab + bc + ca)/2
+        """Compute triangle area, via cross-products of the pairwise sides ab, bc, ca."""
+        return (self.cross_product(a, b) + self.cross_product(b, c) + self.cross_product(c, a))/2
 
     def incircle_radis_of_triangle_abc_helper(self, ab, bc, ca):
+        """Computes the radius of the incircle, this can be achieved from the following formula:
+        radius = area/(perimeter/2) Author: TODO
+        """
         area = self.triangle_area_heron_abc(ab, bc, ca)
         perimeter = self.perimeter_of_triangle_abc(ab, bc, ca) / 2
         return area/perimeter
