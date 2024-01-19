@@ -1064,6 +1064,7 @@ class MathAlgorithms:
         return self.binomial[(n, k)]
 
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
+from itertools import pairwise
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and 
 class Pt2d:
@@ -1503,23 +1504,35 @@ class GeometryAlgorithms:
         bisector_bca = self.angle_bisector_for_triangle_abc(b, c, a)
         return self.triangle_circle_center_pt_abcd(a, bisector_abc, b, bisector_bca)
 
-    def circumcenter_pt_of_triangle_abc_v2(self, a, b, c):
-        ab = self.perpendicular_bisector_for_triangle_ab(a, b)
-        bc = self.perpendicular_bisector_for_triangle_ab(b, c)
+    def circumcenter_pt_of_triangle_abc_2(self, a, b, c):
+        """An alternative way to compute circumcenter. This one uses bisectors
+        Method: TODO
+        """
+        bisector_ab = self.perpendicular_bisector_for_triangle_ab(a, b)
+        bisector_bc = self.perpendicular_bisector_for_triangle_ab(b, c)
         ab2, bc2 = (a+b)/2, (b+c)/2
-        return self.triangle_circle_center_pt_abcd(ab2, ab, bc2, bc)
+        return self.triangle_circle_center_pt_abcd(ab2, bisector_ab, bc2, bisector_bc)
 
     def orthocenter_pt_of_triangle_abc_v2(self, a, b, c):
-        return a + b + c - self.circumcenter_pt_of_triangle_abc_v2(a, b, c) * 2
+        """Compute the orthogonal center of triangle abc.Z
+        Method: TODO
+        """
+        return a + b + c - self.circumcenter_pt_of_triangle_abc_2(a, b, c) * 2
 
     # note these assume counter clockwise ordering of points
     def perimeter_of_polygon_pts(self, pts):
-        return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
+        """Compute summed pairwise perimeter of polygon in CCW ordering."""
+        return fsum([self.distance_normalized(a, b) for a, b in pairwise(pts)])
+        # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
 
     def signed_area_of_polygon_pts(self, pts):
-        return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])/2
+        """Compute sum of area of polygon, via shoelace method: half the sum of the pairwise
+        cross-products."""
+        return fsum([self.cross_product(a, b) for a, b in pairwise(pts)]) / 2
+        # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])/2
 
     def area_of_polygon_pts(self, pts):
+        """Positive area of polygon using above method."""
         return abs(self.signed_area_of_polygon_pts(pts))
 
     # < is counter clock wise <= includes collinear > for clock wise >= includes collinear
