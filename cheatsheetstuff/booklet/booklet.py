@@ -1066,7 +1066,12 @@ class MathAlgorithms:
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
 from itertools import pairwise
 # remember to sub stuff out for integer ops when you want only integers 
-# for ints need to change init, eq and 
+# for ints need to change init, eq and
+# hard code these in for performance speedup
+CCW = 1  # counterclockwise
+CW = -1  # clockwise
+CL = 0   # collinear
+
 class Pt2d:
     def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
 
@@ -1519,35 +1524,54 @@ class GeometryAlgorithms:
         """
         return a + b + c - self.circumcenter_pt_of_triangle_abc_2(a, b, c) * 2
 
-    # note these assume counter clockwise ordering of points
     def perimeter_of_polygon_pts(self, pts):
         """Compute summed pairwise perimeter of polygon in CCW ordering."""
-        return fsum([self.distance_normalized(a, b) for a, b in pairwise(pts)])
-        # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
+        return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
+        # return fsum([self.distance_normalized(a, b) for a, b in pairwise(pts)])
 
     def signed_area_of_polygon_pts(self, pts):
         """Compute sum of area of polygon, via shoelace method: half the sum of the pairwise
         cross-products."""
-        return fsum([self.cross_product(a, b) for a, b in pairwise(pts)]) / 2
-        # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])/2
+        return fsum([self.cross_product(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])/2
+        # return fsum([self.cross_product(a, b) for a, b in pairwise(pts)]) / 2
 
     def area_of_polygon_pts(self, pts):
         """Positive area of polygon using above method."""
         return abs(self.signed_area_of_polygon_pts(pts))
 
-    # < is counter clock wise <= includes collinear > for clock wise >= includes collinear
-    def is_convex_helper(self, a, b, c):
-        return 0 < self.point_c_rotation_wrt_line_ab(a, b, c)
+    def is_convex_polygon_pts_no_collinear(self, pts):
+        """Determines if polygon is convex, only works when no collinear lines.
 
-    def is_convex_polygon_pts(self, pts):
-        lim = len(pts)
-        if lim > 3:
-            is_ccw = self.is_convex_helper(pts[0], pts[1], pts[2])
-            for i in range(1, lim-1):
-                a, b, c = pts[i], pts[i+1], pts[i+2 if i+2<lim else 1]
-                if is_ccw != self.is_convex_helper(a, b, c):
-                    return False
-            return True 
+        Complexity per call: Time: O(n), Space: O(1)
+        """
+        if len(pts) > 3:
+            pts.append(pts[1])
+            end, result = len(pts) - 2, True
+            first_turn = self.point_c_rotation_wrt_line_ab(pts[0], pts[1], pts[2])
+            for i in range(end):
+                if self.point_c_rotation_wrt_line_ab(pts[i], pts[i+1], pts[i+2]) != first_turn:
+                    result = False
+                    break
+            pts.pop()
+            return result
+        return False
+
+    def is_convex_polygon_pts_has_collinear(self, pts):
+        """Determines if polygon is convex, works with collinear but takes more time and space.
+
+        Complexity per call: Time: O(n), Space: O(n)
+        """
+        if len(pts) > 3:
+            pts.append(pts[1])
+            end = len(pts) - 2
+            rotations = [self.point_c_rotation_wrt_line_ab(pts[i], pts[i+1], pts[i+2])
+                         for i in range(end)]
+            tally = [0] * 3 # ccw cl cw only 3 types
+            for el in rotations:
+                tally[el + 1] += 1
+            pts.pop()
+            lo, hi = min(tally[0], tally[2]), max(tally[0], tally[2])
+            return False if lo > 0 or hi == 0 else hi > 0
         return False
 
     def pt_p_in_polygon_pts_v1(self, pts, p):
