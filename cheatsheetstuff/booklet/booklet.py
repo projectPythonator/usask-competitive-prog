@@ -1414,17 +1414,22 @@ class GeometryAlgorithms:
         """Compute triangle area, via cross-products of the pairwise sides ab, bc, ca."""
         return (self.cross_product(a, b) + self.cross_product(b, c) + self.cross_product(c, a))/2
 
-    def incircle_radis_of_triangle_abc_helper(self, ab, bc, ca):
-        """Computes the radius of the incircle, this can be achieved from the following formula:
-        radius = area/(perimeter/2) Author: TODO
-        """
-        area = self.triangle_area_heron_abc(ab, bc, ca)
-        perimeter = self.perimeter_of_triangle_abc(ab, bc, ca) / 2
-        return area/perimeter
+    # def incircle_radis_of_triangle_abc_helper(self, ab, bc, ca):
+    #     """Computes the radius of the incircle, this can be achieved from the following formula:
+    #     radius = area/(perimeter/2) Author: TODO
+    #     """
+    #     area = self.triangle_area_heron_abc(ab, bc, ca)
+    #     perimeter = self.perimeter_of_triangle_abc(ab, bc, ca) / 2
+    #     return area/perimeter
 
     def incircle_radis_of_triangle_abc(self, a, b, c):
-        ab, bc, ca = self.sides_of_triangle_abc(a, b, c)
-        return self.incircle_radis_of_triangle_abc_helper(ab, bc, ca)
+        """Computes the radius of the incircle, achieved by computing the side lengths then finding
+        the area and perimeter to use in this Formula: r = area/(perimeter/2) Author: TODO
+        """
+        side_ab, side_bc, side_ca = self.sides_of_triangle_abc(a, b, c)
+        area = self.triangle_area_heron_abc(side_ab, side_bc, side_ca)
+        perimeter = self.perimeter_of_triangle_abc(side_ab, side_bc, side_ca) / 2
+        return area / perimeter
 
     def circumcircle_radis_of_triangle_abc_helper(self, ab, bc, ca):
         area = self.triangle_area_heron_abc(ab, bc, ca)
