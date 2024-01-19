@@ -1064,7 +1064,7 @@ class MathAlgorithms:
         return self.binomial[(n, k)]
 
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
-from itertools import pairwise
+# from itertools import pairwise
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and
 # hard code these in for performance speedup
@@ -1592,7 +1592,7 @@ class GeometryAlgorithms:
         return False
 
     def pt_p_in_polygon_pts_2(self, pts, p):
-        """Determine if a point is in a polygon via, ray .
+        """Determine if a point is in a polygon via, ray casting.
 
         Complexity per call: Time: O(n), Space: O(1)
         """
@@ -1607,16 +1607,19 @@ class GeometryAlgorithms:
         return ans
 
     def pt_p_on_polygon_perimeter_pts(self, pts, p):
-            n = len(pts)
-            if p in pts:
+        """Determine if a point is on the perimeter of a polygon via.
+
+        Complexity per call: Time: O(n), Space: O(1)
+        Optimizations: move old_dist and new_dist before loop and only call function on new_dist.
+        """
+        n = len(pts)
+        for i in range(n-1):
+            old_dist = self.distance_normalized(pts[i], p)
+            new_dist = self.distance_normalized(p, pts[i + 1])
+            ij_dist = self.distance_normalized(pts[i], pts[i + 1])
+            if self.compare_ab(new_dist+old_dist, ij_dist) == 0:
                 return True
-            for i in range(n-1):
-                dist_ip = self.distance_normalized(pts[i], p)
-                dist_pj = self.distance_normalized(p, pts[i + 1])
-                dist_ij = self.distance_normalized(pts[i], pts[i + 1])
-                if self.compare_ab(dist_ip+dist_pj, dist_ij) == 0:
-                    return True
-            return False
+        return p in pts
 
     def pt_p_in_convex_polygon_pts(self, pts, p):
         n = len(pts)
