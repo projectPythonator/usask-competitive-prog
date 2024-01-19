@@ -1440,7 +1440,7 @@ class GeometryAlgorithms:
         area = self.triangle_area_from_heron_abc(side_ab, side_bc, side_ca)
         return (side_ab * side_bc * side_ca) / (4 * area)
 
-    def incircle_pt_for_triangle_abc(self, a, b, c):
+    def incircle_pt_for_triangle_abc_1(self, a, b, c):
         """Get the circle center of an incircle.
 
         Complexity per call: Time: lots of ops but still O(1), Space O(1)
@@ -1495,10 +1495,13 @@ class GeometryAlgorithms:
         rotated_vector_ba = self.rotate_ccw_90_wrt_origin(b-a)  # code is a ccw turn. check formula
         return rotated_vector_ba + (a+b)/2
 
-    def incircle_pt_of_triangle_abc_v2(self, a, b, c):
-        abc = self.angle_bisector_for_triangle_abc(a, b, c)
-        bca = self.angle_bisector_for_triangle_abc(b, c, a)
-        return self.triangle_circle_center_pt_abcd(a, abc, b, bca)
+    def incircle_pt_for_triangle_abc_2(self, a, b, c):
+        """An alternative way to compute incircle. This one uses bisectors
+        Method: TODO
+        """
+        bisector_abc = self.angle_bisector_for_triangle_abc(a, b, c)
+        bisector_bca = self.angle_bisector_for_triangle_abc(b, c, a)
+        return self.triangle_circle_center_pt_abcd(a, bisector_abc, b, bisector_bca)
 
     def circumcenter_pt_of_triangle_abc_v2(self, a, b, c):
         ab = self.perpendicular_bisector_for_triangle_ab(a, b)
