@@ -1275,7 +1275,7 @@ class GeometryAlgorithms:
 
     def is_segments_intersect_ab_to_cd(self, a, b, c, d):
         """4 distinct points as two lines intersect if they are collinear and at least one of the
-         end points c or d are in between a and b otherwise, """
+         end points c or d are in between a and b otherwise, TODO"""
         if self.is_collinear_lines_ab_and_cd_2(a, b, c, d):
             lo, hi = (a, b) if a < b else (b, a)
             return lo <= c <= hi or lo <= d <= hi
@@ -1290,12 +1290,14 @@ class GeometryAlgorithms:
 
     def pt_lines_intersect_ab_to_cd(self, a, b, c, d):
         """Compute the intersection point between two lines.
-        Explain
+        Explain TODO
         """
         vec_ba, vec_ca, vec_cd = b-a, c-a, c-d
         return a + vec_ba*(self.cross_product(vec_ca, vec_cd) / self.cross_product(vec_ba, vec_cd))
 
     def pt_line_seg_intersect_ab_to_cd(self, a, b, c, d):
+        """Same as for line intersect but this time we need to use a specific formula.
+        Formula: TODO"""
         x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product(d, c)
         u = abs(y*a.x + x*a.y + cross_prod)
         v = abs(y*b.x + x*b.y + cross_prod)
