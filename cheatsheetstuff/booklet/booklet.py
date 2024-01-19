@@ -1308,12 +1308,18 @@ class GeometryAlgorithms:
         return self.compare_ab(self.distance_normalized(p, c), r) < 0
 
     def pt_circle_center_given_pt_abc(self, a, b, c):
+        """Find the center of a circle based of 3 distinct points
+        TODO add in teh formula
+        """
         ab, ac = (a+b)/2, (a+c)/2
         ab_rot = self.rotate_cw_90_wrt_origin(a - ab) + ab
         ac_rot = self.rotate_cw_90_wrt_origin(a - ac) + ac
         return self.pt_lines_intersect_ab_to_cd(ab, ab_rot, ac, ac_rot)
 
     def pts_line_ab_intersects_circle_cr(self, a, b, c, r):
+        """Compute the point(s) that line ab intersects circle c radius r.
+        TODO add in the formula
+        """
         ba, ac = b-a, a-c
         bb = self.dot_product(ba, ba)
         ab = self.dot_product(ac, ba)
@@ -1326,7 +1332,10 @@ class GeometryAlgorithms:
             return first_intersect if result == 0 else first_intersect, second_intersect
         return None # no intersect 
 
-    def pts_two_circles_intersect_ar1_br1(self, c1, c2, r1, r2):
+    def pts_two_circles_intersect_cr1_cr2(self, c1, c2, r1, r2):
+        """I think this is the points on the circumference but not fully sure
+        TODO add in teh formula
+        """
         center_dist = self.distance_normalized(c1, c2)
         if (self.compare_ab(center_dist, r1 + r2) <= 0
                 <= self.compare_ab(center_dist + min(r1, r2), max(r1, r2))):
