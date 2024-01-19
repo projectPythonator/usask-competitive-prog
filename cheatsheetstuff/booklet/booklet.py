@@ -1303,8 +1303,9 @@ class GeometryAlgorithms:
         v = abs(y*b.x + x*b.y + cross_prod)
         return Pt2d((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u))
 
-    def is_point_in_circle(self, a, b, r): # use <= if you want points on the circumfrance 
-        return self.compare_ab(self.distance_normalized(a, b), r) < 0
+    def is_point_p_in_circle_c_radius_r(self, p, c, r):
+        """Computes True if point p in circle False otherwise. Use <= for circumference inclusion"""
+        return self.compare_ab(self.distance_normalized(p, c), r) < 0
 
     def pt_circle_center_given_pt_abc(self, a, b, c):
         ab, ac = (a+b)/2, (a+c)/2
