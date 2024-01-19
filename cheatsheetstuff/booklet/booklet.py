@@ -1441,6 +1441,12 @@ class GeometryAlgorithms:
         return (side_ab * side_bc * side_ca) / (4 * area)
 
     def incircle_pt_for_triangle_abc(self, a, b, c):
+        """Get the circle center of an incircle.
+
+        Complexity per call: Time: lots of ops but still O(1), Space O(1)
+        Formula: TODO
+        Optimization: get sides individually instead of through another call
+        """
         radius = self.incircle_radius_of_triangle_abc(a, b, c)
         if self.compare_ab(radius, 0.0) == 0: #  if the radius was 0 we don't have a point
             return False, 0, 0
@@ -1456,27 +1462,38 @@ class GeometryAlgorithms:
         return False, 0, 0
 
     def triangle_circle_center_pt_abcd(self, a, b, c, d):
-        ba, dc = b-a, d-c
-        pt_1, pt_2 = Pt2d(ba.y, -ba.x), Pt2d(dc.y, -dc.x)
+        """A 2 in one method that can get the middle point of both incircle circumcenter.
+        Method: TODO
+
+        Complexity per call: Time: lots of ops but still O(1), Space O(1)
+        Optimization: paste rotation code instead of function call
+        """
+        pt_1 = self.rotate_cw_90_wrt_origin(b-a)  # rotation on the vector b-a
+        pt_2 = self.rotate_cw_90_wrt_origin(d-c)  # rotation on the vector d-c
         cross_product_1_2 = self.cross_product(pt_1, pt_2)
-        cross_product_2_1 = self.cross_product(pt_2, pt_1)
+        # cross_product_2_1 = -cross_product_1_2  # self.cross_product(pt_2, pt_1)
         if self.compare_ab(cross_product_1_2, 0.0) == 0:
             return None
         pt_3 = Pt2d(self.dot_product(a, pt_1), self.dot_product(c, pt_2))
         x = ((pt_3.x * pt_2.y) - (pt_3.y * pt_1.y)) / cross_product_1_2
-        y = ((pt_3.x * pt_2.x) - (pt_3.y * pt_1.x)) / cross_product_2_1
-        return Pt2d(x, y)
+        y = ((pt_3.x * pt_2.x) - (pt_3.y * pt_1.x)) / -cross_product_1_2  # cross(pt_2, pt_1)
+        return round(Pt2d(x, y), 12)
 
     def angle_bisector_for_triangle_abc(self, a, b, c):
+        """Compute the angle bisector point.
+        Method: TODO
+        """
         dist_ba = self.distance_normalized(b, a)
         dist_ca = self.distance_normalized(c, a)
         ref_pt = (b-a) / dist_ba * dist_ca
         return ref_pt + (c-a) + a
 
     def perpendicular_bisector_for_triangle_ab(self, a, b):
-        ba = b-a
-        ba = Pt2d(-ba.y, ba.x)
-        return ba + (a+b)/2
+        """Compute the perpendicular bisector point.
+        Method: TODO
+        """
+        rotated_vector_ba = self.rotate_ccw_90_wrt_origin(b-a)  # code is a ccw turn. check formula
+        return rotated_vector_ba + (a+b)/2
 
     def incircle_pt_of_triangle_abc_v2(self, a, b, c):
         abc = self.angle_bisector_for_triangle_abc(a, b, c)
