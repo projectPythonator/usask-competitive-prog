@@ -1442,7 +1442,7 @@ class GeometryAlgorithms:
 
     def incircle_pt_for_triangle_abc(self, a, b, c):
         radius = self.incircle_radius_of_triangle_abc(a, b, c)
-        if self.compare_ab(radius, 0.0): # when does this happen
+        if self.compare_ab(radius, 0.0) == 0: #  if the radius was 0 we don't have a point
             return False, 0, 0
         side_ab, side_bc, side_ca = self.sides_of_triangle_abc(a, b, c)
         ratio_1 = side_ab/side_ca
