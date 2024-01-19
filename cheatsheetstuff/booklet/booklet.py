@@ -1071,6 +1071,7 @@ from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
 CCW = 1  # counterclockwise
 CW = -1  # clockwise
 CL = 0   # collinear
+EPS = 1e-12 # used in some spots
 
 class Pt2d:
     def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
@@ -1323,23 +1324,23 @@ class GeometryAlgorithms:
         return self.pt_lines_intersect_ab_to_cd(ab, ab_rot, ac, ac_rot)
 
     def pts_line_ab_intersects_circle_cr(self, a, b, c, r):
-        """Compute the point(s) that line ab intersects circle c radius r.
+        """Compute the point(s) that line ab intersects circle c radius r. from stanford 2016
         TODO add in the formula
         """
-        ba, ac = b-a, a-c
-        bb = self.dot_product(ba, ba)
-        ab = self.dot_product(ac, ba)
-        aa = self.dot_product(ac, ac) - r * r
-        dist_sq = ab*ab - bb*aa
+        vec_ba, vec_ac = b-a, a-c
+        dist_sq_ba = self.dot_product(vec_ba, vec_ba)
+        dist_sq_ac_ba = self.dot_product(vec_ac, vec_ba)
+        dist_sq_ac = self.dot_product(vec_ac, vec_ac) - r * r
+        dist_sq = dist_sq_ac_ba*dist_sq_ac_ba - dist_sq_ba*dist_sq_ac
         result = self.compare_ab(dist_sq, 0.0)
         if result >= 0:
-            first_intersect = c + ac + ba*(-ab + sqrt(dist_sq + EPS))/bb
-            second_intersect = c + ac + ba*(-ab - sqrt(dist_sq))/bb
+            first_intersect = c + vec_ac + vec_ba*(-dist_sq_ac_ba + sqrt(dist_sq + EPS))/dist_sq_ba
+            second_intersect = c + vec_ac + vec_ba*(-dist_sq_ac_ba - sqrt(dist_sq))/dist_sq_ba
             return first_intersect if result == 0 else first_intersect, second_intersect
         return None # no intersect 
 
-    def pts_two_circles_intersect_cr1_cr2(self, c1, c2, r1, r2):
-        """I think this is the points on the circumference but not fully sure
+    def pts_two_circles_intersect_cr1_cr2(self, c1: Pt2d, c2: Pt2d, r1, r2):
+        """I think this is the points on the circumference but not fully sure. from stanford 2016
         TODO add in teh formula
         """
         center_dist = self.distance_normalized(c1, c2)
@@ -1347,24 +1348,24 @@ class GeometryAlgorithms:
                 <= self.compare_ab(center_dist + min(r1, r2), max(r1, r2))):
             x = (center_dist*center_dist - r2*r2 + r1*r1)/(2*center_dist)
             y = sqrt(r1*r1 - x*x)
-            v = (b-a)/center_dist
-            pt1, pt2 = a + v * x, self.rotate_ccw_90_wrt_origin(v) * y
-            return (pt1+pt2) if self.compare_ab(y, 0.0) <= 0 else (pt1+pt2, pt1-pt2)
+            v = (c2-c1)/center_dist
+            pt1, pt2 = c1 + v * x, self.rotate_ccw_90_wrt_origin(v) * y
+            return (pt1 + pt2) if self.compare_ab(y, 0.0) <= 0 else (pt1+pt2, pt1-pt2)
         return None # no overlap
 
     def pt_tangent_to_circle_cr(self, c, r, p):
         """Find the two points that create tangent lines from p to the circumference.
         TODO add in teh formula
         """
-        pc = p-c
-        x = self.dot_product(pc, pc)
+        vec_pc = p-c
+        x = self.dot_product(vec_pc, vec_pc)
         dist_sq = x - r*r
         result = self.compare_ab(dist_sq, 0.0)
         if result >= 0:
             dist_sq = dist_sq if result else 0
-            q1 = pa * (r*r / x)
-            q2 = self.rotate_ccw_90_wrt_origin(pa * (-r * sqrt(dist_sq) / x))
-            return [a+q1-q2, a+q1+q2]
+            q1 = vec_pc * (r*r / x)
+            q2 = self.rotate_ccw_90_wrt_origin(vec_pc * (-r * sqrt(dist_sq) / x))
+            return [c+q1-q2, c+q1+q2]
         return []
 
     def tangents_between_2_circles(self, c1, r1, c2, r2):
@@ -1654,12 +1655,22 @@ class GeometryAlgorithms:
                 else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1)
 
     def centroid_pt_of_convex_polygon(self, pts):
+        """Compute the centroid of a convex polygon.
+
+        Complexity per call: Time: O(n), Space: O(1)
+        Optimizations:
+        """
         ans, n = Pt2d(0, 0), len(pts)
         for i in range(n-1):
             ans = ans + (pts[i]+pts[i+1]) * self.cross_product(pts[i], pts[i + 1])
-            return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
+        return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
 
     def is_polygon_pts_simple_quadratic(self, pts):
+        """Brute force method to check if a polygon is simple. check all line pairs
+
+        Complexity per call: Time: O(n^2), Space: O(1)
+        Optimizations:
+        """
         n = len(pts)
         for i in range(n-1):
             for k in range(i+1, n-1):
@@ -1675,11 +1686,10 @@ class GeometryAlgorithms:
         for i in range(n-1):
             rot_1 = self.point_c_rotation_wrt_line_ab(a, b, pts[i])
             rot_2 = self.point_c_rotation_wrt_line_ab(a, b, pts[i + 1])
-            if 1 == rot_1:
+            if 0 >= rot_1:
                 ans.append(pts[i])
-            elif 0 == rot_1:
-                ans.append(pts[i])
-                continue
+                if 0 == rot_1:
+                    continue
             if 1 == rot_1 and -1 == rot_2:
                 ans.append(self.pt_line_seg_intersect_ab_to_cd(pts[i], pts[i + 1], a, b))
         if ans and ans[0] != ans[-1]:
