@@ -1574,26 +1574,35 @@ class GeometryAlgorithms:
             return False if lo > 0 or hi == 0 else hi > 0
         return False
 
-    def pt_p_in_polygon_pts_v1(self, pts, p):
+    def pt_p_in_polygon_pts_1(self, pts, p):
+        """Determine if a point is in a polygon based on the sum of the angles.
+
+        Complexity per call: Time: O(n), Space: O(1)
+        """
         n = len(pts)
         if n > 3:
             angle_sum = 0.0
             for i in range(n-1):
+                angle = self.angle_point_c_wrt_line_ab(pts[i], pts[i+1], p)
                 if 1 == self.point_c_rotation_wrt_line_ab(pts[i], pts[i + 1], p):
-                    angle_sum += self.angle_point_c_wrt_line_ab(pts[i], pts[i+1], p)
+                    angle_sum += angle
                 else:
-                    angle_sum -= self.angle_point_c_wrt_line_ab(pts[i], pts[i+1], p)
+                    angle_sum -= angle
             return self.compare_ab(abs(angle_sum), pi)
-        return -1
+        return False
 
-    def pt_p_in_polygon_pts_v2(self, pts, p):
+    def pt_p_in_polygon_pts_2(self, pts, p):
+        """Determine if a point is in a polygon via, ray .
+
+        Complexity per call: Time: O(n), Space: O(1)
+        """
         ans = False
         px, py = p.get_tup()
+        xi, yi, xj, yj = 0, 0, pts[0].x, pts[0].y
         for i in range(len(pts)-1):
-            x1, y1 = pts[i].get_tup()
-            x2, y2 = pts[i+1].get_tup()
-            lo, hi = (y1, y2) if y1 < y2 else (y2, y1)
-            if lo <= py < hi and px < (x1 + (x2-x1) * (py-y1) / (y2-y1)):
+            xi, yi = xj, yj
+            xj, yj = pts[i+1].x, pts[i+1].y
+            if (yi <= py < yj or yj <= py < yi) and px < (xi + (xj - xi) * (py - yi) / (yj - yi)):
                 ans = not ans
         return ans
 
@@ -1629,7 +1638,7 @@ class GeometryAlgorithms:
     # return 0 for on 1 for in -1 for out
     def pt_p_position_wrt_polygon_pts(self, pts, p):
         return 0 if self.pt_p_on_polygon_perimeter_pts(pts, p) \
-                else 1 if self.pt_p_in_polygon_pts_v2(pts, p) else -1
+                else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1
 
     def centroid_pt_of_convex_polygon(self, pts):
         ans, n = Pt2d(0, 0), len(pts)
