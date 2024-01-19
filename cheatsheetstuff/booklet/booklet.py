@@ -1607,7 +1607,7 @@ class GeometryAlgorithms:
         return ans
 
     def pt_p_on_polygon_perimeter_pts(self, pts, p):
-        """Determine if a point is on the perimeter of a polygon via.
+        """Determine if a point is on the perimeter of a polygon simply via a distance check.
 
         Complexity per call: Time: O(n), Space: O(1)
         Optimizations: move old_dist and new_dist before loop and only call function on new_dist.
@@ -1622,6 +1622,11 @@ class GeometryAlgorithms:
         return p in pts
 
     def pt_p_in_convex_polygon_pts(self, pts, p):
+        """For a convex Polygon we are able to search if point is in the polygon faster. TODO
+
+        Complexity per call: Time: O(log n), Space: O(1)
+        Optimizations:
+        """
         n = len(pts)
         if n == 2:
             distance = self.distance_pt_c_to_line_seg_ab(pts[0], pts[1], p)
@@ -1640,8 +1645,13 @@ class GeometryAlgorithms:
     # use a set with points if possible checking on the same polygon many times    
     # return 0 for on 1 for in -1 for out
     def pt_p_position_wrt_polygon_pts(self, pts, p):
-        return 0 if self.pt_p_on_polygon_perimeter_pts(pts, p) \
-                else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1
+        """Will determine if a point is in on or outside a polygon.
+
+        Complexity per call: Time: O(n) Convex(log n), Space: O(1)
+        Optimizations: use log n version if you need superfast, and it's a convex polygon
+        """
+        return (0 if self.pt_p_on_polygon_perimeter_pts(pts, p)
+                else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1)
 
     def centroid_pt_of_convex_polygon(self, pts):
         ans, n = Pt2d(0, 0), len(pts)
