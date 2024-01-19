@@ -1444,11 +1444,9 @@ class GeometryAlgorithms:
         radius = self.incircle_radius_of_triangle_abc(a, b, c)
         if self.compare_ab(radius, 0.0): # when does this happen
             return False, 0, 0
-        dist_ab = self.distance_normalized(a, b)
-        dist_bc = self.distance_normalized(b, c)
-        dist_ac = self.distance_normalized(a, c)
-        ratio_1 = dist_ab/dist_ac
-        ratio_2 = dist_ab/dist_bc
+        side_ab, side_bc, side_ca = self.sides_of_triangle_abc(a, b, c)
+        ratio_1 = side_ab/side_ca
+        ratio_2 = side_ab/side_bc
         pt_1 = b + (c-b) * (ratio_1/(ratio_1 + 1.0)) 
         pt_2 = a + (c-a) * (ratio_2/(ratio_2 + 1.0))
 
