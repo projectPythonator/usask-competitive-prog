@@ -1695,20 +1695,20 @@ class GeometryAlgorithms:
         Complexity per call: Time: O(n), Space: O(n)
         Optimizations:
         """
-        left_polygon = []
+        left_partition = []
         # for i in range(len(pts) - 1):
         for u, v in pairwise(pts):
             rot_1 = self.point_c_rotation_wrt_line_ab(a, b, u)
             rot_2 = self.point_c_rotation_wrt_line_ab(a, b, v)
             if 0 >= rot_1:
-                left_polygon.append(u)
+                left_partition.append(u)
                 if 0 == rot_1:
                     continue
             if rot_1 * rot_2 < 0: # CCW -1, CW 1 so tests if they are opposite ie lines intersect.
-                left_polygon.append(self.pt_line_seg_intersect_ab_to_cd(u, v, a, b))
-        if left_polygon and left_polygon[0] != left_polygon[-1]:
-            left_polygon.append(left_polygon[0])
-        return left_polygon
+                left_partition.append(self.pt_line_seg_intersect_ab_to_cd(u, v, a, b))
+        if left_partition and left_partition[0] != left_partition[-1]:
+            left_partition.append(left_partition[0])
+        return left_partition
 
     def convex_hull_monotone_chain(self, pts):
         def func(points, r, lim):
