@@ -1714,7 +1714,8 @@ class GeometryAlgorithms:
         """Compute convex hull of a list of points via Monotone Chain method. CCW ordering returned.
 
         Complexity per call: Time: O(nlog n), Space: final O(n), aux O(nlog n)
-        Optimizations: can use heapsort for Space: O(n)[for set + heap] or O(1) [if we consume pts]
+        Optimizations: can use heapsort for Space: O(n)[for set + heap] or O(1) [if we consume pts],
+        Can also optimize out the append and pop with using a stack like index.
         """
         def func(points, cur_hull, min_size):
             for p in points:
