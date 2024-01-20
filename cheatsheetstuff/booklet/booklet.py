@@ -1852,8 +1852,8 @@ class GeometryAlgorithms:
         return CW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
     def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
-        return (a1 * (b2 * c3 - c2 * b3) - 
-                a2 * (b1 * c3 - c1 * b3) + 
+        return (a1 * (b2 * c3 - c2 * b3) -
+                a2 * (b1 * c3 - c1 * b3) +
                 a3 * (b1 * c2 - c1 * b2))
 
     def is_in_circle(self, a, b, c, d):
@@ -1895,7 +1895,7 @@ class GeometryAlgorithms:
                 ldi = ldi.l_next()
                 continue
             if self.pt_right_of_edge(ldi.origin, rdi):
-                rdi = (rdi.rev()).o_next
+                rdi = rdi.rev().o_next
                 continue
             break
         base_edge_l = self.quad_edges.connect(rdi.rev(), ldi)
@@ -1904,9 +1904,9 @@ class GeometryAlgorithms:
         if rdi.origin == rdo.origin:
             rdo = base_edge_l
         while True:
-            l_cand_edge = (base_edge_l.rev()).o_next
+            l_cand_edge = base_edge_l.rev().o_next
             if self.pt_right_of_edge(l_cand_edge.dest(), base_edge_l):
-                while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin, 
+                while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin,
                                         l_cand_edge.dest(), l_cand_edge.o_next.dest()):
                     temp_edge = l_cand_edge.o_next
                     self.quad_edges.delete_edge(l_cand_edge)
@@ -1914,7 +1914,7 @@ class GeometryAlgorithms:
             r_cand_edge = base_edge_l.o_prev()
             if self.pt_right_of_edge(r_cand_edge.dest(), base_edge_l):
                 while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin,
-                                        r_cand_edge.dest(), (r_cand_edge.o_prev()).dest()):
+                                        r_cand_edge.dest(), r_cand_edge.o_prev().dest()):
                     temp_edge = r_cand_edge.o_prev()
                     self.quad_edges.delete_edge(r_cand_edge)
                     r_cand_edge = temp_edge
@@ -1923,9 +1923,9 @@ class GeometryAlgorithms:
             if (not l_check) and (not r_check):
                 break
             if ((not l_check)
-                or (r_check
-                and self.is_in_circle(l_cand_edge.dest(), l_cand_edge.origin,
-                                      r_cand_edge.origin, r_cand_edge.dest()))):
+                    or (r_check
+                        and self.is_in_circle(l_cand_edge.dest(), l_cand_edge.origin,
+                                              r_cand_edge.origin, r_cand_edge.dest()))):
                 base_edge_l = self.quad_edges.connect(r_cand_edge, base_edge_l.rev())
             else:
                 base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
@@ -1955,9 +1955,8 @@ class GeometryAlgorithms:
             kek += 1
             if not edge.used:
                 add_helper()
-        ans = [(pts[i], pts[i + 1], pts[i + 2]) for i in range(0, len(pts), 3)]
-        return ans
-        
+        ans = [tuple((sorted([pts[i], pts[i + 1], pts[i + 2]]))) for i in range(0, len(pts), 3)]
+        return sorted(list(set(ans)))
 
 
 class String_Algorithms:
