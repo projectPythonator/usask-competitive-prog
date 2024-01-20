@@ -1088,8 +1088,12 @@ class Pt2d:
     def __truediv__(self, scale): return Pt2d(self.x / scale, self.y / scale)
     def __floordiv__(self, scale): return Pt2d(self.x // scale, self.y // scale)
 
-    def __eq__(self, other): return isclose(self.x, other.x) and isclose(self.y, other.y)
-    def __lt__(self, other): return False if self == other else (self.x, self.y) < (other.x, other.y)
+    # def __eq__(self, other): return isclose(self.x, other.x) and isclose(self.y, other.y)
+    def __eq__(self, other): return self.x == other.x and self.y == other.y
+
+    # def __lt__(self, other):
+    #     return self.x < other.x if not isclose(self.x, other.x) else self.y < other.y
+    def __lt__(self, other): return self.x < other.x if self.x != other.x else self.y < other.y
 
     def __str__(self): return "{} {}".format(self.x, self.y)
     # def __str__(self): return "(x = {:20}, y = {:20})".format(self.x, self.y)
@@ -1710,7 +1714,7 @@ class GeometryAlgorithms:
             left_partition.append(left_partition[0])
         return left_partition
 
-    def convex_hull_monotone_chain(self, pts):
+    def convex_hull_monotone_chain(self, pts): # needs test
         """Compute convex hull of a list of points via Monotone Chain method. CCW ordering returned.
 
         Complexity per call: Time: O(nlog n), Space: final O(n), aux O(nlog n)
@@ -1732,21 +1736,24 @@ class GeometryAlgorithms:
         return unique_points
 
     def rotating_caliper_of_polygon_pts(self, pts):
-        n, t, ans = len(pts)-1, 0, 0.0
-        for i in range(n):
-            p_i = pts[i]
-            p_j = pts[i+1] if i+1 <= n else pts[i]
-            p = p_j-p_i
-            while (t+1) % n != i:
-                cross_1 = self.cross_product(p, pts[t+1] - p_i)
-                cross_2 = self.cross_product(p, pts[t] - p_i)
-                if self.compare_ab(cross_1, cross_2) == -1:
-                    break
-                t = (t+1) % n
-            ans = max(ans, self.distance_normalized(p_i, pts[t]))
-            ans = max(ans, self.distance_normalized(p_j, pts[t]))
-        return ans
+        """Computes the max distance of two points in the convex polygon?
 
+        Complexity per call: Time: O(n), Space: O(1)
+        Optimizations:
+        """
+        convex_hull = self.convex_hull_monotone_chain(pts)
+        n, t, ans = len(convex_hull) - 1, 1, 0.0
+        for i in range(n):
+            p_i, p_j = convex_hull[i], convex_hull[(i + 1) % n]
+            p = p_j - p_i
+            while (t + 1) % n != i:
+                if (self.cross_product(p, convex_hull[(t + 1) % n] - p_i) <
+                        self.cross_product(p, convex_hull[t] - p_i)):
+                    break
+                t = (t + 1) % n
+            ans = max(ans, self.distance(p_i, convex_hull[t]))
+            ans = max(ans, self.distance(p_j, convex_hull[t]))
+        return sqrt(ans)
     def closest_pair_helper(self, lo, hi):
         r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
                      self.x_ordering[lo], 
