@@ -1063,7 +1063,7 @@ class MathAlgorithms:
         return self.binomial[(n, k)]
 
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
-# from itertools import pairwise
+from itertools import tee
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and
 # hard code these in for performance speedup
@@ -1071,6 +1071,13 @@ CCW = 1  # counterclockwise
 CW = -1  # clockwise
 CL = 0   # collinear
 EPS = 1e-12 # used in some spots
+
+def pairwise(iterable):
+    # pairwise('ABCDEFG') --> AB BC CD DE EF FG
+    a, b = tee(iterable)
+    next(b, None)
+    return zip(a, b)
+
 
 class Pt2d:
     def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
@@ -1526,14 +1533,14 @@ class GeometryAlgorithms:
 
     def perimeter_of_polygon_pts(self, pts):
         """Compute summed pairwise perimeter of polygon in CCW ordering."""
-        return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
-        # return fsum([self.distance_normalized(a, b) for a, b in pairwise(pts)])
+        return fsum([self.distance_normalized(a, b) for a, b in pairwise(pts)])
+        # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
 
     def signed_area_of_polygon_pts(self, pts):
         """Compute sum of area of polygon, via shoelace method: half the sum of the pairwise
         cross-products."""
-        return fsum([self.cross_product(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])/2
-        # return fsum([self.cross_product(a, b) for a, b in pairwise(pts)]) / 2
+        return fsum([self.cross_product(a, b) for a, b in pairwise(pts)]) / 2
+        # return fsum([self.cross_product(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]) / 2
 
     def area_of_polygon_pts(self, pts):
         """Positive area of polygon using above method."""
@@ -1579,12 +1586,12 @@ class GeometryAlgorithms:
 
         Complexity per call: Time: O(n), Space: O(1)
         """
-        n = len(pts)
-        if n > 3:
+        if len(pts) > 3:
             angle_sum = 0.0
-            for i in range(n-1):
-                angle = self.angle_point_c_wrt_line_ab(pts[i], pts[i+1], p)
-                if 1 == self.point_c_rotation_wrt_line_ab(pts[i], pts[i + 1], p):
+            # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
+            for a, b in pairwise(pts):
+                angle = self.angle_point_c_wrt_line_ab(a, b, p)
+                if 1 == self.point_c_rotation_wrt_line_ab(a, b, p):
                     angle_sum += angle
                 else:
                     angle_sum -= angle
@@ -1680,20 +1687,27 @@ class GeometryAlgorithms:
                     return False
         return True
 
-    def polygon_cut(self, pts, a, b):
-        ans, n = [], len(pts)
-        for i in range(n-1):
-            rot_1 = self.point_c_rotation_wrt_line_ab(a, b, pts[i])
-            rot_2 = self.point_c_rotation_wrt_line_ab(a, b, pts[i + 1])
+    def polygon_cut_from_line_ab(self, pts: Pt2d, a, b):
+        """Method computes the left side polygon resulting from a cut from the line a-b.
+        Method: Walk around the polygon and only take points that return CCW to line ab
+
+        Complexity per call: Time: O(n), Space: O(n)
+        Optimizations:
+        """
+        left_polygon = []
+        # for i in range(len(pts) - 1):
+        for u, v in pairwise(pts):
+            rot_1 = self.point_c_rotation_wrt_line_ab(a, b, u)
+            rot_2 = self.point_c_rotation_wrt_line_ab(a, b, v)
             if 0 >= rot_1:
-                ans.append(pts[i])
+                left_polygon.append(u)
                 if 0 == rot_1:
                     continue
-            if 1 == rot_1 and -1 == rot_2:
-                ans.append(self.pt_line_seg_intersect_ab_to_cd(pts[i], pts[i + 1], a, b))
-        if ans and ans[0] != ans[-1]:
-            ans.append(ans[0])
-        return ans
+            if rot_1 * rot_2 < 0: # CCW -1, CW 1 so tests if they are opposite ie lines intersect.
+                left_polygon.append(self.pt_line_seg_intersect_ab_to_cd(u, v, a, b))
+        if left_polygon and left_polygon[0] != left_polygon[-1]:
+            left_polygon.append(left_polygon[0])
+        return left_polygon
 
     def convex_hull_monotone_chain(self, pts):
         def func(points, r, lim):
