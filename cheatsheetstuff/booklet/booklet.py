@@ -1711,20 +1711,25 @@ class GeometryAlgorithms:
         return left_partition
 
     def convex_hull_monotone_chain(self, pts):
-        def func(points, r, lim):
+        """Compute convex hull of a list of points via Monotone Chain method. CCW ordering returned.
+
+        Complexity per call: Time: O(nlog n), Space: final O(n), aux O(nlog n)
+        Optimizations: can use heapsort for Space: O(n)[for set + heap] or O(1) [if we consume pts]
+        """
+        def func(points, cur_hull, min_size):
             for p in points:
-                while (len(r) > lim and
-                       self.point_c_rotation_wrt_line_ab(r[-2], r[-1], p) == -1):
-                    r.pop()
-                r.append(p)
-            r.pop()
-        ans, convex = sorted(set(pts)), []
-        if len(ans) < 2: 
-            return ans
-        func(ans, convex, 1)
-        func(ans[::-1], convex, len(convex)+1)
-        return convex
-    
+                while (len(cur_hull) > min_size
+                       and self.point_c_rotation_wrt_line_ab(cur_hull[-2], cur_hull[-1], p) == CW):
+                    cur_hull.pop()
+                cur_hull.append(p)
+            cur_hull.pop()
+        unique_points, convex_hull = sorted(set(pts)), []
+        if len(unique_points) > 1:
+            func(unique_points, convex_hull, 1)
+            func(unique_points[::-1], convex_hull, 1 + len(convex_hull))
+            return convex_hull
+        return unique_points
+
     def rotating_caliper_of_polygon_pts(self, pts):
         n, t, ans = len(pts)-1, 0, 0.0
         for i in range(n):
