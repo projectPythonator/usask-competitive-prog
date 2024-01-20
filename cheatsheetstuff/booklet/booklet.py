@@ -1619,11 +1619,11 @@ class GeometryAlgorithms:
         Complexity per call: Time: O(n), Space: O(1)
         Optimizations: move old_dist and new_dist before loop and only call function on new_dist.
         """
-        n = len(pts)
-        for i in range(n-1):
-            old_dist = self.distance_normalized(pts[i], p)
-            new_dist = self.distance_normalized(p, pts[i + 1])
-            ij_dist = self.distance_normalized(pts[i], pts[i + 1])
+        # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
+        for a, b in pairwise(pts):
+            old_dist = self.distance_normalized(a, p)
+            new_dist = self.distance_normalized(p, b)
+            ij_dist = self.distance_normalized(a, b)
             if self.compare_ab(new_dist+old_dist, ij_dist) == 0:
                 return True
         return p in pts
@@ -1667,8 +1667,9 @@ class GeometryAlgorithms:
         Optimizations:
         """
         ans, n = Pt2d(0, 0), len(pts)
-        for i in range(n-1):
-            ans = ans + (pts[i]+pts[i+1]) * self.cross_product(pts[i], pts[i + 1])
+        # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
+        for a, b in pairwise(pts):
+            ans = ans + (a + b) * self.cross_product(a, b)
         return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
 
     def is_polygon_pts_simple_quadratic(self, pts):
