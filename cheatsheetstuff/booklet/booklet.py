@@ -1775,7 +1775,7 @@ class GeometryAlgorithms:
         the optimization of using y_partition 3 times over rather than having 3 separate lists
         """
         n = hi - lo
-        if n < 4: # base case 
+        if n < 5: # base case we brute force the small set of points
             return self.closest_pair_helper(lo, hi)
         left_len, right_len = lo + n - n//2, lo + n//2
         mid = round((self.x_ordering[left_len].x + self.x_ordering[right_len].x)/2)
@@ -1815,6 +1815,11 @@ class GeometryAlgorithms:
         return self.closest_pair_recursive(0, len(pts), y_ordering)
 
     def delaunay_triangulation_slow(self, pts):
+        """A very slow version of  Delaunay Triangulation.
+
+        Complexity per call Time: O(n^4), Space O(n)
+        Optimizations: use c++ if too much memory, haven't found the way to do it without nlog n
+        """
         n = len(pts)
         ans = []
         z = [self.dot_product(el, el) for el in pts]
