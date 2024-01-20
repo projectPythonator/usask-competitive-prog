@@ -1738,7 +1738,7 @@ class GeometryAlgorithms:
     def rotating_caliper_of_polygon_pts(self, pts):
         """Computes the max distance of two points in the convex polygon?
 
-        Complexity per call: Time: O(n), Space: O(1)
+        Complexity per call: Time: O(nlog n) unsorted O(n) sorted, Space: O(1)
         Optimizations:
         """
         convex_hull = self.convex_hull_monotone_chain(pts)
@@ -1754,6 +1754,7 @@ class GeometryAlgorithms:
             ans = max(ans, self.distance(p_i, convex_hull[t]))
             ans = max(ans, self.distance(p_j, convex_hull[t]))
         return sqrt(ans)
+
     def closest_pair_helper(self, lo, hi):
         r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
                      self.x_ordering[lo], 
@@ -1762,7 +1763,7 @@ class GeometryAlgorithms:
             for j in range(i+1, hi):
                 distance_ij = self.distance(self.x_ordering[i],
                                             self.x_ordering[j])
-                if self.compare_ab(distance_ij, r_closest):
+                if self.compare_ab(distance_ij, r_closest) < 0:
                     r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
         return r_closest
 
