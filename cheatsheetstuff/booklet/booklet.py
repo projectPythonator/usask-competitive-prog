@@ -1815,40 +1815,41 @@ class GeometryAlgorithms:
         return self.closest_pair_recursive(0, len(pts), y_ordering)
 
     def delaunay_triangulation_slow(self, pts):
-        """A very slow version of  Delaunay Triangulation.
+        """A very slow version of  Delaunay Triangulation. Can beat the faster version when n small.
 
         Complexity per call Time: O(n^4), Space O(n)
         Optimizations: use c++ if too much memory, haven't found the way to do it without nlog n
         """
         n = len(pts)
         ans = []
-        z = [self.dot_product(el, el) for el in pts]
-        x = [el.x for el in pts]
-        y = [el.y for el in pts]
-        for i in range(n-2):
+        z_arr = [el.x ** 2 + el.y ** 2 for el in pts]
+        x_arr = [el.x for el in pts]
+        y_arr = [el.y for el in pts]
+        for i in range(n - 2):
             for j in range(i + 1, n):
                 for k in range(i + 1, n):
-                    if j == k: continue
-                    xn = (y[j]-y[i])*(z[k]-z[i]) - (y[k]-y[i])*(z[j]-z[i])
-                    yn = (x[k]-x[i])*(z[j]-z[i]) - (x[j]-x[i])*(z[k]-z[i])
-                    zn = (x[j]-x[i])*(y[k]-y[i]) - (x[k]-x[i])*(y[j]-y[i])
-                    flag = zn < 0
+                    if j == k:
+                        continue
+                    xn = (y_arr[j] - y_arr[i]) * (z_arr[k] - z_arr[i]) - (y_arr[k] - y_arr[i]) * (z_arr[j] - z_arr[i])
+                    yn = (x_arr[k] - x_arr[i]) * (z_arr[j] - z_arr[i]) - (x_arr[j] - x_arr[i]) * (z_arr[k] - z_arr[i])
+                    zn = (x_arr[j] - x_arr[i]) * (y_arr[k] - y_arr[i]) - (x_arr[k] - x_arr[i]) * (y_arr[j] - y_arr[i])
+                    flag = zn < 0.0
                     for m in range(n):
                         if flag:
-                            flag = flag and ((x[m]-x[i])*xn + 
-                                             (y[m]-y[i])*yn + 
-                                             (z[m]-z[i])*zn <= 0)
+                            flag = flag and (self.compare_ab((x_arr[m] - x_arr[i]) * xn +
+                                                             (y_arr[m] - y_arr[i]) * yn +
+                                                             (z_arr[m] - z_arr[i]) * zn, 0.0) <= 0)
                         else:
                             break
                     if flag:
-                        ans.append((i, j, k))
+                        ans.append((pts[i], pts[j], pts[k]))
         return ans
 
     def pt_left_of_edge(self, pt, edge):
-        return 1 == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
+        return CCW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
     def pt_right_of_edge(self, pt, edge):
-        return -1 == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
+        return CW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
     def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
         return (a1 * (b2 * c3 - c2 * b3) - 
@@ -1880,21 +1881,21 @@ class GeometryAlgorithms:
         if r - l + 1 == 3:
             edge_a = self.quad_edges.make_edge(pts[l], pts[l + 1])
             edge_b = self.quad_edges.make_edge(pts[l + 1], pts[r])
-            self.quad_edges.splce(edge_a.rev(), edge_b)
+            self.quad_edges.splice(edge_a.rev(), edge_b)
             sg = self.point_c_rotation_wrt_line_ab(pts[l], pts[l + 1], pts[r])
             if sg == 0:
                 return edge_a, edge_b.rev()
             edge_c = self.quad_edges.connect(edge_b, edge_a)
             return (edge_a, edge_b.rev()) if sg == 1 else (edge_c.rev(), edge_c)
         mid = (l + r) // 2
-        ldo, ldi = self.build_triangulation(l, mid, p)
-        rdi, rdo = self.build_triangulation(mid + 1, r, p)
+        ldo, ldi = self.build_triangulation(l, mid, pts)
+        rdi, rdo = self.build_triangulation(mid + 1, r, pts)
         while True:
             if self.pt_left_of_edge(rdi.origin, ldi):
                 ldi = ldi.l_next()
                 continue
             if self.pt_right_of_edge(ldi.origin, rdi):
-                rdi = rdi.rev().o_next
+                rdi = (rdi.rev()).o_next
                 continue
             break
         base_edge_l = self.quad_edges.connect(rdi.rev(), ldi)
@@ -1903,27 +1904,28 @@ class GeometryAlgorithms:
         if rdi.origin == rdo.origin:
             rdo = base_edge_l
         while True:
-            l_cand_edge = base_edge_l.rev().o_next
+            l_cand_edge = (base_edge_l.rev()).o_next
             if self.pt_right_of_edge(l_cand_edge.dest(), base_edge_l):
                 while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin, 
                                         l_cand_edge.dest(), l_cand_edge.o_next.dest()):
-                    t = l_cand_edge.o_next
+                    temp_edge = l_cand_edge.o_next
                     self.quad_edges.delete_edge(l_cand_edge)
-                    l_cand_edge = t
+                    l_cand_edge = temp_edge
             r_cand_edge = base_edge_l.o_prev()
             if self.pt_right_of_edge(r_cand_edge.dest(), base_edge_l):
-                    while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin, 
-                                            r_cand_edge.dest(), r_cand_edge.o_prev().dest()):
-                    t = r_cand_edge.o_prev()
+                while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin,
+                                        r_cand_edge.dest(), (r_cand_edge.o_prev()).dest()):
+                    temp_edge = r_cand_edge.o_prev()
                     self.quad_edges.delete_edge(r_cand_edge)
-                    r_cand_edge = t
+                    r_cand_edge = temp_edge
             l_check = self.pt_right_of_edge(l_cand_edge.dest(), base_edge_l)
             r_check = self.pt_right_of_edge(r_cand_edge.dest(), base_edge_l)
-            if not l_check and not r_check:
+            if (not l_check) and (not r_check):
                 break
-            if (not l_check or 
-                    r_check and 
-                    self.is_in_circle(l_cand_edge.dest(), l_cand_edge.origin, r_cand_edge.origin, r_cand_edge.dest())):
+            if ((not l_check)
+                or (r_check
+                and self.is_in_circle(l_cand_edge.dest(), l_cand_edge.origin,
+                                      r_cand_edge.origin, r_cand_edge.dest()))):
                 base_edge_l = self.quad_edges.connect(r_cand_edge, base_edge_l.rev())
             else:
                 base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
@@ -1934,9 +1936,9 @@ class GeometryAlgorithms:
         result = self.build_triangulation(0, len(pts) - 1, pts)
         edge = result[0]
         edges = [edge]
-        while self.point_c_rotation_wrt_line_ab(edge.o_next.dest(), edge.dest(), edge.origin) < 0:
+        while self.point_c_rotation_wrt_line_ab(edge.o_next.dest(), edge.dest(), edge.origin) < CL:
             edge = edge.o_next
-        def add_helper(pts, edge, edges):
+        def add_helper():
             cur = edge
             while True:
                 cur.used = True
@@ -1945,14 +1947,14 @@ class GeometryAlgorithms:
                 cur = cur.l_next()
                 if cur == edge:
                     return
-        add_helper(pts, edge, edges)
+        add_helper()
         pts = []
         kek = 0
         while kek < len(edges):
             edge = edges[kek]
             kek += 1
             if not edge.used:
-                add_helper(pts, edge, edges)
+                add_helper()
         ans = [(pts[i], pts[i + 1], pts[i + 2]) for i in range(0, len(pts), 3)]
         return ans
         
