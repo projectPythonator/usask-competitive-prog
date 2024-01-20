@@ -1688,7 +1688,7 @@ class GeometryAlgorithms:
                     return False
         return True
 
-    def polygon_cut_from_line_ab(self, pts: Pt2d, a, b):
+    def polygon_cut_from_line_ab(self, pts, a, b):
         """Method computes the left side polygon resulting from a cut from the line a-b.
         Method: Walk around the polygon and only take points that return CCW to line ab
 
