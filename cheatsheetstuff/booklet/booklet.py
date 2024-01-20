@@ -167,15 +167,14 @@ class GraphAlgorithms:
                     self.graph.grid[new_row][new_col] = new_val
                     queue.append((new_row, new_col))
 
-    #will kill the edge list but will save memory
     def min_spanning_tree_via_kruskals_and_heaps(self):  #needs test
         """Computes mst of graph G stored in edge_list, space optimized via heap.
 
-        Complexity: Time: O(|E|log |V|), Space: O(|E|) + Union_Find
+        Complexity per call: Time: O(|E|log |V|), Space: O(|E|) + Union_Find
         More uses: finding min spanning tree
         Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning tree
-        Optimization: We use a heap to make space comp. O(|E|) 
-        instead of O(|E|log |E|) when using sort, however edge_list is CONSUMED.
+        Optimization: We use a heap to make space comp. O(|E|). instead of O(|E|log |E|)
+        when using sort, however edge_list is CONSUMED.
         """
         heapify(self.graph.edge_list)
         ufds = UnionFindDisjointSets(self.graph.num_nodes)
