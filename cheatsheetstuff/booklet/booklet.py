@@ -1,8 +1,18 @@
-#data structurea
-#union find
+from typing import List, Tuple, Set, Dict
 from sys import setrecursionlimit
-setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
 
+
+type Num = int|float
+type IntList = List[int]
+type FloatList = List[float]
+type BoolList = List[float]
+type NumList = List[Num]
+type TupleListMST = List[Tuple[Num, int, int]]
+type EdgeTupleList = List[Tuple[int, int]]
+type EdgeTypeList = List[Tuple[int, int, int]]
+
+
+setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
 class UnionFindDisjointSets:
     """This Data structure is for none directional disjoint sets."""
     def __init__(self, n):
@@ -47,93 +57,99 @@ class UnionFindDisjointSets:
         return self.set_sizes[self.find_set(u)]
 
 ######################################################################################
-from math import log2
+
+# from math import log2
 from collections import deque
 from heapq import heappush, heappop, heapify
 from sys import setrecursionlimit
+
 setrecursionlimit(100000)
 
 class Graph:
-    def __init__(self, v, e, r=None, c=None):
-        self.num_edges = e
-        self.num_nodes = v
-        self.num_rows = r
-        self.num_cols = c
+    def __init__(self, v: int, e: int, r=None, c=None):
+        self.num_edges: int = e
+        self.num_nodes: int = v
+        self.num_rows: int = r
+        self.num_cols: int = c
 
         self.adj_list = []
+        self.adj_list_trans = [] # for topological sort
         self.adj_matrix = []
         self.edge_list = []
         self.grid = []
 
-        self.data_to_code = {}
-        self.code_to_data = []
+        self.data_to_code: dict[object, int] = {}
+        self.code_to_data: list[object] = []
 
-    def convert_data_to_code(self, data):
+    def convert_data_to_code(self, data: object) -> int:
         """Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair, then return u."""
         if data not in self.data_to_code:
             self.data_to_code[data] = len(self.code_to_data)
             self.code_to_data.append(data) # can be replaced with a count variable if space needed
         return self.data_to_code[data]
 
-    def add_edge_u_v_wt_into_directed_graph(self, u, v, wt=None, data=None):
+    def add_edge_u_v_wt_into_directed_graph(self, u: int, v: int, wt: Num=None, data: Num =None):
         """A pick and choose function will convert u, v into index form then add it to the structure
         you choose.
         """
-        u = self.convert_data_to_code(u) # omit if u,v is in the form: int u | 0 <= u < |V|
-        v = self.convert_data_to_code(v) # omit if u,v is in the form: int u | 0 <= u < |V|
+        u: int = self.convert_data_to_code(u) # omit if u,v is in the form: int u | 0 <= u < |V|
+        v: int = self.convert_data_to_code(v) # omit if u,v is in the form: int u | 0 <= u < |V|
 
-        self.adj_list[u].append((v, wt))    # Adjacency list usage
+        self.adj_list[u].append(v)
+        # self.adj_list[u].append((v, wt))    # Adjacency list usage with weights
         self.adj_matrix[u][v] = wt          # Adjacency matrix usage
         self.edge_list.append((wt, u, v))   # Edge list usage
         # the following lines come as a pair-set used in max flow algorithm and are used in tandem.
-        self.edge_list.append((v, wt, data))
+        self.edge_list.append([v, wt, data])
         self.adj_list[u].append(len(self.edge_list) - 1)
 
-    def add_edge_u_v_wt_into_undirected_graph(self, u, v, wt=None):
+    def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: int|float=None):
         """undirected graph version of the previous function"""
         self.add_edge_u_v_wt_into_undirected_graph(u, v, wt)
         self.add_edge_u_v_wt_into_undirected_graph(v, u, wt)
 
-    def fill_grid_graph(self, new_grid):
+    def fill_grid_graph(self, new_grid: list[list[object]]):
         self.num_rows = len(new_grid)
         self.num_cols = len(new_grid[0])
         self.grid = [[self.convert_data_to_code(el) for el in row] for row in new_grid]
 
-INF=2**31
-UNVISITED = -1
-EXPLORED  = -2
-VISITED   = -3
-TREE = 0
-BIDIRECTIONAL = 1
-BACK = 2
-FORWARD = 3
+INF: int = 2**31
+# turn these into enums later
+UNVISITED: int = -1
+EXPLORED: int  = -2
+VISITED: int   = -3
+# turn these into enums later
+TREE: int = 0
+BIDIRECTIONAL: int = 1
+BACK: int = 2
+FORWARD: int = 3
+
 class GraphAlgorithms:
-    
     def __init__(self, new_graph):
-        self.graph = new_graph
-        self.dfs_counter = None
-        self.dfs_root = None
-        self.root_children = None
-        self.region_num = None
+        self.graph: Graph = new_graph
+        self.dfs_counter: int   = 0
+        self.dfs_root: int      = 0
+        self.root_children: int = 0
+        self.region_num: int    = 0
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
-        self.mst_node_set = None
-        self.dist = []
-        self.visited = None
-        self.topo_sort_node_set = None
-        self.parent = None
-        self.low_values = None
-        self.articulation_nodes = None
-        self.bridge_edges = None
-        self.directed_edge_type = None
-        self.component_region = None
-        self.decrease_finish_order = None
-        self.nodes_on_stack = None
-        self.node_state = None
-        self.bipartite_colouring = None
-        self.last = None
+        self.mst_node_list: TupleListMST = []
+        self.dist: NumList = []
+        self.visited: IntList = []
+        self.topo_sort_node_list: IntList = []
+        self.parent: IntList = []
+        self.low_values: IntList = []
+        self.articulation_nodes: BoolList = []
+        self.bridge_edges: EdgeTupleList = []
+        self.directed_edge_type: EdgeTypeList = [] # change last int to enum sometime
+        self.component_region: IntList = []
+        self.decrease_finish_order: IntList = []
+        self.nodes_on_stack: IntList = []
+        self.node_state: IntList = [] # change to enum type sometime
+        self.bipartite_colouring: BoolList = []
+        self.last: IntList = []
 
-    def flood_fill_via_dfs(self, row, col, old_val, new_val): #needs test
+    def flood_fill_via_dfs(self, row: int, col: int, old_val: object, new_val: object): # retest needed
         """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
 
         Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
@@ -150,7 +166,7 @@ class GraphAlgorithms:
                     and self.graph.grid[new_row][new_col] == old_val):
                 self.flood_fill_via_dfs(new_row, new_col, old_val, new_val)
 
-    def flood_fill_via_bfs(self, start_row, start_col, old_val, new_val):  #needs test
+    def flood_fill_via_bfs(self, start_row: int, start_col: int, old_val: object, new_val: object): # retest needed
         """Computes flood fill graph traversal via breadth first search. Use on grid graphs.
 
         Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
@@ -167,7 +183,7 @@ class GraphAlgorithms:
                     self.graph.grid[new_row][new_col] = new_val
                     queue.append((new_row, new_col))
 
-    def min_spanning_tree_via_kruskals_and_heaps(self):  #needs test
+    def min_spanning_tree_via_kruskals_and_heaps(self): # tested
         """Computes mst of graph G stored in edge_list, space optimized via heap.
 
         Complexity per call: Time: O(|E|log |V|), Space: O(|E|) + Union_Find
@@ -178,16 +194,16 @@ class GraphAlgorithms:
         """
         heapify(self.graph.edge_list)
         ufds = UnionFindDisjointSets(self.graph.num_nodes)
-        min_spanning_tree = []
+        min_spanning_tree: TupleListMST = []
         while self.graph.edge_list and ufds.num_sets > 1:
             wt, u, v = heappop(self.graph.edge_list) # use w, uv = ... for single cord storage
             #v,u = uv%self.num_nodes, uv//self.num_nodes
             if not ufds.is_same_set(u, v):
                 min_spanning_tree.append((wt, u, v))
                 ufds.union_set(u, v)
-        self.mst_node_set = min_spanning_tree
+        self.mst_node_list = min_spanning_tree
         
-    def prims_visit_adj_matrix(self, u, not_visited, mst_best_dist, heap):
+    def prims_visit_adj_matrix(self, u: int, not_visited: Set[int], mst_best_dist: NumList, heap):
         """Find min weight edge in adjacency matrix implementation of prims.
 
         Complexity per call: Time: O(|V|), Space: O(1)
@@ -200,7 +216,7 @@ class GraphAlgorithms:
                 mst_best_dist[v] = wt
                 heappush(heap, (wt, v, u)) # fix this
     
-    def prims_visit_adj_list(self, u, not_visited, mst_best_dist, heap): #needs test
+    def prims_visit_adj_list(self, u: int, not_visited: BoolList, mst_best_dist: NumList, heap): # retest needed
         """Find min weight edge in adjacency list implementation of prims.
 
         Complexity per call: Time: O(|V|log |V|), Space: increase by O(|V|)
@@ -211,7 +227,7 @@ class GraphAlgorithms:
                 mst_best_dist[v] = wt
                 heappush(heap, (wt, v, u))
     
-    def min_spanning_tree_via_prims(self):  #needs test
+    def min_spanning_tree_via_prims(self): # retest needed
         """Computes mst of graph G stored in adj_list.
 
         Complexity: Time: O(|E|log |V|) or O(|V|^2), Space: O(|E|) or O(|V|^2)
@@ -227,15 +243,13 @@ class GraphAlgorithms:
                 self.prims_visit_adj_list(v, not_visited, mst_best_dist, heap)
                 min_spanning_tree.append((wt, v, u))
                 nodes_taken += 1
-        self.mst_node_set.sort()
+        self.mst_node_list.sort()
 
-    def breadth_first_search_vanilla_template(self, source): #needs test
+    def breadth_first_search_vanilla_template(self, source: int): # retest needed
         """Template for distance based bfs traversal from node source.
 
         Complexity per call: Time: O(|V| + |E|), Space: O(|V|)
         More uses: connectivity, shortest path on monotone weighted graphs
-        Input:
-            source: is the node we start from
         """
         distance = [UNVISITED] * self.graph.num_nodes
         queue, distance[source] = deque([source]), 0
@@ -247,7 +261,7 @@ class GraphAlgorithms:
                     queue.append(v)
         self.dist = distance
 
-    def topology_sort_via_tarjan_helper(self, u):
+    def topology_sort_via_tarjan_helper(self, u: int): # retest
         """Recursively explore unvisited graph via dfs.
 
         Complexity per call: Time: O(|V|), Space: O(|V|) at deepest point
@@ -256,22 +270,22 @@ class GraphAlgorithms:
         for v in self.graph.adj_list[u]:
             if self.visited[v] == UNVISITED:
                 self.topology_sort_via_tarjan_helper(v)
-        self.topo_sort_node_set.append(u)
+        self.topo_sort_node_list.append(u)
         
-    def topology_sort_via_tarjan(self):
+    def topology_sort_via_tarjan(self): # retest
         """Compute a topology sort via tarjan method, on adj_list.
 
         Complexity per call: Time: O(|V| + |E|), Space: O(|V|)
         More Uses: produces a DAG, topology sorted graph, build dependencies
         """
         self.visited = [UNVISITED] * self.graph.num_nodes
-        self.topo_sort_node_set = []
+        self.topo_sort_node_list = []
         for u in range(self.graph.num_nodes):
             if self.visited[u] == UNVISITED:
                 self.topology_sort_via_tarjan_helper(u)
-        self.topo_sort_node_set = self.topo_sort_node_set[::-1]
+        self.topo_sort_node_list = self.topo_sort_node_list[::-1]
 
-    def topology_sort_via_kahns(self):
+    def topology_sort_via_kahns(self): # retest
         """Compute a topology sort via kahn's method, on adj_list.
 
         Complexity per call: Time: O(|E|log|V|), Space: O(|V|)
@@ -292,6 +306,7 @@ class GraphAlgorithms:
                 in_degree[v] -= 1
                 if in_degree[v] <= 0:
                     heappush(heap, v)
+        self.topo_sort_node_list = topo_sort
 
     def amortized_heap_fix(self, heap):
         """Should we need |V| space this will ensure that while still being O(log|V|)"""
@@ -302,7 +317,7 @@ class GraphAlgorithms:
         heap = [(wt, v) for v, wt in enumerate(tmp) if wt != -1]
         heapify(heap)
 
-    def single_source_shortest_path_dijkstras(self, source, sink): #needs test
+    def single_source_shortest_path_dijkstras(self, source: int, sink: int=None): # retest
         """It is Dijkstra's pathfinder using heaps.
 
         Complexity per call: Time: O(|E|log |V|), Space: O(|V|)
@@ -313,14 +328,12 @@ class GraphAlgorithms:
         """
         distance, parents = [INF] * self.graph.num_nodes, [UNVISITED] * self.graph.num_nodes
         distance[source], parents[source] = 0, source
-        heap, limit = [(0, source)], 2**(int(log2(self.graph.num_nods)) + 4)
+        heap = [(0, source)]
         while heap:
-            # if len(heap) > limit:
-            #     self.amortized_heap_fix(heap)
             cur_dist, u = heappop(heap)
             if distance[u] < cur_dist:
                 continue
-            # if u == sink: return cur_dist #uncomment this line for fast return
+            # if u == sink: return cur_dist # uncomment this line for fast return
             for v, wt in self.graph.adj_list[u]:
                 if distance[v] > cur_dist + wt:
                     distance[v] = cur_dist + wt
@@ -329,7 +342,7 @@ class GraphAlgorithms:
         self.dist = distance
         self.parent = parents
     
-    def all_pairs_shortest_path_floyd_warshall(self): #needs test
+    def all_pairs_shortest_path_floyd_warshall(self): # tested
         """Computes essentially a matrix operation on a graph.
 
         Complexity per call: Time: O(|V|^3), Space: O(|V|^2)
@@ -351,9 +364,7 @@ class GraphAlgorithms:
                     if matrix[k][k] < 0 and matrix[i][k] != INF and matrix[k][j] != INF:
                         matrix[i][j] = -INF
 
-    def articulation_point_and_bridge_helper_via_dfs(self, u):
-        # need to rego over this and test it *** not as confident as the other code atm since have
-        # not really used it to solve a problem
+    def articulation_point_and_bridge_helper_via_dfs(self, u: int): # retest needed
         """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
         Complexity per call: Time: O(|E|), Space: O(|V|)
@@ -375,7 +386,7 @@ class GraphAlgorithms:
             elif v != self.parent[u]:
                 self.low_values[u] = min(self.low_values[u], self.visited[v])
 
-    def articulation_points_and_bridges_via_dfs(self):
+    def articulation_points_and_bridges_via_dfs(self): # retest needed
         """Generates the name on an adj_list based graph.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -390,7 +401,7 @@ class GraphAlgorithms:
                 self.articulation_point_and_bridge_helper_via_dfs(u)
                 self.articulation_nodes[self.dfs_root] = (self.root_children > 1)
 
-    def cycle_check_on_directed_graph_helper(self, u):
+    def cycle_check_on_directed_graph_helper(self, u: int): # retest needed
         """Recursion part of the dfs. It is modified to list various types of edges.
 
         Complexity per call: Time: O(|E|), Space: O(|V|) at deepest call
@@ -399,7 +410,7 @@ class GraphAlgorithms:
         """
         self.visited[u] = EXPLORED
         for v in self.graph.adj_list[u]:
-            edge_type = None
+            edge_type: int = TREE
             if self.visited[v] == UNVISITED:
                 edge_type = TREE
                 self.parent[v] = u
@@ -411,7 +422,7 @@ class GraphAlgorithms:
             self.directed_edge_type.append((u, v, edge_type))
         self.visited[u] = VISITED
 
-    def cycle_check_on_directed_graph(self):
+    def cycle_check_on_directed_graph(self): # retest needed
         """Determines if a graph is cyclic or acyclic via dfs.
 
         Complexity per call: Time: O(|E| + |V|),
@@ -424,21 +435,21 @@ class GraphAlgorithms:
             if self.visited[u] == UNVISITED:
                 self.cycle_check_on_directed_graph_helper(u)
   
-    def strongly_connected_components_of_graph_kosaraju_helper(self, u, pass_one):
+    def strongly_connected_components_of_graph_kosaraju_helper(self, u: int, pass_one: bool): # retest needed
         """Pass one explore G and build stack, Pass two mark the SCC regions on transposition of G.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
         """
         self.visited[u] = VISITED
         self.component_region[u] = self.region_num
-        neighbours = self.graph.adj_list[u] if pass_one else self.graph.adj_list_trans[u]
+        neighbours: IntList = self.graph.adj_list[u] if pass_one else self.graph.adj_list_trans[u]
         for v in neighbours:
             if self.visited[v] == UNVISITED:
                 self.strongly_connected_components_of_graph_kosaraju_helper(v, pass_one)
         if pass_one:
             self.decrease_finish_order.append(u)
 
-    def strongly_connected_components_of_graph_kosaraju(self):
+    def strongly_connected_components_of_graph_kosaraju(self):  # retest needed
         """Marks the SCC of a directed graph using Kosaraju's method.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -456,7 +467,7 @@ class GraphAlgorithms:
                 self.strongly_connected_components_of_graph_kosaraju_helper(u, False)
                 self.region_num += 1
     
-    def strongly_connected_components_of_graph_tarjans_helper(self, u):
+    def strongly_connected_components_of_graph_tarjans_helper(self, u: int): # retest needed
         """Recursive part of tarjan's, pre-order finds the SCC regions, marks regions post-order.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -473,12 +484,12 @@ class GraphAlgorithms:
         if self.low_values[u] == self.node_state[u]:
             self.region_num += 1
             while True:
-                v = self.nodes_on_stack.pop()
+                v: int = self.nodes_on_stack.pop()
                 self.visited[v], self.component_region[v] = UNVISITED, self.region_num
                 if u == v:
                     break
 
-    def strongly_connected_components_of_graph_tarjans(self):
+    def strongly_connected_components_of_graph_tarjans(self): # retest needed
         """Marks the SCC regions of a directed graph using tarjan's method.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -492,7 +503,7 @@ class GraphAlgorithms:
             if self.node_state[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
 
-    def bipartite_check_on_graph_helper(self, source, color):
+    def bipartite_check_on_graph_helper(self, source: int, color: IntList): # retest needed
         """Uses bfs to check if the graph region connected to source is bipartite.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -511,7 +522,7 @@ class GraphAlgorithms:
                     break
         return is_bipartite
 
-    def bipartite_check_on_graph(self):
+    def bipartite_check_on_graph(self): # retest needed
         """Checks if a graph has the bipartite property.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -526,7 +537,7 @@ class GraphAlgorithms:
         self.bipartite_colouring = color if is_bipartite else None
 
 
-    def max_flow_find_augmenting_path_helper(self, source, sink):
+    def max_flow_find_augmenting_path_helper(self, source: int, sink: int): # new, testing needed
         """Will check if augmenting path in the graph from source to sink exists via bfs.
 
         Complexity per call: Time: O(|E| + |V|), Space O(|V|)
@@ -550,7 +561,7 @@ class GraphAlgorithms:
         self.dist, self.parent = [], []
         return False
 
-    def send_flow_via_augmenting_path(self, source, sink, flow_in):
+    def send_flow_via_augmenting_path(self, source: int, sink: int, flow_in: Num): # testing needed
         """Function to recursively emulate sending a flow. returns min pushed flow.
 
         Complexity per call: Time: O(|V|), Space O(|V|)
@@ -570,7 +581,7 @@ class GraphAlgorithms:
         self.graph.edge_list[edge_ind ^ 1][2] -= pushed_flow
         return pushed_flow
 
-    def send_max_flow_via_dfs(self, u, sink, flow_in):
+    def send_max_flow_via_dfs(self, u: int, sink: int, flow_in: Num): # testing needed
         """Function to recursively emulate sending a flow via dfs. Returns min pushed flow.
 
         Complexity per call: Time: O(|E| * |V|), Space O(|V|)
@@ -595,7 +606,7 @@ class GraphAlgorithms:
                 return pushed_flow
         return 0
 
-    def max_flow_via_edmonds_karp(self, source, sink):
+    def max_flow_via_edmonds_karp(self, source: int, sink: int):
         """Compute max flow using edmonds karp's method.
 
         Complexity per call: Time: O(|V| * |E|^2), Space O(|V|)
@@ -609,7 +620,7 @@ class GraphAlgorithms:
             max_flow += flow
         return max_flow
 
-    def max_flow_via_dinic(self, source, sink):
+    def max_flow_via_dinic(self, source: int, sink: int):
         """Compute max flow using Dinic's method.
 
         Complexity per call: Time: O(|E| * |V|^2), Space O(|V|)
@@ -623,9 +634,6 @@ class GraphAlgorithms:
                 max_flow += flow
                 flow = self.send_max_flow_via_dfs(source, sink, INF)
         return max_flow
-
-    def dfs_bipartite_checker(self):
-        pass # find code for this later
 
 from math import isqrt, log, gcd, prod
 from itertools import takewhile
