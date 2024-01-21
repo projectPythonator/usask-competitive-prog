@@ -1080,6 +1080,7 @@ def pairwise(iterable):
 
 
 class Pt2d:
+    __slots__ = ("x", "y")
     def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
 
     def __add__(self, other): return Pt2d(self.x + other.x, self.y + other.y)
@@ -1124,16 +1125,17 @@ class Pt3d:
     def __hash__(self): return hash((self.x, self.y, self.z))
 
 class QuadEdge:
+    __slots__ = ("origin", "rot", "o_next", "used")
     def __init__(self):
-        self.origin = Pt2d(0, 0)
+        self.origin = None
         self.rot = None
         self.o_next = None
         self.used = False
 
     def rev(self): return self.rot.rot
-    def l_next(self): return self.rot.rev().o_next.rot
+    def l_next(self): return self.rot.rot.rot.o_next.rot
     def o_prev(self): return self.rot.o_next.rot
-    def dest(self): return self.rev().origin
+    def dest(self): return self.rot.rot.origin
 
 class QuadEdgeDataStructure:
     def __init__(self):
