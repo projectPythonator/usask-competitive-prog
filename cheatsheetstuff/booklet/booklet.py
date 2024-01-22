@@ -243,6 +243,7 @@ class GraphAlgorithms:
                 self.prims_visit_adj_list(v, not_visited, mst_best_dist, heap)
                 min_spanning_tree.append((wt, v, u))
                 nodes_taken += 1
+        self.mst_node_list = min_spanning_tree
         self.mst_node_list.sort()
 
     def breadth_first_search_vanilla_template(self, source: int): # retest needed
