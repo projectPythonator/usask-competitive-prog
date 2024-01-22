@@ -1089,7 +1089,9 @@ def pairwise(iterable):
 
 class Pt2d:
     __slots__ = ("x", "y")
-    def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
+    # def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
+
+    def __init__(self, x_val, y_val): self.x, self.y = x_val, y_val
 
     def __add__(self, other): return Pt2d(self.x + other.x, self.y + other.y)
     def __sub__(self, other): return Pt2d(self.x - other.x, self.y - other.y)
@@ -1156,8 +1158,8 @@ class QuadEdgeDataStructure:
         e4 = QuadEdge()
         e1.origin = in_pt
         e2.origin = out_pt
-        e3.origin = Pt2d(2 ** 63, 2 ** 63)
-        e4.origin = Pt2d(2 ** 63, 2 ** 63)
+        e3.origin = None
+        e4.origin = None
         e1.rot = e3
         e2.rot = e4
         e3.rot = e2
@@ -1175,10 +1177,10 @@ class QuadEdgeDataStructure:
     def delete_edge(self, edge):
         self.splice(edge, edge.o_prev())
         self.splice(edge.rev(), edge.rev().o_prev())
-        del edge.rot.rot.rot
-        del edge.rot.rot
-        del edge.rot
-        del edge
+        # del edge.rot.rot.rot
+        # del edge.rot.rot
+        # del edge.rot
+        # del edge
 
     def connect(self, a, b):
         e = self.make_edge(a.dest(), b.origin)
@@ -1856,17 +1858,21 @@ class GeometryAlgorithms:
         return ans
 
     def pt_left_of_edge(self, pt, edge):
+        """A helper function with a name to describe the action. Remove for speedup."""
         return CCW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
     def pt_right_of_edge(self, pt, edge):
+        """A helper function with a name to describe the action. Remove for speedup."""
         return CW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
     def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
+        """A helper function for determining the angle. Remove for speedup."""
         return (a1 * (b2 * c3 - c2 * b3) -
                 a2 * (b1 * c3 - c1 * b3) +
                 a3 * (b1 * c2 - c1 * b2))
 
     def is_in_circle(self, a, b, c, d):
+        """Expensive caclution function that determines if """
         a_dot = self.dot_product(a, a)
         b_dot = self.dot_product(b, b)
         c_dot = self.dot_product(c, c)
