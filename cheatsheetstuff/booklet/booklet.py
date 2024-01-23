@@ -2076,9 +2076,9 @@ class StringAlgorithms:
             for i in range(1, self.text_len):
                 suffix_1 = self.suffix_array[i]
                 suffix_2 = self.suffix_array[i - 1]
-                r = r if (self.rank_array[suffix_1] == self.rank_array[suffix_2] and 
-                          self.rank_array[suffix_1 + k] == self.rank_array[suffix_2 + k] else r + 1)
-                rank_array_temp[suffix_1] = r
+                rank = rank if (self.rank_array[suffix_1] == self.rank_array[suffix_2] and
+                                self.rank_array[suffix_1 + k] == self.rank_array[suffix_2 + k]) else rank + 1
+                rank_array_temp[suffix_1] = rank
             self.rank_array = [el for el in rank_array_temp]
 
     def suffix_array_check_from_ind(self, ind):
