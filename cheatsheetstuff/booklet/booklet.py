@@ -1976,10 +1976,13 @@ class GeometryAlgorithms:
         return sorted(list(set(ans)))
 
 
-class String_Algorithms:
+class StringAlgorithms:
     def __init__(self):
         self.n = 0
         self.text = ''
+        self.pattern = ''
+        self.back_table = []
+        self.pattern_len = 0
 
     def init_data(self, new_text):
         self.n = len(new_text)
@@ -2007,21 +2010,33 @@ class String_Algorithms:
         self.h_vals = [0] * self.text_len
         self.math_algos = MathAlgorithms()
 
-    def kmp_preprocess(self, target):
-        self.prepare_pattern_data(target)
-        self.back_table = [0] * (self.pattern_len + 1)
-        self.back_table[0], j = -1, -1
-        for i in range(self.pattern_len):
-            while j >= 0 and self.pattern[i] != self.pattern[j]:
-                j = self.back_table[j]
-            j += 1
-            self.back_table[i+1] = j
+    def kmp_preprocess(self, new_pattern):
+        """Preprocess the pattern for KMP. TODO add a bit more to this description ?
 
-    def kmp_search_find_indices(self):
-        ans = []
-        j = 0
-        for i in range(self.text_len):
-            while j >= 0 and self.text[i] != self.pattern[j]:
+        Complexity per call: Time O(m + m), Space: O(m)
+        """
+        pattern = new_pattern
+        pattern_len = len(pattern)  # m = length of pattern
+        back_table = [0] * (pattern_len + 1)
+        back_table[0], j = -1, -1
+        for i, character in enumerate(pattern):
+            while j >= 0 and character != pattern[j]:
+                j = back_table[j]
+            j += 1
+            back_table[i + 1] = j
+        self.pattern = pattern
+        self.pattern_len = pattern_len
+        self.back_table = back_table
+
+
+    def kmp_search_find_indices(self, text_to_search):
+        """Search the text for the pattern we preprocessed.
+
+        Complexity per call: Time O(n + m), Space: O(n + m)
+        """
+        ans, j = [], 0
+        for i, character in enumerate(text_to_search):
+            while j >= 0 and character != self.pattern[j]:
                 j = self.back_table[j]
             j += 1
             if j == self.pattern_len:
