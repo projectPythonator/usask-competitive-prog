@@ -2084,10 +2084,11 @@ class StringAlgorithms:
         Complexity per call: Time: O(nlog n), T(3n log n), Space: O(n), S(6n)
         Optimizations: remove take while, don't use list(map(ord, text)), remove the pairwise
         """
-        new_text = ''.join([txt+chr(i) for i, txt in enumerate(new_texts)])
+        num_strings = len(new_texts)
+        new_text = ''.join([txt + chr(num_strings - i) for i, txt in enumerate(new_texts)])
         self.text_len, new_len = len(new_text), len(new_text)
         suffix_arr, rank_arr = [i for i in range(new_len)], list(map(ord, new_text))
-        for power in takewhile(lambda x: 2**x < new_len, range(32)):  # iterate powers of 2
+        for power in takewhile(lambda x: 2 ** x < new_len, range(32)):  # iterate powers of 2
             k = 2 ** power
             self.suffix_array_counting_sort(k, suffix_arr, rank_arr)
             self.suffix_array_counting_sort(0, suffix_arr, rank_arr)
@@ -2098,9 +2099,11 @@ class StringAlgorithms:
                                 and rank_arr[curr + k] == rank_arr[last + k]) else rank + 1
                 rank_array_temp[curr] = rank
             rank_arr = rank_array_temp
+            if rank_arr[suffix_arr[-1]] == new_len - 1:
+                break
         self.suffix_array, self.text = suffix_arr, new_text
         self.text_ord = list(map(ord, new_text))  # optional line for searching in k log n
-        self.seperator_list = list(range(len(new_texts)))
+        self.seperator_list = [num_strings - i for i in range(len(new_texts))]  # optional owners
 
     def compute_longest_common_prefix(self):
         """After generating a suffix array you can use that to find the longest common pattern.
@@ -2108,8 +2111,8 @@ class StringAlgorithms:
         Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
         """
         local_suffix_array = self.suffix_array  # shortens the byte code, again they can be removed
-        local_text_len = self.text_len  # for faster implementations, they needed to exist
-        local_text_ord = self.text_ord  # before the function tho as globals or func params
+        local_text_len = self.text_len          # for faster implementations, they needed to exist
+        local_text_ord = self.text_ord          # before the function tho as globals or func params
         permuted_lcp, phi = [0] * local_text_len, [0] * local_text_len
         phi[0], left = -1, 0
         for last, curr in pairwise_func(local_suffix_array):
@@ -2180,31 +2183,36 @@ class StringAlgorithms:
         max_lcp = max(local_lcp)
         return max_lcp, local_lcp.index(max_lcp)
 
-    def owner(self, ind):
-        return 1 if ind < self.text_len - self.pattern_len - 1 else 2
-
     def compute_owners(self):
-        local_ord_arr = self.text_ord
+        """Used to compute the owners of each position in the text. O(n) time and space."""
+        local_ord_arr, local_suffix = self.text_ord, self.suffix_array
         local_owners = [0] * self.text_len
+        tmp_owner = [0] * self.text_len
         it = iter(self.seperator_list)
         seperator = next(it)
         for i, ord_value in enumerate(local_ord_arr):
-            local_owners[i] = seperator
+            tmp_owner[i] = seperator
             if ord_value == seperator:
                 seperator = next(it, None)
+        for i, suffix_i in enumerate(local_suffix):
+            local_owners[i] = tmp_owner[suffix_i]
         self.owner = local_owners
 
-
     def compute_longest_common_substring(self):
-        local_suffix_arr = self.suffix_array
+        """Computes the longest common substring between two strings. returns index, value pair.
 
-        ind, max_lcp = 0, -1
-
-        for i in range(1, self.text_len):
-            if (self.owner(self.suffix_array[i]) != self.owner(self.suffix_array[i - 1]) and
-                self.longest_common_prefix[i] > max_lcp):
-                ind, max_lcp = i, self.longest_common_prefix[i]
-        return (max_lcp, ind)
+        Complexity per call: Time: O(n), Space: O(1)
+        Pre-Requirements: owner, and longest_common_prefix must be built (also suffix array for lcp)
+        Variants: LCS pair from k strings, LCS between all k strings.
+        """
+        local_lcp = self.longest_common_prefix  # shortens the byte code, again they can be removed
+        local_owners = self.owner               # for faster implementations, they needed to exist
+        it = iter(local_lcp)
+        max_lcp_index, max_lcp_value = 0, next(it)
+        for i, lcp_value in enumerate(it, 1):
+            if local_owners[i] != local_owners[i - 1] and lcp_value > max_lcp_value:
+                max_lcp_index, max_lcp_value = i, lcp_value
+        return max_lcp_index, max_lcp_value
         
     def compute_rolling_hash(self, new_text):
         self.prepare_text_data(new_text)
