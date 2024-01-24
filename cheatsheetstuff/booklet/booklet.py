@@ -1081,11 +1081,10 @@ CW = -1  # clockwise
 CL = 0   # collinear
 EPS = 1e-12 # used in some spots
 
-def pairwise(iterable):
-    # pairwise('ABCDEFG') --> AB BC CD DE EF FG
-    a, b = tee(iterable)
-    next(b, None)
-    return zip(a, b)
+
+def pairwise(seq):
+    it = iter(seq); next(it)
+    return zip(iter(seq), it)
 
 
 class Pt2d:
@@ -1979,7 +1978,7 @@ class GeometryAlgorithms:
 ####################################################################################################
 
 
-from itertools import islice, takewhile, tee, pairwise
+from itertools import takewhile, tee, pairwise
 
 
 def pairwise_func(seq):
