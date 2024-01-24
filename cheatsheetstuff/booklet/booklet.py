@@ -2003,13 +2003,6 @@ class StringAlgorithms:
         self.pattern = new_pattern
         self.pattern_len = len(new_pattern)
 
-    def prepare_suffix_array_data(self, new_len):
-        self.text_len = new_len
-        self.counts_len = max(300, self.text_len)
-        self.suffix_array = [i for i in range(self.text_len)]
-        self.rank_arrary = [ord(self.text[i]) for i in range(self.text_len)]
-        self.powers_of_2 = [2**i for i in range(32) if 2**i < self.text_len]
-
     def prepare_rolling_hash_data(self):
         self.prime_p = 131
         self.mod_m = 10**9 - 7
@@ -2050,10 +2043,6 @@ class StringAlgorithms:
                 ans.append(1 + i - j)
                 j = self.back_table[j]
         return ans
-
-    def suffix_array_preprocess(self, new_text):
-        self.prepare_text_data(''.join([new_text, chr(0)*100010]))
-        self.epare_suffix_array_data(len(new_text) + 1)
 
     def suffix_array_counting_sort(self, k, s_array, r_array):
         """Basic count sort for the radix sorting part of suffix arrays.
