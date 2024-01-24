@@ -1976,12 +1976,19 @@ class GeometryAlgorithms:
         return sorted(list(set(ans)))
 
 
+####################################################################################################
+
+from itertools import accumulate, islice, takewhile
+
 class StringAlgorithms:
     def __init__(self):
+        self.text_len = 0
         self.n = 0
+        self.max_n = 2**20
         self.text = ''
         self.pattern = ''
         self.back_table = []
+        self.suffix_array = []
         self.pattern_len = 0
 
     def init_data(self, new_text):
@@ -2048,38 +2055,50 @@ class StringAlgorithms:
         self.prepare_text_data(''.join([new_text, chr(0)*100010]))
         self.epare_suffix_array_data(len(new_text) + 1)
 
-    def suffix_array_counting_sort(self, k):
-        suffix_array_temp = [0] * self.text_len
-        counts = [0] * self.counts_len
-        ind = 0
-        counts[0] = self.text_len - (self.text_len - k)
-        for i in range(self.text_len - k):
-            counts[self.rank_array[i + k]] += 1
-        for i in range(self.counts_len):
-            counts_i = counts[i]
-            counts[i] = ind
-            ind += counts_i
-        for i in range(self.text_len):
-            pos = 0
-            if self.suffix_array[i] + k < self.text_len:
-                pos = self.rank_array[self.suffix_array[i] + k]
-            suffix_array_temp[counts[pos]] = self.suffix_array[i]
-            counts[pos] += 1
-        self.suffix_array = [el for el in suffix_array_temp]
+    def suffix_array_counting_sort(self, k, s_array, r_array):
+        """Basic count sort for the radix sorting part of suffix arrays.
 
-    def suffix_array_build_array(self):
-        for k in self.powers_of_2:
-            self.suffix_array_counting_sort(k)
-            self.suffix_array_counting_sort(0)
-            rank_array_temp = [0] * self.text_len
+        Complexity per call. Time: O(n), T(6n), Space: O(n), S(2n)
+        Switching to non itertools versions and non enumerating version can speed it up.
+        """
+        n = self.text_len
+        suffix_array_temp = [0] * n
+        frequency_array = [0] * max(255, n)
+        frequency_array[0] = n - (n - k)  # this sets all the values to 1 of 0
+        for rank_value in islice(r_array, k, None):
+            frequency_array[rank_value] += 1
+        frequency_array = list(accumulate(frequency_array, initial=0))
+        for suffix_i in s_array:
+            pos = 0 if suffix_i + k >= n else r_array[suffix_i + k]
+            suffix_array_temp[frequency_array[pos]] = suffix_i
+            frequency_array[pos] += 1
+        for i, value in enumerate(suffix_array_temp):
+            s_array[i] = value
+
+    def suffix_array_build_array(self, new_text):
+        """Suffix array creation sets suffix array upon completion.
+
+        Complexity per call: Time: O(nlog n), T(3n log n), Space: O(n), S(6n)
+        Optimizations: remove take while, don't use list(map(ord, text))
+        """
+        new_text = new_text + chr(0)
+        self.text_len, new_len = len(new_text), len(new_text)
+        suffix_arr, rank_arr = [i for i in range(new_len)], list(map(ord, new_text))
+        for power in takewhile(lambda x: 2**x < new_len, range(32)):  # iterate powers of 2
+            k = 2 ** power
+            self.suffix_array_counting_sort(k, suffix_arr, rank_arr)
+            self.suffix_array_counting_sort(0, suffix_arr, rank_arr)
+            rank_array_temp = [0] * new_len
             rank = 0
             for i in range(1, self.text_len):
-                suffix_1 = self.suffix_array[i]
-                suffix_2 = self.suffix_array[i - 1]
-                rank = rank if (self.rank_array[suffix_1] == self.rank_array[suffix_2] and
-                                self.rank_array[suffix_1 + k] == self.rank_array[suffix_2 + k]) else rank + 1
-                rank_array_temp[suffix_1] = rank
-            self.rank_array = [el for el in rank_array_temp]
+                suffix_curr = suffix_arr[i]
+                suffix_last = suffix_arr[i - 1]
+                rank = rank if (rank_arr[suffix_curr] == rank_arr[suffix_last]
+                        and rank_arr[suffix_curr + k] == rank_arr[suffix_last + k]) else rank + 1
+                rank_array_temp[suffix_curr] = rank
+            rank_arr = rank_array_temp
+        self.suffix_array, self.text = suffix_arr, new_text
+
 
     def suffix_array_check_from_ind(self, ind):
         for i in range(self.pattern_len):
