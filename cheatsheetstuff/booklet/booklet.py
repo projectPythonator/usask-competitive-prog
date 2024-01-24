@@ -2205,8 +2205,8 @@ class StringAlgorithms:
         Pre-Requirements: owner, and longest_common_prefix must be built (also suffix array for lcp)
         Variants: LCS pair from k strings, LCS between all k strings.
         """
-        local_lcp = self.longest_common_prefix  # shortens the byte code, again they can be removed
-        local_owners = self.owner               # for faster implementations, they needed to exist
+        local_lcp = self.longest_common_prefix  # optional avoid expensive load_attr operation
+        local_owners = self.owner               # can be ignored to code faster
         it = iter(local_lcp)
         max_lcp_index, max_lcp_value = 0, next(it) - 1  # - 1 here since next(it) should return 0
         for i, lcp_value in enumerate(it, 1):
