@@ -2148,9 +2148,9 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
         """
-        local_suffix_array = self.suffix_array  # shortens the byte code
-        local_text_len = self.text_len          # again can remove for faster implementations
-        local_text_ord = self.text_ord
+        local_suffix_array = self.suffix_array  # shortens the byte code, again they can be removed
+        local_text_len = self.text_len          # for faster implementations, they needed to exist
+        local_text_ord = self.text_ord          # before the function tho as globals or func params
         permuted_lcp, phi = [0] * local_text_len, [0] * local_text_len
         phi[0], left = -1, 0
         for last, curr in pairwise_func(local_suffix_array):
