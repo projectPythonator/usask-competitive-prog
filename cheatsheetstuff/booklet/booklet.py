@@ -1,8 +1,8 @@
-from typing import List, Tuple, Set, Dict
+from typing import List, Tuple, Set
 from sys import setrecursionlimit
 
 
-type Num = int|float
+type Num = int | float
 type IntList = List[int]
 type FloatList = List[float]
 type BoolList = List[float]
@@ -1071,8 +1071,8 @@ class MathAlgorithms:
             self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
         return self.binomial[(n, k)]
 
+
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
-from itertools import tee
 # remember to sub stuff out for integer ops when you want only integers 
 # for ints need to change init, eq and
 # hard code these in for performance speedup
@@ -1978,7 +1978,7 @@ class GeometryAlgorithms:
 ####################################################################################################
 
 
-from itertools import takewhile, tee, pairwise
+from itertools import takewhile, pairwise
 
 
 def pairwise_func(seq):
