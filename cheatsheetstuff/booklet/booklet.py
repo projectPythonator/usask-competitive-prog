@@ -1993,9 +1993,11 @@ GREATER_THAN = 0
 
 class StringAlgorithms:
     def __init__(self):
+        self.math_algos = None
         self.text_len = 0
         self.pattern_len = 0
         self.n = 0
+        self.prime_p = self.mod_m = 0
         self.text = ''
         self.pattern = ''
         self.back_table = []
@@ -2005,6 +2007,8 @@ class StringAlgorithms:
         self.longest_common_prefix = []
         self.owner = []
         self.seperator_list = []
+        self.hash_powers = []
+        self.hash_h_values = []
 
     def init_data(self, new_text):
         self.n = len(new_text)
@@ -2088,7 +2092,7 @@ class StringAlgorithms:
         """
         num_strings = len(new_texts)
         new_text = ''.join([txt + chr(num_strings - i) for i, txt in enumerate(new_texts)])
-        self.text_len, new_len = len(new_text), len(new_text)
+        self.text_len = new_len = len(new_text)
         suffix_arr, rank_arr = [i for i in range(new_len)], [ord(c) for c in new_text]
         for power in takewhile(lambda x: 2 ** x < new_len, range(32)):  # iterate powers of 2
             k = 2 ** power
@@ -2214,16 +2218,22 @@ class StringAlgorithms:
         return max_lcp_index, max_lcp_value
         
     def compute_rolling_hash(self, new_text):
-        self.prepare_text_data(new_text)
-        self.prepare_rolling_hash_data()
-        self.powers[0] = 1
-        self.h_vals[0] = 0
-        for i in range(1, self.text_len):
-            self.powers[i] = (self.powers[i - 1] * self.prime_p) % self.mod_m
-        for i in range(self.text_len):
-            if i != 0:
-                self.h_vals[i] = self.h_vals[i - 1]
-            self.h_vals[i] = (self.h_vals[i] + (ord(self.text[i]) * self.powers[i]) % self.mod_m) % self.mod_m
+        """For a given text compute and store the rolling hash. we use the smallest prime lower than
+        2^30 since python gets slower after 2^30, p = 131 is a small prime below 256.
+
+        Complexity per call: Time: O(n), T(4n),  Space O(n), midcall S(6n), post call S(3n)
+        """
+        len_text, p, m = len(new_text), 131, 2**30 - 35  # p is prime m is the smallest prime < 2^30
+        h_vals, powers, ord_iter = [0] * len_text, [0] * len_text, map(ord, new_text)
+        powers[0], h_vals[0] = 1, 0
+        for i in range(1, len_text):
+            powers[i] = (powers[i - 1] * p) % m
+        for i, power in enumerate(powers):
+            h_vals[i] = ((h_vals[i-1] if i != 0 else 0) + (next(ord_iter) * power) % m) % m
+        self.text = new_text
+        self.hash_powers, self.hash_h_values = powers, h_vals
+        self.prime_p, self.mod_m, self.math_algos = p, m, MathAlgorithms()
+
 
     def hash_fast(self, l, r):
         if l == 0:
@@ -2233,7 +2243,9 @@ class StringAlgorithms:
         return ans
 
 
-
+import dis
+a = StringAlgorithms()
+dis.dis(a.compute_rolling_hash)
 
 
 
@@ -2327,9 +2339,6 @@ class Matrix:
             r = r * det[i][i]
         return r
 
-import dis
-a = StringAlgorithms()
-dis.dis(a.compute_longest_repeated_substring)
 
 
 
