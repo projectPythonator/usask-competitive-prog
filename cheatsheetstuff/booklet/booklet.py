@@ -2099,7 +2099,7 @@ class StringAlgorithms:
                                 and rank_arr[curr + k] == rank_arr[last + k]) else rank + 1
                 rank_array_temp[curr] = rank
             rank_arr = rank_array_temp
-            if rank_arr[suffix_arr[-1]] == new_len - 1:
+            if rank_arr[suffix_arr[-1]] == new_len - 1:  # exit loop early optimization
                 break
         self.suffix_array, self.text = suffix_arr, new_text
         self.text_ord = list(map(ord, new_text))  # optional line for searching in k log n
@@ -2124,7 +2124,7 @@ class StringAlgorithms:
             while (i + left < local_text_len
                    and phi_i + left < local_text_len
                    and local_text_ord[i + left] == local_text_ord[phi_i + left]):
-                left = left + 1
+                left += 1
             permuted_lcp[i] = left
             left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
         self.longest_common_prefix = [permuted_lcp[suffix] for suffix in local_suffix_array]
