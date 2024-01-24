@@ -2205,7 +2205,7 @@ class StringAlgorithms:
         local_lcp = self.longest_common_prefix  # shortens the byte code, again they can be removed
         local_owners = self.owner               # for faster implementations, they needed to exist
         it = iter(local_lcp)
-        max_lcp_index, max_lcp_value = 0, next(it)
+        max_lcp_index, max_lcp_value = 0, next(it) - 1  # - 1 here since next(it) should return 0
         for i, lcp_value in enumerate(it, 1):
             if lcp_value > max_lcp_value and local_owners[i] != local_owners[i - 1]:
                 max_lcp_index, max_lcp_value = i, lcp_value
