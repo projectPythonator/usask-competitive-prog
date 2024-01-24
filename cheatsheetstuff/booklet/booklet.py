@@ -2207,7 +2207,7 @@ class StringAlgorithms:
         it = iter(local_lcp)
         max_lcp_index, max_lcp_value = 0, next(it)
         for i, lcp_value in enumerate(it, 1):
-            if local_owners[i] != local_owners[i - 1] and lcp_value > max_lcp_value:
+            if lcp_value > max_lcp_value and local_owners[i] != local_owners[i - 1]:
                 max_lcp_index, max_lcp_value = i, lcp_value
         return max_lcp_index, max_lcp_value
         
