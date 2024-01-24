@@ -1982,10 +1982,10 @@ class GeometryAlgorithms:
 from itertools import accumulate, islice, takewhile, tee, pairwise
 
 
-def pairwise_func(iterable):
-    first, second = tee(iterable)
-    next(second)
-    return zip(first, second)
+def pairwise_func(seq):
+    it = iter(seq); next(it)
+    return zip(iter(seq), it)
+
 
 # constants can paste into code for speedup
 GREATER_EQUAL = -1
@@ -2168,11 +2168,16 @@ class StringAlgorithms:
         self.longest_common_prefix = [permuted_lcp[suffix] for suffix in local_suffix_array]
 
     def compute_longest_repeated_substring(self):
-        ind, max_lcp = 0, -1
-        for i in range(1, self.text_len):
-            if self.longest_common_prefix[i] > max_lcp:
-                ind, max_lcp = i, self.longest_common_prefix[i]
-        return (max_lcp, ind)
+        """The longest repeated substring is just the longest common pattern. Require lcp to be
+        computed already. Returns the first longest repeat pattern, so for other ones implement a
+        forloop.
+
+        Complexity per call: Time: O(n), T(2n), Space: O(1), S(1)
+
+        """
+        local_lcp = self.longest_common_prefix
+        max_lcp = max(local_lcp)
+        return max_lcp, local_lcp.index(max_lcp)
 
     def owner(self, ind):
         return 1 if ind < self.text_len - self.pattern_len - 1 else 2
@@ -2286,7 +2291,7 @@ class Matrix:
 
 import dis
 a = StringAlgorithms()
-dis.dis(a.suffix_array_compare_pattern_from_index)
+dis.dis(a.compute_longest_repeated_substring)
 
 class Matrix_Algorithhms:
     def __init__(self):
