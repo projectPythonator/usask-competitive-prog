@@ -2186,7 +2186,6 @@ class StringAlgorithms:
     def compute_owners(self):
         """Used to compute the owners of each position in the text. O(n) time and space."""
         local_ord_arr, local_suffix = self.text_ord, self.suffix_array
-        local_owners = [0] * self.text_len
         tmp_owner = [0] * self.text_len
         it = iter(self.seperator_list)
         seperator = next(it)
@@ -2194,9 +2193,7 @@ class StringAlgorithms:
             tmp_owner[i] = seperator
             if ord_value == seperator:
                 seperator = next(it, None)
-        for i, suffix_i in enumerate(local_suffix):
-            local_owners[i] = tmp_owner[suffix_i]
-        self.owner = local_owners
+        self.owner = [tmp_owner[suffix_i] for suffix_i in local_suffix]
 
     def compute_longest_common_substring(self):
         """Computes the longest common substring between two strings. returns index, value pair.
