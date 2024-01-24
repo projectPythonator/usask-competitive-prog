@@ -2002,6 +2002,8 @@ class StringAlgorithms:
         self.text_ord = []
         self.pattern_ord = []
         self.longest_common_prefix = []
+        self.owner = []
+        self.seperator_list = []
 
     def init_data(self, new_text):
         self.n = len(new_text)
@@ -2076,13 +2078,13 @@ class StringAlgorithms:
         for i, value in enumerate(suffix_array_temp):
             s_array[i] = value
 
-    def suffix_array_build_array(self, new_text):
-        """Suffix array creation sets suffix array upon completion.
+    def suffix_array_build_array(self, new_texts):
+        """Suffix array construction on a list of texts. n = sum lengths of all the texts.
 
         Complexity per call: Time: O(nlog n), T(3n log n), Space: O(n), S(6n)
         Optimizations: remove take while, don't use list(map(ord, text)), remove the pairwise
         """
-        new_text = new_text + chr(0)
+        new_text = ''.join([txt+chr(i) for i, txt in enumerate(new_texts)])
         self.text_len, new_len = len(new_text), len(new_text)
         suffix_arr, rank_arr = [i for i in range(new_len)], list(map(ord, new_text))
         for power in takewhile(lambda x: 2**x < new_len, range(32)):  # iterate powers of 2
@@ -2098,7 +2100,31 @@ class StringAlgorithms:
             rank_arr = rank_array_temp
         self.suffix_array, self.text = suffix_arr, new_text
         self.text_ord = list(map(ord, new_text))  # optional line for searching in k log n
+        self.seperator_list = list(range(len(new_texts)))
 
+    def compute_longest_common_prefix(self):
+        """After generating a suffix array you can use that to find the longest common pattern.
+
+        Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
+        """
+        local_suffix_array = self.suffix_array  # shortens the byte code, again they can be removed
+        local_text_len = self.text_len  # for faster implementations, they needed to exist
+        local_text_ord = self.text_ord  # before the function tho as globals or func params
+        permuted_lcp, phi = [0] * local_text_len, [0] * local_text_len
+        phi[0], left = -1, 0
+        for last, curr in pairwise_func(local_suffix_array):
+            phi[curr] = last
+        for i, phi_i in enumerate(phi):
+            if phi_i == -1:
+                permuted_lcp[i] = 0
+                continue
+            while (i + left < local_text_len
+                   and phi_i + left < local_text_len
+                   and local_text_ord[i + left] == local_text_ord[phi_i + left]):
+                left = left + 1
+            permuted_lcp[i] = left
+            left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
+        self.longest_common_prefix = [permuted_lcp[suffix] for suffix in local_suffix_array]
 
     def suffix_array_compare_from_index(self, offset):
         """C style string compare to compare 0 is equal 1 is greater than -1 is less than.
@@ -2111,7 +2137,6 @@ class StringAlgorithms:
             if num_char != local_text_ord[offset + i]:
                 return -1 if num_char < local_text_ord[offset + i] else 1
         return 0
-
 
     def suffix_array_binary_search(self, lo, hi, comp_val):
         """Standard binary search. comp_val allows us to select how strict we are, > vs >=
@@ -2143,37 +2168,13 @@ class StringAlgorithms:
             hi -= 1
         return lo, hi
 
-    def compute_longest_common_prefix(self):
-        """After generating a suffix array you can use that to find the longest common pattern.
-
-        Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
-        """
-        local_suffix_array = self.suffix_array  # shortens the byte code, again they can be removed
-        local_text_len = self.text_len          # for faster implementations, they needed to exist
-        local_text_ord = self.text_ord          # before the function tho as globals or func params
-        permuted_lcp, phi = [0] * local_text_len, [0] * local_text_len
-        phi[0], left = -1, 0
-        for last, curr in pairwise_func(local_suffix_array):
-            phi[curr] = last
-        for i, phi_i in enumerate(phi):
-            if phi_i == -1:
-                permuted_lcp[i] = 0
-                continue
-            while (i + left < local_text_len
-                   and phi_i + left < local_text_len
-                   and local_text_ord[i + left] == local_text_ord[phi_i + left]):
-                left = left + 1
-            permuted_lcp[i] = left
-            left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
-        self.longest_common_prefix = [permuted_lcp[suffix] for suffix in local_suffix_array]
-
     def compute_longest_repeated_substring(self):
         """The longest repeated substring is just the longest common pattern. Require lcp to be
         computed already. Returns the first longest repeat pattern, so for other ones implement a
         forloop.
 
-        Complexity per call: Time: O(n), T(2n), Space: O(1), S(1)
-
+        Complexity per call: Time: O(n), T(2n), Space: O(1)
+        for optimization implement the physical forloop itself, however it's still O(n).
         """
         local_lcp = self.longest_common_prefix
         max_lcp = max(local_lcp)
@@ -2182,8 +2183,23 @@ class StringAlgorithms:
     def owner(self, ind):
         return 1 if ind < self.text_len - self.pattern_len - 1 else 2
 
+    def compute_owners(self):
+        local_ord_arr = self.text_ord
+        local_owners = [0] * self.text_len
+        it = iter(self.seperator_list)
+        seperator = next(it)
+        for i, ord_value in enumerate(local_ord_arr):
+            local_owners[i] = seperator
+            if ord_value == seperator:
+                seperator = next(it, None)
+        self.owner = local_owners
+
+
     def compute_longest_common_substring(self):
+        local_suffix_arr = self.suffix_array
+
         ind, max_lcp = 0, -1
+
         for i in range(1, self.text_len):
             if (self.owner(self.suffix_array[i]) != self.owner(self.suffix_array[i - 1]) and
                 self.longest_common_prefix[i] > max_lcp):
@@ -2208,6 +2224,21 @@ class StringAlgorithms:
         ans = ((self.h_vals[r] - self.h_vals[l - 1]) % self.mod_m + self.mod_m) % self.mod_m
         ans = (ans * self.math_algos.mod_inverse(self.powers[l], self.mod_m)) % self.mod_m
         return ans
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Matrix:
     def __init__(self, n, m):
@@ -2292,6 +2323,22 @@ class Matrix:
 import dis
 a = StringAlgorithms()
 dis.dis(a.compute_longest_repeated_substring)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 class Matrix_Algorithhms:
     def __init__(self):
