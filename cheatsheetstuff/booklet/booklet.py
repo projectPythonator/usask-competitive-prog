@@ -1978,7 +1978,14 @@ class GeometryAlgorithms:
 
 ####################################################################################################
 
-from itertools import accumulate, islice, takewhile
+
+from itertools import accumulate, islice, takewhile, tee, pairwise
+
+
+def pairwise_func(iterable):
+    first, second = tee(iterable)
+    next(second)
+    return zip(first, second)
 
 # constants can paste into code for speedup
 GREATER_EQUAL = -1
@@ -2073,7 +2080,7 @@ class StringAlgorithms:
         """Suffix array creation sets suffix array upon completion.
 
         Complexity per call: Time: O(nlog n), T(3n log n), Space: O(n), S(6n)
-        Optimizations: remove take while, don't use list(map(ord, text))
+        Optimizations: remove take while, don't use list(map(ord, text)), remove the pairwise
         """
         new_text = new_text + chr(0)
         self.text_len, new_len = len(new_text), len(new_text)
@@ -2084,12 +2091,10 @@ class StringAlgorithms:
             self.suffix_array_counting_sort(0, suffix_arr, rank_arr)
             rank_array_temp = [0] * new_len
             rank = 0
-            for i in range(1, self.text_len):
-                suffix_curr = suffix_arr[i]
-                suffix_last = suffix_arr[i - 1]
-                rank = rank if (rank_arr[suffix_curr] == rank_arr[suffix_last]
-                        and rank_arr[suffix_curr + k] == rank_arr[suffix_last + k]) else rank + 1
-                rank_array_temp[suffix_curr] = rank
+            for last, curr in pairwise_func(suffix_arr):  # suffix[i] = curr, suffix[i - 1] last
+                rank = rank if (rank_arr[curr] == rank_arr[last]
+                                and rank_arr[curr + k] == rank_arr[last + k]) else rank + 1
+                rank_array_temp[curr] = rank
             rank_arr = rank_array_temp
         self.suffix_array, self.text = suffix_arr, new_text
         self.text_ord = list(map(ord, new_text))  # optional line for searching in k log n
@@ -2139,12 +2144,16 @@ class StringAlgorithms:
         return lo, hi
 
     def compute_longest_common_prefix(self):
-        permuted_lcp = [0] * self.text_len
-        phi = [0] * self.text_len
-        l = 0
-        phi[0] = -1
-        for i in range(1, self.text_len):
-            phi[self.suffix_array[i]] = self.suffix_array[i - 1]
+        """After generating a suffix array you can use that to find the longest common pattern.
+
+        Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
+        """
+        local_suffix_array = self.suffix_array  # shortens the byte code
+        local_text_len = self.text_len          # again can remove for faster implementations
+        permuted_lcp, phi = [0] * local_text_len, [0] * local_text_len
+        phi[0], left = -1, 0
+        for last, curr in pairwise_func(local_suffix_array):
+            phi[curr] = last
         for i in range(self.text_len):
             if phi[i] == -1:
                 permuted_lcp[i] = 0
@@ -2155,7 +2164,7 @@ class StringAlgorithms:
                 l += 1
             permuted_lcp[i] = l
             l = max(l - 1, 0)
-        self.longest_common_prefix = [permuted_lcp[el] for el in self.suffix_array]
+        self.longest_common_prefix = [permuted_lcp[el] for el in local_suffix_array]
 
     def compute_longest_repeated_substring(self):
         ind, max_lcp = 0, -1
