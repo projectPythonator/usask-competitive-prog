@@ -1980,16 +1980,21 @@ class GeometryAlgorithms:
 
 from itertools import accumulate, islice, takewhile
 
+# constants can paste into code for speedup
+GREATER_EQUAL = -1
+GREATER_THAN = 0
 class StringAlgorithms:
     def __init__(self):
         self.text_len = 0
+        self.pattern_len = 0
         self.n = 0
-        self.max_n = 2**20
         self.text = ''
         self.pattern = ''
         self.back_table = []
         self.suffix_array = []
-        self.pattern_len = 0
+        self.text_ord = []
+        self.pattern_ord = []
+        self.longest_common_prefix = []
 
     def init_data(self, new_text):
         self.n = len(new_text)
@@ -2087,30 +2092,51 @@ class StringAlgorithms:
                 rank_array_temp[suffix_curr] = rank
             rank_arr = rank_array_temp
         self.suffix_array, self.text = suffix_arr, new_text
+        self.text_ord = list(map(ord, new_text))  # optional line for searching in k log n
 
 
-    def suffix_array_check_from_ind(self, ind):
-        for i in range(self.pattern_len):
-            if self.pattern[i] != self.text[ind + i]:
-                return 1 if ord(self.text[ind + i]) > ord(self.pattern[i]) else -1
+    def suffix_array_compare_from_index(self, offset):
+        """C style string compare to compare 0 is equal 1 is greater than -1 is less than.
+
+        Complexity per call: Time: O(k) len of pattern, Space: O(1)
+        """
+        local_text_ord = self.text_ord        # produces shorter disassembly code
+        local_pattern_ord = self.pattern_ord  # ignore for faster coding
+        for i, num_char in enumerate(local_pattern_ord):
+            if num_char != local_text_ord[offset + i]:
+                return -1 if num_char < local_text_ord[offset + i] else 1
         return 0
 
+
     def suffix_array_binary_search(self, lo, hi, comp_val):
+        """Standard binary search. comp_val allows us to select how strict we are, > vs >=
+
+        Complexity per call: Time: O(k log n) len of pattern, Space: O(1)
+        """
+        local_suffix_arr = self.suffix_array
         while lo < hi:
-            mid = (lo + hi)//2
-            lo, hi = lo, mid if self.suffix_array_check_from_ind(self.suffix_array[mid]) > comp_val \
-                            else mid + 1, hi
+            mid = (lo + hi) // 2
+            if self.suffix_array_compare_from_index(local_suffix_arr[mid]) > comp_val:
+                hi = mid
+            else:
+                lo = mid + 1
         return lo, hi
 
     def suffix_array_string_matching(self, new_pattern):
-        self.prepare_text_data(new_pattern)
-        lo, _ = self.suffix_array_binary_search(0, self.text_len - 1, -1)
-        if self.suffix_array_check_from_ind(self.suffix_array[lo]) != 0:
-            return (-1, -1)
-        _, hi = self.suffix_array_binary_search(lo, self.text_len - 1, 0)
-        if self.suffix_array_check_from_ind(self.suffix_array[hi]) != 0:
+        """Utilizing the suffix array we can search efficiently for a pattern. gives first and last
+        index found for patterns.
+
+        Complexity per call: Time: O(k log n), T(2(k log n)), Space: O(k)
+        """
+        local_suffix_array = self.suffix_array  # produces shorter disassembly code, can ignore :)
+        self.pattern_ord = list(map(ord, new_pattern))  # this line helps avoid repeated ord calls
+        lo, _ = self.suffix_array_binary_search(0, self.text_len - 1, GREATER_EQUAL)
+        if self.suffix_array_compare_from_index(local_suffix_array[lo]) != 0:
+            return -1, -1
+        _, hi = self.suffix_array_binary_search(lo, self.text_len - 1, GREATER_THAN)
+        if self.suffix_array_compare_from_index(local_suffix_array[hi]) != 0:
             hi -= 1
-        return (lo, hi)
+        return lo, hi
 
     def compute_longest_common_prefix(self):
         permuted_lcp = [0] * self.text_len
@@ -2247,6 +2273,10 @@ class Matrix:
                     r = -r
             r = r * det[i][i]
         return r
+
+import dis
+a = StringAlgorithms()
+dis.dis(a.suffix_array_compare_pattern_from_index)
 
 class Matrix_Algorithhms:
     def __init__(self):
