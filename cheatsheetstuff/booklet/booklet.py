@@ -2150,21 +2150,22 @@ class StringAlgorithms:
         """
         local_suffix_array = self.suffix_array  # shortens the byte code
         local_text_len = self.text_len          # again can remove for faster implementations
+        local_text_ord = self.text_ord
         permuted_lcp, phi = [0] * local_text_len, [0] * local_text_len
         phi[0], left = -1, 0
         for last, curr in pairwise_func(local_suffix_array):
             phi[curr] = last
-        for i in range(self.text_len):
-            if phi[i] == -1:
+        for i, phi_i in enumerate(phi):
+            if phi_i == -1:
                 permuted_lcp[i] = 0
                 continue
-            while (i + l < self.text_len and 
-                   phi[i] + l < self.text_len and 
-                   self.text[i + l] == self.text[phi[i] + l]):
-                l += 1
-            permuted_lcp[i] = l
-            l = max(l - 1, 0)
-        self.longest_common_prefix = [permuted_lcp[el] for el in local_suffix_array]
+            while (i + left < local_text_len
+                   and phi_i + left < local_text_len
+                   and local_text_ord[i + left] == local_text_ord[phi_i + left]):
+                left = left + 1
+            permuted_lcp[i] = left
+            left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
+        self.longest_common_prefix = [permuted_lcp[suffix] for suffix in local_suffix_array]
 
     def compute_longest_repeated_substring(self):
         ind, max_lcp = 0, -1
