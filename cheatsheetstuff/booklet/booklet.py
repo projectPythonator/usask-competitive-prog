@@ -1979,7 +1979,7 @@ class GeometryAlgorithms:
 ####################################################################################################
 
 
-from itertools import accumulate, islice, takewhile, tee, pairwise
+from itertools import islice, takewhile, tee, pairwise
 
 
 def pairwise_func(seq):
@@ -1990,6 +1990,8 @@ def pairwise_func(seq):
 # constants can paste into code for speedup
 GREATER_EQUAL = -1
 GREATER_THAN = 0
+
+
 class StringAlgorithms:
     def __init__(self):
         self.text_len = 0
@@ -2065,12 +2067,13 @@ class StringAlgorithms:
         Switching to non itertools versions and non enumerating version can speed it up.
         """
         n = self.text_len
-        suffix_array_temp = [0] * n
-        frequency_array = [0] * max(255, n)
-        frequency_array[0] = n - (n - k)  # this sets all the values to 1 of 0
-        for rank_value in islice(r_array, k, None):
-            frequency_array[rank_value] += 1
-        frequency_array = list(accumulate(frequency_array, initial=0))
+        maxi, tmp = max(255, n), 0
+        suffix_array_temp, frequency_array = [0] * n, [0] * maxi
+        frequency_array[0] = n - (n - k)  # allows us to skip k values, handled in the second loop
+        for i in range(k, n):             # here we skip those k iterations
+            frequency_array[r_array[i]] += 1
+        for i in range(maxi):
+            frequency_array[i], tmp = tmp, tmp + frequency_array[i]
         for suffix_i in s_array:
             pos = 0 if suffix_i + k >= n else r_array[suffix_i + k]
             suffix_array_temp[frequency_array[pos]] = suffix_i
@@ -2087,7 +2090,7 @@ class StringAlgorithms:
         num_strings = len(new_texts)
         new_text = ''.join([txt + chr(num_strings - i) for i, txt in enumerate(new_texts)])
         self.text_len, new_len = len(new_text), len(new_text)
-        suffix_arr, rank_arr = [i for i in range(new_len)], list(map(ord, new_text))
+        suffix_arr, rank_arr = [i for i in range(new_len)], [ord(c) for c in new_text]
         for power in takewhile(lambda x: 2 ** x < new_len, range(32)):  # iterate powers of 2
             k = 2 ** power
             self.suffix_array_counting_sort(k, suffix_arr, rank_arr)
@@ -2102,7 +2105,7 @@ class StringAlgorithms:
             if rank_arr[suffix_arr[-1]] == new_len - 1:  # exit loop early optimization
                 break
         self.suffix_array, self.text = suffix_arr, new_text
-        self.text_ord = list(map(ord, new_text))  # optional line for searching in k log n
+        self.text_ord = [ord(c) for c in new_text]  # optional used in the binary search
         self.seperator_list = [num_strings - i for i in range(len(new_texts))]  # optional owners
 
     def compute_longest_common_prefix(self):
@@ -2110,9 +2113,9 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
         """
-        local_suffix_array = self.suffix_array  # shortens the byte code, again they can be removed
-        local_text_len = self.text_len          # for faster implementations, they needed to exist
-        local_text_ord = self.text_ord          # before the function tho as globals or func params
+        local_suffix_array = self.suffix_array  # optional, avoids expensive load_attr operation
+        local_text_len = self.text_len          # ignore for faster implementations, and place it
+        local_text_ord = self.text_ord          # directly in the code
         permuted_lcp, phi = [0] * local_text_len, [0] * local_text_len
         phi[0], left = -1, 0
         for last, curr in pairwise_func(local_suffix_array):
@@ -2134,8 +2137,8 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(k) len of pattern, Space: O(1)
         """
-        local_text_ord = self.text_ord        # produces shorter disassembly code
-        local_pattern_ord = self.pattern_ord  # ignore for faster coding
+        local_text_ord = self.text_ord        # optional for avoiding expensive load_attr operation
+        local_pattern_ord = self.pattern_ord  # ignore for faster implementation of the code
         for i, num_char in enumerate(local_pattern_ord):
             if num_char != local_text_ord[offset + i]:
                 return -1 if num_char < local_text_ord[offset + i] else 1
@@ -2161,8 +2164,8 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(k log n), T(2(k log n)), Space: O(k)
         """
-        local_suffix_array = self.suffix_array  # produces shorter disassembly code, can ignore :)
-        self.pattern_ord = list(map(ord, new_pattern))  # this line helps avoid repeated ord calls
+        local_suffix_array = self.suffix_array  # optional avoid expensive load_attr operation
+        self.pattern_ord = [ord(c) for c in new_pattern]  # line helps avoid repeated ord calls
         lo, _ = self.suffix_array_binary_search(0, self.text_len - 1, GREATER_EQUAL)
         if self.suffix_array_compare_from_index(local_suffix_array[lo]) != 0:
             return -1, -1
@@ -2185,7 +2188,7 @@ class StringAlgorithms:
 
     def compute_owners(self):
         """Used to compute the owners of each position in the text. O(n) time and space."""
-        local_ord_arr, local_suffix = self.text_ord, self.suffix_array
+        local_ord_arr, local_suffix = self.text_ord, self.suffix_array  # optional avoids load_attr
         tmp_owner = [0] * self.text_len
         it = iter(self.seperator_list)
         seperator = next(it)
