@@ -1,4 +1,3 @@
-import string
 from typing import List, Tuple, Set
 from sys import setrecursionlimit
 
@@ -14,6 +13,8 @@ type EdgeTypeList = List[Tuple[int, int, int]]
 
 
 setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
+
+
 class UnionFindDisjointSets:
     """This Data structure is for none directional disjoint sets."""
     def __init__(self, n):
@@ -50,21 +51,35 @@ class UnionFindDisjointSets:
             self.parent[u_parent] = v_parent                     # this line joins u with v
             if self.rank[u_parent] == self.rank[v_parent]:       # an optional speedup
                 self.rank[v_parent] += 1
-            self.set_sizes[v_parent] += self.set_sizes[u_parent] # u -> v so add size_u to size_v
+            self.set_sizes[v_parent] += self.set_sizes[u_parent]  # u -> v so add size_u to size_v
             self.num_sets -= 1
 
-    def size_of_u(self, u): #optional information
+    def size_of_u(self, u):  # optional information
         """Gives you the size of set u. TIME and SPACE Complexity is the same as find_set"""
         return self.set_sizes[self.find_set(u)]
 
-######################################################################################
+
+####################################################################################################
 
 # from math import log2
 from collections import deque
 from heapq import heappush, heappop, heapify
 from sys import setrecursionlimit
 
-setrecursionlimit(100000)
+setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
+
+
+INF: int = 2**31
+# turn these into enums later
+UNVISITED: int = -1
+EXPLORED: int = -2
+VISITED: int = -3
+# turn these into enums later
+TREE: int = 0
+BIDIRECTIONAL: int = 1
+BACK: int = 2
+FORWARD: int = 3
+
 
 class Graph:
     def __init__(self, v: int, e: int, r=None, c=None):
@@ -74,7 +89,7 @@ class Graph:
         self.num_cols: int = c
 
         self.adj_list = []
-        self.adj_list_trans = [] # for topological sort
+        self.adj_list_trans = []  # for topological sort
         self.adj_matrix = []
         self.edge_list = []
         self.grid = []
@@ -86,26 +101,26 @@ class Graph:
         """Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair, then return u."""
         if data not in self.data_to_code:
             self.data_to_code[data] = len(self.code_to_data)
-            self.code_to_data.append(data) # can be replaced with a count variable if space needed
+            self.code_to_data.append(data)  # can be replaced with a count variable if space needed
         return self.data_to_code[data]
 
-    def add_edge_u_v_wt_into_directed_graph(self, u: int, v: int, wt: Num=None, data: Num =None):
+    def add_edge_u_v_wt_into_directed_graph(self, u: int, v: int, wt: Num, data: Num):
         """A pick and choose function will convert u, v into index form then add it to the structure
         you choose.
         """
-        u: int = self.convert_data_to_code(u) # omit if u,v is in the form: int u | 0 <= u < |V|
-        v: int = self.convert_data_to_code(v) # omit if u,v is in the form: int u | 0 <= u < |V|
+        u: int = self.convert_data_to_code(u)  # omit if u,v is in the form: int u | 0 <= u < |V|
+        v: int = self.convert_data_to_code(v)  # omit if u,v is in the form: int u | 0 <= u < |V|
 
         self.adj_list[u].append(v)
-        # self.adj_list[u].append((v, wt))    # Adjacency list usage with weights
+        # self.adj_list[u].append((v, wt))  # Adjacency list usage with weights
         self.adj_matrix[u][v] = wt          # Adjacency matrix usage
         self.edge_list.append((wt, u, v))   # Edge list usage
         # the following lines come as a pair-set used in max flow algorithm and are used in tandem.
         self.edge_list.append([v, wt, data])
         self.adj_list[u].append(len(self.edge_list) - 1)
 
-    def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: int|float=None):
-        """undirected graph version of the previous function"""
+    def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: int | float):
+        """undirected graph version of the previous function. wt can be omitted if not used."""
         self.add_edge_u_v_wt_into_undirected_graph(u, v, wt)
         self.add_edge_u_v_wt_into_undirected_graph(v, u, wt)
 
@@ -114,24 +129,14 @@ class Graph:
         self.num_cols = len(new_grid[0])
         self.grid = [[self.convert_data_to_code(el) for el in row] for row in new_grid]
 
-INF: int = 2**31
-# turn these into enums later
-UNVISITED: int = -1
-EXPLORED: int  = -2
-VISITED: int   = -3
-# turn these into enums later
-TREE: int = 0
-BIDIRECTIONAL: int = 1
-BACK: int = 2
-FORWARD: int = 3
 
 class GraphAlgorithms:
     def __init__(self, new_graph):
         self.graph: Graph = new_graph
-        self.dfs_counter: int   = 0
-        self.dfs_root: int      = 0
+        self.dfs_counter: int = 0
+        self.dfs_root: int = 0
         self.root_children: int = 0
-        self.region_num: int    = 0
+        self.region_num: int = 0
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.mst_node_list: TupleListMST = []
@@ -142,17 +147,17 @@ class GraphAlgorithms:
         self.low_values: IntList = []
         self.articulation_nodes: BoolList = []
         self.bridge_edges: EdgeTupleList = []
-        self.directed_edge_type: EdgeTypeList = [] # change last int to enum sometime
+        self.directed_edge_type: EdgeTypeList = []  # change last int to enum sometime
         self.component_region: IntList = []
         self.decrease_finish_order: IntList = []
         self.nodes_on_stack: IntList = []
-        self.node_state: IntList = [] # change to enum type sometime
+        self.node_state: IntList = []  # change to enum type sometime
         self.bipartite_colouring: BoolList = []
         self.last: IntList = []
 
-    def flood_fill_via_dfs(self, row: int, col: int, old_val: object, new_val: object): # retest needed
+    def flood_fill_via_dfs(self, row: int, col: int, old_val: object, new_val: object):
         """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
-
+        TODO RETEST
         Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
         More uses: Region Colouring, Connectivity, Area/island Size, misc
         Input
@@ -167,9 +172,9 @@ class GraphAlgorithms:
                     and self.graph.grid[new_row][new_col] == old_val):
                 self.flood_fill_via_dfs(new_row, new_col, old_val, new_val)
 
-    def flood_fill_via_bfs(self, start_row: int, start_col: int, old_val: object, new_val: object): # retest needed
+    def flood_fill_via_bfs(self, start_row: int, start_col: int, old_val: object, new_val: object):
         """Computes flood fill graph traversal via breadth first search. Use on grid graphs.
-
+        TODO RETEST
         Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
         More uses: previous uses tplus shortest connected pah
         """
@@ -179,12 +184,12 @@ class GraphAlgorithms:
             for row_mod, col_mod in self.dir_rc:
                 new_row, new_col = row + row_mod, col + col_mod
                 if (0 <= new_row < self.graph.num_rows
-                    and 0 <= new_col < self.graph.num_cols
-                    and self.graph.grid[new_row][new_col] == old_val):
+                        and 0 <= new_col < self.graph.num_cols
+                        and self.graph.grid[new_row][new_col] == old_val):
                     self.graph.grid[new_row][new_col] = new_val
                     queue.append((new_row, new_col))
 
-    def min_spanning_tree_via_kruskals_and_heaps(self): # tested
+    def min_spanning_tree_via_kruskals_and_heaps(self):  # tested
         """Computes mst of graph G stored in edge_list, space optimized via heap.
 
         Complexity per call: Time: O(|E|log |V|), Space: O(|E|) + Union_Find
@@ -197,8 +202,8 @@ class GraphAlgorithms:
         ufds = UnionFindDisjointSets(self.graph.num_nodes)
         min_spanning_tree: TupleListMST = []
         while self.graph.edge_list and ufds.num_sets > 1:
-            wt, u, v = heappop(self.graph.edge_list) # use w, uv = ... for single cord storage
-            #v,u = uv%self.num_nodes, uv//self.num_nodes
+            wt, u, v = heappop(self.graph.edge_list)  # use w, uv = ... for single cord storage
+            # v,u = uv%self.num_nodes, uv//self.num_nodes
             if not ufds.is_same_set(u, v):
                 min_spanning_tree.append((wt, u, v))
                 ufds.union_set(u, v)
@@ -206,20 +211,19 @@ class GraphAlgorithms:
         
     def prims_visit_adj_matrix(self, u: int, not_visited: Set[int], mst_best_dist: NumList, heap):
         """Find min weight edge in adjacency matrix implementation of prims.
-
+        TODO: FIX TO NOT USE HEAPS
         Complexity per call: Time: O(|V|), Space: O(1)
         """
-        # NEEDS FIXING 
         not_visited.remove(u)
         for v in not_visited:
             wt = self.graph.adj_matrix[u][v]
             if wt <= mst_best_dist[v]:
                 mst_best_dist[v] = wt
-                heappush(heap, (wt, v, u)) # fix this
+                heappush(heap, (wt, v, u))  # fix it by making it not a heap?
     
-    def prims_visit_adj_list(self, u: int, not_visited: BoolList, mst_best_dist: NumList, heap): # retest needed
+    def prims_visit_adj_list(self, u: int, not_visited: BoolList, mst_best_dist: NumList, heap):
         """Find min weight edge in adjacency list implementation of prims.
-
+        TODO: RETEST
         Complexity per call: Time: O(|V|log |V|), Space: increase by O(|V|)
         """
         not_visited[u] = False
@@ -228,7 +232,7 @@ class GraphAlgorithms:
                 mst_best_dist[v] = wt
                 heappush(heap, (wt, v, u))
     
-    def min_spanning_tree_via_prims(self): # retest needed
+    def min_spanning_tree_via_prims(self):  # TODO RETEST
         """Computes mst of graph G stored in adj_list.
 
         Complexity: Time: O(|E|log |V|) or O(|V|^2), Space: O(|E|) or O(|V|^2)
@@ -247,7 +251,7 @@ class GraphAlgorithms:
         self.mst_node_list = min_spanning_tree
         self.mst_node_list.sort()
 
-    def breadth_first_search_vanilla_template(self, source: int): # retest needed
+    def breadth_first_search_vanilla_template(self, source: int):  # TODO RETEST
         """Template for distance based bfs traversal from node source.
 
         Complexity per call: Time: O(|V| + |E|), Space: O(|V|)
@@ -263,7 +267,7 @@ class GraphAlgorithms:
                     queue.append(v)
         self.dist = distance
 
-    def topology_sort_via_tarjan_helper(self, u: int): # retest
+    def topology_sort_via_tarjan_helper(self, u: int):  # TODO RETEST
         """Recursively explore unvisited graph via dfs.
 
         Complexity per call: Time: O(|V|), Space: O(|V|) at deepest point
@@ -274,7 +278,7 @@ class GraphAlgorithms:
                 self.topology_sort_via_tarjan_helper(v)
         self.topo_sort_node_list.append(u)
         
-    def topology_sort_via_tarjan(self): # retest
+    def topology_sort_via_tarjan(self):  # TODO RETEST
         """Compute a topology sort via tarjan method, on adj_list.
 
         Complexity per call: Time: O(|V| + |E|), Space: O(|V|)
@@ -287,7 +291,7 @@ class GraphAlgorithms:
                 self.topology_sort_via_tarjan_helper(u)
         self.topo_sort_node_list = self.topo_sort_node_list[::-1]
 
-    def topology_sort_via_kahns(self): # retest
+    def topology_sort_via_kahns(self):  # TODO RETEST
         """Compute a topology sort via kahn's method, on adj_list.
 
         Complexity per call: Time: O(|E|log|V|), Space: O(|V|)
@@ -319,7 +323,7 @@ class GraphAlgorithms:
         heap = [(wt, v) for v, wt in enumerate(tmp) if wt != -1]
         heapify(heap)
 
-    def single_source_shortest_path_dijkstras(self, source: int, sink: int=None): # retest
+    def single_source_shortest_path_dijkstras(self, source: int, sink: int):  # TODO RETEST
         """It is Dijkstra's pathfinder using heaps.
 
         Complexity per call: Time: O(|E|log |V|), Space: O(|V|)
@@ -344,7 +348,7 @@ class GraphAlgorithms:
         self.dist = distance
         self.parent = parents
     
-    def all_pairs_shortest_path_floyd_warshall(self): # tested
+    def all_pairs_shortest_path_floyd_warshall(self):  # TESTED
         """Computes essentially a matrix operation on a graph.
 
         Complexity per call: Time: O(|V|^3), Space: O(|V|^2)
@@ -358,7 +362,7 @@ class GraphAlgorithms:
                 for j in range(self.graph.num_nodes):
                     matrix[i][j] = min(matrix[i][j], matrix[i][k] + matrix[k][j])
 
-    def apsp_floyd_warshall_neg_cycles(self): #needs test
+    def apsp_floyd_warshall_neg_cycles(self):  # TODO RETEST
         matrix = self.graph.adj_matrix
         for i in range(self.graph.num_nodes):
             for j in range(self.graph.num_nodes):
@@ -366,7 +370,7 @@ class GraphAlgorithms:
                     if matrix[k][k] < 0 and matrix[i][k] != INF and matrix[k][j] != INF:
                         matrix[i][j] = -INF
 
-    def articulation_point_and_bridge_helper_via_dfs(self, u: int): # retest needed
+    def articulation_point_and_bridge_helper_via_dfs(self, u: int):  # TODO RETEST
         """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
         Complexity per call: Time: O(|E|), Space: O(|V|)
@@ -388,7 +392,7 @@ class GraphAlgorithms:
             elif v != self.parent[u]:
                 self.low_values[u] = min(self.low_values[u], self.visited[v])
 
-    def articulation_points_and_bridges_via_dfs(self): # retest needed
+    def articulation_points_and_bridges_via_dfs(self):  # TODO RETEST
         """Generates the name on an adj_list based graph.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -403,7 +407,7 @@ class GraphAlgorithms:
                 self.articulation_point_and_bridge_helper_via_dfs(u)
                 self.articulation_nodes[self.dfs_root] = (self.root_children > 1)
 
-    def cycle_check_on_directed_graph_helper(self, u: int): # retest needed
+    def cycle_check_on_directed_graph_helper(self, u: int):  # TODO RETEST
         """Recursion part of the dfs. It is modified to list various types of edges.
 
         Complexity per call: Time: O(|E|), Space: O(|V|) at deepest call
@@ -418,13 +422,13 @@ class GraphAlgorithms:
                 self.parent[v] = u
                 self.cycle_check_on_directed_graph_helper(v)
             elif self.visited[v] == EXPLORED:
-                edge_type = BIDIRECTIONAL if v == self.parent[u] else BACK # graph is not DAG.
+                edge_type = BIDIRECTIONAL if v == self.parent[u] else BACK  # case graph is not DAG
             elif self.visited[v] == VISITED:
                 edge_type = FORWARD
             self.directed_edge_type.append((u, v, edge_type))
         self.visited[u] = VISITED
 
-    def cycle_check_on_directed_graph(self): # retest needed
+    def cycle_check_on_directed_graph(self):  # TODO RETEST
         """Determines if a graph is cyclic or acyclic via dfs.
 
         Complexity per call: Time: O(|E| + |V|),
@@ -432,14 +436,14 @@ class GraphAlgorithms:
         More uses: Checks if graph is acyclic(DAG) which can open potential for efficient algorithms
         """
         self.visited = [UNVISITED] * self.graph.num_nodes
-        self.directed_edge_type = [] # can be swapped out for a marked variable
+        self.directed_edge_type = []  # can be swapped out for a marked variable if checking for DAG
         for u in range(self.graph.num_nodes):
             if self.visited[u] == UNVISITED:
                 self.cycle_check_on_directed_graph_helper(u)
   
-    def strongly_connected_components_of_graph_kosaraju_helper(self, u: int, pass_one: bool): # retest needed
+    def strongly_connected_components_of_graph_kosaraju_helper(self, u: int, pass_one: bool):
         """Pass one explore G and build stack, Pass two mark the SCC regions on transposition of G.
-
+        # TODO RETEST
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
         """
         self.visited[u] = VISITED
@@ -451,7 +455,7 @@ class GraphAlgorithms:
         if pass_one:
             self.decrease_finish_order.append(u)
 
-    def strongly_connected_components_of_graph_kosaraju(self):  # retest needed
+    def strongly_connected_components_of_graph_kosaraju(self):  # TODO RETEST
         """Marks the SCC of a directed graph using Kosaraju's method.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -469,7 +473,7 @@ class GraphAlgorithms:
                 self.strongly_connected_components_of_graph_kosaraju_helper(u, False)
                 self.region_num += 1
     
-    def strongly_connected_components_of_graph_tarjans_helper(self, u: int): # retest needed
+    def strongly_connected_components_of_graph_tarjans_helper(self, u: int):  # TODO RETEST
         """Recursive part of tarjan's, pre-order finds the SCC regions, marks regions post-order.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -491,7 +495,7 @@ class GraphAlgorithms:
                 if u == v:
                     break
 
-    def strongly_connected_components_of_graph_tarjans(self): # retest needed
+    def strongly_connected_components_of_graph_tarjans(self):  # TODO RETEST
         """Marks the SCC regions of a directed graph using tarjan's method.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -505,7 +509,7 @@ class GraphAlgorithms:
             if self.node_state[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_tarjans_helper(u)
 
-    def bipartite_check_on_graph_helper(self, source: int, color: IntList): # retest needed
+    def bipartite_check_on_graph_helper(self, source: int, color: IntList):  # TODO RETEST
         """Uses bfs to check if the graph region connected to source is bipartite.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -524,7 +528,7 @@ class GraphAlgorithms:
                     break
         return is_bipartite
 
-    def bipartite_check_on_graph(self): # retest needed
+    def bipartite_check_on_graph(self):  # TODO RETEST
         """Checks if a graph has the bipartite property.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
@@ -538,8 +542,7 @@ class GraphAlgorithms:
                     break
         self.bipartite_colouring = color if is_bipartite else None
 
-
-    def max_flow_find_augmenting_path_helper(self, source: int, sink: int): # new, testing needed
+    def max_flow_find_augmenting_path_helper(self, source: int, sink: int):  # TODO RETEST NEW
         """Will check if augmenting path in the graph from source to sink exists via bfs.
 
         Complexity per call: Time: O(|E| + |V|), Space O(|V|)
@@ -563,7 +566,7 @@ class GraphAlgorithms:
         self.dist, self.parent = [], []
         return False
 
-    def send_flow_via_augmenting_path(self, source: int, sink: int, flow_in: Num): # testing needed
+    def send_flow_via_augmenting_path(self, source: int, sink: int, flow_in: Num):  # TODO RETEST
         """Function to recursively emulate sending a flow. returns min pushed flow.
 
         Complexity per call: Time: O(|V|), Space O(|V|)
@@ -583,7 +586,7 @@ class GraphAlgorithms:
         self.graph.edge_list[edge_ind ^ 1][2] -= pushed_flow
         return pushed_flow
 
-    def send_max_flow_via_dfs(self, u: int, sink: int, flow_in: Num): # testing needed
+    def send_max_flow_via_dfs(self, u: int, sink: int, flow_in: Num):  # TODO RETEST
         """Function to recursively emulate sending a flow via dfs. Returns min pushed flow.
 
         Complexity per call: Time: O(|E| * |V|), Space O(|V|)
@@ -637,8 +640,11 @@ class GraphAlgorithms:
                 flow = self.send_max_flow_via_dfs(source, sink, INF)
         return max_flow
 
+
+####################################################################################################
 from math import isqrt, log, gcd, prod
 from itertools import takewhile
+
 
 class MathAlgorithms:
     def __init__(self):
@@ -658,18 +664,20 @@ class MathAlgorithms:
         self.fibonacci_list = []
         self.fibonacci_dict = {}
         self.fibonacci_dict = {0: 0, 1: 1, 2: 1}
-        
-    def is_prime_triv(self, n):
+
+    def is_prime_triv(self, n):  # TODO RETEST
         """Tests if n is prime via divisors up to sqrt(n)."""
-        if n <= 3: return n > 1
-        if n%2 == 0 or n%3 == 0: return False
+        if n <= 3:
+            return n > 1
+        if n % 2 == 0 or n % 3 == 0:
+            return False
         limit = isqrt(n) + 1
         for p in range(5, limit+1, 6):
             if n % p == 0 or n % (p+2) == 0:
                 return False
         return True
 
-    def sieve_of_eratosthenes(self, n):
+    def sieve_of_eratosthenes(self, n):  # TODO RETEST
         """Generates list of primes up to n via eratosthenes method.
 
         Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
@@ -683,7 +691,7 @@ class MathAlgorithms:
                     prime_sieve[j] = False
         self.primes_list = [2] + [i for i in enumerate(prime_sieve) if i]
     
-    def sieve_of_eratosthenes_optimized(self, n):
+    def sieve_of_eratosthenes_optimized(self, n):  # TODO RETEST
         """Odds only optimized version of the previous method
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
@@ -698,7 +706,7 @@ class MathAlgorithms:
                     primes_sieve[j] = False
         self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
-    def sieve_of_min_primes(self, n):
+    def sieve_of_min_primes(self, n):  # TODO RETEST
         """Stores the min prime for each number up to n.
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
@@ -707,12 +715,12 @@ class MathAlgorithms:
         min_primes[1] = 1
         for prime in reversed(self.primes_list):
             min_primes[prime] = prime
-            start, end, step = prime*prime, n+1, prime if prime==2 else 2*prime
+            start, end, step = prime*prime, n+1, prime if prime == 2 else 2*prime
             for j in range(start, end, step):
                 min_primes[j] = prime
         self.min_primes_list = min_primes
 
-    def sieve_of_eratosthenes_variants(self, n):
+    def sieve_of_eratosthenes_variants(self, n):  # TODO RETEST
         """Seven variants of prime sieve listed above.
 
         Complexity:
@@ -720,7 +728,7 @@ class MathAlgorithms:
             function 3: Time: O(n log(n)), Space: O(n)
             function 2: Time: O(n lnln(n) log(n)), Space: O(n)
         """
-        def euler_phi_plus_sum_and_number_of_diff_prime_factors(limit):
+        def euler_phi_plus_sum_and_number_of_diff_prime_factors(limit):  # TODO RETEST
             """This is basically same as sieve just using different ops. Complexity function 1."""
             num_diff_pf = [0] * (limit + 1)
             sum_diff_pf = [0] * (limit + 1)
@@ -735,7 +743,7 @@ class MathAlgorithms:
             self.sum_diff_prime_factors = sum_diff_pf
             self.euler_phi = phi
             
-        def num_and_sum_of_divisors(limit):
+        def num_and_sum_of_divisors(limit):  # TODO RETEST
             """Does a basic sieve. Complexity function 2."""
             num_div = [1] * (limit + 1)
             sum_div = [1] * (limit + 1)
@@ -746,7 +754,7 @@ class MathAlgorithms:
             self.num_divisors = num_div
             self.sum_divisors = sum_div
 
-        def num_and_sum_of_prime_factors(limit):
+        def num_and_sum_of_prime_factors(limit):  # TODO RETEST
             """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
             num_pf = [0] * (limit + 1)
             sum_pf = [0] * (limit + 1)
@@ -760,11 +768,15 @@ class MathAlgorithms:
                         num_pf[i] += 1
             self.num_prime_factors = num_pf
             self.sum_prime_factors = sum_pf
+
+        euler_phi_plus_sum_and_number_of_diff_prime_factors(n)
+        num_and_sum_of_divisors(n)
+        num_and_sum_of_prime_factors(n)
     
     def gen_set_primes(self):
-        self.primes_set=set(self.primes_list)
+        self.primes_set = set(self.primes_list)
 
-    def prime_factorize_n(self, n):
+    def prime_factorize_n(self, n):  # TODO RETEST
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
 
         Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
@@ -776,10 +788,11 @@ class MathAlgorithms:
                 while n % prime == 0:
                     n //= prime
                     prime_factors.append(prime)
-        if n > 1: prime_factors.append(n)
+        if n > 1:
+            prime_factors.append(n)
         return prime_factors
 
-    def prime_factorize_n_log_n(self, n):
+    def prime_factorize_n_log_n(self, n):  # TODO RETEST
         """An optimized prime factorization of n function based on min primes already sieved
 
         Complexity: Time: O(log n), Space: O(log n)
@@ -792,7 +805,7 @@ class MathAlgorithms:
             n = n // prime
         return prime_factors
 
-    def prime_factorize_n_variants(self, n):
+    def prime_factorize_n_variants(self, n):  # TODO RETEST
         """Covers all the variants listed above, holds the same time complexity with O(1) space."""
         limit = isqrt(n) + 1
         sum_diff_prime_factors, num_diff_prime_factors = 0, 0
@@ -824,7 +837,7 @@ class MathAlgorithms:
             euler_phi -= (euler_phi // n)
         return num_diff_prime_factors
 
-    def is_composite(self, a, d, n, s):
+    def is_composite(self, a, d, n, s):  # TODO RETEST
         """The witness test of miller rabin.
 
         Complexity per call: Time O(log^3(n)), Space: O(2**s) bits
@@ -836,14 +849,14 @@ class MathAlgorithms:
                 return False
         return True
 
-    def miller_rabin_primality_test(self, n, precision_for_huge_n=16):
+    def miller_rabin_primality_test(self, n, precision_for_huge_n=16):  # TODO RETEST
         """Probabilistic primality test with error rate of 4^(-k) past 341550071728321.
 
         Complexity per call: Time O(k log^3(n)), Space: O(2**s) bits
         """
         if n in self.primes_set:
             return True
-        if any((n%self.primes_list[p] == 0) for p in range(50)) or n < 2 or n == 3215031751:
+        if any((n % self.primes_list[p] == 0) for p in range(50)) or n < 2 or n == 3215031751:
             return False
         d, s = n-1, 0
         while d % 2 == 0:
@@ -855,26 +868,25 @@ class MathAlgorithms:
         return not any(self.is_composite(self.primes_list[j], d, n, s)
                        for j in range(precision_for_huge_n))
     
-    def miller_rabin_primality_test_prep(self):
+    def miller_rabin_primality_test_prep(self):  # TODO RETEST
         """This function needs to be called before miller rabin"""
         self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
                                   2152302898747, 3474749660383, 341550071728321]
         self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
-        self.sieve_of_eratosthenes(1000) # comment out if different size needed
-        self.gen_set_primes() # comment out if already have bigger size
+        self.sieve_of_eratosthenes(1000)  # comment out if different size needed
+        self.gen_set_primes()  # comment out if already have bigger size
 
-    #test this against stevens
-    def extended_euclid_recursive(self, a, b):
+    def extended_euclid_recursive(self, a, b):  # TODO RETEST
         """Solves coefficients of Bezout identity: ax + by = gcd(a, b), recursively
 
         Complexity per call: Time: O(log n), Space: O(log n) at the deepest call.
         """
         if 0 == b:
             return 1, 0, a
-        x, y, d = self.extended_euclid_recursive(b, a%b)
+        x, y, d = self.extended_euclid_recursive(b, a % b)
         return y, x-y*(a//b), d
 
-    def extended_euclid_iterative(self, a, b):
+    def extended_euclid_iterative(self, a, b):  # TODO RETEST
         """Solves coefficients of Bezout identity: ax + by = gcd(a, b), iteratively.
 
         Complexity per call: Time: O(log n) about twice as fast in python vs above, Space: O(1)
@@ -889,14 +901,14 @@ class MathAlgorithms:
             y, last_y = last_y - quotient * y, y
         return -last_x if a < 0 else last_x, -last_y if b < 0 else last_y, last_remainder
 
-    def safe_modulo(self, a, n): #needs test
+    def safe_modulo(self, a, n):  # TODO RETEST
         """Existence is much for c++ which doesn't always handle % operator nicely.
         use ((a % n) + n) % n for getting proper mod of a potential negative value
         use (a + b) % --> ((a % n) + (b % n)) % n for operations sub out + for * and -
         """
         return ((a % n) + n) % n
 
-    def modular_linear_equation_solver(self, a, b, n):
+    def modular_linear_equation_solver(self, a, b, n):  # TODO RETEST
         """Solves gives the solution x in ax = b(mod n).
 
         Complexity per call: Time: O(log n), Space: O(d)
@@ -907,7 +919,7 @@ class MathAlgorithms:
             return [(x + i*(n//d)) % n for i in range(d)]
         return []
 
-    def linear_diophantine_1(self, a, b, c):
+    def linear_diophantine_1(self, a, b, c):  # TODO RETEST
         """Solves for x, y in ax + by = c. From stanford icpc 2013-14
 
         Complexity per call: Time: O(log n), Space: O(1).
@@ -919,7 +931,7 @@ class MathAlgorithms:
             return x, (c - a * x) // b
         return -1, -1
 
-    def linear_diophantine_2(self, a, b, c):
+    def linear_diophantine_2(self, a, b, c):  # TODO RETEST
         """Solves for x0, y0 in x = x0 + (b/d)n, y = y0 - (a/d)n.
         derived from ax + by = c, d = gcd(a, b), and d|c.
         Can further derive into: n = x0 (d/b), and n = y0 (d/a).
@@ -932,8 +944,7 @@ class MathAlgorithms:
         x, y, d = self.extended_euclid_iterative(a, b)
         return (-1, -1) if c % d != 0 else (x * (c // d), y * (c // d))
 
-
-    def mod_inverse(self, b, m): #needs test
+    def mod_inverse(self, b, m):  # TODO RETEST
         """Solves b^(-1) (mod m).
 
         Complexity per call: Time: O(log n), Space: O(1)
@@ -941,7 +952,7 @@ class MathAlgorithms:
         x, y, d = self.extended_euclid_iterative(b, m)
         return None if d != 1 else x % m  # -1 instead of None if we intend to go on with the prog
 
-    def chinese_remainder_theorem_1(self, remainders, modulos):
+    def chinese_remainder_theorem_1(self, remainders, modulos):  # TODO RETEST
         """Steven's CRT version to solve x in x = r[0] (mod m[0]) ... x = r[n-1] (mod m[n-1]).
 
         Complexity per call: Time: O(n log n), Space: O(1)? O(mt) bit size:
@@ -955,9 +966,7 @@ class MathAlgorithms:
             x = (x + (remainders[i] * self.mod_inverse(p, modulo) * p)) % mt
         return x
 
-
-    # stanford icpc 2013-14
-    def chinese_remainder_theorem_helper(self, mod1, rem1, mod2, rem2): #needs test
+    def chinese_remainder_theorem_helper(self, mod1, rem1, mod2, rem2):  # TODO RETEST
         """Chinese remainder theorem (special case): find z such that z % m1 = r1, z % m2 = r2.
         Here, z is unique modulo M = lcm(m1, m2). Return (z, M).  On failure, M = -1.
         from: stanford icpc 2016
@@ -966,12 +975,11 @@ class MathAlgorithms:
         """
         s, t, d = self.extended_euclid_iterative(mod1, mod2)
         if rem1 % d != rem2 % d:
-            mod3, sremmod, tremmod = mod1*mod2, s*rem2*mod1, t*rem1*mod2
-            return ((sremmod + tremmod) % mod3) // d, mod3 // d
+            mod3, s_rem_mod, t_rem_mod = mod1*mod2, s*rem2*mod1, t*rem1*mod2
+            return ((s_rem_mod + t_rem_mod) % mod3) // d, mod3 // d
         return 0, -1
-    
-    # from stanford icpc 2013-14
-    def chinese_remainder_theorem_2(self, remainders, modulos):
+
+    def chinese_remainder_theorem_2(self, remainders, modulos):  # TODO RETEST
         """Chinese remainder theorem: find z such that z % m[i] = r[i] for all i.  Note that the
         solution is unique modulo M = lcm_i (m[i]).  Return (z, M). On failure, M = -1. Note that
         we do not require the r[i]'s to be relatively prime.
@@ -986,7 +994,7 @@ class MathAlgorithms:
                 break
         return z_m
 
-    def fibonacci_n_iterative(self, n):
+    def fibonacci_n_iterative(self, n):  # TODO RETEST
         """Classic fibonacci solver. Generates answers from 0 to n inclusive.
 
         Complexity per call: Time: O(n), Space: O(n).
@@ -997,7 +1005,7 @@ class MathAlgorithms:
             fib_list[i] = fib_list[i - 1] + fib_list[i - 2]
         self.fibonacci_list = fib_list
 
-    def fibonacci_n_dp_1(self, n):
+    def fibonacci_n_dp_1(self, n):  # TODO RETEST
         """Dynamic programming way to compute the nth fibonacci.
 
         Complexity per call: Time: O(log n), Space: increase by O(log n).
@@ -1008,9 +1016,8 @@ class MathAlgorithms:
         f2 = self.fibonacci_n_dp_1((n - 1) // 2)
         self.fibonacci_dict[n] = (f1 * f1 + f2 * f2 if n & 1 else f1 * f1 - f2 * f2)
         return self.fibonacci_dict[n]
-    
-    #this needs testing 
-    def generate_catalan_n(self, n):
+
+    def generate_catalan_n(self, n):  # TODO RETEST
         """Generate catalan up to n iteratively.
 
         Complexity per call: Time: O(n), Space: O(n * 2^(log n)).
@@ -1021,7 +1028,7 @@ class MathAlgorithms:
             catalan[i + 1] = catalan[i] * (4*i + 2) // (i + 2)
         self.catalan_numbers = catalan
 
-    def generate_catalan_n_mod_inverse(self, n, p):
+    def generate_catalan_n_mod_inverse(self, n, p):  # TODO RETEST
         """Generate catalan up to n iteratively cat n % p.
 
         Complexity per call: Time: O(n log n), Space: O(n * (2^(log n)%p)).
@@ -1030,10 +1037,10 @@ class MathAlgorithms:
         catalan = [0] * (n+1)
         catalan[0] = 1
         for i in range(n-1):
-            catalan[i+1] = ((4*i + 2)%p * catalan[i]%p * pow(i+1, p-2, p)) % p
+            catalan[i+1] = (((4*i + 2) % p) * (catalan[i] % p) * pow(i+1, p-2, p)) % p
         self.catalan_numbers = catalan
 
-    def c_n_k(self, n, k):
+    def c_n_k(self, n, k):  # TODO RETEST
         """Computes C(n, k) % p. From competitive programming 4.
 
         Complexity per call: v1: Time: O(log n), v2 Time: O(1), Space: O(1).
@@ -1045,7 +1052,7 @@ class MathAlgorithms:
                 * pow(self.fact[n - k], self.mod_p - 2, self.mod_p)) % self.mod_p
         # return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
 
-    def binomial_coefficient_n_mod_p_prep(self, max_n, mod_p):
+    def binomial_coefficient_n_mod_p_prep(self, max_n, mod_p):  # TODO RETEST
         """Does preprocessing for binomial coefficients. From competitive programming 4.
 
         Complexity per call: Time: O(n), Space: O(n).
@@ -1061,7 +1068,7 @@ class MathAlgorithms:
         #     inverse_factorial_mod_p[i] = (inverse_factorial_mod_p[i+1] * (i+1)) % mod_p
         # self.inv_fact = inverse_factorial_mod_p
             
-    def binomial_coefficient_dp(self, n, k):
+    def binomial_coefficient_dp(self, n, k):  # TODO RETEST
         """Uses the recurrence to calculate binomial coefficient.
         
         Complexity per call: Time: O(n*k) I think, Space: O(n*k).
@@ -1069,8 +1076,13 @@ class MathAlgorithms:
         if n == k or 0 == k:
             return 1
         if (n, k) not in self.binomial:
-            self.binomial[(n, k)] = self.binomial_coefficient_dp(n-1, k) + self.binomial_coefficient_dp(n-1, k-1)
+            take_case = self.binomial_coefficient_dp(n-1, k)
+            skip_case = self.binomial_coefficient_dp(n-1, k-1)
+            self.binomial[(n, k)] = take_case + skip_case
         return self.binomial[(n, k)]
+
+
+####################################################################################################
 
 
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
@@ -1080,18 +1092,18 @@ from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
 CCW = 1  # counterclockwise
 CW = -1  # clockwise
 CL = 0   # collinear
-EPS = 1e-12 # used in some spots
+EPS = 1e-12  # used in some spots
 
 
 def pairwise(seq):
-    it = iter(seq); next(it)
+    it = iter(seq)
+    next(it)
     return zip(iter(seq), it)
 
 
-class Pt2d:
+class Pt2d:  # TODO RETEST
     __slots__ = ("x", "y")
     # def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
-
     def __init__(self, x_val, y_val): self.x, self.y = x_val, y_val
 
     def __add__(self, other): return Pt2d(self.x + other.x, self.y + other.y)
@@ -1115,7 +1127,7 @@ class Pt2d:
     def get_tup(self): return self.x, self.y
 
 
-class Pt3d:
+class Pt3d:  # TODO RETEST
     def __init__(self, x_val, y_val, z_val): 
         self.x, self.y, self.z = map(float, (x_val, y_val, z_val))
 
@@ -1127,6 +1139,7 @@ class Pt3d:
 
     def __eq__(self, other): 
         return isclose(self.x, other.x) and isclose(self.y, other.y) and isclose(self.z, other.z)
+
     def __lt__(self, other):
         return False if self == other else (self.x, self.y, self.z) < (other.x, other.y, other.y)
 
@@ -1135,8 +1148,10 @@ class Pt3d:
     def __round__(self, n): return Pt3d(round(self.x, n), round(self.y, n), round(self.z, n))
     def __hash__(self): return hash((self.x, self.y, self.z))
 
-class QuadEdge:
+
+class QuadEdge:  # TODO RETEST
     __slots__ = ("origin", "rot", "o_next", "used")
+
     def __init__(self):
         self.origin = None
         self.rot = None
@@ -1148,11 +1163,12 @@ class QuadEdge:
     def o_prev(self): return self.rot.o_next.rot
     def dest(self): return self.rot.rot.origin
 
+
 class QuadEdgeDataStructure:
     def __init__(self):
         pass
 
-    def make_edge(self, in_pt, out_pt):
+    def make_edge(self, in_pt, out_pt):  # TODO RETEST
         e1 = QuadEdge()
         e2 = QuadEdge()
         e3 = QuadEdge()
@@ -1171,11 +1187,11 @@ class QuadEdgeDataStructure:
         e4.o_next = e3
         return e1
 
-    def splice(self, a, b):
-        a.o_next.rot.o_next, b.o_next.rot.o_next =  b.o_next.rot.o_next, a.o_next.rot.o_next
+    def splice(self, a, b):  # TODO RETEST
+        a.o_next.rot.o_next, b.o_next.rot.o_next = b.o_next.rot.o_next, a.o_next.rot.o_next
         a.o_next, b.o_next = b.o_next, a.o_next
 
-    def delete_edge(self, edge):
+    def delete_edge(self, edge):  # TODO RETEST
         self.splice(edge, edge.o_prev())
         self.splice(edge.rev(), edge.rev().o_prev())
         # del edge.rot.rot.rot
@@ -1183,45 +1199,48 @@ class QuadEdgeDataStructure:
         # del edge.rot
         # del edge
 
-    def connect(self, a, b):
+    def connect(self, a, b):  # TODO RETEST
         e = self.make_edge(a.dest(), b.origin)
         self.splice(e, a.l_next())
         self.splice(e.rev(), b)
         return e
 
-class GeometryAlgorithms:
+
+class GeometryAlgorithms:  # TODO RETEST
     def __init__(self):
         self.x_ordering = None
         self.quad_edges = QuadEdgeDataStructure()
 
-    def compare_ab(self, a, b):
+    def compare_ab(self, a, b):  # TODO RETEST
         """Compare a b, for floats and ints. It is useful when you want set values to observe.
         paste directly into code and drop isclose for runtime speedup."""
-        return 0 if isclose(a, b) else -1 if a<b else 1
+        return 0 if isclose(a, b) else -1 if a < b else 1
 
-    def dot_product(self, a, b):
+    def dot_product(self, a, b):  # TODO RETEST
         """Compute the scalar product a.b of a,b equivalent to: a . b"""
         return a.x*b.x + a.y*b.y
-    def cross_product(self, a, b):
+
+    def cross_product(self, a, b):  # TODO RETEST
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return a.x*b.y - a.y*b.x
 
-    def distance_normalized(self, a, b):
+    def distance_normalized(self, a, b):  # TODO RETEST
         """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
         return dist(a.get_tup(), b.get_tup())
+
     def distance(self, a, b):
         """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
         return self.dot_product(a - b, a - b)
 
-    def rotate_cw_90_wrt_origin(self, pt):
+    def rotate_cw_90_wrt_origin(self, pt):  # TODO RETEST
         """Compute a point rotation on pt. Just swap x and y and negate x."""
         return Pt2d(pt.y, -pt.x)
 
-    def rotate_ccw_90_wrt_origin(self, pt):
+    def rotate_ccw_90_wrt_origin(self, pt):  # TODO RETEST
         """Compute a point rotation on pt. Just swap x and y and negate y."""
         return Pt2d(-pt.y, pt.x)
 
-    def rotate_ccw_rad_wrt_origin(self, pt, rad):
+    def rotate_ccw_rad_wrt_origin(self, pt, rad):  # TODO RETEST
         """Compute a counterclockwise point rotation on pt. Accurate only for floating point cords.
         formula: x = (x cos(rad) - y sin(rad)), y = (x sin(rad) + y cos (rad)).
 
@@ -1231,7 +1250,7 @@ class GeometryAlgorithms:
         return Pt2d(pt.x * cos(rad) - pt.y * sin(rad),
                     pt.x * sin(rad) + pt.y * cos(rad))
 
-    def point_c_rotation_wrt_line_ab(self, a, b, c):
+    def point_c_rotation_wrt_line_ab(self, a, b, c):  # TODO RETEST
         """Determine orientation of c wrt line ab, in terms of collinear clockwise counterclockwise.
         Since 2d cross-product is the area of the parallelogram, we can use this to accomplish this.
 
@@ -1241,7 +1260,7 @@ class GeometryAlgorithms:
         """
         return self.compare_ab(self.cross_product(b - a, c - a), 0.0)
 
-    def angle_point_c_wrt_line_ab(self, a, b, c):
+    def angle_point_c_wrt_line_ab(self, a, b, c):  # TODO RETEST
         """For a line ab and point c, determine the angle of a to b to c in radians.
         formula: arc-cos(dot(vec_ab, vec_cb) / sqrt(dist_sq(vec_ab) * dist_sq(vec_cb))) = angle
 
@@ -1255,7 +1274,7 @@ class GeometryAlgorithms:
         return acos(dot_ab_cb / (sqrt(dist_sq_ab) * sqrt(dist_sq_cb)))
         # return acos(dot_ab_cb / sqrt(dist_sq_ab * dist_sq_cb))
 
-    def project_pt_c_to_line_ab(self, a, b, c):
+    def project_pt_c_to_line_ab(self, a, b, c):  # TODO RETEST
         """Compute the point closest to c on the line ab.
         formula: pt = a + u x vector_ba, where u is the scalar projection of vector_ca onto
         vector_ba via dot-product
@@ -1265,7 +1284,7 @@ class GeometryAlgorithms:
         vec_ba, vec_ca = b-a, c-a
         return a + vec_ba*(self.dot_product(vec_ca, vec_ba) / self.dot_product(vec_ba, vec_ba))
 
-    def project_pt_c_to_line_seg_ab(self, a, b, c):
+    def project_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
         """Compute the point closest to c on the line segment ab.
         Rule if a==b, then if c closer to a or b, otherwise we can just use the line version.
 
@@ -1274,31 +1293,31 @@ class GeometryAlgorithms:
         """
         vec_ba, vec_ca = b-a, c-a
         dist_sq_ba = self.dot_product(vec_ba, vec_ba)
-        if self.compare_ab(dist_sq_ba, 0.0) == 0: # a == b return either, maybe turn into a==b??
+        if self.compare_ab(dist_sq_ba, 0.0) == 0:  # a == b return either, maybe turn into a==b??
             return a
         u = self.dot_product(vec_ca, vec_ba) / dist_sq_ba
         return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab(a, b, c)
 
-    def distance_pt_c_to_line_ab(self, a, b, c):
+    def distance_pt_c_to_line_ab(self, a, b, c):  # TODO RETEST
         """Just return the distance between c and the projected point :)."""
         return self.distance_normalized(c, self.project_pt_c_to_line_ab(a, b, c))
 
-    def distance_pt_c_to_line_seg_ab(self, a, b, c):
+    def distance_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
         """Same as above, just return the distance between c and the projected point :)."""
         return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab(a, b, c))
     
-    def is_parallel_lines_ab_and_cd(self, a, b, c, d):
+    def is_parallel_lines_ab_and_cd(self, a, b, c, d):  # TODO RETEST
         """Two lines are parallel if the cross_product between vec_ba and vec_cd is 0."""
         vec_ba, vec_cd = b - a, c - d
         return self.compare_ab(self.cross_product(vec_ba, vec_cd), 0.0) == 0
 
-    def is_collinear_lines_ab_and_cd_1(self, a, b, c, d):
+    def is_collinear_lines_ab_and_cd_1(self, a, b, c, d):  # TODO RETEST
         """Old function. a!=b and c!=d and then returns correctly"""
         return (self.is_parallel_lines_ab_and_cd(a, b, c, d)
                 and self.is_parallel_lines_ab_and_cd(b, a, a, c)
                 and self.is_parallel_lines_ab_and_cd(d, c, c, a))
 
-    def is_collinear_lines_ab_and_cd_2(self, a, b, c, d):
+    def is_collinear_lines_ab_and_cd_2(self, a, b, c, d):  # TODO RETEST
         """Two lines are collinear iff a!=b and c!=d, and both c and d are collinear to line ab."""
         return (self.point_c_rotation_wrt_line_ab(a, b, c) == 0
                 and self.point_c_rotation_wrt_line_ab(a, b, d) == 0)
@@ -1311,21 +1330,21 @@ class GeometryAlgorithms:
             return lo <= c <= hi or lo <= d <= hi
         a_val = self.cross_product(d - a, b - a) * self.cross_product(c - a, b - a)
         c_val = self.cross_product(a - c, d - c) * self.cross_product(b - c, d - c)
-        return not(a_val>0 or c_val>0)
+        return not (a_val > 0 or c_val > 0)
 
-    def is_lines_intersect_ab_to_cd(self, a, b, c, d):
+    def is_lines_intersect_ab_to_cd(self, a, b, c, d):  # TODO RETEST
         """Two lines intersect if they aren't parallel or if they collinear."""
         return (not self.is_parallel_lines_ab_and_cd(a, b, c, d)
                 or self.is_collinear_lines_ab_and_cd_2(a, b, c, d))
 
-    def pt_lines_intersect_ab_to_cd(self, a, b, c, d):
+    def pt_lines_intersect_ab_to_cd(self, a, b, c, d):  # TODO RETEST
         """Compute the intersection point between two lines.
         Explain TODO
         """
         vec_ba, vec_ca, vec_cd = b-a, c-a, c-d
         return a + vec_ba*(self.cross_product(vec_ca, vec_cd) / self.cross_product(vec_ba, vec_cd))
 
-    def pt_line_seg_intersect_ab_to_cd(self, a, b, c, d):
+    def pt_line_seg_intersect_ab_to_cd(self, a, b, c, d):  # TODO RETEST
         """Same as for line intersect but this time we need to use a specific formula.
         Formula: TODO"""
         x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product(d, c)
@@ -1333,11 +1352,11 @@ class GeometryAlgorithms:
         v = abs(y*b.x + x*b.y + cross_prod)
         return Pt2d((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u))
 
-    def is_point_p_in_circle_c_radius_r(self, p, c, r):
+    def is_point_p_in_circle_c_radius_r(self, p, c, r):  # TODO RETEST
         """Computes True if point p in circle False otherwise. Use <= for circumference inclusion"""
         return self.compare_ab(self.distance_normalized(p, c), r) < 0
 
-    def pt_circle_center_given_pt_abc(self, a, b, c):
+    def pt_circle_center_given_pt_abc(self, a, b, c):  # TODO RETEST
         """Find the center of a circle based of 3 distinct points
         TODO add in teh formula
         """
@@ -1346,7 +1365,7 @@ class GeometryAlgorithms:
         ac_rot = self.rotate_cw_90_wrt_origin(a - ac) + ac
         return self.pt_lines_intersect_ab_to_cd(ab, ab_rot, ac, ac_rot)
 
-    def pts_line_ab_intersects_circle_cr(self, a, b, c, r):
+    def pts_line_ab_intersects_circle_cr(self, a, b, c, r):  # TODO RETEST
         """Compute the point(s) that line ab intersects circle c radius r. from stanford 2016
         TODO add in the formula
         """
@@ -1360,9 +1379,9 @@ class GeometryAlgorithms:
             first_intersect = c + vec_ac + vec_ba*(-dist_sq_ac_ba + sqrt(dist_sq + EPS))/dist_sq_ba
             second_intersect = c + vec_ac + vec_ba*(-dist_sq_ac_ba - sqrt(dist_sq))/dist_sq_ba
             return first_intersect if result == 0 else first_intersect, second_intersect
-        return None # no intersect 
+        return None  # no intersect
 
-    def pts_two_circles_intersect_cr1_cr2(self, c1: Pt2d, c2: Pt2d, r1, r2):
+    def pts_two_circles_intersect_cr1_cr2(self, c1: Pt2d, c2: Pt2d, r1, r2):  # TODO RETEST
         """I think this is the points on the circumference but not fully sure. from stanford 2016
         TODO add in teh formula
         """
@@ -1374,9 +1393,9 @@ class GeometryAlgorithms:
             v = (c2-c1)/center_dist
             pt1, pt2 = c1 + v * x, self.rotate_ccw_90_wrt_origin(v) * y
             return (pt1 + pt2) if self.compare_ab(y, 0.0) <= 0 else (pt1+pt2, pt1-pt2)
-        return None # no overlap
+        return None  # no overlap
 
-    def pt_tangent_to_circle_cr(self, c, r, p):
+    def pt_tangent_to_circle_cr(self, c, r, p):  # TODO RETEST
         """Find the two points that create tangent lines from p to the circumference.
         TODO add in teh formula
         """
@@ -1391,15 +1410,14 @@ class GeometryAlgorithms:
             return [c+q1-q2, c+q1+q2]
         return []
 
-    def tangents_between_2_circles(self, c1, r1, c2, r2):
+    def tangents_between_2_circles(self, c1, r1, c2, r2):  # TODO RETEST
         """Between two circles there should be at least 4 points that make two tangent lines.
         TODO add in teh formula
         """
-        r_tangents = []
         if self.compare_ab(r1, r2) == 0:
             c2c1 = c2 - c1
             multiplier = r1/sqrt(self.dot_product(c2c1, c2c1))
-            tangent = self.rotate_ccw_90_wrt_origin(c2c1 * multiplier) # need better name
+            tangent = self.rotate_ccw_90_wrt_origin(c2c1 * multiplier)  # need better name
             r_tangents = [(c1+tangent, c2+tangent), (c1-tangent, c2-tangent)]
         else:
             ref_pt = ((c1 * -r2) + (c2 * r1)) / (r1 - r2)
@@ -1413,34 +1431,34 @@ class GeometryAlgorithms:
             r_tangents.append((ps[i], qs[i]))
         return r_tangents
 
-    def sides_of_triangle_abc(self, a, b, c):
+    def sides_of_triangle_abc(self, a, b, c):  # TODO RETEST
         """Compute the side lengths of a triangle."""
         dist_ab = self.distance_normalized(a, b)
         dist_bc = self.distance_normalized(b, c)
         dist_ca = self.distance_normalized(c, a)
         return dist_ab, dist_bc, dist_ca
 
-    def pt_p_in_triangle_abc(self, a, b, c, p):
+    def pt_p_in_triangle_abc(self, a, b, c, p):  # TODO RETEST
         """Compute if a point is in or on a triangle. If all edges return the same orientation this
         should return true and the point should be in or on the triangle."""
         return (self.point_c_rotation_wrt_line_ab(a, b, p) >= 0
                 and self.point_c_rotation_wrt_line_ab(b, c, p) >= 0
                 and self.point_c_rotation_wrt_line_ab(c, a, p) >= 0)
 
-    def perimeter_of_triangle_abc(self, side_ab, side_bc, side_ca):
+    def perimeter_of_triangle_abc(self, side_ab, side_bc, side_ca):  # TODO RETEST
         """Computes the perimeter of triangle given the side lengths."""
         return side_ab + side_bc + side_ca
 
-    def triangle_area_bh(self, base, height):
+    def triangle_area_bh(self, base, height):  # TODO RETEST
         """Simple triangle area formula: area = b*h/2."""
         return base*height/2
 
-    def triangle_area_from_heron_abc(self, side_ab, side_bc, side_ca):
+    def triangle_area_from_heron_abc(self, side_ab, side_bc, side_ca):  # TODO RETEST
         """Compute heron's formula which gives us the area of a triangle given the side lengths."""
         s = self.perimeter_of_triangle_abc(side_ab, side_bc, side_ca) / 2
         return sqrt(s * (s-side_ab) * (s-side_bc) * (s-side_ca))
 
-    def triangle_area_from_cross_product_abc(self, a, b, c):
+    def triangle_area_from_cross_product_abc(self, a, b, c):  # TODO RETEST
         """Compute triangle area, via cross-products of the pairwise sides ab, bc, ca."""
         return (self.cross_product(a, b) + self.cross_product(b, c) + self.cross_product(c, a))/2
 
@@ -1449,7 +1467,7 @@ class GeometryAlgorithms:
     #     perimeter = self.perimeter_of_triangle_abc(ab, bc, ca) / 2
     #     return area/perimeter
 
-    def incircle_radius_of_triangle_abc(self, a, b, c):
+    def incircle_radius_of_triangle_abc(self, a, b, c):  # TODO RETEST
         """Computes the radius of the incircle, achieved by computing the side lengths then finding
         the area and perimeter to use in this Formula: r = area/(perimeter/2) Author: TODO
         """
@@ -1462,7 +1480,7 @@ class GeometryAlgorithms:
     #     area = self.triangle_area_from_heron_abc(ab, bc, ca)
     #     return (ab*bc*ca) / (4*area)
         
-    def circumcircle_radius_of_triangle_abc(self, a, b, c):
+    def circumcircle_radius_of_triangle_abc(self, a, b, c):  # TODO RETEST
         """Computes the radius of the circum-circle, achieved by computing the side lengths then
         gets the area for Formula: r = (ab * bc * ca) / (4 * area) Author: TODO
         """
@@ -1470,7 +1488,7 @@ class GeometryAlgorithms:
         area = self.triangle_area_from_heron_abc(side_ab, side_bc, side_ca)
         return (side_ab * side_bc * side_ca) / (4 * area)
 
-    def incircle_pt_for_triangle_abc_1(self, a, b, c):
+    def incircle_pt_for_triangle_abc_1(self, a, b, c):  # TODO RETEST
         """Get the circle center of an incircle.
 
         Complexity per call: Time: lots of ops but still O(1), Space O(1)
@@ -1478,7 +1496,7 @@ class GeometryAlgorithms:
         Optimization: get sides individually instead of through another call
         """
         radius = self.incircle_radius_of_triangle_abc(a, b, c)
-        if self.compare_ab(radius, 0.0) == 0: #  if the radius was 0 we don't have a point
+        if self.compare_ab(radius, 0.0) == 0:  # if the radius was 0 we don't have a point
             return False, 0, 0
         side_ab, side_bc, side_ca = self.sides_of_triangle_abc(a, b, c)
         ratio_1 = side_ab/side_ca
@@ -1491,7 +1509,7 @@ class GeometryAlgorithms:
             return True, radius, round(intersection_pt, 12)  # can remove the round function
         return False, 0, 0
 
-    def triangle_circle_center_pt_abcd(self, a, b, c, d):
+    def triangle_circle_center_pt_abcd(self, a, b, c, d):  # TODO RETEST
         """A 2 in one method that can get the middle point of both incircle circumcenter.
         Method: TODO
 
@@ -1509,7 +1527,7 @@ class GeometryAlgorithms:
         y = ((pt_3.x * pt_2.x) - (pt_3.y * pt_1.x)) / -cross_product_1_2  # cross(pt_2, pt_1)
         return round(Pt2d(x, y), 12)
 
-    def angle_bisector_for_triangle_abc(self, a, b, c):
+    def angle_bisector_for_triangle_abc(self, a, b, c):  # TODO RETEST
         """Compute the angle bisector point.
         Method: TODO
         """
@@ -1518,14 +1536,14 @@ class GeometryAlgorithms:
         ref_pt = (b-a) / dist_ba * dist_ca
         return ref_pt + (c-a) + a
 
-    def perpendicular_bisector_for_triangle_ab(self, a, b):
+    def perpendicular_bisector_for_triangle_ab(self, a, b):  # TODO RETEST
         """Compute the perpendicular bisector point.
         Method: TODO
         """
         rotated_vector_ba = self.rotate_ccw_90_wrt_origin(b-a)  # code is a ccw turn. check formula
         return rotated_vector_ba + (a+b)/2
 
-    def incircle_pt_for_triangle_abc_2(self, a, b, c):
+    def incircle_pt_for_triangle_abc_2(self, a, b, c):  # TODO RETEST
         """An alternative way to compute incircle. This one uses bisectors
         Method: TODO
         """
@@ -1533,7 +1551,7 @@ class GeometryAlgorithms:
         bisector_bca = self.angle_bisector_for_triangle_abc(b, c, a)
         return self.triangle_circle_center_pt_abcd(a, bisector_abc, b, bisector_bca)
 
-    def circumcenter_pt_of_triangle_abc_2(self, a, b, c):
+    def circumcenter_pt_of_triangle_abc_2(self, a, b, c):  # TODO RETEST
         """An alternative way to compute circumcenter. This one uses bisectors
         Method: TODO
         """
@@ -1542,28 +1560,28 @@ class GeometryAlgorithms:
         ab2, bc2 = (a+b)/2, (b+c)/2
         return self.triangle_circle_center_pt_abcd(ab2, bisector_ab, bc2, bisector_bc)
 
-    def orthocenter_pt_of_triangle_abc_v2(self, a, b, c):
+    def orthocenter_pt_of_triangle_abc_v2(self, a, b, c):  # TODO RETEST
         """Compute the orthogonal center of triangle abc.Z
         Method: TODO
         """
         return a + b + c - self.circumcenter_pt_of_triangle_abc_2(a, b, c) * 2
 
-    def perimeter_of_polygon_pts(self, pts):
+    def perimeter_of_polygon_pts(self, pts):  # TODO RETEST
         """Compute summed pairwise perimeter of polygon in CCW ordering."""
         return fsum([self.distance_normalized(a, b) for a, b in pairwise(pts)])
         # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
 
-    def signed_area_of_polygon_pts(self, pts):
+    def signed_area_of_polygon_pts(self, pts):  # TODO RETEST
         """Compute sum of area of polygon, via shoelace method: half the sum of the pairwise
         cross-products."""
         return fsum([self.cross_product(a, b) for a, b in pairwise(pts)]) / 2
         # return fsum([self.cross_product(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]) / 2
 
-    def area_of_polygon_pts(self, pts):
+    def area_of_polygon_pts(self, pts):  # TODO RETEST
         """Positive area of polygon using above method."""
         return abs(self.signed_area_of_polygon_pts(pts))
 
-    def is_convex_polygon_pts_no_collinear(self, pts):
+    def is_convex_polygon_pts_no_collinear(self, pts):  # TODO RETEST
         """Determines if polygon is convex, only works when no collinear lines.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -1580,7 +1598,7 @@ class GeometryAlgorithms:
             return result
         return False
 
-    def is_convex_polygon_pts_has_collinear(self, pts):
+    def is_convex_polygon_pts_has_collinear(self, pts):  # TODO RETEST
         """Determines if polygon is convex, works with collinear but takes more time and space.
 
         Complexity per call: Time: O(n), Space: O(n)
@@ -1590,7 +1608,7 @@ class GeometryAlgorithms:
             end = len(pts) - 2
             rotations = [self.point_c_rotation_wrt_line_ab(pts[i], pts[i+1], pts[i+2])
                          for i in range(end)]
-            tally = [0] * 3 # ccw cl cw only 3 types
+            tally = [0] * 3  # ccw cl cw only 3 types
             for el in rotations:
                 tally[el + 1] += 1
             pts.pop()
@@ -1598,7 +1616,7 @@ class GeometryAlgorithms:
             return False if lo > 0 or hi == 0 else hi > 0
         return False
 
-    def pt_p_in_polygon_pts_1(self, pts, p):
+    def pt_p_in_polygon_pts_1(self, pts, p):  # TODO RETEST
         """Determine if a point is in a polygon based on the sum of the angles.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -1615,7 +1633,7 @@ class GeometryAlgorithms:
             return self.compare_ab(abs(angle_sum), pi)
         return False
 
-    def pt_p_in_polygon_pts_2(self, pts, p):
+    def pt_p_in_polygon_pts_2(self, pts, p):  # TODO RETEST
         """Determine if a point is in a polygon via, ray casting.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -1630,7 +1648,7 @@ class GeometryAlgorithms:
                 ans = not ans
         return ans
 
-    def pt_p_on_polygon_perimeter_pts(self, pts, p):
+    def pt_p_on_polygon_perimeter_pts(self, pts, p):  # TODO RETEST
         """Determine if a point is on the perimeter of a polygon simply via a distance check.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -1645,7 +1663,7 @@ class GeometryAlgorithms:
                 return True
         return p in pts
 
-    def pt_p_in_convex_polygon_pts(self, pts, p):
+    def pt_p_in_convex_polygon_pts(self, pts, p):  # TODO RETEST
         """For a convex Polygon we are able to search if point is in the polygon faster. TODO
 
         Complexity per call: Time: O(log n), Space: O(1)
@@ -1668,7 +1686,7 @@ class GeometryAlgorithms:
     
     # use a set with points if possible checking on the same polygon many times
     # return 0 for on 1 for in -1 for out
-    def pt_p_position_wrt_polygon_pts(self, pts, p):
+    def pt_p_position_wrt_polygon_pts(self, pts, p):  # TODO RETEST
         """Will determine if a point is in on or outside a polygon.
 
         Complexity per call: Time: O(n) Convex(log n), Space: O(1)
@@ -1677,7 +1695,7 @@ class GeometryAlgorithms:
         return (0 if self.pt_p_on_polygon_perimeter_pts(pts, p)
                 else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1)
 
-    def centroid_pt_of_convex_polygon(self, pts):
+    def centroid_pt_of_convex_polygon(self, pts):  # TODO RETEST
         """Compute the centroid of a convex polygon.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -1689,7 +1707,7 @@ class GeometryAlgorithms:
             ans = ans + (a + b) * self.cross_product(a, b)
         return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
 
-    def is_polygon_pts_simple_quadratic(self, pts):
+    def is_polygon_pts_simple_quadratic(self, pts):  # TODO RETEST
         """Brute force method to check if a polygon is simple. check all line pairs
 
         Complexity per call: Time: O(n^2), Space: O(1)
@@ -1698,14 +1716,14 @@ class GeometryAlgorithms:
         n = len(pts)
         for i in range(n-1):
             for k in range(i+1, n-1):
-                j, l = (i+1) % n, (k+1) % n
-                if i == l or j == k:
+                j, m = (i+1) % n, (k+1) % n
+                if i == m or j == k:
                     continue
-                if self.is_segments_intersect_ab_to_cd(pts[i], pts[j], pts[k], pts[l]):
+                if self.is_segments_intersect_ab_to_cd(pts[i], pts[j], pts[k], pts[m]):
                     return False
         return True
 
-    def polygon_cut_from_line_ab(self, pts, a, b):
+    def polygon_cut_from_line_ab(self, pts, a, b):  # TODO RETEST
         """Method computes the left side polygon resulting from a cut from the line a-b.
         Method: Walk around the polygon and only take points that return CCW to line ab
 
@@ -1721,13 +1739,13 @@ class GeometryAlgorithms:
                 left_partition.append(u)
                 if 0 == rot_1:
                     continue
-            if rot_1 * rot_2 < 0: # CCW -1, CW 1 so tests if they are opposite ie lines intersect.
+            if rot_1 * rot_2 < 0:  # CCW -1, CW 1 so tests if they are opposite ie lines intersect.
                 left_partition.append(self.pt_line_seg_intersect_ab_to_cd(u, v, a, b))
         if left_partition and left_partition[0] != left_partition[-1]:
             left_partition.append(left_partition[0])
         return left_partition
 
-    def convex_hull_monotone_chain(self, pts): # needs test
+    def convex_hull_monotone_chain(self, pts):  # TODO RETEST
         """Compute convex hull of a list of points via Monotone Chain method. CCW ordering returned.
 
         Complexity per call: Time: O(nlog n), Space: final O(n), aux O(nlog n)
@@ -1748,7 +1766,7 @@ class GeometryAlgorithms:
             return convex_hull
         return unique_points
 
-    def rotating_caliper_of_polygon_pts(self, pts):
+    def rotating_caliper_of_polygon_pts(self, pts):  # TODO RETEST
         """Computes the max distance of two points in the convex polygon?
 
         Complexity per call: Time: O(nlog n) unsorted O(n) sorted, Space: O(1)
@@ -1768,7 +1786,7 @@ class GeometryAlgorithms:
             ans = max(ans, self.distance(p_j, convex_hull[t]))
         return sqrt(ans)
 
-    def closest_pair_helper(self, lo, hi):
+    def closest_pair_helper(self, lo, hi):  # TODO RETEST
         """brute force function, for small range will brute force find the closet pair. O(n^2)"""
         r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
                      self.x_ordering[lo], 
@@ -1780,7 +1798,7 @@ class GeometryAlgorithms:
                     r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
         return r_closest
 
-    def closest_pair_recursive(self, lo, hi, y_ordering):
+    def closest_pair_recursive(self, lo, hi, y_ordering):  # TODO RETEST
         """Recursive part of computing the closest pair. Divide by y recurse then do a special check
 
         Complexity per call T(n/2) halves each time, T(n/2) halves each call, O(n) at max tho
@@ -1788,7 +1806,7 @@ class GeometryAlgorithms:
         the optimization of using y_partition 3 times over rather than having 3 separate lists
         """
         n = hi - lo
-        if n < 5: # base case we brute force the small set of points
+        if n < 5:  # base case we brute force the small set of points
             return self.closest_pair_helper(lo, hi)
         left_len, right_len = lo + n - n//2, lo + n//2
         mid = round((self.x_ordering[left_len].x + self.x_ordering[right_len].x)/2)
@@ -1817,7 +1835,7 @@ class GeometryAlgorithms:
                     best_pair = (dist_ij, y_partition[i], y_partition[j])
         return best_pair
 
-    def compute_closest_pair(self, pts):
+    def compute_closest_pair(self, pts):  # TODO RETEST
         """Compute the closest pair of points in a set of points. method is divide and conqur
 
         Complexity per call Time: O(nlog n), Space O(nlog n)
@@ -1827,7 +1845,7 @@ class GeometryAlgorithms:
         y_ordering = sorted(pts, key=lambda point: point.y)
         return self.closest_pair_recursive(0, len(pts), y_ordering)
 
-    def delaunay_triangulation_slow(self, pts):
+    def delaunay_triangulation_slow(self, pts):  # TODO RETEST
         """A very slow version of  Delaunay Triangulation. Can beat the faster version when n small.
 
         Complexity per call Time: O(n^4), Space O(n)
@@ -1843,9 +1861,12 @@ class GeometryAlgorithms:
                 for k in range(i + 1, n):
                     if j == k:
                         continue
-                    xn = (y_arr[j] - y_arr[i]) * (z_arr[k] - z_arr[i]) - (y_arr[k] - y_arr[i]) * (z_arr[j] - z_arr[i])
-                    yn = (x_arr[k] - x_arr[i]) * (z_arr[j] - z_arr[i]) - (x_arr[j] - x_arr[i]) * (z_arr[k] - z_arr[i])
-                    zn = (x_arr[j] - x_arr[i]) * (y_arr[k] - y_arr[i]) - (x_arr[k] - x_arr[i]) * (y_arr[j] - y_arr[i])
+                    xn = ((y_arr[j] - y_arr[i]) * (z_arr[k] - z_arr[i])
+                          - (y_arr[k] - y_arr[i]) * (z_arr[j] - z_arr[i]))
+                    yn = ((x_arr[k] - x_arr[i]) * (z_arr[j] - z_arr[i])
+                          - (x_arr[j] - x_arr[i]) * (z_arr[k] - z_arr[i]))
+                    zn = ((x_arr[j] - x_arr[i]) * (y_arr[k] - y_arr[i])
+                          - (x_arr[k] - x_arr[i]) * (y_arr[j] - y_arr[i]))
                     flag = zn < 0.0
                     for m in range(n):
                         if flag:
@@ -1858,22 +1879,22 @@ class GeometryAlgorithms:
                         ans.append((pts[i], pts[j], pts[k]))
         return ans
 
-    def pt_left_of_edge(self, pt, edge):
+    def pt_left_of_edge(self, pt, edge):  # TODO RETEST
         """A helper function with a name to describe the action. Remove for speedup."""
         return CCW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
-    def pt_right_of_edge(self, pt, edge):
+    def pt_right_of_edge(self, pt, edge):  # TODO RETEST
         """A helper function with a name to describe the action. Remove for speedup."""
         return CW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
-    def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
+    def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):  # TODO RETEST
         """A helper function for determining the angle. Remove for speedup."""
         return (a1 * (b2 * c3 - c2 * b3) -
                 a2 * (b1 * c3 - c1 * b3) +
                 a3 * (b1 * c2 - c1 * b2))
 
-    def is_in_circle(self, a, b, c, d):
-        """Expensive caclution function that determines if """
+    def is_in_circle(self, a, b, c, d):  # TODO RETEST
+        """Expensive calculation function that determines if """
         a_dot = self.dot_product(a, a)
         b_dot = self.dot_product(b, b)
         c_dot = self.dot_product(c, c)
@@ -1891,22 +1912,22 @@ class GeometryAlgorithms:
         # kek = angle(a, b, c) + angle(c, d, a) - angle(b, c, d) - angle(d, a, b)
         # return self.compare_ab(kek, 0.0) > 0
 
-    def build_triangulation(self, l, r, pts):
-        if r - l + 1 == 2:
-            res = self.quad_edges.make_edge(pts[l], pts[r])
+    def build_triangulation(self, left, right, pts):  # TODO RETEST
+        if right - left + 1 == 2:
+            res = self.quad_edges.make_edge(pts[left], pts[right])
             return res, res.rev()
-        if r - l + 1 == 3:
-            edge_a = self.quad_edges.make_edge(pts[l], pts[l + 1])
-            edge_b = self.quad_edges.make_edge(pts[l + 1], pts[r])
+        if right - left + 1 == 3:
+            edge_a = self.quad_edges.make_edge(pts[left], pts[left + 1])
+            edge_b = self.quad_edges.make_edge(pts[left + 1], pts[right])
             self.quad_edges.splice(edge_a.rev(), edge_b)
-            sg = self.point_c_rotation_wrt_line_ab(pts[l], pts[l + 1], pts[r])
+            sg = self.point_c_rotation_wrt_line_ab(pts[left], pts[left + 1], pts[right])
             if sg == 0:
                 return edge_a, edge_b.rev()
             edge_c = self.quad_edges.connect(edge_b, edge_a)
             return (edge_a, edge_b.rev()) if sg == 1 else (edge_c.rev(), edge_c)
-        mid = (l + r) // 2
-        ldo, ldi = self.build_triangulation(l, mid, pts)
-        rdi, rdo = self.build_triangulation(mid + 1, r, pts)
+        mid = (left + right) // 2
+        ldo, ldi = self.build_triangulation(left, mid, pts)
+        rdi, rdo = self.build_triangulation(mid + 1, right, pts)
         while True:
             if self.pt_left_of_edge(rdi.origin, ldi):
                 ldi = ldi.l_next()
@@ -1948,13 +1969,14 @@ class GeometryAlgorithms:
                 base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
         return ldo, rdo
             
-    def delaunay_triangulation_fast(self, pts):
+    def delaunay_triangulation_fast(self, pts):  # TODO RETEST
         pts.sort()
         result = self.build_triangulation(0, len(pts) - 1, pts)
         edge = result[0]
         edges = [edge]
         while self.point_c_rotation_wrt_line_ab(edge.o_next.dest(), edge.dest(), edge.origin) < CL:
             edge = edge.o_next
+
         def add_helper():
             cur = edge
             while True:
@@ -1983,7 +2005,8 @@ from itertools import takewhile, pairwise
 
 
 def pairwise_func(seq):
-    it = iter(seq); next(it)
+    it = iter(seq)
+    next(it)
     return zip(iter(seq), it)
 
 
@@ -2012,7 +2035,7 @@ class StringAlgorithms:
         self.hash_h_values = []
         self.left_mod_inverse = []
 
-    def kmp_preprocess(self, new_pattern):
+    def kmp_preprocess(self, new_pattern):  # TODO RETEST
         """Preprocess the pattern for KMP. TODO add a bit more to this description ?
 
         Complexity per call: Time O(m + m), Space: O(m)
@@ -2030,7 +2053,7 @@ class StringAlgorithms:
         self.pattern_len = pattern_len
         self.back_table = back_table
 
-    def kmp_search_find_indices(self, text_to_search):
+    def kmp_search_find_indices(self, text_to_search):  # TODO RETEST
         """Search the text for the pattern we preprocessed.
 
         Complexity per call: Time O(n + m), Space: O(n + m)
@@ -2045,7 +2068,7 @@ class StringAlgorithms:
                 j = self.back_table[j]
         return ans
 
-    def suffix_array_counting_sort(self, k, s_array, r_array):
+    def suffix_array_counting_sort(self, k, s_array, r_array):  # TODO RETEST
         """Basic count sort for the radix sorting part of suffix arrays.
 
         Complexity per call. Time: O(n), T(6n), Space: O(n), S(2n)
@@ -2066,7 +2089,7 @@ class StringAlgorithms:
         for i, value in enumerate(suffix_array_temp):
             s_array[i] = value
 
-    def suffix_array_build_array(self, new_texts):
+    def suffix_array_build_array(self, new_texts):  # TODO RETEST
         """Suffix array construction on a list of texts. n = sum lengths of all the texts.
 
         Complexity per call: Time: O(nlog n), T(3n log n), Space: O(n), S(6n)
@@ -2093,7 +2116,7 @@ class StringAlgorithms:
         self.text_ord = [ord(c) for c in new_text]  # optional used in the binary search
         self.seperator_list = [num_strings - i for i in range(len(new_texts))]  # optional owners
 
-    def compute_longest_common_prefix(self):
+    def compute_longest_common_prefix(self):  # TODO RETEST
         """After generating a suffix array you can use that to find the longest common pattern.
 
         Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
@@ -2117,7 +2140,7 @@ class StringAlgorithms:
             left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
         self.longest_common_prefix = [permuted_lcp[suffix] for suffix in local_suffix_array]
 
-    def suffix_array_compare_from_index(self, offset):
+    def suffix_array_compare_from_index(self, offset):  # TODO RETEST
         """C style string compare to compare 0 is equal 1 is greater than -1 is less than.
 
         Complexity per call: Time: O(k) len of pattern, Space: O(1)
@@ -2129,7 +2152,7 @@ class StringAlgorithms:
                 return -1 if num_char < local_text_ord[offset + i] else 1
         return 0
 
-    def suffix_array_binary_search(self, lo, hi, comp_val):
+    def suffix_array_binary_search(self, lo, hi, comp_val):  # TODO RETEST
         """Standard binary search. comp_val allows us to select how strict we are, > vs >=
 
         Complexity per call: Time: O(k log n) len of pattern, Space: O(1)
@@ -2143,7 +2166,7 @@ class StringAlgorithms:
                 lo = mid + 1
         return lo, hi
 
-    def suffix_array_string_matching(self, new_pattern):
+    def suffix_array_string_matching(self, new_pattern):  # TODO RETEST
         """Utilizing the suffix array we can search efficiently for a pattern. gives first and last
         index found for patterns.
 
@@ -2159,7 +2182,7 @@ class StringAlgorithms:
             hi -= 1
         return lo, hi
 
-    def compute_longest_repeated_substring(self):
+    def compute_longest_repeated_substring(self):  # TODO RETEST
         """The longest repeated substring is just the longest common pattern. Require lcp to be
         computed already. Returns the first longest repeat pattern, so for other ones implement a
         forloop.
@@ -2171,7 +2194,7 @@ class StringAlgorithms:
         max_lcp = max(local_lcp)
         return max_lcp, local_lcp.index(max_lcp)
 
-    def compute_owners(self):
+    def compute_owners(self):  # TODO RETEST
         """Used to compute the owners of each position in the text. O(n) time and space."""
         local_ord_arr, local_suffix = self.text_ord, self.suffix_array  # optional avoids load_attr
         tmp_owner = [0] * self.text_len
@@ -2183,7 +2206,7 @@ class StringAlgorithms:
                 seperator = next(it, None)
         self.owner = [tmp_owner[suffix_i] for suffix_i in local_suffix]
 
-    def compute_longest_common_substring(self):
+    def compute_longest_common_substring(self):  # TODO RETEST
         """Computes the longest common substring between two strings. returns index, value pair.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -2199,11 +2222,11 @@ class StringAlgorithms:
                 max_lcp_index, max_lcp_value = i, lcp_value
         return max_lcp_index, max_lcp_value
         
-    def compute_rolling_hash(self, new_text):
+    def compute_rolling_hash(self, new_text):  # TODO RETEST
         """For a given text compute and store the rolling hash. we use the smallest prime lower than
         2^30 since python gets slower after 2^30, p = 131 is a small prime below 256.
 
-        Complexity per call: Time: O(n), T(4n),  Space O(n), midcall S(6n), post call S(4n)
+        Complexity per call: Time: O(n), T(4n),  Space O(n), mid-call S(6n), post call S(4n)
         """
         len_text, p, m = len(new_text), 131, 2**30 - 35  # p is prime m is the smallest prime < 2^30
         h_vals, powers, ord_iter = [0] * len_text, [0] * len_text, map(ord, new_text)
@@ -2217,7 +2240,7 @@ class StringAlgorithms:
         self.prime_p, self.mod_m, self.math_algos = p, m, MathAlgorithms()
         self.left_mod_inverse = [pow(power, m-2, m) for power in powers]  # optional
 
-    def hash_fast_log_n(self, left, right):
+    def hash_fast_log_n(self, left, right):  # TODO RETEST
         """Log n time calculation of rolling hash formula: h[right]-h[left] * mod_inverse(left).
 
         Complexity per call: Time: O(log mod_m), Space: O(1)
@@ -2230,7 +2253,7 @@ class StringAlgorithms:
                    * pow(self.hash_powers[left], loc_mod-2, loc_mod)) % loc_mod
         return ans
 
-    def hash_fast_constant(self, left, right):
+    def hash_fast_constant(self, left, right):  # TODO RETEST
         """Constant time calculation of rolling hash. formula: h[right]-h[left] * mod_inverse[left]
 
         Complexity per call: Time: O(1), Space: O(1)
@@ -2254,26 +2277,26 @@ class Matrix:
         self.matrix_left = []
         self.matrix_right = []
 
-    def prep_matrix_multiply(self, matrix_a, matrix_b, size_n):
+    def prep_matrix_multiply(self, matrix_a, matrix_b, size_n):  # TODO RETEST
         """loads up the left and right matrices for a matrix multiply. O(n^2) but optimized."""
         self.matrix_left = [[el for el in row] for row in matrix_a]
         self.matrix_right = [[el for el in row] for row in matrix_b]
         self.matrix = [[0] * size_n for _ in range(size_n)]
         self.num_rows = self.num_cols = size_n
 
-    def fast_copy(self, other):
+    def fast_copy(self, other):  # TODO RETEST
         """Quickly copy one matrix to another. MIGHT CHANGE SIZE, O(n^2), is fast copy tho."""
         other_mat = other.matrix
         self.matrix = [[el for el in row] for row in other_mat]
 
-    def fill_matrix_from_row_col(self, new_matrix, row_offset: int, col_offset: int):
-        """fill self.matrix from row and col offset with new_matrix, O(n^2). Doesn't change size."""
+    def fill_matrix_from_row_col(self, new_matrix, row_offset: int, col_offset: int):  # TODO RETEST
+        """fill our matrix from row and col offset with new_matrix, O(n^2). Doesn't change size."""
         local_matrix = self.matrix  # prefix optimization see class docs for more info
         for i, row in enumerate(new_matrix):
             for j, new_value in enumerate(row):
                 local_matrix[i + row_offset][j + col_offset] = new_value
 
-    def matrix_multiply_mod_a_times_b(self, multiplier_1, multiplier_2, mod_m):
+    def matrix_multiply_mod_a_times_b(self, multiplier_1, multiplier_2, mod_m):  # TODO RETEST
         """Performs (A*B)%mod_m on matrix A,B and mod=mod_m, for normal multiply just remove mod_m.
 
         Complexity per call: Time: O(n^3), T(n^3 + n^2), Space: (1), does require 3n^2 in memory tho
@@ -2291,14 +2314,14 @@ class Matrix:
                         local_matrix[i][j] = (local_matrix[i][j] + mat_a_ik * mat_b[k][j]) % mod_m
         self.matrix_left, self.matrix_right = [], []   # optional? keep space small
 
-    def set_identity(self):
+    def set_identity(self):  # TODO RETEST
         """Used for pow and pow mod on matrices. O(n^2) but memset(0) lvl speed for python."""
         local_matrix, local_num_rows = self.matrix, self.num_rows
         local_matrix = [[0] * local_num_rows for _ in range(local_num_rows)]  # memset(0) in python
         for i in range(local_num_rows):
             local_matrix[i][i] = 1
 
-    def get_best_sawp_row(self, row: int, col: int, local_matrix, local_num_rows):
+    def get_best_sawp_row(self, row: int, col: int, local_matrix, local_num_rows):  # TODO RETEST
         """Find the best pivot row defined as the row with the highest absolute value.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -2310,21 +2333,21 @@ class Matrix:
                 best, pos = column_value, i
         return pos
 
-    def swap_rows(self, row_a: int, row_b: int, local_matrix):
+    def swap_rows(self, row_a: int, row_b: int, local_matrix):  # TODO RETEST
         """Swaps two rows a and b, via reference swapping so should be constant time.
 
         Complexity per call: Time: O(1)[or very fast O(n) like memset], Space: O(1)
         """
         local_matrix[row_a], local_matrix[row_b] = local_matrix[row_b], local_matrix[row_a]
 
-    def row_divide(self, row: int, div: float, local_matrix):
+    def row_divide(self, row: int, div: float, local_matrix):  # TODO RETEST
         """Applies a vector divide operation on the whole row, via optimised list comprehension.
 
         Complexity per call: Time: O(n), Space: during O(n), post O(1)
         """
         local_matrix[row] = [el/div for el in local_matrix[row]]  # use int divide if possible
 
-    def row_reduce_helper(self, i: int, row: int, val: Num, local_matrix):
+    def row_reduce_helper(self, i: int, row: int, val: Num, local_matrix):  # TODO RETEST
         """Applies a vector row reduce to a single row, via optimised list comprehension.
 
         Complexity per call: Time: O(n), Space: during O(n), post O(1)
@@ -2332,7 +2355,7 @@ class Matrix:
         local_matrix[i] = [el - val * local_matrix[row][col]
                            for col, el in enumerate(local_matrix[i])]
 
-    def row_reduce(self, row: int, col: int, row_begin: int):
+    def row_reduce(self, row: int, col: int, row_begin: int):  # TODO RETEST
         """Applies the whole row reduction step to the matrix.
 
         Complexity per call: Time: O(n^2), Space: during O(n), post O(1)
@@ -2342,7 +2365,7 @@ class Matrix:
             if i != row:
                 self.row_reduce_helper(i, row, local_matrix[i][col], local_matrix)
 
-    def row_reduce_2(self, row: int, col: int, determinant):
+    def row_reduce_2(self, row: int, col: int, determinant):  # TODO RETEST
         """Applies the whole row reduction step to both the matrix and its determinant."""
         determinant_matrix = determinant.matrix  # prefix optimization see class docs for more info
         local_matrix = self.matrix               # it is optional
@@ -2352,7 +2375,7 @@ class Matrix:
                 self.row_reduce_helper(i, row, const_value, local_matrix)
                 determinant.row_reduce_helper(i, row, const_value, determinant_matrix)
 
-    def get_augmented_matrix(self, matrix_b):
+    def get_augmented_matrix(self, matrix_b):  # TODO RETEST
         """Given matrix A and B return augmented matrix = A | B.
 
         Complexity per call: Time: O(n^2), Space: O(n^2)
@@ -2364,7 +2387,7 @@ class Matrix:
         augmented.fill_matrix_from_row_col(matrix_b.matrix, 0, self.num_cols)
         return augmented
 
-    def get_determinant_matrix(self):
+    def get_determinant_matrix(self):  # TODO RETEST
         """Compute the determinant of a matrix and return the result.
 
          Complexity per call: Time: O(n^3), T(n^3 + n^2), Space: (n^2)
@@ -2393,7 +2416,7 @@ class MatrixAlgorithms:
     def matrix_pow_base_exponent_mod(self, base: Matrix, exponent: int, mod_m: int) -> Matrix:
         """Modular exponentiation applied to square matrices. For normal pow omit mod_m.
         [translated from Competitive Programming 4 part 2 c++ book, in the math section]
-
+        # TODO RETEST
         Complexity per call: Time: [big n]O(n^3 log p), [small n] O(log p), Space: O(n^2)
         Input:
             base: the matrix represent the base, nxn matrix
@@ -2410,7 +2433,7 @@ class MatrixAlgorithms:
             exponent //= 2
         return result
 
-    def get_rank_via_reduced_row_echelon(self, aug_ab: Matrix) -> int:
+    def get_rank_via_reduced_row_echelon(self, aug_ab: Matrix) -> int:  # TODO RETEST
         """Method used is Gauss-jordan elimination, only partial pivoting.
         [translated from standford 2016 c++ acm icpc booklet]
 
@@ -2435,7 +2458,7 @@ class MatrixAlgorithms:
                 rank += 1
         return rank
             
-    def gauss_elimination(self, aug_ab: Matrix) -> int:
+    def gauss_elimination(self, aug_ab: Matrix) -> int:  # TODO RETEST
         """Computes gauss with constraints, Ax=b | A -> nxn matrix, b -> nx1 matrix aug_ab = A | b.
          [translated from foreverbell 2014 c++ acm icpc cheat sheet repo]
 
@@ -2467,7 +2490,7 @@ class MatrixAlgorithms:
                 augmented_matrix[j][i] = 0
         return rank
 
-    def gauss_jordan_elimination(self, a: Matrix, b: Matrix) -> float:
+    def gauss_jordan_elimination(self, a: Matrix, b: Matrix) -> float:  # TODO RETEST
         """Full pivoting. Mutates a and b [translated from standford 2016 c++ acm icpc booklet]
 
         Complexity per call: Time: O(n^3), Space: O(n), S(4n)
@@ -2513,12 +2536,3 @@ class MatrixAlgorithms:
                     matrix_a[k][i_row_p], matrix_a[k][i_col_p] = (matrix_a[k][i_col_p],
                                                                   matrix_a[k][i_row_p])
         return det
-            
-
-            
-    
-        
-    
-    
-
-
