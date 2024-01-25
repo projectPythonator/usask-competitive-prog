@@ -1,3 +1,4 @@
+import string
 from typing import List, Tuple, Set
 from sys import setrecursionlimit
 
@@ -2009,6 +2010,7 @@ class StringAlgorithms:
         self.seperator_list = []
         self.hash_powers = []
         self.hash_h_values = []
+        self.left_mod_inverse = []
 
     def init_data(self, new_text):
         self.n = len(new_text)
@@ -2221,7 +2223,7 @@ class StringAlgorithms:
         """For a given text compute and store the rolling hash. we use the smallest prime lower than
         2^30 since python gets slower after 2^30, p = 131 is a small prime below 256.
 
-        Complexity per call: Time: O(n), T(4n),  Space O(n), midcall S(6n), post call S(3n)
+        Complexity per call: Time: O(n), T(4n),  Space O(n), midcall S(6n), post call S(4n)
         """
         len_text, p, m = len(new_text), 131, 2**30 - 35  # p is prime m is the smallest prime < 2^30
         h_vals, powers, ord_iter = [0] * len_text, [0] * len_text, map(ord, new_text)
@@ -2233,31 +2235,33 @@ class StringAlgorithms:
         self.text = new_text
         self.hash_powers, self.hash_h_values = powers, h_vals
         self.prime_p, self.mod_m, self.math_algos = p, m, MathAlgorithms()
+        self.left_mod_inverse = [pow(power, m-2, m) for power in powers]  # optional
 
+    def hash_fast_log_n(self, left, right):
+        """Log n time calculation of rolling hash formula: h[right]-h[left] * mod_inverse(left).
 
-    def hash_fast(self, l, r):
-        if l == 0:
-            return self.h_vals[r]
-        ans = ((self.h_vals[r] - self.h_vals[l - 1]) % self.mod_m + self.mod_m) % self.mod_m
-        ans = (ans * self.math_algos.mod_inverse(self.powers[l], self.mod_m)) % self.mod_m
+        Complexity per call: Time: O(log mod_m), Space: O(1)
+        """
+        loc_h_vals = self.hash_h_values  # optional avoids expensive load_attr operation
+        ans = loc_h_vals[right]
+        if left != 0:
+            loc_mod = self.mod_m  # optional avoids expensive load_attr operation
+            ans = ((ans - loc_h_vals[left - 1])
+                   * pow(self.hash_powers[left], loc_mod-2, loc_mod)) % loc_mod
         return ans
 
+    def hash_fast_constant(self, left, right):
+        """Constant time calculation of rolling hash. formula: h[right]-h[left] * mod_inverse[left]
 
-import dis
-a = StringAlgorithms()
-dis.dis(a.compute_rolling_hash)
-
-
-
-
-
-
-
-
-
-
-
-
+        Complexity per call: Time: O(1), Space: O(1)
+        more uses: string matching in n + m or constant if you know that it's a set size
+        kattis typo: uses a variant of this were you will expand on the code further.
+        """
+        loc_h_vals = self.hash_h_values  # optional avoids expensive load_attr operation
+        ans = loc_h_vals[right]
+        if left != 0:
+            ans = ((ans - loc_h_vals[left - 1]) * self.left_mod_inverse[left]) % self.mod_m
+        return ans
 
 class Matrix:
     def __init__(self, n, m):
