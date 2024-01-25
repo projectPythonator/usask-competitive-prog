@@ -2386,13 +2386,9 @@ class Matrix:
         return r
 
 
-class Matrix_Algorithhms:
+class MatrixAlgorithms:
     def __init__(self):
-        self.matrix_A = []
-        self.matrix_b = []
-        self.matrix_x = []
-        self.num_rows = 0
-        self.num_cols = 0
+        pass
 
     def matrix_pow_base_exponent_mod(self, base: Matrix, exponent: int, mod_m: int) -> Matrix:
         """Modular exponentiation applied to square matrices. For normal pow omit mod_m.
