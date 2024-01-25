@@ -1666,7 +1666,7 @@ class GeometryAlgorithms:
         side = self.point_c_rotation_wrt_line_ab(pts[left], pts[left + 1] - pts[left], p)
         return side >= 0
     
-    # use a set with points if possible checking on the same polygon many times    
+    # use a set with points if possible checking on the same polygon many times
     # return 0 for on 1 for in -1 for out
     def pt_p_position_wrt_polygon_pts(self, pts, p):
         """Will determine if a point is in on or outside a polygon.
@@ -2243,101 +2243,147 @@ class StringAlgorithms:
             ans = ((ans - loc_h_vals[left - 1]) * self.left_mod_inverse[left]) % self.mod_m
         return ans
 
+
 class Matrix:
-    def __init__(self, n, m):
-        self.matrix = []
+    """Optimization notes: prefixed names of form local_NAME are used to avoid expensive load_attr
+    calls they can be replaced with self.NAME or passed in as global values, """
+    def __init__(self, n, m, init_value: Num):
         self.num_rows = n
         self.num_cols = m
-        self.matrix = [[0 for _ in range(m)] for _ in range(n)]
+        self.matrix = [[init_value] * m for _ in range(n)]
+        self.matrix_left = []
+        self.matrix_right = []
 
-    def get_best_sawp_row(self, row, col):
-        local_mat, local_rows = self.matrix, self.num_rows
-        best, pos = 0.0, -1
-        for i in range(row, local_rows):
-            if abs(local_mat[i][col]) > best:
-                best, pos = abs(local_mat[i][col]), i
-        return pos
+    def prep_matrix_multiply(self, matrix_a, matrix_b, size_n):
+        """loads up the left and right matrices for a matrix multiply. O(n^2) but optimized."""
+        self.matrix_left = [[el for el in row] for row in matrix_a]
+        self.matrix_right = [[el for el in row] for row in matrix_b]
+        self.matrix = [[0] * size_n for _ in range(size_n)]
+        self.num_rows = self.num_cols = size_n
 
-    def swap_rows(self, row_a, row_b):
-        local_mat = self.matrix
-        local_mat[row_a], local_mat[row_b] = local_mat[row_b], local_mat[row_a]
+    def fast_copy(self, other):
+        """Quickly copy one matrix to another. MIGHT CHANGE SIZE, O(n^2), is fast copy tho."""
+        other_mat = other.matrix
+        self.matrix = [[el for el in row] for row in other_mat]
 
-    def divide_row(self, row, div):
-        local_mat, local_cols = self.matrix, self.num_cols
-        for i in range(local_cols):
-            local_mat[row][i] /= div
+    def fill_matrix_from_row_col(self, new_matrix, row_offset: int, col_offset: int):
+        """fill self.matrix from row and col offset with new_matrix, O(n^2). Doesn't change size."""
+        local_matrix = self.matrix  # prefix optimization see class docs for more info
+        for i, row in enumerate(new_matrix):
+            for j, new_value in enumerate(row):
+                local_matrix[i + row_offset][j + col_offset] = new_value
 
-    def row_reduce_helper(self, i, row, val):
-        local_mat, local_cols = self.matrix, self.num_cols
-        for j in range(local_cols):
-            self.matrix[i][j] -= (val * local_mat[row][j])
+    def matrix_multiply_mod_a_times_b(self, multiplier_1, multiplier_2, mod_m):
+        """Performs (A*B)%mod_m on matrix A,B and mod=mod_m, for normal multiply just remove mod_m.
 
-    def row_reduce(self, row, col, row_begin):
-        for i in range(row_begin, self.num_rows):
-            if i != row:
-                self.row_reduce_helper(i, row, self.matrix[i][col])
-
-    def row_reduce_2(self, row, col, other):
-        for i in range(self.num_rows):
-            if i != row:
-                tmp = self.matrix[i][col]
-                self.matrix[i][col] = 0
-                self.row_reduce_helper(i, row, tmp)
-                other.row_reduce_helper(i, row, tmp)
-
-    def __mul__(self, multiplier):
-        product = Matrix(self.num_rows, self.num_rows)
-        for k in range(self.num_rows):
-            for i in range(self.num_rows):
-                if self.matrix[i][k] != 0:
-                    for j in range(self.num_rows):
-                        product.matrix[i][j] += (self.matrix[i][k] * multiplier.matrix[k][j])
-        return product 
+        Complexity per call: Time: O(n^3), T(n^3 + n^2), Space: (1), does require 3n^2 in memory tho
+        """
+        local_num_rows = self.num_rows  # prefix optimization see class docs for more info.
+        self.prep_matrix_multiply(multiplier_1.matrix, multiplier_2.matrix, local_num_rows)
+        local_matrix = self.matrix    # prefix optimization see class docs for more info.
+        mat_a = self.matrix_left   # prefix optimization see class docs for more info.
+        mat_b = self.matrix_right  # prefix optimization see class docs for more info.
+        for i in range(local_num_rows):
+            for k in range(local_num_rows):
+                mat_a_ik = mat_a[i][k]
+                if 0 != mat_a_ik:  # skip because we will just be adding 0 to local
+                    for j in range(local_num_rows):
+                        local_matrix[i][j] = (local_matrix[i][j] + mat_a_ik * mat_b[k][j]) % mod_m
+        self.matrix_left, self.matrix_right = [], []   # optional? keep space small
 
     def set_identity(self):
-        for i in range(base.num_rows):
-            for j in range(base.num_rows):
-                self.matrix[i][j] = 1 if i == j else 0
+        """Used for pow and pow mod on matrices. O(n^2) but memset(0) lvl speed for python."""
+        local_matrix, local_num_rows = self.matrix, self.num_rows
+        local_matrix = [[0] * local_num_rows for _ in range(local_num_rows)]  # memset(0) in python
+        for i in range(local_num_rows):
+            local_matrix[i][i] = 1
 
-    def fill_matrix(self, new_matrix, a, b):
-        for i in range(new_matrix.num_rows):
-            for j in range(new_matrix.num_cols):
-                self.matrix[i + a][j + b] = new_matrix.matrix[i][j]
+    def get_best_sawp_row(self, row: int, col: int, local_matrix, local_num_rows):
+        """Find the best pivot row defined as the row with the highest absolute value.
 
+        Complexity per call: Time: O(n), Space: O(1)
+        """
+        best, pos = 0.0, -1
+        for i in range(row, local_num_rows):
+            column_value = abs(local_matrix[i][col])  # compute and lookup the value only once
+            if column_value > best:
+                best, pos = column_value, i
+        return pos
+
+    def swap_rows(self, row_a: int, row_b: int, local_matrix):
+        """Swaps two rows a and b, via reference swapping so should be constant time.
+
+        Complexity per call: Time: O(1)[or very fast O(n) like memset], Space: O(1)
+        """
+        local_matrix[row_a], local_matrix[row_b] = local_matrix[row_b], local_matrix[row_a]
+
+    def row_divide(self, row: int, div: float, local_matrix):
+        """Applies a vector divide operation on the whole row, via optimised list comprehension.
+
+        Complexity per call: Time: O(n), Space: during O(n), post O(1)
+        """
+        local_matrix[row] = [el/div for el in local_matrix[row]]  # use int divide if possible
+
+    def row_reduce_helper(self, i: int, row: int, val: Num, local_matrix):
+        """Applies a vector row reduce to a single row, via optimised list comprehension.
+
+        Complexity per call: Time: O(n), Space: during O(n), post O(1)
+        """
+        local_matrix[i] = [el - val * local_matrix[row][col]
+                           for col, el in enumerate(local_matrix[i])]
+
+    def row_reduce(self, row: int, col: int, row_begin: int):
+        """Applies the whole row reduction step to the matrix.
+
+        Complexity per call: Time: O(n^2), Space: during O(n), post O(1)
+        """
+        local_matrix = self.matrix  # prefix optimization see class docs for more info
+        for i in range(row_begin, self.num_rows):
+            if i != row:
+                self.row_reduce_helper(i, row, local_matrix[i][col], local_matrix)
+
+    def row_reduce_2(self, row: int, col: int, determinant):
+        """Applies the whole row reduction step to both the matrix and its determinant."""
+        determinant_matrix = determinant.matrix  # prefix optimization see class docs for more info
+        local_matrix = self.matrix               # it is optional
+        for i in range(self.num_rows):
+            if i != row:
+                const_value, local_matrix[i][col] = local_matrix[i][col], 0.0
+                self.row_reduce_helper(i, row, const_value, local_matrix)
+                determinant.row_reduce_helper(i, row, const_value, determinant_matrix)
 
     def get_augmented_matrix(self, matrix_b):
-        augmented = Matrix(self.num_rows + matrix_b.num_rows, 
-                           self.num_cols + matrix_b.num_cols)
-        augmented.fill_matrix(self, 0, 0)
-        augmented.fill_matrix(matrix_b, 0, self.num_cols)
+        """Given matrix A and B return augmented matrix = A | B.
+
+        Complexity per call: Time: O(n^2), Space: O(n^2)
+        """
+        augmented = Matrix(self.num_rows + matrix_b.num_rows,
+                           self.num_cols + matrix_b.num_cols,
+                           self.matrix[0][0])
+        augmented.fill_matrix_from_row_col(self.matrix, 0, 0)
+        augmented.fill_matrix_from_row_col(matrix_b.matrix, 0, self.num_cols)
         return augmented
 
     def get_determinant_matrix(self):
-        det = Matrix(self.num_rows, self.num_cols)
-        r = 1
-        det.fill_matrix(self, 0, 0)
-        for i in range(self.num_rows):
-            for j in range(self.num_rows):
-                while determinant.matrix[j][i] != 0:
-                    ratio = det.matrix[i][i] / det.matrix[j][i]
-                    for k in range(i, self.num_rows):
-                        det.matrix[i][k] -= (ratio * det.matrix[j][k])
-                        det.matrix[i][k], det.matrix[j][k] = det.matrix[j][k], det.matrix[i][k]
+        """Compute the determinant of a matrix and return the result.
+
+         Complexity per call: Time: O(n^3), T(n^3 + n^2), Space: (n^2)
+        """
+        det_num_rows = self.num_rows
+        determinant = Matrix(det_num_rows, self.num_cols, self.matrix[0][0])
+        determinant.fast_copy(self)
+        det_matrix = determinant.matrix
+        r = 1.0
+        for i in range(det_num_rows):
+            for j in range(det_num_rows):
+                while det_matrix[j][i] != 0:
+                    ratio = det_matrix[i][i] / det_matrix[j][i]
+                    for k in range(i, det_num_rows):
+                        det_matrix[i][k] = (det_matrix[i][k] - ratio * det_matrix[j][k])
+                        det_matrix[i][k], det_matrix[j][k] = det_matrix[j][k], det_matrix[i][k]
                     r = -r
-            r = r * det[i][i]
+            r = r * det_matrix[i][i]
         return r
-
-import dis
-M = Matrix(1,1,)
-dis.dis(M.swap_rows)
-
-
-
-
-
-
-
-
 
 
 class Matrix_Algorithhms:
@@ -2348,13 +2394,13 @@ class Matrix_Algorithhms:
         self.num_rows = 0
         self.num_cols = 0
 
-    def matrix_exponentiation(self, base, power):
-        result = Matrix(base.num_rows, base.num_rows)
+    def matrix_pow_mod(self, base, power: int, mod_m: int):
+        result = Matrix(base.num_rows, base.num_rows, 0)
         result.set_identity()
         while power:
-            if power%2 == 1:
-                result = result * base
-            base = base * base
+            if power % 2 == 1:
+                result.matrix_multiply_mod_a_times_b(result, base, mod_m)
+            base.matrix_multiply_mod_a_times_b(base, base, mod_m)
             power //= 2
         return result
     
@@ -2369,63 +2415,88 @@ class Matrix_Algorithhms:
     def init_data(self, n, m):
         self.init_constants(n, m)
 
-    def get_rank_via_reduced_row_echelon(self, aug_Ab):
+    def get_rank_via_reduced_row_echelon(self, aug_ab: Matrix) -> int:
+        """
+
+        """
+        local_num_rows, local_num_cols = aug_ab.num_rows, aug_ab.num_cols
+        augmented_matrix = aug_ab.matrix
         rank = 0
-        for col in range(aug_Ab.num_cols):
-            if rank == aug_Ab.num_rows:
+        for col in range(local_num_cols):
+            if rank == local_num_rows:
                 break
-            pos = aug_Ab.get_best_sawp_row(rank, col)
-            if pos != -1:
-                aug_Ab.swap_rows(pos, rank)
-                aug_Ab.divide_row(rank, aug_Ab.matrix[row][col])
-                aug_Ab.row_reduce(rank, col, 0)
+            swap_row = aug_ab.get_best_sawp_row(rank, col, augmented_matrix, local_num_rows)
+            if swap_row != -1:
+                aug_ab.swap_rows(swap_row, rank, augmented_matrix)
+                aug_ab.row_divide(rank, augmented_matrix[rank][col], augmented_matrix)
+                aug_ab.row_reduce(rank, col, 0)
                 rank += 1
         return rank
             
-    def gauss_elimination(self, aug_Ab):
+    def gauss_elimination(self, aug_ab: Matrix):
+        local_num_rows, local_num_cols = aug_ab.num_rows, aug_ab.num_cols
+        n = local_num_rows
+        augmented_matrix = aug_ab.matrix
         rank = 0
-        for col in range(aug_Ab.num_cols):
-            if rank == aug_Ab.num_rows:
+        for col in range(local_num_cols):
+            if rank == local_num_rows:
                 break
-            pos = aug_Ab.get_best_sawp_row(rank, col)
-            if pos != -1:
-                aug_Ab.swap_rows(pos, rank)
-                aug_Ab.divide_row(rank, aug_Ab.matrix[row][col])
-                aug_Ab.row_reduce(rank, col, rank + 1)
+            swap_row = aug_ab.get_best_sawp_row(rank, col, augmented_matrix, local_num_rows)
+            if swap_row != -1:
+                aug_ab.swap_rows(swap_row, rank, augmented_matrix)
+                aug_ab.row_divide(rank, augmented_matrix[rank][col], augmented_matrix)
+                aug_ab.row_reduce(rank, col, rank + 1)
                 rank += 1
-        n = aug_Ab.num_rows
         for i in range(n - 1, -1, -1):
             for j in range(i):
-                aug_Ab.matrix[j][n] -= (aug_Ab.matrix[i][n] * aug_Ab.matrix[j][i])
-                aug_Ab.matrix[j][i] = 0
+                augmented_matrix[j][n] -= (augmented_matrix[i][n] * augmented_matrix[j][i])
+                augmented_matrix[j][i] = 0
 
-    def gauss_jordan_elimination(self, a, b):
-        n, m = a.num_rows, b.num_cols
+    def gauss_jordan_elimination(self, a: Matrix, b: Matrix) -> float:
+        """Full pivoting. Mutates a and b [translated from standford 2016 c++ acm icpc booklet]
+
+        Complexity per call: Time: O(n^3), Space: O(n), S(4n)
+        More uses: solving systems of linear equations (AX=B), Inverting matrices (AX=I), and
+        Computing determinants of square matrices.
+
+        Input:
+            a = nxn matrix
+            b = nxm matrix
+        Mutation:
+            b -> X | X = nxm matrix
+            a -> A^{-1} | nxn matrix
+            returns determinant of a
+        """
+        n = a.num_rows
+        matrix_a = a.matrix
+        matrix_b = b.matrix
         det = 1.0
-        irow, icol, ipivj, ipivk = [0] * n, [0] * n, set(range(n)), set(range(n))
+        i_row, i_col, i_piv_j, i_piv_k = [0] * n, [0] * n, set(range(n)), set(range(n))
         for i in range(n):
             pj, pk = -1, -1
-            for j in ipivj:
-                for k in ipivk:
-                    if pj == -1 or abs(a.matrix[j][k]) > abs(a.math[pj][pk]):
+            for j in i_piv_j:
+                for k in i_piv_k:
+                    if pj == -1 or abs(matrix_a[j][k]) > abs(matrix_a[pj][pk]):
                         pj, pk = j, k
-            ipivj.remove(pk)
-            ipivk.remove(pk)
-            a.swap_rows(pj, pk)
-            b.swap_rows(pj, pk)
+            i_piv_j.remove(pk)
+            i_piv_k.remove(pk)
+            a.swap_rows(pj, pk, matrix_a)
+            b.swap_rows(pj, pk, matrix_b)
             if pj != pk:
                 det = -det
-            irow[i], icol[i] = pj, pk
-            div = a.matrix[pk][pk]
+            i_row[i], i_col[i] = pj, pk
+            div = matrix_a[pk][pk]
             det /= div
-            a.matrix[pk][pk] = 1.0
-            a.divide_row(pk, div)
-            b.divide_row(pk, div)
+            matrix_a[pk][pk] = 1.0
+            a.row_divide(pk, div, matrix_a)
+            b.row_divide(pk, div, matrix_b)
             a.row_reduce_2(pk, pk, b)
         for p in range(n - 1, -1, -1):
-            if irow[p] != icol[p]:
+            if i_row[p] != i_col[p]:
+                i_row_p, i_col_p = i_row[p], i_col[p]
                 for k in range(n):
-                    a.matrix[k][irow[p]], a.matrix[k][icol[p]] = a.matrix[k][icol[p]], a.matrix[k][irow[p]]
+                    matrix_a[k][i_row_p], matrix_a[k][i_col_p] = (matrix_a[k][i_col_p],
+                                                                  matrix_a[k][i_row_p])
         return det
             
 
