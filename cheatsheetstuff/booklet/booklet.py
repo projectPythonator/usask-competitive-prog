@@ -2030,7 +2030,6 @@ class StringAlgorithms:
         self.pattern_len = pattern_len
         self.back_table = back_table
 
-
     def kmp_search_find_indices(self, text_to_search):
         """Search the text for the pattern we preprocessed.
 
