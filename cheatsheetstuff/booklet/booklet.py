@@ -2394,7 +2394,7 @@ class Matrix_Algorithhms:
         self.num_rows = 0
         self.num_cols = 0
 
-    def matrix_pow_mod(self, base: Matrix, exponent: int, mod_m: int) -> Matrix:
+    def matrix_pow_base_exponent_mod(self, base: Matrix, exponent: int, mod_m: int) -> Matrix:
         """Modular exponentiation applied to square matrices. For normal pow omit mod_m.
         [translated from Competitive Programming 4 part 2 c++ book, in the math section]
 
