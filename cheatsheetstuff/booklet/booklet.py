@@ -18,7 +18,7 @@ setrecursionlimit(10000000)  # 10 million should be good enough for most contest
 class UnionFindDisjointSets:
     """This Data structure is for none directional disjoint sets."""
     def __init__(self, n):
-        self.parent = list(range(n))
+        self.parent = [i for i in range(n)]
         self.rank = [0] * n        # optional optimization
         self.set_sizes = [1] * n   # optional information
         self.num_sets = n          # optional information
@@ -29,8 +29,9 @@ class UnionFindDisjointSets:
         Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
                     Space: Amortized O(1) stack space
         """
-        root_parent = u if self.parent[u] == u else self.find_set(self.parent[u])
-        self.parent[u] = root_parent
+        local_parent = self.parent
+        root_parent = u if local_parent[u] == u else self.find_set(local_parent[u])
+        local_parent[u] = root_parent
         return root_parent
         
     def is_same_set(self, u, v):
