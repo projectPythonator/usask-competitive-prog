@@ -16,7 +16,7 @@ setrecursionlimit(10000000)  # 10 million should be good enough for most contest
 
 
 class UnionFindDisjointSets:
-    """This Data structure is for none directional disjoint sets."""
+    """This Data structure is for non-directional disjoint sets."""
     def __init__(self, n):
         self.parent = [i for i in range(n)]
         self.rank = [0] * n        # optional optimization
