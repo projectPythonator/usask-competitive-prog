@@ -2012,25 +2012,6 @@ class StringAlgorithms:
         self.hash_h_values = []
         self.left_mod_inverse = []
 
-    def init_data(self, new_text):
-        self.n = len(new_text)
-        self.text = new_text
-
-    def prepare_text_data(self, new_text):
-        self.text = new_text
-        self.text_len = len(new_text)
-
-    def prepare_pattern_data(self, new_pattern):
-        self.pattern = new_pattern
-        self.pattern_len = len(new_pattern)
-
-    def prepare_rolling_hash_data(self):
-        self.prime_p = 131
-        self.mod_m = 10**9 - 7
-        self.powers = [0] * self.text_len
-        self.h_vals = [0] * self.text_len
-        self.math_algos = MathAlgorithms()
-
     def kmp_preprocess(self, new_pattern):
         """Preprocess the pattern for KMP. TODO add a bit more to this description ?
 
