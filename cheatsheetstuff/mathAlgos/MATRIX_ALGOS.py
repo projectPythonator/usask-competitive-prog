@@ -32,26 +32,26 @@ class MATRIX_ALGOS:
                 return None
             ipiv[pk]+=1
             self.mat[pj],self.mat[pk]=self.mat[pk],self.mat[pj]
-            b.mat[pj],b.mat[pk]=b.mat[pk],b.mat[pj]
+            b.matrix[pj],b.matrix[pk]=b.matrix[pk],b.matrix[pj]
             if pj!=pk: det*=-1
             irow[i],icol[i]=pj,pk
             
             c,det=1.0/self.mat[pk][pk],det*self.mat[pk][pk]
             self.mat[pk][pk]=1.0
             for p in range(n): self.mat[pk][p]*=c
-            for p in range(m): b.mat[pk][p]*=c
+            for p in range(m): b.matrix[pk][p]*=c
             for p in range(n):
                 if p!=pk:
                     c=self.mat[p][pk]
                     self.mat[p][pk]=0
                     for q in range(n): self.mat[p][q]-=(self.mat[pk][q]*c)
-                    for q in range(m): b.mat[p][q]-=(b.mat[pk][q]*c)
+                    for q in range(m): b.matrix[p][q]-=(b.matrix[pk][q] * c)
         for p in range(n-1, -1, -1):
             if irow[p]==icol[p]: continue
             for k in range(n): self.mat[k][irow[p]],self.mat[k][icol[p]]=self.mat[k][icol[p]],self.mat[k][irow[p]]
         for i in range(n):
             for j in range(n): self.mat[i][j]=round(self.mat[i][j],NUM_SIG)
-            for j in range(m): b.mat[i][j]=round(b.mat[i][j],NUM_SIG)
+            for j in range(m): b.matrix[i][j]=round(b.matrix[i][j], NUM_SIG)
         return round(det,NUM_SIG)
     
 def main():

@@ -2245,39 +2245,43 @@ class StringAlgorithms:
 
 class Matrix:
     def __init__(self, n, m):
+        self.matrix = []
         self.num_rows = n
         self.num_cols = m
-        self.mat = [[0 for _ in range(m)] for _ in range(n)]
+        self.matrix = [[0 for _ in range(m)] for _ in range(n)]
 
     def get_best_sawp_row(self, row, col):
+        local_mat, local_rows = self.matrix, self.num_rows
         best, pos = 0.0, -1
-        for i in range(row, self.num_rows):
-            if abs(self.mat[i][col]) > best:
-                best, pos = abs(self.mat[i][col]), i
+        for i in range(row, local_rows):
+            if abs(local_mat[i][col]) > best:
+                best, pos = abs(local_mat[i][col]), i
         return pos
 
     def swap_rows(self, row_a, row_b):
-        for i in range(self.num_cols):
-            self.mat[row_a][i], self.mat[row_b][i] = self.mat[row_b][i], self.mat[row_a][i]
+        local_mat = self.matrix
+        local_mat[row_a], local_mat[row_b] = local_mat[row_b], local_mat[row_a]
 
     def divide_row(self, row, div):
-        for i in range(self.num_cols):
-            self.mat[row][i] /= div
+        local_mat, local_cols = self.matrix, self.num_cols
+        for i in range(local_cols):
+            local_mat[row][i] /= div
 
     def row_reduce_helper(self, i, row, val):
-        for j in range(self.num_cols):
-            self.mat[i][j] -= (val * self.mat[row][j])
+        local_mat, local_cols = self.matrix, self.num_cols
+        for j in range(local_cols):
+            self.matrix[i][j] -= (val * local_mat[row][j])
 
     def row_reduce(self, row, col, row_begin):
         for i in range(row_begin, self.num_rows):
             if i != row:
-                self.row_reduce_helper(i, row, self.mat[i][col])
+                self.row_reduce_helper(i, row, self.matrix[i][col])
 
     def row_reduce_2(self, row, col, other):
         for i in range(self.num_rows):
             if i != row:
-                tmp = self.mat[i][col]
-                self.mat[i][col] = 0
+                tmp = self.matrix[i][col]
+                self.matrix[i][col] = 0
                 self.row_reduce_helper(i, row, tmp)
                 other.row_reduce_helper(i, row, tmp)
 
@@ -2285,20 +2289,20 @@ class Matrix:
         product = Matrix(self.num_rows, self.num_rows)
         for k in range(self.num_rows):
             for i in range(self.num_rows):
-                if self.mat[i][k] != 0:
+                if self.matrix[i][k] != 0:
                     for j in range(self.num_rows):
-                        product.mat[i][j] += (self.mat[i][k] * multiplier.mat[k][j])
+                        product.matrix[i][j] += (self.matrix[i][k] * multiplier.matrix[k][j])
         return product 
 
     def set_identity(self):
         for i in range(base.num_rows):
             for j in range(base.num_rows):
-                self.mat[i][j] = 1 if i==j else 0
+                self.matrix[i][j] = 1 if i == j else 0
 
     def fill_matrix(self, new_matrix, a, b):
         for i in range(new_matrix.num_rows):
             for j in range(new_matrix.num_cols):
-                self.mat[i + a][j + b] = new_matrix.mat[i][j]
+                self.matrix[i + a][j + b] = new_matrix.matrix[i][j]
 
 
     def get_augmented_matrix(self, matrix_b):
@@ -2314,22 +2318,18 @@ class Matrix:
         det.fill_matrix(self, 0, 0)
         for i in range(self.num_rows):
             for j in range(self.num_rows):
-                while determinant.mat[j][i] != 0:
-                    ratio = det.mat[i][i] / det.mat[j][i]
+                while determinant.matrix[j][i] != 0:
+                    ratio = det.matrix[i][i] / det.matrix[j][i]
                     for k in range(i, self.num_rows):
-                        det.mat[i][k] -= (ratio * det.mat[j][k])
-                        det.mat[i][k], det.mat[j][k] = det.mat[j][k], det.mat[i][k]
+                        det.matrix[i][k] -= (ratio * det.matrix[j][k])
+                        det.matrix[i][k], det.matrix[j][k] = det.matrix[j][k], det.matrix[i][k]
                     r = -r
             r = r * det[i][i]
         return r
 
-
-
-
-
-
-
-
+import dis
+M = Matrix(1,1,)
+dis.dis(M.swap_rows)
 
 
 
@@ -2377,7 +2377,7 @@ class Matrix_Algorithhms:
             pos = aug_Ab.get_best_sawp_row(rank, col)
             if pos != -1:
                 aug_Ab.swap_rows(pos, rank)
-                aug_Ab.divide_row(rank, aug_Ab.mat[row][col])
+                aug_Ab.divide_row(rank, aug_Ab.matrix[row][col])
                 aug_Ab.row_reduce(rank, col, 0)
                 rank += 1
         return rank
@@ -2390,14 +2390,14 @@ class Matrix_Algorithhms:
             pos = aug_Ab.get_best_sawp_row(rank, col)
             if pos != -1:
                 aug_Ab.swap_rows(pos, rank)
-                aug_Ab.divide_row(rank, aug_Ab.mat[row][col])
+                aug_Ab.divide_row(rank, aug_Ab.matrix[row][col])
                 aug_Ab.row_reduce(rank, col, rank + 1)
                 rank += 1
         n = aug_Ab.num_rows
         for i in range(n - 1, -1, -1):
             for j in range(i):
-                aug_Ab.mat[j][n] -= (aug_Ab.mat[i][n] * aug_Ab.mat[j][i])
-                aug_Ab.mat[j][i] = 0
+                aug_Ab.matrix[j][n] -= (aug_Ab.matrix[i][n] * aug_Ab.matrix[j][i])
+                aug_Ab.matrix[j][i] = 0
 
     def gauss_jordan_elimination(self, a, b):
         n, m = a.num_rows, b.num_cols
@@ -2407,7 +2407,7 @@ class Matrix_Algorithhms:
             pj, pk = -1, -1
             for j in ipivj:
                 for k in ipivk:
-                    if pj == -1 or abs(a.mat[j][k]) > abs(a.math[pj][pk]):
+                    if pj == -1 or abs(a.matrix[j][k]) > abs(a.math[pj][pk]):
                         pj, pk = j, k
             ipivj.remove(pk)
             ipivk.remove(pk)
@@ -2416,16 +2416,16 @@ class Matrix_Algorithhms:
             if pj != pk:
                 det = -det
             irow[i], icol[i] = pj, pk
-            div = a.mat[pk][pk]
+            div = a.matrix[pk][pk]
             det /= div
-            a.mat[pk][pk] = 1.0
+            a.matrix[pk][pk] = 1.0
             a.divide_row(pk, div)
             b.divide_row(pk, div)
             a.row_reduce_2(pk, pk, b)
         for p in range(n - 1, -1, -1):
             if irow[p] != icol[p]:
                 for k in range(n):
-                    a.mat[k][irow[p]], a.mat[k][icol[p]] = a.mat[k][icol[p]], a.mat[k][irow[p]]
+                    a.matrix[k][irow[p]], a.matrix[k][icol[p]] = a.matrix[k][icol[p]], a.matrix[k][irow[p]]
         return det
             
 

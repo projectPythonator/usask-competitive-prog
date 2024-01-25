@@ -62,7 +62,7 @@ class GRAPH_ALGOS():
         for k in range(self.V):
             for i in range(self.V):
                 for j in range(self.V):
-                    #if self.mat[i][k]<INF and self.mat[k][j]<INF: #use for negative cycles check
+                    #if self.matrix[i][k]<INF and self.matrix[k][j]<INF: #use for negative cycles check
                     self.mat[i][j]=min(self.mat[i][j], self.mat[i][k]+self.mat[k][j])
     
     def APSP_neg_cycles(self):
