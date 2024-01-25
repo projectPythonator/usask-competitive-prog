@@ -2394,30 +2394,36 @@ class Matrix_Algorithhms:
         self.num_rows = 0
         self.num_cols = 0
 
-    def matrix_pow_mod(self, base, power: int, mod_m: int):
+    def matrix_pow_mod(self, base: Matrix, exponent: int, mod_m: int) -> Matrix:
+        """Modular exponentiation applied to square matrices. For normal pow omit mod_m.
+        [translated from Competitive Programming 4 part 2 c++ book, in the math section]
+
+        Complexity per call: Time: [big n]O(n^3 log p), [small n] O(log p), Space: O(n^2)
+        Input:
+            base: the matrix represent the base, nxn matrix
+        Mutations and return:
+            base get  mutated to keep up with the calculation.
+            returns the resulting matrix from (b^e)%m
+        """
         result = Matrix(base.num_rows, base.num_rows, 0)
         result.set_identity()
-        while power:
-            if power % 2 == 1:
+        while exponent:
+            if exponent % 2 == 1:
                 result.matrix_multiply_mod_a_times_b(result, base, mod_m)
             base.matrix_multiply_mod_a_times_b(base, base, mod_m)
-            power //= 2
+            exponent //= 2
         return result
-    
-    def init_matrices(self):
-        self.matrix_A = [[0 for _ in range(self.num_rows)] for _ in range(self.num_rows)] 
-        self.matrix_b = [[0 for _ in range(self.num_cols)] for _ in range(self.num_rows)] 
-    
-    def init_constants(self, n, m):
-        self.num_rows = n
-        self.num_cols = m
-
-    def init_data(self, n, m):
-        self.init_constants(n, m)
 
     def get_rank_via_reduced_row_echelon(self, aug_ab: Matrix) -> int:
-        """
+        """Method used is Gauss-jordan elimination, only partial pivoting.
+        [translated from standford 2016 c++ acm icpc booklet]
 
+        Complexity per call: Time: O(n^3), Space: O(n)
+        Input:
+            aug_ab: a nxm augmented matrix of A | b
+        Mutations and return:
+            a -> rref: a mutations into nxm matrix of rref
+            returns the rank of the matrix.
         """
         local_num_rows, local_num_cols = aug_ab.num_rows, aug_ab.num_cols
         augmented_matrix = aug_ab.matrix
@@ -2433,7 +2439,19 @@ class Matrix_Algorithhms:
                 rank += 1
         return rank
             
-    def gauss_elimination(self, aug_ab: Matrix):
+    def gauss_elimination(self, aug_ab: Matrix) -> int:
+        """Computes gauss with constraints, Ax=b | A -> nxn matrix, b -> nx1 matrix aug_ab = A | b.
+         [translated from foreverbell 2014 c++ acm icpc cheat sheet repo]
+
+        Complexity per call: Time: O(n^3), Space: O(n)
+        More uses: solving systems of linear equations (AX=B), getting the rank
+
+        Input:
+            aug_ab = nxm matrix | m = n + 1
+        Mutation and return:
+            aug_ab -> X
+            returns rank
+        """
         local_num_rows, local_num_cols = aug_ab.num_rows, aug_ab.num_cols
         n = local_num_rows
         augmented_matrix = aug_ab.matrix
@@ -2451,6 +2469,7 @@ class Matrix_Algorithhms:
             for j in range(i):
                 augmented_matrix[j][n] -= (augmented_matrix[i][n] * augmented_matrix[j][i])
                 augmented_matrix[j][i] = 0
+        return rank
 
     def gauss_jordan_elimination(self, a: Matrix, b: Matrix) -> float:
         """Full pivoting. Mutates a and b [translated from standford 2016 c++ acm icpc booklet]
