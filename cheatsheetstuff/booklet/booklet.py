@@ -49,11 +49,11 @@ class UnionFindDisjointSets:
             if local_rank[u_parent] > local_rank[v_parent]:   # keep u_parent shorter than v_parent
                 u_parent, v_parent = v_parent, u_parent
 
-            self.parent[u_parent] = v_parent                       # this line joins u with v
             if local_rank[u_parent] == local_rank[v_parent]:       # an optional speedup
                 local_rank[v_parent] = local_rank[v_parent] + 1
-            local_set_sizes[v_parent] += local_set_sizes[u_parent]  # u -> v so add size_u to size_v
+            self.parent[u_parent] = v_parent                        # this line joins u with v
             self.num_sets -= 1
+            local_set_sizes[v_parent] += local_set_sizes[u_parent]  # u -> v so add size_u to size_v
 
     def size_of_u(self, u):  # optional information
         """Gives you the size of set u. TIME and SPACE Complexity is the same as find_set"""
