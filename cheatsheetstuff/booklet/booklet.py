@@ -15,7 +15,7 @@ type EdgeTypeList = List[Tuple[int, int, int]]
 setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
 
 
-class UnionFindDisjointSets:
+class UnionFindDisjointSets:  # tested works for functions in class
     """This Data structure is for non-directional disjoint sets."""
     def __init__(self, n):
         self.parent = [i for i in range(n)]
