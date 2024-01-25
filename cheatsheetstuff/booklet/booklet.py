@@ -22,17 +22,32 @@ class UnionFindDisjointSets:
         self.rank = [0] * n        # optional optimization
         self.set_sizes = [1] * n   # optional information
         self.num_sets = n          # optional information
-        
+
     def find_set(self, u):
         """Recursively find which set u belongs to. Memoize on the way back up.
 
         Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
                     Space: Amortized O(1) stack space
         """
-        local_parent = self.parent
+        local_parent = self.parent  # pulls parent into the local scope to avoid load_attr call
         root_parent = u if local_parent[u] == u else self.find_set(local_parent[u])
         local_parent[u] = root_parent
         return root_parent
+
+    def find_set_iterative(self, x):
+        """Iteratively find which set u belongs to. Memoize on the way back up.
+
+        Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
+                    Space: O(α(n)) stack space
+        """
+        local_parent = self.parent  # pulls parent into the local scope to avoid load_attr call
+        xp, local_stack = x, []
+        while xp != local_parent[xp]:
+            local_stack.append(xp)
+            xp = local_parent[xp]
+        for c in local_stack:
+            local_parent[c] = xp
+        return xp
         
     def is_same_set(self, u, v):
         """Checks if u and v in same set. TIME and SPACE Complexity is the same as find_set"""
