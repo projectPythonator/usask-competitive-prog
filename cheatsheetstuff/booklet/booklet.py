@@ -35,7 +35,7 @@ class UnionFindDisjointSets:
         return root_parent
 
     def find_set_iterative(self, x):
-        """Iteratively find which set u belongs to. Memoize on the way back up.
+        """Iteratively find which set u belongs to. uses stack to memoize.
 
         Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
                     Space: O(α(n)) stack space
