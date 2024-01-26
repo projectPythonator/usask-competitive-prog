@@ -79,6 +79,7 @@ class UnionFindDisjointSets:  # tested works for functions in class
 class FenwickTree:
     def __init__(self, m):
         self.fenwick_tree = [0] * (m + 1)
+        self.fenwick_tree_size = len(self.fenwick_tree)
 
     def last_set_bit(self, a):
         return a & (-a)
@@ -86,6 +87,7 @@ class FenwickTree:
     def build_tree_from_f(self, f):
         m = len(f)
         self.fenwick_tree = [0] * m
+        self.fenwick_tree_size = m
         local_fenwick = self.fenwick_tree
         for i in range(1, m):
             local_fenwick[i] += f[i]
@@ -108,6 +110,11 @@ class FenwickTree:
 
     def range_sum_query(self, i, j):
         return self.range_sum_j(j) - self.range_sum_j(i-1)
+
+    def update_position_i(self, position_i, new_value):
+        while position_i < self.fenwick_tree_size:
+            self.fenwick_tree[position_i] += new_value
+            position_i = position_i + self.last_set_bit(position_i)
 
 
 ####################################################################################################
