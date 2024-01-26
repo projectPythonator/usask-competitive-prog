@@ -682,9 +682,9 @@ class MathAlgorithms:
         self.fibonacci_dict = {}
         self.fibonacci_dict = {0: 0, 1: 1, 2: 1}
 
-    def is_prime_triv(self, n):  # TODO RETEST
+    def is_prime_triv(self, n):
         """Tests if n is prime via divisors up to sqrt(n)."""
-        if n <= 3:
+        if n < 4:
             return n > 1
         if n % 2 == 0 or n % 3 == 0:
             return False
