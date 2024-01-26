@@ -101,15 +101,15 @@ class FenwickTree:
             f[i] = f[i] + 1
         self.build_tree_from_f(f)
 
-    def range_sum_j(self, j):
-        range_sum = 0
-        while j:
-            range_sum = range_sum + self.fenwick_tree[j]
-            j = j - self.last_set_bit(j)
-        return range_sum
+    def range_sum_query_point_i(self, point_i):
+        sum_of_point_i = 0
+        while point_i:
+            sum_of_point_i = sum_of_point_i + self.fenwick_tree[point_i]
+            point_i = point_i - self.last_set_bit(point_i)
+        return sum_of_point_i
 
     def range_sum_query(self, i, j):
-        return self.range_sum_j(j) - self.range_sum_j(i-1)
+        return self.range_sum_query_point_i(j) - self.range_sum_query_point_i(i - 1)
 
     def update_position_i(self, position_i, new_value):
         while position_i < self.fenwick_tree_size:
@@ -133,7 +133,7 @@ class RangeUpdatePointQuery:
         self.tree_fenwick.update_position_i(point_j, -new_value)  # removed from position j
 
     def point_query(self, point_i):
-        return self.tree_fenwick.range_sum_j(point_i)
+        return self.tree_fenwick.range_sum_query_point_i(point_i)
 
 
 class RangeUpdateRangeQuery:
@@ -148,7 +148,7 @@ class RangeUpdateRangeQuery:
 
     def range_sum_point_query(self, i):
         return (self.range_update_point_query_tree.point_query(i) * i
-                - self.point_update_point_query_tree.range_sum_j(i))
+                - self.point_update_point_query_tree.range_sum_query_point_i(i))
 
     def range_sum_query_i_j(self, i, j):
         return self.range_sum_point_query(j) - self.range_sum_point_query(i - 1)
