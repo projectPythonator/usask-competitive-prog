@@ -151,12 +151,12 @@ class RangeUpdateRangeQuery:
         point_update_point_i_tree(range_i, new_value * (range_i - 1))
         point_update_point_i_tree(range_j + 1, -new_value * range_j)
 
-    def range_sum_point_query(self, i):
+    def range_sum_point_i_query(self, i):
         return (self.range_update_point_query.point_i_query_sum(i) * i
                 - self.point_update_point_query.range_sum_query_point_i(i))
 
     def range_sum_query_i_j(self, i, j):
-        return self.range_sum_point_query(j) - self.range_sum_point_query(i - 1)
+        return self.range_sum_point_i_query(j) - self.range_sum_point_i_query(i - 1)
 
 
 
