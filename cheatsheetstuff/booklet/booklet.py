@@ -126,8 +126,11 @@ class FenwickTree:
 
 class RUPQ:
     def __init__(self, m):
-        tree_fenwick = FenwickTree(m)
+        self.tree_fenwick = FenwickTree(m)
 
+    def range_update(self, update_i, update_j, new_value):
+        self.tree_fenwick.update_position_i(update_i, new_value)
+        self.tree_fenwick.update_position_i(update_j, -new_value)  # removed from position j
 
 
 ####################################################################################################
