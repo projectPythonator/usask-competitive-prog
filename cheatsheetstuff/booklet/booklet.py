@@ -689,7 +689,7 @@ class MathAlgorithms:
         if n % 2 == 0 or n % 3 == 0:
             return False
         limit = isqrt(n) + 1
-        for p in range(5, limit+1, 6):
+        for p in range(5, limit, 6):
             if n % p == 0 or n % (p+2) == 0:
                 return False
         return True
