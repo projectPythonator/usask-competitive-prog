@@ -2052,7 +2052,7 @@ class StringAlgorithms:
         self.hash_h_values = []
         self.left_mod_inverse = []
 
-    def kmp_preprocess(self, new_pattern):  # TODO RETEST
+    def kmp_preprocess(self, new_pattern):
         """Preprocess the pattern for KMP. TODO add a bit more to this description ?
 
         Complexity per call: Time O(m + m), Space: O(m)
@@ -2070,7 +2070,7 @@ class StringAlgorithms:
         self.pattern_len = pattern_len
         self.back_table = back_table
 
-    def kmp_search_find_indices(self, text_to_search):  # TODO RETEST
+    def kmp_search_find_indices(self, text_to_search):
         """Search the text for the pattern we preprocessed.
 
         Complexity per call: Time O(n + m), Space: O(n + m)
