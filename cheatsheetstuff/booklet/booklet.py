@@ -135,6 +135,11 @@ class RangeUpdatePointQuery:
     def point_query(self, point_i):
         return self.tree_fenwick.range_sum_j(point_i)
 
+class RangeUpdateRangeQuery:
+    def __init__(self, m):
+        self.range_update_point_query_tree = RangeUpdatePointQuery(m)
+        self.point_update_point_query_tree = FenwickTree(m)
+
 
 ####################################################################################################
 
