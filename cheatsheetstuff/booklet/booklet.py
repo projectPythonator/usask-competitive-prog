@@ -710,7 +710,7 @@ class MathAlgorithms:
             if prime_sieve[i]:
                 for j in range(i*i, n+1, i):
                     prime_sieve[j] = False
-        self.primes_list = [2] + [i for i, el in enumerate(prime_sieve) if el]
+        self.primes_list = [i for i, el in enumerate(prime_sieve) if el]
     
     def sieve_of_eratosthenes_optimized(self, n):  # TODO RETEST
         """Odds only optimized version of the previous method
