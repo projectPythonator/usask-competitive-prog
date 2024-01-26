@@ -2166,7 +2166,7 @@ class StringAlgorithms:
         local_pattern_ord = self.pattern_ord  # ignore for faster implementation of the code
         for i, num_char in enumerate(local_pattern_ord):
             if num_char != local_text_ord[offset + i]:
-                return -1 if num_char < local_text_ord[offset + i] else 1
+                return -1 if local_text_ord[offset + i] < num_char else 1
         return 0
 
     def suffix_array_binary_search(self, lo, hi, comp_val):  # TODO RETEST
