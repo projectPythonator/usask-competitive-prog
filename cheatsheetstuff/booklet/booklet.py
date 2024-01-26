@@ -698,7 +698,7 @@ class MathAlgorithms:
                 return False
         return True
 
-    def sieve_of_eratosthenes(self, n):  # TODO RETEST
+    def sieve_of_eratosthenes(self, n):
         """Generates list of primes up to n via eratosthenes method.
 
         Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
@@ -712,7 +712,7 @@ class MathAlgorithms:
                     prime_sieve[j] = False
         self.primes_list = [i for i, el in enumerate(prime_sieve) if el]
     
-    def sieve_of_eratosthenes_optimized(self, n):  # TODO RETEST
+    def sieve_of_eratosthenes_optimized(self, n):
         """Odds only optimized version of the previous method
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
@@ -858,7 +858,7 @@ class MathAlgorithms:
             euler_phi -= (euler_phi // n)
         return num_diff_prime_factors
 
-    def is_composite(self, a, d, n, s):  # TODO RETEST
+    def is_composite(self, a, d, n, s):
         """The witness test of miller rabin.
 
         Complexity per call: Time O(log^3(n)), Space: O(2**s) bits
@@ -870,7 +870,7 @@ class MathAlgorithms:
                 return False
         return True
 
-    def miller_rabin_primality_test(self, n, precision_for_huge_n=16):  # TODO RETEST
+    def miller_rabin_primality_test(self, n, precision_for_huge_n=16):
         """Probabilistic primality test with error rate of 4^(-k) past 341550071728321.
 
         Complexity per call: Time O(k log^3(n)), Space: O(2**s) bits
@@ -889,7 +889,7 @@ class MathAlgorithms:
         return not any(self.is_composite(self.primes_list[j], d, n, s)
                        for j in range(precision_for_huge_n))
     
-    def miller_rabin_primality_test_prep(self):  # TODO RETEST
+    def miller_rabin_primality_test_prep(self):
         """This function needs to be called before miller rabin"""
         self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
                                   2152302898747, 3474749660383, 341550071728321]
