@@ -2199,7 +2199,7 @@ class StringAlgorithms:
             hi -= 1
         return lo, hi
 
-    def compute_longest_repeated_substring(self):  # TODO RETEST
+    def compute_longest_repeated_substring(self):
         """The longest repeated substring is just the longest common pattern. Require lcp to be
         computed already. Returns the first longest repeat pattern, so for other ones implement a
         forloop.
