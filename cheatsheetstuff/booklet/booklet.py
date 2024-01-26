@@ -2085,7 +2085,7 @@ class StringAlgorithms:
                 j = self.back_table[j]
         return ans
 
-    def suffix_array_counting_sort(self, k, s_array, r_array):  # TODO RETEST
+    def suffix_array_counting_sort(self, k, s_array, r_array):
         """Basic count sort for the radix sorting part of suffix arrays.
 
         Complexity per call. Time: O(n), T(6n), Space: O(n), S(2n)
@@ -2106,7 +2106,7 @@ class StringAlgorithms:
         for i, value in enumerate(suffix_array_temp):
             s_array[i] = value
 
-    def suffix_array_build_array(self, new_texts):  # TODO RETEST
+    def suffix_array_build_array(self, new_texts):
         """Suffix array construction on a list of texts. n = sum lengths of all the texts.
 
         Complexity per call: Time: O(nlog n), T(3n log n), Space: O(n), S(6n)
@@ -2133,7 +2133,7 @@ class StringAlgorithms:
         self.text_ord = [ord(c) for c in new_text]  # optional used in the binary search
         self.seperator_list = [num_strings - i for i in range(len(new_texts))]  # optional owners
 
-    def compute_longest_common_prefix(self):  # TODO RETEST
+    def compute_longest_common_prefix(self):
         """After generating a suffix array you can use that to find the longest common pattern.
 
         Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
