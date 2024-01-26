@@ -107,7 +107,8 @@ class FenwickTree:
         return range_sum
 
     def range_sum_query(self, i, j):
-        
+        return self.range_sum_j(j) - self.range_sum_j(i-1)
+
 
 ####################################################################################################
 
