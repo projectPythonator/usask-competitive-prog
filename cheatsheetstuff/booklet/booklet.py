@@ -172,6 +172,8 @@ class SegmentTree:
     def right_child(self, parent):
         return (parent << 1) + 1
 
+    def conqur(self, a, b):
+        return b if a == -1 else a if b == -1 else min(a, b)
 
 
 
