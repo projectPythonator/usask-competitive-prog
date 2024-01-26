@@ -124,7 +124,7 @@ class FenwickTree:
         return hi
 
 
-class RUPQ:
+class RangeUpdatePointQuery:
     def __init__(self, m):
         self.tree_fenwick = FenwickTree(m)
 
