@@ -76,6 +76,10 @@ class UnionFindDisjointSets:  # tested works for functions in class
         return self.set_sizes[self.find_set(u)]
 
 
+class FenwickTree:
+    def __init__(self):
+        pass
+
 ####################################################################################################
 
 # from math import log2
