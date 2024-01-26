@@ -132,6 +132,9 @@ class RUPQ:
         self.tree_fenwick.update_position_i(update_i, new_value)
         self.tree_fenwick.update_position_i(update_j, -new_value)  # removed from position j
 
+    def point_query(self, point_i):
+        return self.tree_fenwick.range_sum_j(point_i)
+
 
 ####################################################################################################
 
