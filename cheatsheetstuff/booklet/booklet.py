@@ -116,6 +116,13 @@ class FenwickTree:
             self.fenwick_tree[position_i] += new_value
             position_i = position_i + self.last_set_bit(position_i)
 
+    def select_k(self, k):
+        lo, hi = 1, self.fenwick_tree_size - 1
+        for i in range(30):         # good for up to the range of 2**30
+            mid = (lo + hi) // 2    # see bsta section 3.3.1 for more info
+            lo, hi = (mid, hi) if self.range_sum_query(i, mid) < k else (lo, mid)
+        return hi
+
 
 ####################################################################################################
 
