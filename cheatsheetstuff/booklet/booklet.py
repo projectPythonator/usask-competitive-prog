@@ -727,7 +727,7 @@ class MathAlgorithms:
                     primes_sieve[j] = False
         self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
-    def sieve_of_min_primes(self, n):  # TODO RETEST
+    def sieve_of_min_primes(self, n):
         """Stores the min prime for each number up to n.
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
@@ -797,7 +797,7 @@ class MathAlgorithms:
     def gen_set_primes(self):
         self.primes_set = set(self.primes_list)
 
-    def prime_factorize_n(self, n):  # TODO RETEST
+    def prime_factorize_n(self, n):
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
 
         Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
@@ -813,7 +813,7 @@ class MathAlgorithms:
             prime_factors.append(n)
         return prime_factors
 
-    def prime_factorize_n_log_n(self, n):  # TODO RETEST
+    def prime_factorize_n_log_n(self, n):
         """An optimized prime factorization of n function based on min primes already sieved
 
         Complexity: Time: O(log n), Space: O(log n)
