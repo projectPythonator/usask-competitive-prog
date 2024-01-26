@@ -159,7 +159,6 @@ class RangeUpdateRangeQuery:
         return self.range_sum_point_i_query(j) - self.range_sum_point_i_query(i - 1)
 
 
-
 ####################################################################################################
 
 # from math import log2
