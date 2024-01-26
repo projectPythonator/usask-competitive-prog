@@ -1026,7 +1026,7 @@ class MathAlgorithms:
             fib_list[i] = fib_list[i - 1] + fib_list[i - 2]
         self.fibonacci_list = fib_list
 
-    def fibonacci_n_dp_1(self, n):  # TODO RETEST
+    def fibonacci_n_dp_1(self, n):
         """Dynamic programming way to compute the nth fibonacci.
 
         Complexity per call: Time: O(log n), Space: increase by O(log n).

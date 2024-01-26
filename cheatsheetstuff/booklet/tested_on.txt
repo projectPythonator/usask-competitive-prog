@@ -18,6 +18,7 @@ prime_factorize_n: tested on kattis:  primalrepresentation
 euler_phi_plus_sum_and_number_of_diff_prime_factors: num_diff_prims tested on kattis: nonprimefactors
 num_and_sum_of_divisors num_divs tested on kattis: nonprimefactors worked but was too slow vs using below method
 num_and_sum_of_prime_factors: num_divs mod tested on kattis: nonprimefactors
+fibonacci_n_dp_1: tested on kattis snakesandmasters
 
 StringAlgorithms
 suffix_array_build_array tested on kattis suffixarray, Dvaput, repeatedsubstrings
