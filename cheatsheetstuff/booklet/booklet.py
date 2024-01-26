@@ -882,7 +882,7 @@ class MathAlgorithms:
         d, s = n-1, 0
         while d % 2 == 0:
             d, s = d//2, s+1
-        for i, bound in enumerate(self.mrpt_known_bounds):
+        for i, bound in enumerate(self.mrpt_known_bounds, 2):
             if n < bound:
                 return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s)
                                for j in range(i))
