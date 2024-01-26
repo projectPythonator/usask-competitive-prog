@@ -108,7 +108,7 @@ class FenwickTree:
             point_i = point_i - self.last_set_bit(point_i)
         return sum_of_point_i
 
-    def range_sum_query(self, i, j):
+    def range_sum_query_range_i_to_j(self, i, j):
         return self.range_sum_query_point_i(j) - self.range_sum_query_point_i(i - 1)
 
     def update_position_i(self, position_i, new_value):
@@ -120,7 +120,7 @@ class FenwickTree:
         lo, hi = 1, self.fenwick_tree_size - 1
         for i in range(30):         # good for up to the range of 2**30
             mid = (lo + hi) // 2    # see bsta section 3.3.1 for more info
-            lo, hi = (mid, hi) if self.range_sum_query(i, mid) < k else (lo, mid)
+            lo, hi = (mid, hi) if self.range_sum_query_range_i_to_j(i, mid) < k else (lo, mid)
         return hi
 
 
