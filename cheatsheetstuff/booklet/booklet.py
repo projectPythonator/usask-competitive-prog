@@ -749,7 +749,7 @@ class MathAlgorithms:
             function 3: Time: O(n log(n)), Space: O(n)
             function 2: Time: O(n lnln(n) log(n)), Space: O(n)
         """
-        def euler_phi_plus_sum_and_number_of_diff_prime_factors(limit):  # TODO RETEST
+        def euler_phi_plus_sum_and_number_of_diff_prime_factors(limit):
             """This is basically same as sieve just using different ops. Complexity function 1."""
             num_diff_pf = [0] * (limit + 1)
             sum_diff_pf = [0] * (limit + 1)
@@ -764,7 +764,7 @@ class MathAlgorithms:
             self.sum_diff_prime_factors = sum_diff_pf
             self.euler_phi = phi
             
-        def num_and_sum_of_divisors(limit):  # TODO RETEST
+        def num_and_sum_of_divisors(limit):
             """Does a basic sieve. Complexity function 2."""
             num_div = [1] * (limit + 1)
             sum_div = [1] * (limit + 1)
@@ -775,7 +775,7 @@ class MathAlgorithms:
             self.num_divisors = num_div
             self.sum_divisors = sum_div
 
-        def num_and_sum_of_prime_factors(limit):  # TODO RETEST
+        def num_and_sum_of_prime_factors(limit):
             """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
             num_pf = [0] * (limit + 1)
             sum_pf = [0] * (limit + 1)
