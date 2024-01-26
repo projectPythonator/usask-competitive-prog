@@ -760,7 +760,7 @@ class MathAlgorithms:
                         num_diff_pf[j] += 1
                         sum_diff_pf[j] += i
                         phi[j] = (phi[j]//i) * (i-1)
-            self.num_diff_prime_factors = sum_diff_pf
+            self.num_diff_prime_factors = num_diff_pf
             self.sum_diff_prime_factors = sum_diff_pf
             self.euler_phi = phi
             
