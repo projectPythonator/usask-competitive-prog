@@ -159,6 +159,23 @@ class RangeUpdateRangeQuery:
         return self.range_sum_point_i_query(j) - self.range_sum_point_i_query(i - 1)
 
 
+class SegmentTree:
+    def __init__(self):
+        self.tree_size = 0
+        self.lazy_array = []
+        self.st = []
+        self.array = []
+
+    def left_child(self, parent):
+        return parent << 1
+
+    def right_child(self, parent):
+        return (parent << 1) + 1
+
+
+
+
+
 ####################################################################################################
 
 # from math import log2
