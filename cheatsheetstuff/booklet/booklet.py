@@ -146,9 +146,10 @@ class RangeUpdateRangeQuery:
         self.point_update_point_query = FenwickTree(m)
 
     def range_update_range_i_j(self, range_i, range_j, new_value):
+        point_update_point_i_tree = self.point_update_point_query.update_point_i_with_new_value
         self.range_update_point_query.range_update_point_i_j(range_i, range_j, new_value)
-        self.point_update_point_query.update_point_i_with_new_value(range_i, new_value * (range_i - 1))
-        self.point_update_point_query.update_point_i_with_new_value(range_j + 1, -new_value * range_j)
+        point_update_point_i_tree(range_i, new_value * (range_i - 1))
+        point_update_point_i_tree(range_j + 1, -new_value * range_j)
 
     def range_sum_point_query(self, i):
         return (self.range_update_point_query.point_query(i) * i
