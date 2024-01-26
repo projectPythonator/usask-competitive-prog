@@ -124,6 +124,12 @@ class FenwickTree:
         return hi
 
 
+class RUPQ:
+    def __init__(self, m):
+        tree_fenwick = FenwickTree(m)
+
+
+
 ####################################################################################################
 
 # from math import log2
