@@ -159,12 +159,19 @@ class RangeUpdateRangeQuery:
         return self.range_sum_point_i_query(j) - self.range_sum_point_i_query(i - 1)
 
 
+SEG_INF = 2**30  # can be reduced or increased to fit the max value
+
+
 class SegmentTree:
     def __init__(self, new_array):
-        self.tree_size = len(new_array)
+        n = len(new_array)
+        next_2_pow_n = n if 2**(n.bit_length()-1) == n else 2**n.bit_length()
+        self.lazy = [-1] * (4 * next_2_pow_n)         # 4 * n used to avoid index out of bounds
+        self.segment_tree = [0] * (4 * next_2_pow_n)  # 4 * n used to avoid index out of bounds
         self.array_a = [el for el in new_array]
-        self.lazy = [-1] * (4 * self.tree_size)         # 4 * n used to avoid index out of bounds
-        self.segment_tree = [0] * (4 * self.tree_size)  # 4 * n used to avoid index out of bounds
+        if next_2_pow_n != n:                                # we add extra padding to the end to
+            self.array_a.extend([SEG_INF]*(next_2_pow_n-n))  # make the len a power of 2
+        self.tree_size = len(self.array_a)
 
     def left_child(self, parent):
         """Macro function, gets left child in array based binary tree, paste in code for speedup."""
