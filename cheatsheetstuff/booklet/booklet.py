@@ -186,7 +186,16 @@ class SegmentTree:
             self.segment_tree[parent] = self.conqur(self.segment_tree[left_path],
                                                     self.segment_tree[right_path])
 
-
+    def propagate(self, parent, left, right):
+        local_lazy = self.lazy_array
+        lazy_p = local_lazy[parent]
+        if lazy_p != -1:
+            self.segment_tree[parent] = lazy_p
+            if left != right:
+                local_lazy[self.left_child(parent)] = local_lazy[self.right_child(parent)] = lazy_p
+            else:
+                self.array_a[left] = lazy_p
+            local_lazy[parent] = 0
 
 ####################################################################################################
 
