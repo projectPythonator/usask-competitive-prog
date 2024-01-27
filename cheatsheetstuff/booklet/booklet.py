@@ -208,6 +208,33 @@ class SegmentTree:
         right_min = self.range_min_query(self.right_child(parent), mid+1, right, max(i, mid+1), j)
         return self.conqur(left_min, right_min)
 
+    def update(self, parent, left, right, i, j, value):
+        self.propagate(parent, left, right)
+        if i > j:
+            return
+        elif left >= i and right <= j:
+            self.lazy_array[parent] = value
+            self.propagate(parent, left, right)
+        else:
+            mid = (left + right) // 2
+            left_path, right_path = self.left_child(parent), self.right_child(parent)
+            self.update(left_path, left, mid, i, min(mid, j), value)
+            self.update(right_path, mid+1, right, max(i, mid+1), j, value)
+            left_subtree = (self.lazy_array[left_path] if self.lazy_array[left_path] != -1
+                            else self.segment_tree[left_path])
+            right_subtree = (self.lazy_array[right_path] if self.lazy_array[right_path] != -1
+                             else self.segment_tree[right_path])
+            self.segment_tree[parent] = (self.segment_tree[left_path]
+                                         if left_subtree <= right_subtree
+                                         else self.segment_tree[right_path])
+            # local_lazy, local_seg_tree = self.lazy_array, self.segment_tree
+            # lazy_left, lazy_right = local_lazy[left_path], local_lazy[right_path]
+            # seg_left, seg_right = local_seg_tree[left_path], local_seg_tree[right_path]
+            # left_subtree = lazy_left if lazy_left != -1 else seg_left
+            # right_subtree = lazy_right if lazy_right != -1 else seg_right
+            # local_seg_tree[parent] = seg_left if left_subtree <= right_subtree else seg_right
+
+
 ####################################################################################################
 
 # from math import log2
