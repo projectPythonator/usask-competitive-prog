@@ -167,12 +167,15 @@ class SegmentTree:
         self.array_a = []
 
     def left_child(self, parent):
+        """Macro function, gets left child in array based binary tree, paste in code for speedup."""
         return parent << 1
 
     def right_child(self, parent):
+        """Macro function, gets right child in array based binary tree, paste in code to speedup."""
         return (parent << 1) + 1
 
     def conqur(self, a, b):
+        """Macro function, handles to conqur conditional, paste in code for speedup."""
         return b if a == -1 else a if b == -1 else min(a, b)
 
     def build_segment_tree(self, parent, left, right):
