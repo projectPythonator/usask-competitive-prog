@@ -133,12 +133,12 @@ class RangeUpdatePointQuery:
     def __init__(self, m):
         self.point_update_range_query = FenwickTree([0] * m)
 
-    def range_update_point_i_j(self, point_i, point_j, new_value):  # TODO RETEST
+    def range_update_point_i_j(self, point_i, point_j, new_value):  # TODO semi tested
         tree_update_call = self.point_update_range_query.update_point_i_with_new_value
         tree_update_call(point_i, new_value)
         tree_update_call(point_j + 1, -new_value)
 
-    def point_i_query_sum(self, point_i):  # TODO RETEST
+    def point_i_query_sum(self, point_i):  # TODO semi tested
         return self.point_update_range_query.range_sum_query_range_i_to_j(1, point_i)
 
 
@@ -147,13 +147,13 @@ class RangeUpdateRangeQuery:
         self.range_update_point_query = RangeUpdatePointQuery(m)
         self.point_update_point_query = FenwickTree([0] * m)
 
-    def range_update_range_i_j(self, range_i, range_j, new_value):  # TODO RETEST
+    def range_update_range_i_j(self, range_i, range_j, new_value):  # TODO semi tested
         point_update_point_i_tree = self.point_update_point_query.update_point_i_with_new_value
         self.range_update_point_query.range_update_point_i_j(range_i, range_j, new_value)
         point_update_point_i_tree(range_i, new_value * (range_i - 1))
         point_update_point_i_tree(range_j + 1, -1 * new_value * range_j)
 
-    def range_sum_query_i_j(self, point_i, point_j):  # TODO RETEST
+    def range_sum_query_i_j(self, point_i, point_j):  # TODO semi tested
         if point_i > 1:
             return (self.range_sum_query_i_j(1, point_j)
                     - self.range_sum_query_i_j(1, point_i - 1))
