@@ -222,7 +222,7 @@ class SegmentTree:
         self.propagate(parent, left, right)
         if i > j:
             return
-        elif left >= i and right <= j:
+        elif i <= left and j >= right:
             self.lazy[parent] = value
             self.propagate(parent, left, right)
         else:
