@@ -163,8 +163,8 @@ class SegmentTree:
     def __init__(self):
         self.tree_size = 0
         self.lazy_array = []
-        self.st = []
-        self.array = []
+        self.segment_tree = []
+        self.array_a = []
 
     def left_child(self, parent):
         return parent << 1
@@ -175,6 +175,16 @@ class SegmentTree:
     def conqur(self, a, b):
         return b if a == -1 else a if b == -1 else min(a, b)
 
+    def build_segment_tree(self, parent, left, right):
+        if left == right:
+            self.segment_tree[parent] = self.array_a[left]
+        else:
+            mid = (left + right) // 2
+            left_path, right_path = self.left_child(parent), self.right_child(parent)
+            self.build_segment_tree(left_path, left, mid)
+            self.build_segment_tree(right_path, mid + 1, right)
+            self.segment_tree[parent] = self.conqur(self.segment_tree[left_path],
+                                                    self.segment_tree[right_path])
 
 
 
