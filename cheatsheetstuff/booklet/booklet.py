@@ -195,17 +195,19 @@ class SegmentTree:
             self._build_segment_tree(right_path, mid + 1, right)
             self.segment_tree[parent] = self.conqur(self.segment_tree[left_path],
                                                     self.segment_tree[right_path])
+            # seg_tree = self.segment_tree  # uncomment if self.segment_tree gets too costly
+            # seg_tree[parent] = self.conqur(seg_tree[left_path], seg_tree[right_path])
 
     def propagate(self, parent, left, right):
-        local_lazy = self.lazy
-        lazy_p = local_lazy[parent]
+        # local_lazy = self.lazy  # uncomment and use if self.lazy is too much overhead
+        lazy_p = self.lazy[parent]
         if lazy_p != -1:
             self.segment_tree[parent] = lazy_p
             if left != right:
-                local_lazy[self.left_child(parent)] = local_lazy[self.right_child(parent)] = lazy_p
+                self.lazy[self.left_child(parent)] = self.lazy[self.right_child(parent)] = lazy_p
             else:
                 self.array_a[left] = lazy_p
-            local_lazy[parent] = 0
+            self.lazy[parent] = 0
 
     def _range_min_query(self, parent, left, right, i, j):
         self.propagate(parent, left, right)
