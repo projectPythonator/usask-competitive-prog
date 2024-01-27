@@ -6,8 +6,6 @@ FenwickTree:
 tested on the test cases given by steven github
 tested on kattis: FenwickTree, justforsidekicks, supercomputer
 
-
-
 SegmentTree:
 tested on sample input provided by Stevin Halim and Suhendry Effendy from their github
 
