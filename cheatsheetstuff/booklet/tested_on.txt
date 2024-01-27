@@ -2,6 +2,9 @@ UnionFindDisjointSets
 find_set, is_same_set, union_set, find_set_iterative tested on kattis: wheresmyinternet, tildes, bridgesandtunnels
 size_of_u tested on kattis: tildes, bridgesandtunnels
 
+SegmentTree:
+tested on sample input provided by Stevin Halim and Suhendry Effendy from their github
+
 GraphAlgorithms:
 flood_fill_via_dfs: tested on kattis: amoebas, countingstars
 flood_fill_via_bfs: tested on kattis: amoebas, countingstars
