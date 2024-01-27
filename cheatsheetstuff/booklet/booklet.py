@@ -255,6 +255,7 @@ class SegmentTree:
     def range_min_query(self, i, j):
         return self._range_min_query(1, 0, self.tree_size - 1, i, j)
 
+
 ####################################################################################################
 
 # from math import log2
