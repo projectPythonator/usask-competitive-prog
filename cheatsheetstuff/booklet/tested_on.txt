@@ -2,6 +2,12 @@ UnionFindDisjointSets
 find_set, is_same_set, union_set, find_set_iterative tested on kattis: wheresmyinternet, tildes, bridgesandtunnels
 size_of_u tested on kattis: tildes, bridgesandtunnels
 
+FenwickTree:
+tested on the test cases given by steven github
+tested on kattis: FenwickTree
+
+
+
 SegmentTree:
 tested on sample input provided by Stevin Halim and Suhendry Effendy from their github
 
