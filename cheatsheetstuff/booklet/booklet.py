@@ -160,9 +160,9 @@ class RangeUpdateRangeQuery:
 
 
 class SegmentTree:
-    def __init__(self):
-        self.tree_size = 0
-        self.lazy_array = []
+    def __init__(self, n):
+        self.tree_size = n
+        self.lazy = []
         self.segment_tree = []
         self.array_a = []
 
@@ -190,7 +190,7 @@ class SegmentTree:
                                                     self.segment_tree[right_path])
 
     def propagate(self, parent, left, right):
-        local_lazy = self.lazy_array
+        local_lazy = self.lazy
         lazy_p = local_lazy[parent]
         if lazy_p != -1:
             self.segment_tree[parent] = lazy_p
@@ -216,16 +216,16 @@ class SegmentTree:
         if i > j:
             return
         elif left >= i and right <= j:
-            self.lazy_array[parent] = value
+            self.lazy[parent] = value
             self.propagate(parent, left, right)
         else:
             mid = (left + right) // 2
             left_path, right_path = self.left_child(parent), self.right_child(parent)
             self.update(left_path, left, mid, i, min(mid, j), value)
             self.update(right_path, mid+1, right, max(i, mid+1), j, value)
-            left_subtree = (self.lazy_array[left_path] if self.lazy_array[left_path] != -1
+            left_subtree = (self.lazy[left_path] if self.lazy[left_path] != -1
                             else self.segment_tree[left_path])
-            right_subtree = (self.lazy_array[right_path] if self.lazy_array[right_path] != -1
+            right_subtree = (self.lazy[right_path] if self.lazy[right_path] != -1
                              else self.segment_tree[right_path])
             self.segment_tree[parent] = (self.segment_tree[left_path]
                                          if left_subtree <= right_subtree
