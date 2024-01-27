@@ -185,14 +185,14 @@ class SegmentTree:
         """Macro function, handles to conqur conditional, paste in code for speedup."""
         return b if a == -1 else a if b == -1 else min(a, b)
 
-    def build_segment_tree(self, parent, left, right):
+    def _build_segment_tree(self, parent, left, right):
         if left == right:
             self.segment_tree[parent] = self.array_a[left]
         else:
             mid = (left + right) // 2
             left_path, right_path = self.left_child(parent), self.right_child(parent)
-            self.build_segment_tree(left_path, left, mid)
-            self.build_segment_tree(right_path, mid + 1, right)
+            self._build_segment_tree(left_path, left, mid)
+            self._build_segment_tree(right_path, mid + 1, right)
             self.segment_tree[parent] = self.conqur(self.segment_tree[left_path],
                                                     self.segment_tree[right_path])
 
@@ -244,6 +244,8 @@ class SegmentTree:
             # right_subtree = lazy_right if lazy_right != -1 else seg_right
             # local_seg_tree[parent] = seg_left if left_subtree <= right_subtree else seg_right
 
+    def build_segment_tree(self):
+        self._build_segment_tree(1, 0, self.tree_size - 1)
 
 ####################################################################################################
 
