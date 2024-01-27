@@ -77,23 +77,24 @@ class UnionFindDisjointSets:  # tested works for functions in class
 
 
 class FenwickTree:
-    def __init__(self, m):
-        self.fenwick_tree = [0] * (m + 1)
-        self.fenwick_tree_size = len(self.fenwick_tree)
+    def __init__(self, f):
+        self.fenwick_tree = []
+        self.fenwick_tree_size = 0
+        if f:
+            self.build_tree_from_f(f)
 
     def last_set_bit(self, a):  # TODO RETEST
         return a & (-a)
 
     def build_tree_from_f(self, f):  # TODO RETEST
-        m = len(f)
-        self.fenwick_tree = [0] * m
-        self.fenwick_tree_size = m
-        local_fenwick = self.fenwick_tree
-        for i in range(1, m):
-            local_fenwick[i] += f[i]
+        n = len(f)
+        self.fenwick_tree = [0] * (n + 1)
+        self.fenwick_tree_size = n
+        for i in range(1, n + 1):
+            self.fenwick_tree[i] += f[i - 1]
             pos = i + self.last_set_bit(i)
-            if pos < m:
-                local_fenwick[pos] += local_fenwick[i]
+            if pos <= n:
+                self.fenwick_tree[pos] += self.fenwick_tree[i]
 
     def build_tree_from_s(self, m, s):  # TODO RETEST
         f = [0] * (m + 1)
@@ -101,62 +102,63 @@ class FenwickTree:
             f[i] = f[i] + 1
         self.build_tree_from_f(f)
 
-    def range_sum_query_point_i(self, point_i):  # TODO RETEST
-        sum_of_point_i = 0
-        while point_i:
-            sum_of_point_i = sum_of_point_i + self.fenwick_tree[point_i]
-            point_i = point_i - self.last_set_bit(point_i)
-        return sum_of_point_i
-
-    def range_sum_query_range_i_to_j(self, i, j):  # TODO RETEST
-        return self.range_sum_query_point_i(j) - self.range_sum_query_point_i(i - 1)
+    def range_sum_query_range_i_to_j(self, point_i, point_j):  # TODO RETEST
+        if point_i > 1:
+            return (self.range_sum_query_range_i_to_j(1, point_j)
+                    - self.range_sum_query_range_i_to_j(1, point_i - 1))
+        sum_of_point_j = 0
+        while point_j:
+            sum_of_point_j += self.fenwick_tree[point_j]
+            point_j -= self.last_set_bit(point_j)
+        return sum_of_point_j
 
     def update_point_i_with_new_value(self, position_i, new_value):  # TODO RETEST
-        while position_i < self.fenwick_tree_size:
+        while position_i <= self.fenwick_tree_size:
             self.fenwick_tree[position_i] += new_value
             position_i = position_i + self.last_set_bit(position_i)
 
     def select_k(self, k):  # TODO RETEST
-        lo, hi = 1, self.fenwick_tree_size - 1
-        for i in range(30):         # good for up to the range of 2**30
-            mid = (lo + hi) // 2    # see bsta section 3.3.1 for more info
-            if self.range_sum_query_range_i_to_j(i, mid) < k:
-                lo = mid
-            else:
-                hi = mid
-        return hi
+        p = 2**(self.fenwick_tree_size.bit_length()-1)
+        i = 0
+        while p:
+            fen_val = self.fenwick_tree[i + p]
+            if k > fen_val:
+                k -= fen_val
+                i = i + p
+            p //= 2
+        return i + 1
 
 
 class RangeUpdatePointQuery:
     def __init__(self, m):
-        self.point_update_range_query = FenwickTree(m)
+        self.point_update_range_query = FenwickTree([0] * m)
 
     def range_update_point_i_j(self, point_i, point_j, new_value):  # TODO RETEST
         tree_update_call = self.point_update_range_query.update_point_i_with_new_value
         tree_update_call(point_i, new_value)
-        tree_update_call(point_j, -new_value)
+        tree_update_call(point_j + 1, -new_value)
 
     def point_i_query_sum(self, point_i):  # TODO RETEST
-        return self.point_update_range_query.range_sum_query_point_i(point_i)
+        return self.point_update_range_query.range_sum_query_range_i_to_j(1, point_i)
 
 
 class RangeUpdateRangeQuery:
     def __init__(self, m):
         self.range_update_point_query = RangeUpdatePointQuery(m)
-        self.point_update_point_query = FenwickTree(m)
+        self.point_update_point_query = FenwickTree([0] * m)
 
     def range_update_range_i_j(self, range_i, range_j, new_value):  # TODO RETEST
         point_update_point_i_tree = self.point_update_point_query.update_point_i_with_new_value
         self.range_update_point_query.range_update_point_i_j(range_i, range_j, new_value)
         point_update_point_i_tree(range_i, new_value * (range_i - 1))
-        point_update_point_i_tree(range_j + 1, -new_value * range_j)
+        point_update_point_i_tree(range_j + 1, -1 * new_value * range_j)
 
-    def range_sum_point_i_query(self, i):  # TODO RETEST
-        return (self.range_update_point_query.point_i_query_sum(i) * i
-                - self.point_update_point_query.range_sum_query_point_i(i))
-
-    def range_sum_query_i_j(self, i, j):  # TODO RETEST
-        return self.range_sum_point_i_query(j) - self.range_sum_point_i_query(i - 1)
+    def range_sum_query_i_j(self, point_i, point_j):  # TODO RETEST
+        if point_i > 1:
+            return (self.range_sum_query_i_j(1, point_j)
+                    - self.range_sum_query_i_j(1, point_i - 1))
+        return (self.range_update_point_query.point_i_query_sum(point_j) * point_j
+                - self.point_update_point_query.range_sum_query_range_i_to_j(1, point_j))
 
 
 SEG_INF = 2**30  # can be reduced or increased to fit the max value
