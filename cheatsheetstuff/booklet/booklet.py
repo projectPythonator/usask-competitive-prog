@@ -197,6 +197,17 @@ class SegmentTree:
                 self.array_a[left] = lazy_p
             local_lazy[parent] = 0
 
+    def range_min_query(self, parent, left, right, i, j):
+        self.propagate(parent, left, right)
+        if i > j:
+            return -1
+        if left >= i and right <= j:
+            return self.segment_tree[parent]
+        mid = (left + right) // 2
+        left_min = self.range_min_query(self.left_child(parent), left, mid, i, min(mid, j))
+        right_min = self.range_min_query(self.right_child(parent), mid+1, right, max(i, mid+1), j)
+        return self.conqur(left_min, right_min)
+
 ####################################################################################################
 
 # from math import log2
