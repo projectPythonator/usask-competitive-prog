@@ -211,7 +211,7 @@ class SegmentTree:
         self.propagate(parent, left, right)
         if i > j:
             return -1
-        if left >= i and right <= j:
+        if i <= left and j >= right:
             return self.segment_tree[parent]
         mid = (left + right) // 2
         left_min = self._range_min_query(self.left_child(parent), left, mid, i, min(mid, j))
