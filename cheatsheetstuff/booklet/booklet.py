@@ -160,11 +160,11 @@ class RangeUpdateRangeQuery:
 
 
 class SegmentTree:
-    def __init__(self, n):
-        self.tree_size = n
-        self.lazy = []
-        self.segment_tree = []
-        self.array_a = []
+    def __init__(self, new_array):
+        self.tree_size = len(new_array)
+        self.array_a = [el for el in new_array]
+        self.lazy = [-1] * (4 * self.tree_size)         # 4 * n used to avoid index out of bounds
+        self.segment_tree = [0] * (4 * self.tree_size)  # 4 * n used to avoid index out of bounds
 
     def left_child(self, parent):
         """Macro function, gets left child in array based binary tree, paste in code for speedup."""
@@ -230,7 +230,7 @@ class SegmentTree:
             self.segment_tree[parent] = (self.segment_tree[left_path]
                                          if left_subtree <= right_subtree
                                          else self.segment_tree[right_path])
-            # local_lazy, local_seg_tree = self.lazy_array, self.segment_tree
+            # local_lazy, local_seg_tree = self.lazy, self.segment_tree
             # lazy_left, lazy_right = local_lazy[left_path], local_lazy[right_path]
             # seg_left, seg_right = local_seg_tree[left_path], local_seg_tree[right_path]
             # left_subtree = lazy_left if lazy_left != -1 else seg_left
