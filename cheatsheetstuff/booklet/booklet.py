@@ -185,6 +185,17 @@ class SegmentTree:
         """Macro function, handles to conqur conditional, paste in code for speedup."""
         return b if a == -1 else a if b == -1 else min(a, b)
 
+    def propagate(self, parent, left, right):
+        # local_lazy = self.lazy  # uncomment and use if self.lazy is too much overhead
+        lazy_p = self.lazy[parent]
+        if lazy_p != -1:
+            self.segment_tree[parent] = lazy_p
+            if left != right:
+                self.lazy[self.left_child(parent)] = self.lazy[self.right_child(parent)] = lazy_p
+            else:
+                self.array_a[left] = lazy_p
+            self.lazy[parent] = 0
+
     def _build_segment_tree(self, parent, left, right):
         if left == right:
             self.segment_tree[parent] = self.array_a[left]
@@ -197,17 +208,6 @@ class SegmentTree:
                                                     self.segment_tree[right_path])
             # seg_tree = self.segment_tree  # uncomment if self.segment_tree gets too costly
             # seg_tree[parent] = self.conqur(seg_tree[left_path], seg_tree[right_path])
-
-    def propagate(self, parent, left, right):
-        # local_lazy = self.lazy  # uncomment and use if self.lazy is too much overhead
-        lazy_p = self.lazy[parent]
-        if lazy_p != -1:
-            self.segment_tree[parent] = lazy_p
-            if left != right:
-                self.lazy[self.left_child(parent)] = self.lazy[self.right_child(parent)] = lazy_p
-            else:
-                self.array_a[left] = lazy_p
-            self.lazy[parent] = 0
 
     def _range_min_query(self, parent, left, right, i, j):
         self.propagate(parent, left, right)
