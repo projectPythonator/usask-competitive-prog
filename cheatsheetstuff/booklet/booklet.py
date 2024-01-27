@@ -164,6 +164,15 @@ SEG_INF = 2**30  # can be reduced or increased to fit the max value
 
 class SegmentTree:
     def __init__(self, new_array):
+        self.is_lazy = []
+        self.lazy = []
+        self.segment_tree = []
+        self.array_a = []
+        self.tree_size = 0
+        self._version_1(new_array)
+        # self._version_2(new_array)
+
+    def _version_1(self, new_array):
         n = len(new_array)
         next_2_pow_n = n if 2**(n.bit_length()-1) == n else 2**n.bit_length()
         self.lazy = [-1] * (4 * next_2_pow_n)         # 4 * n used to avoid index out of bounds
@@ -172,6 +181,16 @@ class SegmentTree:
         if next_2_pow_n != n:                                # we add extra padding to the end to
             self.array_a.extend([SEG_INF]*(next_2_pow_n-n))  # make the len a power of 2
         self.tree_size = len(self.array_a)
+        self.build_segment_tree_1()
+
+    def _version_2(self, new_array):
+        n = len(new_array)
+        self.is_lazy = [False] * (4 * n)
+        self.lazy = [0] * (4 * n)
+        self.segment_tree = [0] * (4 * n)
+        self.array_a = [el for el in new_array]
+        self.tree_size = n
+        self.build_segment_tree_2()
 
     def left_child(self, parent):
         """Macro function, gets left child in array based binary tree, paste in code for speedup."""
@@ -183,7 +202,7 @@ class SegmentTree:
 
     def conqur(self, a, b):
         """Macro function, handles to conqur conditional, paste in code for speedup."""
-        return b if a == -1 else a if b == -1 else min(a, b)
+        return b if a == -1 else (a if b == -1 else min(a, b))
 
     def propagate(self, parent, left, right):
         # local_lazy = self.lazy  # uncomment and use if self.lazy is too much overhead
@@ -194,35 +213,66 @@ class SegmentTree:
                 self.lazy[self.left_child(parent)] = self.lazy[self.right_child(parent)] = lazy_p
             else:
                 self.array_a[left] = lazy_p
-            self.lazy[parent] = 0
+            self.lazy[parent] = -1
 
-    def _build_segment_tree(self, parent, left, right):
+    def _build_segment_tree_1(self, parent, left, right):
         if left == right:
             self.segment_tree[parent] = self.array_a[left]
         else:
             mid = (left + right) // 2
             left_path, right_path = self.left_child(parent), self.right_child(parent)
-            self._build_segment_tree(left_path, left, mid)
-            self._build_segment_tree(right_path, mid + 1, right)
-            self.segment_tree[parent] = self.conqur(self.segment_tree[left_path],
-                                                    self.segment_tree[right_path])
+            self._build_segment_tree_1(left_path, left, mid)
+            self._build_segment_tree_1(right_path, mid + 1, right)
+            left_val = self.segment_tree[left_path]
+            right_val = self.segment_tree[right_path]
+            self.segment_tree[parent] = self.conqur(left_val, right_val)
             # seg_tree = self.segment_tree  # uncomment if self.segment_tree gets too costly
             # seg_tree[parent] = self.conqur(seg_tree[left_path], seg_tree[right_path])
 
-    def _range_min_query(self, parent, left, right, i, j):
+    def _build_segment_tree_2(self, parent, left, right):
+        if left == right:
+            self.segment_tree[parent] = left
+        else:
+            mid = (left + right) // 2
+            left_path, right_path = self.left_child(parent), self.right_child(parent)
+            self._build_segment_tree_2(left_path, left, mid)
+            self._build_segment_tree_2(right_path, mid + 1, right)
+            left_ind = self.segment_tree[left_path]
+            right_ind = self.segment_tree[right_path]
+            self.segment_tree[parent] = (left_ind if (self.array_a[left_ind]
+                                                      <= self.array_a[right_ind]) else right_ind)
+
+    def _range_min_query_1(self, parent, left, right, i, j):
         self.propagate(parent, left, right)
         if i > j:
             return -1
         if i <= left and j >= right:
             return self.segment_tree[parent]
         mid = (left + right) // 2
-        left_min = self._range_min_query(self.left_child(parent), left, mid,
-                                         i, min(mid, j))
-        right_min = self._range_min_query(self.right_child(parent), mid + 1, right,
-                                          max(i, mid + 1), j)
+        left_min = self._range_min_query_1(self.left_child(parent), left, mid,
+                                           i, min(mid, j))
+        right_min = self._range_min_query_1(self.right_child(parent), mid + 1, right,
+                                            max(i, mid + 1), j)
         return self.conqur(left_min, right_min)
 
-    def _update_segment_tree(self, parent, left, right, i, j, value):
+    def _range_min_query_2(self, parent, left, right, i, j):
+        if right < i or j < left:
+            return -1, -1
+        if self.is_lazy[parent]:
+            return i, self.lazy[parent]
+        if i <= left and j >= right:
+            return self.segment_tree[parent], self.array_a[self.segment_tree[parent]]
+        mid = (left + right) // 2
+        left_ind, left_val = self._range_min_query_2(self.left_child(parent), left, mid, i, j)
+        right_ind, right_val = self._range_min_query_2(self.right_child(parent), mid+1, right, i, j)
+        if left_ind == -1:
+            return right_ind, right_val
+        elif right_ind == -1:
+            return left_ind, left_val
+        else:
+            return (left_ind, left_val) if left_val <= right_val else (right_ind, right_val)
+
+    def _update_segment_tree_1(self, parent, left, right, i, j, value):
         self.propagate(parent, left, right)
         if i > j:
             return
@@ -232,8 +282,8 @@ class SegmentTree:
         else:
             mid = (left + right) // 2
             left_path, right_path = self.left_child(parent), self.right_child(parent)
-            self._update_segment_tree(left_path, left, mid, i, min(mid, j), value)
-            self._update_segment_tree(right_path, mid + 1, right, max(i, mid + 1), j, value)
+            self._update_segment_tree_1(left_path, left, mid, i, min(mid, j), value)
+            self._update_segment_tree_1(right_path, mid + 1, right, max(i, mid + 1), j, value)
             left_subtree = (self.lazy[left_path] if self.lazy[left_path] != -1
                             else self.segment_tree[left_path])
             right_subtree = (self.lazy[right_path] if self.lazy[right_path] != -1
@@ -241,21 +291,52 @@ class SegmentTree:
             self.segment_tree[parent] = (self.segment_tree[left_path]
                                          if left_subtree <= right_subtree
                                          else self.segment_tree[right_path])
-            # local_lazy, local_seg_tree = self.lazy, self.segment_tree
-            # lazy_left, lazy_right = local_lazy[left_path], local_lazy[right_path]
-            # seg_left, seg_right = local_seg_tree[left_path], local_seg_tree[right_path]
-            # left_subtree = lazy_left if lazy_left != -1 else seg_left
-            # right_subtree = lazy_right if lazy_right != -1 else seg_right
-            # local_seg_tree[parent] = seg_left if left_subtree <= right_subtree else seg_right
 
-    def build_segment_tree(self):
-        self._build_segment_tree(1, 0, self.tree_size - 1)
+    def _update_segment_tree_2(self, parent, left, right, i, j, new_value):
+        if right < i or j < left:
+            return self.segment_tree[parent]
+        if i == left and j == right:
+            if i == j:
+                self.array_a[left] = new_value
+                self.is_lazy[parent] = False
+            else:
+                self.lazy[parent] = new_value
+                self.is_lazy[parent] = True
+            self.segment_tree[parent] = i
+            return i
+        mid = (left + right) // 2
+        left_path, right_path = self.left_child(parent), self.right_child(parent)
+        if self.is_lazy[parent]:
+            self.is_lazy[parent] = False
+            self.is_lazy[left_path] = self.is_lazy[right_path] = True
+            self.lazy[left_path] = self.lazy[right_path] = self.lazy[parent]
+            self.segment_tree[left_path] = left
+            self.segment_tree[right_path] = mid
+        left_ind = self._update_segment_tree_2(left_path, left, mid,
+                                               max(i, left), min(j, mid), new_value)
+        right_ind = self._update_segment_tree_2(right_path, mid+1, right,
+                                                max(i, mid+1), min(j, right), new_value)
+        self.segment_tree[parent] = (left_ind if (self.array_a[left_ind]
+                                                  <= self.array_a[right_ind]) else right_ind)
+        return self.segment_tree[parent]
 
-    def update_segment_tree(self, i, j, value):
-        self._update_segment_tree(1, 0, self.tree_size - 1, i, j, value)
+    def build_segment_tree_1(self):
+        self._build_segment_tree_1(1, 0, self.tree_size - 1)
 
-    def range_min_query(self, i, j):
-        return self._range_min_query(1, 0, self.tree_size - 1, i, j)
+    def build_segment_tree_2(self):
+        self._build_segment_tree_2(1, 0, self.tree_size - 1)
+
+    def update_segment_tree_1(self, i, j, value):
+        self._update_segment_tree_1(1, 0, self.tree_size - 1, i, j, value)
+
+    def update_segment_tree_2(self, i, j, value):
+        self._update_segment_tree_2(1, 0, self.tree_size - 1, i, j, value)
+
+    def range_min_query_1(self, i, j):
+        return self._range_min_query_1(1, 0, self.tree_size - 1, i, j)
+
+    def range_min_query_2(self, i, j):
+        return self._range_min_query_2(1, 0, self.tree_size - 1, i, j)[0]
 
 
 ####################################################################################################
