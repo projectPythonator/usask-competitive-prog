@@ -83,10 +83,10 @@ class FenwickTree:
         if f:
             self.build_tree_from_f(f)
 
-    def last_set_bit(self, a):  # TODO RETEST
+    def last_set_bit(self, a):
         return a & (-a)
 
-    def build_tree_from_f(self, f):  # TODO RETEST
+    def build_tree_from_f(self, f):
         n = len(f)
         self.fenwick_tree = [0] * (n + 1)
         self.fenwick_tree_size = n
@@ -96,13 +96,13 @@ class FenwickTree:
             if pos <= n:
                 self.fenwick_tree[pos] += self.fenwick_tree[i]
 
-    def build_tree_from_s(self, m, s):  # TODO RETEST
+    def build_tree_from_s(self, m, s):
         f = [0] * (m + 1)
         for i in s:
             f[i] = f[i] + 1
         self.build_tree_from_f(f)
 
-    def range_sum_query_range_i_to_j(self, point_i, point_j):  # TODO RETEST
+    def range_sum_query_range_i_to_j(self, point_i, point_j):
         if point_i > 1:
             return (self.range_sum_query_range_i_to_j(1, point_j)
                     - self.range_sum_query_range_i_to_j(1, point_i - 1))
@@ -112,12 +112,12 @@ class FenwickTree:
             point_j -= self.last_set_bit(point_j)
         return sum_of_point_j
 
-    def update_point_i_with_new_value(self, position_i, new_value):  # TODO RETEST
+    def update_point_i_with_new_value(self, position_i, new_value):
         while position_i <= self.fenwick_tree_size:
             self.fenwick_tree[position_i] += new_value
             position_i = position_i + self.last_set_bit(position_i)
 
-    def select_k(self, k):  # TODO RETEST
+    def select_k(self, k):  # TODO semi tested
         p = 2**(self.fenwick_tree_size.bit_length()-1)
         i = 0
         while p:
