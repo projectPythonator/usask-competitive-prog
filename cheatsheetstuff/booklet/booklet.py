@@ -106,11 +106,11 @@ class FenwickTree:
         if left > 1:
             return (self.range_sum_query_range_i_to_j(1, right)
                     - self.range_sum_query_range_i_to_j(1, left - 1))
-        sum_of_point_j = 0
+        sum_up_to_right = 0
         while right:
-            sum_of_point_j += self.fenwick_tree[right]
+            sum_up_to_right += self.fenwick_tree[right]
             right -= self.last_set_bit(right)
-        return sum_of_point_j
+        return sum_up_to_right
 
     def update_point_i_with_new_value(self, position_i, new_value):
         while position_i <= self.fenwick_tree_size:
