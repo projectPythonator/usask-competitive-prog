@@ -102,10 +102,10 @@ class FenwickTree:
             f[i] = f[i] + 1
         self.build_tree_from_f(f)
 
-    def range_sum_query_range_i_to_j(self, left, right):
+    def range_sum_query_i_to_j(self, left, right):
         if left > 1:
-            return (self.range_sum_query_range_i_to_j(1, right)
-                    - self.range_sum_query_range_i_to_j(1, left - 1))
+            return (self.range_sum_query_i_to_j(1, right)
+                    - self.range_sum_query_i_to_j(1, left - 1))
         sum_up_to_right = 0
         while right:
             sum_up_to_right += self.fenwick_tree[right]
@@ -139,7 +139,7 @@ class RangeUpdatePointQuery:
         tree_update_call(point_j + 1, -new_value)
 
     def point_i_query_sum(self, point_i):  # TODO semi tested
-        return self.point_update_range_query.range_sum_query_range_i_to_j(1, point_i)
+        return self.point_update_range_query.range_sum_query_i_to_j(1, point_i)
 
 
 class RangeUpdateRangeQuery:
@@ -158,7 +158,7 @@ class RangeUpdateRangeQuery:
             return (self.range_sum_query_i_j(1, point_j)
                     - self.range_sum_query_i_j(1, point_i - 1))
         return (self.range_update_point_query.point_i_query_sum(point_j) * point_j
-                - self.point_update_point_query.range_sum_query_range_i_to_j(1, point_j))
+                - self.point_update_point_query.range_sum_query_i_to_j(1, point_j))
 
 
 SEG_INF = 2**30  # can be reduced or increased to fit the max value
