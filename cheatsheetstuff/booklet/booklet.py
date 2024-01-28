@@ -386,7 +386,7 @@ class Graph:
             self.code_to_data.append(data)  # can be replaced with a count variable if space needed
         return self.data_to_code[data]
 
-    def add_edge_u_v_wt_into_directed_graph(self, u: int, v: int, wt: Num, data: Num):
+    def add_edge_u_v_wt_into_directed_graph(self, u: object, v: object, wt: Num, data: Num):
         """A pick and choose function will convert u, v into index form then add it to the structure
         you choose.
         """
@@ -401,10 +401,10 @@ class Graph:
         self.edge_list.append([v, wt, data])
         self.adj_list[u].append(len(self.edge_list) - 1)
 
-    def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: int | float):
+    def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: Num, data: Num):
         """undirected graph version of the previous function. wt can be omitted if not used."""
-        self.add_edge_u_v_wt_into_directed_graph(u, v, wt)
-        self.add_edge_u_v_wt_into_directed_graph(v, u, wt)
+        self.add_edge_u_v_wt_into_directed_graph(u, v, wt, data)
+        self.add_edge_u_v_wt_into_directed_graph(v, u, wt, data)
 
     def fill_grid_graph(self, new_grid: list[list[object]]):
         self.num_rows = len(new_grid)
