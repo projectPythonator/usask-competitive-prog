@@ -2131,12 +2131,13 @@ class GeometryAlgorithms:  # TODO RETEST
                     r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
         return r_closest
 
-    def closest_pair_recursive(self, lo, hi, y_ordering):  # TODO RETEST
+    def closest_pair_recursive(self, lo, hi, y_ordering):
         """Recursive part of computing the closest pair. Divide by y recurse then do a special check
 
         Complexity per call T(n/2) halves each time, T(n/2) halves each call, O(n) at max tho
         Optimizations and notes: If not working use y_part_left and y_part_right again. I did add in
         the optimization of using y_partition 3 times over rather than having 3 separate lists
+        also can remove compare_ab for direct compare
         """
         n = hi - lo
         if n < 5:  # base case we brute force the small set of points
