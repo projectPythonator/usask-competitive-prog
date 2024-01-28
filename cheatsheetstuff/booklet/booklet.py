@@ -129,20 +129,20 @@ class FenwickTree:
             self.fenwick_tree[index] += delta
             index = index + self.last_set_bit(index)
 
-    def update_index_by_delta_2d(self, row, col, delta):
-        i, j, fenwick_2d = row, col, self.fenwick_tree_2d
-        while i <= self.num_rows:
-            while j <= self.num_cols:
-                fenwick_2d[i][j], j = fenwick_2d[i][j] + delta, j + self.last_set_bit(j)
-            j, i = col, i + self.last_set_bit(i)
-
-    def sum_query_2d(self, row, col):
-        i, j, result = row, col, 0
-        while i:
-            while j:
-                result, j = result + self.fenwick_tree_2d[i][j], j - self.last_set_bit(j)
-            j, i = col, i - self.last_set_bit(i)
-        return result
+    # def update_index_by_delta_2d(self, row, col, delta):
+    #     i, j, fenwick_2d = row, col, self.fenwick_tree_2d
+    #     while i <= self.num_rows:
+    #         while j <= self.num_cols:
+    #             fenwick_2d[i][j], j = fenwick_2d[i][j] + delta, j + self.last_set_bit(j)
+    #         j, i = col, i + self.last_set_bit(i)
+    #
+    # def sum_query_2d(self, row, col):
+    #     i, j, result = row, col, 0
+    #     while i:
+    #         while j:
+    #             result, j = result + self.fenwick_tree_2d[i][j], j - self.last_set_bit(j)
+    #         j, i = col, i - self.last_set_bit(i)
+    #     return result
 
     def select_k(self, k):  # TODO semi tested
         p = 2**(self.fenwick_tree_size.bit_length()-1)
