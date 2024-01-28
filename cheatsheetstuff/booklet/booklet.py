@@ -144,10 +144,19 @@ class RangeUpdatePointQuery:
         self.point_update_range_query = FenwickTree([0] * m)
 
     def update_range_i_to_j_by_delta(self, left, right, delta):  # TODO semi tested
+        """For a range update we need only update all indices in [i,i+1...n] to have +delta and
+        then all indices in [j+1,j+2...n] with -delta to negate range(j+1, n) that was affected
+
+        Complexity per call: Time: O(log n), Space: O(1).
+        """
         self.point_update_range_query.update_index_by_delta(left, delta)
         self.point_update_range_query.update_index_by_delta(right + 1, -delta)
 
     def point_sum_query_of_index(self, index):  # TODO semi tested
+        """With restriction of only point sum query, will return range_sum(1, index).
+
+        Complexity per call: Time: O(log n), Space: O(1).
+        """
         return self.point_update_range_query.range_sum_from_i_to_j(1, index)
 
 
@@ -157,6 +166,11 @@ class RangeUpdateRangeQuery:
         self.point_update_range_query = FenwickTree([0] * m)
 
     def update_range_i_to_j_by_delta(self, left, right, delta):  # TODO semi tested
+        """Updates range by delta like above but then also updates the augmented tree which is
+        needed for dynamic range updates and queries for the same structure.
+
+        Complexity per call: Time: O(log n), Space: O(1).
+        """
         self.range_update_point_query.update_range_i_to_j_by_delta(left, right, delta)
         self.point_update_range_query.update_index_by_delta(left, delta * (left - 1))
         self.point_update_range_query.update_index_by_delta(right + 1, -delta * right)
