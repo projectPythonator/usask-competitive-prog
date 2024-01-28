@@ -112,10 +112,10 @@ class FenwickTree:
             right -= self.last_set_bit(right)
         return sum_up_to_right
 
-    def update_index_by_delta(self, position_i, delta):
-        while position_i <= self.fenwick_tree_size:
-            self.fenwick_tree[position_i] += delta
-            position_i = position_i + self.last_set_bit(position_i)
+    def update_index_by_delta(self, index, delta):
+        while index <= self.fenwick_tree_size:
+            self.fenwick_tree[index] += delta
+            index = index + self.last_set_bit(index)
 
     def select_k(self, k):  # TODO semi tested
         p = 2**(self.fenwick_tree_size.bit_length()-1)
