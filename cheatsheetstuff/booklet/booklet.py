@@ -403,8 +403,8 @@ class Graph:
 
     def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: int | float):
         """undirected graph version of the previous function. wt can be omitted if not used."""
-        self.add_edge_u_v_wt_into_undirected_graph(u, v, wt)
-        self.add_edge_u_v_wt_into_undirected_graph(v, u, wt)
+        self.add_edge_u_v_wt_into_directed_graph(u, v, wt)
+        self.add_edge_u_v_wt_into_directed_graph(v, u, wt)
 
     def fill_grid_graph(self, new_grid: list[list[object]]):
         self.num_rows = len(new_grid)
