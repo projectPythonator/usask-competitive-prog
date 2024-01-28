@@ -176,6 +176,15 @@ class RangeUpdateRangeQuery:
         self.point_update_range_query.update_index_by_delta(right + 1, -delta * right)
 
     def range_sum_from_i_to_j(self, left, right):  # TODO semi tested
+        """Similar to the Fenwick tree we use inclusion exclusion, but we need to use our augmented
+        tree to handle 3 cases to compute formula sum[0, i] = sum(rupq, i) * i - sum(purq, i)
+                    | original                      | simplified            |   conditions
+        sum[0,i] =  | 0*i - 0                       | 0                     |   i < left
+                    | x*i - x(left - 1)             | x(i - (left - 1))     |   left <= i <= right
+                    | 0*i - (x(left - 1) - x*right) | x(right - left + 1)   |   i > right
+
+        Complexity per call: Time: O(log n), Space: O(1).
+        """
         if left > 1:
             return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
         return (self.range_update_point_query.point_sum_query_of_index(right) * right
