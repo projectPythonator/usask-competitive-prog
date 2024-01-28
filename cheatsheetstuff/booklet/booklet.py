@@ -150,12 +150,11 @@ class RangeUpdateRangeQuery:
         self.point_update_range_query.update_index_by_delta(left, delta * (left - 1))
         self.point_update_range_query.update_index_by_delta(right + 1, -delta * right)
 
-    def range_sum_from_i_to_j(self, point_i, point_j):  # TODO semi tested
-        if point_i > 1:
-            return (self.range_sum_from_i_to_j(1, point_j)
-                    - self.range_sum_from_i_to_j(1, point_i - 1))
-        return (self.range_update_point_query.point_sum_query_of_index(point_j) * point_j
-                - self.point_update_range_query.range_sum_from_i_to_j(1, point_j))
+    def range_sum_from_i_to_j(self, left, right):  # TODO semi tested
+        if left > 1:
+            return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
+        return (self.range_update_point_query.point_sum_query_of_index(right) * right
+                - self.point_update_range_query.range_sum_from_i_to_j(1, right))
 
 
 SEG_INF = 2**30  # can be reduced or increased to fit the max value
