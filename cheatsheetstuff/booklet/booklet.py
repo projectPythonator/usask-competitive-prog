@@ -143,10 +143,10 @@ class RangeUpdatePointQuery:
 class RangeUpdateRangeQuery:
     def __init__(self, m):
         self.range_update_point_query = RangeUpdatePointQuery(m)
-        self.point_update_point_query = FenwickTree([0] * m)
+        self.point_update_range_query = FenwickTree([0] * m)
 
     def range_update_range_i_j(self, range_i, range_j, new_value):  # TODO semi tested
-        point_update_point_i_tree = self.point_update_point_query.update_index_by_delta
+        point_update_point_i_tree = self.point_update_range_query.update_index_by_delta
         self.range_update_point_query.range_update_from_i_j(range_i, range_j, new_value)
         point_update_point_i_tree(range_i, new_value * (range_i - 1))
         point_update_point_i_tree(range_j + 1, -1 * new_value * range_j)
@@ -156,7 +156,7 @@ class RangeUpdateRangeQuery:
             return (self.range_sum_query_i_j(1, point_j)
                     - self.range_sum_query_i_j(1, point_i - 1))
         return (self.range_update_point_query.point_sum_query_of_i(point_j) * point_j
-                - self.point_update_point_query.range_sum_from_i_to_j(1, point_j))
+                - self.point_update_range_query.range_sum_from_i_to_j(1, point_j))
 
 
 SEG_INF = 2**30  # can be reduced or increased to fit the max value
