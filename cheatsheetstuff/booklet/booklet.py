@@ -531,8 +531,8 @@ class GraphAlgorithms:
         ufds = UnionFindDisjointSets(self.graph.num_nodes)
         min_spanning_tree: TupleListMST = []
         while self.graph.edge_list and ufds.num_sets > 1:
-            wt, u, v = heappop(self.graph.edge_list)  # use w, uv = ... for single cord storage
-            # v,u = uv%self.num_nodes, uv//self.num_nodes
+            wt, uv = heappop(self.graph.edge_list)   # uv is u*num_nodes + v
+            v, u = divmod(uv, self.graph.num_nodes)  # u, v = uv//n, uv%n
             if not ufds.is_same_set(u, v):
                 min_spanning_tree.append((wt, u, v))
                 ufds.union_set(u, v)
