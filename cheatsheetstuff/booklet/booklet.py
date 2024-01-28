@@ -112,7 +112,7 @@ class FenwickTree:
             right -= self.last_set_bit(right)
         return sum_up_to_right
 
-    def update_point_i_with_new_value(self, position_i, delta):
+    def update_index_by_delta(self, position_i, delta):
         while position_i <= self.fenwick_tree_size:
             self.fenwick_tree[position_i] += delta
             position_i = position_i + self.last_set_bit(position_i)
@@ -134,7 +134,7 @@ class RangeUpdatePointQuery:
         self.point_update_range_query = FenwickTree([0] * m)
 
     def range_update_point_i_j(self, point_i, point_j, new_value):  # TODO semi tested
-        tree_update_call = self.point_update_range_query.update_point_i_with_new_value
+        tree_update_call = self.point_update_range_query.update_index_by_delta
         tree_update_call(point_i, new_value)
         tree_update_call(point_j + 1, -new_value)
 
@@ -148,7 +148,7 @@ class RangeUpdateRangeQuery:
         self.point_update_point_query = FenwickTree([0] * m)
 
     def range_update_range_i_j(self, range_i, range_j, new_value):  # TODO semi tested
-        point_update_point_i_tree = self.point_update_point_query.update_point_i_with_new_value
+        point_update_point_i_tree = self.point_update_point_query.update_index_by_delta
         self.range_update_point_query.range_update_point_i_j(range_i, range_j, new_value)
         point_update_point_i_tree(range_i, new_value * (range_i - 1))
         point_update_point_i_tree(range_j + 1, -1 * new_value * range_j)
