@@ -84,6 +84,7 @@ class FenwickTree:
             self.build_tree_from_f(f)
 
     def last_set_bit(self, a):
+        """Will get the last set bit of a used in 1-indexing. for 0-indexing use i & (i+1)"""
         return a & (-a)
 
     def build_tree_from_f(self, f):
