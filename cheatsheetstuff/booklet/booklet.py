@@ -580,7 +580,7 @@ class GraphAlgorithms:
         self.mst_node_list = min_spanning_tree
         self.mst_node_list.sort()
 
-    def breadth_first_search_vanilla_template(self, source: int):  # TODO RETEST
+    def breadth_first_search_vanilla_template(self, source: int):
         """Template for distance based bfs traversal from node source.
 
         Complexity per call: Time: O(|V| + |E|), Space: O(|V|)
