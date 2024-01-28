@@ -104,8 +104,7 @@ class FenwickTree:
 
     def range_sum_from_i_to_j(self, left, right):
         if left > 1:
-            return (self.range_sum_from_i_to_j(1, right)
-                    - self.range_sum_from_i_to_j(1, left - 1))
+            return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
         sum_up_to_right = 0
         while right:
             sum_up_to_right += self.fenwick_tree[right]
