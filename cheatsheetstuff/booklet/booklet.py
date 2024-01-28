@@ -104,6 +104,11 @@ class FenwickTree:
         self.build_tree_from_f(f)
 
     def range_sum_from_i_to_j(self, left, right):
+        """Returns the inclusive-exclusive range sum [i...j). version is 1-index based
+        rsq(i, j) = sum(1, right) - sum(1, left - 1)
+
+        Complexity per call: Time: O(log n), Space: O(1).
+        """
         if left > 1:
             return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
         sum_up_to_right = 0
