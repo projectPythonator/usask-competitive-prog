@@ -136,7 +136,7 @@ class RangeUpdatePointQuery:
         self.point_update_range_query.update_index_by_delta(left, delta)
         self.point_update_range_query.update_index_by_delta(right + 1, -delta)
 
-    def point_i_query_sum(self, point_i):  # TODO semi tested
+    def point_sum_query_of_i(self, point_i):  # TODO semi tested
         return self.point_update_range_query.range_sum_from_i_to_j(1, point_i)
 
 
@@ -155,7 +155,7 @@ class RangeUpdateRangeQuery:
         if point_i > 1:
             return (self.range_sum_query_i_j(1, point_j)
                     - self.range_sum_query_i_j(1, point_i - 1))
-        return (self.range_update_point_query.point_i_query_sum(point_j) * point_j
+        return (self.range_update_point_query.point_sum_query_of_i(point_j) * point_j
                 - self.point_update_point_query.range_sum_from_i_to_j(1, point_j))
 
 
