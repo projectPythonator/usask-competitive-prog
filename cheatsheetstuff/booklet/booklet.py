@@ -652,7 +652,7 @@ class GraphAlgorithms:
         heap = [(wt, v) for v, wt in enumerate(tmp) if wt != -1]
         heapify(heap)
 
-    def single_source_shortest_path_dijkstras(self, source: int, sink: int):  # TODO RETEST
+    def single_source_shortest_path_dijkstras(self, source: int, sink: int):
         """It is Dijkstra's pathfinder using heaps.
 
         Complexity per call: Time: O(|E|log |V|), Space: O(|V|)
