@@ -78,12 +78,12 @@ class UnionFindDisjointSets:  # tested works for functions in class
 
 class FenwickTree:
     def __init__(self, f):
-        self.num_rows = self.num_cols = 0   # for 2d
-        self.fenwick_tree_2d = [[0] for _ in range(1)]  # for 2d
         self.fenwick_tree = []
         self.fenwick_tree_size = 0
         if f:
             self.build_tree_from_f(f)
+        # self.num_rows = self.num_cols = 0               # for 2d
+        # self.fenwick_tree_2d = [[0] for _ in range(1)]  # for 2d
 
     def last_set_bit(self, a):
         """Will get the last set bit of a used in 1-indexing. for 0-indexing use i & (i+1)"""
