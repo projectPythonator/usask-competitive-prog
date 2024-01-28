@@ -104,7 +104,7 @@ class FenwickTree:
         self.build_tree_from_f(f)
 
     def range_sum_from_i_to_j(self, left, right):
-        """Returns the inclusive-exclusive range sum [i...j). version is 1-index based
+        """Returns the inclusive-exclusive range sum [i...j). version is 1-index based.
         rsq(i, j) = sum(1, right) - sum(1, left - 1)
 
         Complexity per call: Time: O(log n), Space: O(1).
@@ -118,6 +118,11 @@ class FenwickTree:
         return sum_up_to_right
 
     def update_index_by_delta(self, index, delta):
+        """Updates the branch that follows index by delta. version is 1-index based.
+        Branch defined as "for i in range(index, tree_size, f(i)=i & (-i))", for(start, end, step)
+
+        Complexity per call: Time: O(log n), Space: O(1).
+        """
         while index <= self.fenwick_tree_size:
             self.fenwick_tree[index] += delta
             index = index + self.last_set_bit(index)
