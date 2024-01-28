@@ -102,14 +102,14 @@ class FenwickTree:
             f[i] = f[i] + 1
         self.build_tree_from_f(f)
 
-    def range_sum_query_range_i_to_j(self, point_i, point_j):
-        if point_i > 1:
-            return (self.range_sum_query_range_i_to_j(1, point_j)
-                    - self.range_sum_query_range_i_to_j(1, point_i - 1))
+    def range_sum_query_range_i_to_j(self, left, right):
+        if left > 1:
+            return (self.range_sum_query_range_i_to_j(1, right)
+                    - self.range_sum_query_range_i_to_j(1, left - 1))
         sum_of_point_j = 0
-        while point_j:
-            sum_of_point_j += self.fenwick_tree[point_j]
-            point_j -= self.last_set_bit(point_j)
+        while right:
+            sum_of_point_j += self.fenwick_tree[right]
+            right -= self.last_set_bit(right)
         return sum_of_point_j
 
     def update_point_i_with_new_value(self, position_i, new_value):
