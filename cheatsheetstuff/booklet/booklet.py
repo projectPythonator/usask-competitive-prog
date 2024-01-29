@@ -623,7 +623,7 @@ class GraphAlgorithms:
                     self.topology_sort_via_tarjan_helper(u)
         self.topo_sort_node_list = self.topo_sort_node_list[::-1]
 
-    def topology_sort_via_kahns(self):  # TODO RETEST
+    def topology_sort_via_kahns(self):
         """Compute a topology sort via kahn's method, on adj_list.
 
         Complexity per call: Time: O(|E|log|V|), Space: O(|V|)
