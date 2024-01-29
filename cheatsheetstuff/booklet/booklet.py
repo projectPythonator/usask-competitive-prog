@@ -538,17 +538,26 @@ class GraphAlgorithms:
                 ufds.union_set(u, v)
         self.mst_node_list = min_spanning_tree
         
-    def prims_visit_adj_matrix(self, u: int, not_visited: Set[int], mst_best_dist: NumList, heap):
+    def prims_visit_adj_matrix(self, u: in):
         """Find min weight edge in adjacency matrix implementation of prims.
         TODO: FIX TO NOT USE HEAPS
         Complexity per call: Time: O(|V|), Space: O(1)
         """
-        not_visited.remove(u)
-        for v in not_visited:
-            wt = self.graph.adj_matrix[u][v]
-            if wt <= mst_best_dist[v]:
-                mst_best_dist[v] = wt
-                heappush(heap, (wt, v, u))  # fix it by making it not a heap?
+        # vertices = self.graph.num_nodes
+        # min_spanning_tree = []
+        # seen_and_dist = {v: self.graph.adj_matrix[0][v] for v in range(1, vertices)}
+        # u = 0
+        # while seen_and_dist:
+        #     v, min_val = -1, INF
+        #     for key, val in seen_and_dist.items():
+        #         if val < min_val:
+        #             v, min_val = key, val
+        #     del seen_and_dist[v]
+        #     seen_and_dist = {key: min(val, self.graph.adj_matrix[u][key])
+        #                      for key, val in seen_and_dist.items()}
+        #     min_spanning_tree.append((min_val, u, v))
+        #     u = v
+
 
     def min_spanning_tree_via_prims_adj_list(self):
         """Computes mst of graph G stored in adj_list.
