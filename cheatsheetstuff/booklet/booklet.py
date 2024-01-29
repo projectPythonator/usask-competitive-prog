@@ -468,9 +468,9 @@ class GraphAlgorithms:
         self.region_num: int = 0
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
+        self.visited = []
         self.mst_node_list: TupleListMST = []
         self.dist: NumList = []
-        self.visited: IntList = []
         self.topo_sort_node_list: IntList = []
         self.parent: IntList = []
         self.low_values: IntList = []
@@ -596,7 +596,7 @@ class GraphAlgorithms:
                     queue.append(v)
         self.dist = distance
 
-    def topology_sort_via_tarjan_helper(self, u: int):  # TODO RETEST
+    def topology_sort_via_tarjan_helper(self, u: int):
         """Recursively explore unvisited graph via dfs.
 
         Complexity per call: Time: O(|V|), Space: O(|V|) at deepest point
@@ -607,7 +607,7 @@ class GraphAlgorithms:
                 self.topology_sort_via_tarjan_helper(v)
         self.topo_sort_node_list.append(u)
         
-    def topology_sort_via_tarjan(self):  # TODO RETEST
+    def topology_sort_via_tarjan(self, source=-1):
         """Compute a topology sort via tarjan method, on adj_list.
 
         Complexity per call: Time: O(|V| + |E|), Space: O(|V|)
@@ -615,9 +615,12 @@ class GraphAlgorithms:
         """
         self.visited = [UNVISITED] * self.graph.num_nodes
         self.topo_sort_node_list = []
-        for u in range(self.graph.num_nodes):
-            if self.visited[u] == UNVISITED:
-                self.topology_sort_via_tarjan_helper(u)
+        if source != -1:
+            self.topology_sort_via_tarjan_helper(source)
+        else:
+            for u in range(self.graph.num_nodes):
+                if self.visited[u] == UNVISITED:
+                    self.topology_sort_via_tarjan_helper(u)
         self.topo_sort_node_list = self.topo_sort_node_list[::-1]
 
     def topology_sort_via_kahns(self):  # TODO RETEST
