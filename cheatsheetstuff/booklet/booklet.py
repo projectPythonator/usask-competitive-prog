@@ -550,7 +550,7 @@ class GraphAlgorithms:
                 mst_best_dist[v] = wt
                 heappush(heap, (wt, v, u))  # fix it by making it not a heap?
 
-    def min_spanning_tree_via_prims(self):
+    def min_spanning_tree_via_prims_adj_list(self):
         """Computes mst of graph G stored in adj_list.
 
         Complexity: Time: O(|E|log |V|), Space: O(|E|)
