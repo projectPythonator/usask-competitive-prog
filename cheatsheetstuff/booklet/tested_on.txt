@@ -16,7 +16,7 @@ bfs_vannila tested on kattis: horror
 kruskals tested on kattis: cats needed to be updated though with cord compression, minspantree, cheatingstudents
 prims_adj_list worked find on Kattis:cats, minspantree, cheatingstudents
 dijkstras tested on kattis: shortestpath1
-Kahns topo sort tested on kattis: brexitnegotiations,brexit
+Kahns topo sort tested on kattis: brexitnegotiations,brexit, pickupsticks
 tarjans topo sort: tested on kattis: builddeps
 
 MathAlgorithms
