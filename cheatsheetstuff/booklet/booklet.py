@@ -549,36 +549,35 @@ class GraphAlgorithms:
             if wt <= mst_best_dist[v]:
                 mst_best_dist[v] = wt
                 heappush(heap, (wt, v, u))  # fix it by making it not a heap?
-    
-    def prims_visit_adj_list(self, u: int, not_visited: BoolList, mst_best_dist: NumList, heap):
-        """Find min weight edge in adjacency list implementation of prims.
 
-        Complexity per call: Time: O(|V|log |V|), Space: increase by O(|V|)
-        """
-        not_visited[u] = False
-        for v, wt in self.graph.adj_list[u]:
-            if wt <= mst_best_dist[v] and not_visited[v]:
-                mst_best_dist[v] = wt
-                heappush(heap, (wt, v, u))
-    
     def min_spanning_tree_via_prims(self):
         """Computes mst of graph G stored in adj_list.
 
-        Complexity: Time: O(|E|log |V|) or O(|V|^2), Space: O(|E|) or O(|V|^2)
+        Complexity: Time: O(|E|log |V|), Space: O(|E|)
         More uses: gets a different min spamming tree than kruskal's
         """
-        not_visited = [True] * self.graph.num_nodes
-        mst_best_dist = [INF] * self.graph.num_nodes
-        heap, min_spanning_tree, nodes_taken = [], [], 1
-        self.prims_visit_adj_list(0, not_visited, mst_best_dist, heap)
+        vertices = self.graph.num_nodes
+        not_visited, mst_best_dist = [True] * vertices, [INF] * vertices
+        heap = [(wt, v * vertices) for v, wt in self.graph.adj_list[0]]
+        heapify(heap)
+        for v, wt in self.graph.adj_list[0]:
+            mst_best_dist[v] = wt
+        not_visited[0], min_spanning_tree, nodes_taken, msc = False, [], 0, 0
         while heap and nodes_taken < self.graph.num_nodes:
-            wt, v, u = heappop(heap)
-            if not_visited[v]:
-                self.prims_visit_adj_list(v, not_visited, mst_best_dist, heap)
-                min_spanning_tree.append((wt, v, u))
+            edge_wt, u_parent = heappop(heap)
+            u, parent = divmod(u_parent, vertices)
+            if not_visited[u]:
+                min_spanning_tree.append((u, parent) if u <= parent else (parent, u))
+                msc += edge_wt
                 nodes_taken += 1
+                not_visited[u] = False
+                for v, wt in self.graph.adj_list[u]:
+                    if wt < mst_best_dist[v] and not_visited[v]:
+                        mst_best_dist[v] = wt
+                        heappush(heap, (wt, v * vertices + u))
+        min_spanning_tree.sort()
         self.mst_node_list = min_spanning_tree
-        self.mst_node_list.sort()
+        return msc if len(min_spanning_tree) == self.graph.num_nodes - 1 else -1
 
     def breadth_first_search_vanilla_template(self, source: int):
         """Template for distance based bfs traversal from node source.
