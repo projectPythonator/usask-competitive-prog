@@ -714,7 +714,7 @@ class GraphAlgorithms:
     def articulation_point_and_bridge_helper_via_dfs(self, u: int):  # TODO RETEST
         """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
-        Complexity per call: Time: O(|E|), Space: O(|V|)
+        Complexity per call: Time: O(|E|), Space: O(|V|) or O(|E|) depending on points vs edges.
         """
         self.visited[u] = self.dfs_counter
         self.low_values[u] = self.visited[u]
