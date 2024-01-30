@@ -538,26 +538,26 @@ class GraphAlgorithms:
                 ufds.union_set(u, v)
         self.mst_node_list = min_spanning_tree
         
-    def prims_visit_adj_matrix(self, u: in):
+    def prims_visit_adj_matrix(self, source: int):
         """Find min weight edge in adjacency matrix implementation of prims.
-        TODO: FIX TO NOT USE HEAPS
-        Complexity per call: Time: O(|V|), Space: O(1)
-        """
-        # vertices = self.graph.num_nodes
-        # min_spanning_tree = []
-        # seen_and_dist = {v: self.graph.adj_matrix[0][v] for v in range(1, vertices)}
-        # u = 0
-        # while seen_and_dist:
-        #     v, min_val = -1, INF
-        #     for key, val in seen_and_dist.items():
-        #         if val < min_val:
-        #             v, min_val = key, val
-        #     del seen_and_dist[v]
-        #     seen_and_dist = {key: min(val, self.graph.adj_matrix[u][key])
-        #                      for key, val in seen_and_dist.items()}
-        #     min_spanning_tree.append((min_val, u, v))
-        #     u = v
 
+        Complexity per call: Time: O(|V|^2), Space: O(|V|), S(~5|V|)
+        """
+        vertices = self.graph.num_nodes
+        not_seen_and_min_dist, mst_parent = {v: INF for v in range(vertices)}, [-1] * vertices
+        min_spanning_tree, min_weight, not_seen_and_min_dist[source] = [], 0, 0
+        for _ in range(vertices):
+            u, best_dist = min(not_seen_and_min_dist.items(), key=lambda x: x[1])
+            # if best_dist == INF:  # graph is disconnected case
+            #     return            # uncomment when graph might be disconnected
+            min_spanning_tree.append((min(u, mst_parent[u]), max(u, mst_parent[u])))
+            min_weight += best_dist
+            del not_seen_and_min_dist[u]  # remove u since it has been seen now
+            for v, min_dist in not_seen_and_min_dist.items():
+                if self.graph.adj_matrix[u][v] < min_dist:
+                    not_seen_and_min_dist[v], mst_parent[v] = self.graph.adj_matrix[u][v], u
+        # min_spanning_tree.sort()  # this line will add |V|log |V| Time and Space per Call
+        self.mst_node_list = min_spanning_tree[1:]  # cut off the root node
 
     def min_spanning_tree_via_prims_adj_list(self):
         """Computes mst of graph G stored in adj_list.
