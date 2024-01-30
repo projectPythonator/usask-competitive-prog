@@ -556,7 +556,7 @@ class GraphAlgorithms:
             for v, min_dist in not_seen_and_min_dist.items():
                 if self.graph.adj_matrix[u][v] < min_dist:
                     not_seen_and_min_dist[v], mst_parent[v] = self.graph.adj_matrix[u][v], u
-        # min_spanning_tree.sort()  # this line will add |V|log |V| Time and Space per Call
+        # min_spanning_tree.sort()  # optional for when edges need to be ordered: nlog n cost
         self.mst_node_list = min_spanning_tree[1:]  # cut off the root node
 
     def min_spanning_tree_via_prims_adj_list(self):
