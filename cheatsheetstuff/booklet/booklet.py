@@ -462,6 +462,7 @@ class Graph:
 class GraphAlgorithms:
     def __init__(self, new_graph):
         self.graph: Graph = new_graph
+        self.min_spanning_cost: int = 0
         self.dfs_counter: int = 0
         self.dfs_root: int = 0
         self.root_children: int = 0
@@ -559,34 +560,34 @@ class GraphAlgorithms:
         # min_spanning_tree.sort()  # optional for when edges need to be ordered: nlog n cost
         self.mst_node_list = min_spanning_tree[1:]  # cut off the root node
 
-    def min_spanning_tree_via_prims_adj_list(self):
-        """Computes mst of graph G stored in adj_list.
+    def min_spanning_tree_via_prims_adj_list(self, source: int):
+        """Computes mst of graph G stored in adj_list. Uses edge compression u, v = u*|V| + v.
 
         Complexity: Time: O(|E|log |V|), Space: O(|E|)
-        More uses: gets a different min spamming tree than kruskal's
+        More uses: Gets a different min spamming tree than kruskal's
         """
         vertices = self.graph.num_nodes
         not_visited, mst_best_dist = [True] * vertices, [INF] * vertices
-        heap = [(wt, v * vertices) for v, wt in self.graph.adj_list[0]]
+        heap = [(wt, v * vertices + source) for v, wt in self.graph.adj_list[source]]
         heapify(heap)
-        for v, wt in self.graph.adj_list[0]:
+        for v, wt in self.graph.adj_list[source]:
             mst_best_dist[v] = wt
-        not_visited[0], min_spanning_tree, nodes_taken, msc = False, [], 0, 0
-        while heap and nodes_taken < self.graph.num_nodes:
+        min_spanning_tree, nodes_taken, msc, not_visited[source] = [], 0, 0, False
+        while heap and nodes_taken < vertices - 1:
             edge_wt, u_parent = heappop(heap)
-            u, parent = divmod(u_parent, vertices)
+            u, parent = divmod(u_parent, vertices)  # edge uncompress u, v = uv//|V|, uv%|V|
             if not_visited[u]:
-                min_spanning_tree.append((u, parent) if u <= parent else (parent, u))
+                min_spanning_tree.append((min(u, parent), max(u, parent)))
                 msc += edge_wt
                 nodes_taken += 1
                 not_visited[u] = False
                 for v, wt in self.graph.adj_list[u]:
                     if wt < mst_best_dist[v] and not_visited[v]:
                         mst_best_dist[v] = wt
-                        heappush(heap, (wt, v * vertices + u))
-        min_spanning_tree.sort()
+                        heappush(heap, (wt, v * vertices + u))  # edge compression v*|V| + u.
+        min_spanning_tree.sort()  # optional for when edges need to be ordered: nlog n cost
         self.mst_node_list = min_spanning_tree
-        return msc if len(min_spanning_tree) == self.graph.num_nodes - 1 else -1
+        self.min_spanning_cost = msc if nodes_taken == vertices - 1 else -1
 
     def breadth_first_search_vanilla_template(self, source: int):
         """Template for distance based bfs traversal from node source.
