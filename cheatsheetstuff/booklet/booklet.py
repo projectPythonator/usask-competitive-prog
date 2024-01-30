@@ -541,7 +541,7 @@ class GraphAlgorithms:
     def prims_visit_adj_matrix(self, source: int):
         """Find min weight edge in adjacency matrix implementation of prims.
 
-        Complexity per call: Time: O(|V|^2), Space: O(|V|), S(~5|V|)
+        Complexity per call: Time: O(|V|^2), T(|V| * 4|V|), Space: O(|V|), S(~5|V|)
         """
         vertices = self.graph.num_nodes
         not_seen_and_min_dist, mst_parent = {v: INF for v in range(vertices)}, [-1] * vertices
