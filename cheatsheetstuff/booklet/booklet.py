@@ -585,7 +585,7 @@ class GraphAlgorithms:
                     if wt < mst_best_dist[v] and not_visited[v]:
                         mst_best_dist[v] = wt
                         heappush(heap, (wt, v * vertices + u))  # edge compression v*|V| + u.
-        min_spanning_tree.sort()  # optional for when edges need to be ordered: nlog n cost
+        # min_spanning_tree.sort()  # optional for when edges need to be ordered: nlog n cost
         self.mst_node_list = min_spanning_tree
         self.min_spanning_cost = msc if nodes_taken == vertices - 1 else -1
 
