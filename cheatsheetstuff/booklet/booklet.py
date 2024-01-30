@@ -48,7 +48,7 @@ class UnionFindDisjointSets:  # tested works for functions in class
         for c in local_stack:
             local_parent[c] = xp
         return xp
-        
+
     def is_same_set(self, u, v):
         """Checks if u and v in same set. TIME and SPACE Complexity is the same as find_set"""
         return self.find_set(u) == self.find_set(v)
@@ -538,7 +538,7 @@ class GraphAlgorithms:
                 min_spanning_tree.append((wt, u, v))
                 ufds.union_set(u, v)
         self.mst_node_list = min_spanning_tree
-        
+
     def prims_visit_adj_matrix(self, source: int):
         """Find min weight edge in adjacency matrix implementation of prims.
 
@@ -615,7 +615,7 @@ class GraphAlgorithms:
             if self.visited[v] == UNVISITED:
                 self.topology_sort_via_tarjan_helper(v)
         self.topo_sort_node_list.append(u)
-        
+
     def topology_sort_via_tarjan(self, source=-1):
         """Compute a topology sort via tarjan method, on adj_list.
 
@@ -688,7 +688,7 @@ class GraphAlgorithms:
                     heappush(heap, (distance[v], v))
         self.dist = distance
         self.parent = parents
-    
+
     def all_pairs_shortest_path_floyd_warshall(self):  # TESTED
         """Computes essentially a matrix operation on a graph.
 
@@ -748,7 +748,7 @@ class GraphAlgorithms:
                 self.articulation_point_and_bridge_helper_via_dfs(u)
                 self.articulation_nodes[self.dfs_root] = (self.root_children > 1)
 
-    def cycle_check_on_directed_graph_helper(self, u: int):  # TODO RETEST
+    def cycle_check_on_directed_graph_helper(self, u: int):
         """Recursion part of the dfs. It is modified to list various types of edges.
 
         Complexity per call: Time: O(|E|), Space: O(|V|) at deepest call
@@ -769,7 +769,7 @@ class GraphAlgorithms:
             self.directed_edge_type.append((u, v, edge_type))
         self.visited[u] = VISITED
 
-    def cycle_check_on_directed_graph(self):  # TODO RETEST
+    def cycle_check_on_directed_graph(self):
         """Determines if a graph is cyclic or acyclic via dfs.
 
         Complexity per call: Time: O(|E| + |V|),
@@ -781,7 +781,7 @@ class GraphAlgorithms:
         for u in range(self.graph.num_nodes):
             if self.visited[u] == UNVISITED:
                 self.cycle_check_on_directed_graph_helper(u)
-  
+
     def strongly_connected_components_of_graph_kosaraju_helper(self, u: int, pass_one: bool):
         """Pass one explore G and build stack, Pass two mark the SCC regions on transposition of G.
         # TODO RETEST
@@ -813,7 +813,7 @@ class GraphAlgorithms:
             if self.visited[u] == UNVISITED:
                 self.strongly_connected_components_of_graph_kosaraju_helper(u, False)
                 self.region_num += 1
-    
+
     def strongly_connected_components_of_graph_tarjans_helper(self, u: int):  # TODO RETEST
         """Recursive part of tarjan's, pre-order finds the SCC regions, marks regions post-order.
 
@@ -1035,7 +1035,7 @@ class MathAlgorithms:
                 for j in range(i*i, n+1, i):
                     prime_sieve[j] = False
         self.primes_list = [i for i, el in enumerate(prime_sieve) if el]
-    
+
     def sieve_of_eratosthenes_optimized(self, n):
         """Odds only optimized version of the previous method
 
@@ -1087,7 +1087,7 @@ class MathAlgorithms:
             self.num_diff_prime_factors = num_diff_pf
             self.sum_diff_prime_factors = sum_diff_pf
             self.euler_phi = phi
-            
+
         def num_and_sum_of_divisors(limit):
             """Does a basic sieve. Complexity function 2."""
             num_div = [1] * (limit + 1)
@@ -1117,7 +1117,7 @@ class MathAlgorithms:
         euler_phi_plus_sum_and_number_of_diff_prime_factors(n)
         num_and_sum_of_divisors(n)
         num_and_sum_of_prime_factors(n)
-    
+
     def gen_set_primes(self):
         self.primes_set = set(self.primes_list)
 
@@ -1212,7 +1212,7 @@ class MathAlgorithms:
                                for j in range(i))
         return not any(self.is_composite(self.primes_list[j], d, n, s)
                        for j in range(precision_for_huge_n))
-    
+
     def miller_rabin_primality_test_prep(self):
         """This function needs to be called before miller rabin"""
         self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
@@ -1412,10 +1412,10 @@ class MathAlgorithms:
         # for i in range(max_n-2, -1, -1):
         #     inverse_factorial_mod_p[i] = (inverse_factorial_mod_p[i+1] * (i+1)) % mod_p
         # self.inv_fact = inverse_factorial_mod_p
-            
+
     def binomial_coefficient_dp(self, n, k):  # TODO RETEST
         """Uses the recurrence to calculate binomial coefficient.
-        
+
         Complexity per call: Time: O(n*k) I think, Space: O(n*k).
         """
         if n == k or 0 == k:
@@ -1431,7 +1431,7 @@ class MathAlgorithms:
 
 
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
-# remember to sub stuff out for integer ops when you want only integers 
+# remember to sub stuff out for integer ops when you want only integers
 # for ints need to change init, eq and
 # hard code these in for performance speedup
 CCW = 1  # counterclockwise
@@ -1473,7 +1473,7 @@ class Pt2d:  # TODO RETEST
 
 
 class Pt3d:  # TODO RETEST
-    def __init__(self, x_val, y_val, z_val): 
+    def __init__(self, x_val, y_val, z_val):
         self.x, self.y, self.z = map(float, (x_val, y_val, z_val))
 
     def __add__(self, other): return Pt3d(self.x + other.x, self.y + other.y, self.z + other.z)
@@ -1482,7 +1482,7 @@ class Pt3d:  # TODO RETEST
     def __truediv__(self, scale): return Pt3d(self.x / scale, self.y / scale, self.z / scale)
     def __floordiv__(self, scale): return Pt3d(self.x // scale, self.y // scale, self.z // scale)
 
-    def __eq__(self, other): 
+    def __eq__(self, other):
         return isclose(self.x, other.x) and isclose(self.y, other.y) and isclose(self.z, other.z)
 
     def __lt__(self, other):
@@ -1650,7 +1650,7 @@ class GeometryAlgorithms:  # TODO RETEST
     def distance_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
         """Same as above, just return the distance between c and the projected point :)."""
         return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab(a, b, c))
-    
+
     def is_parallel_lines_ab_and_cd(self, a, b, c, d):  # TODO RETEST
         """Two lines are parallel if the cross_product between vec_ba and vec_cd is 0."""
         vec_ba, vec_cd = b - a, c - d
@@ -1824,7 +1824,7 @@ class GeometryAlgorithms:  # TODO RETEST
     # def circumcircle_radis_of_triangle_abc_helper(self, ab, bc, ca):
     #     area = self.triangle_area_from_heron_abc(ab, bc, ca)
     #     return (ab*bc*ca) / (4*area)
-        
+
     def circumcircle_radius_of_triangle_abc(self, a, b, c):  # TODO RETEST
         """Computes the radius of the circum-circle, achieved by computing the side lengths then
         gets the area for Formula: r = (ab * bc * ca) / (4 * area) Author: TODO
@@ -1846,7 +1846,7 @@ class GeometryAlgorithms:  # TODO RETEST
         side_ab, side_bc, side_ca = self.sides_of_triangle_abc(a, b, c)
         ratio_1 = side_ab/side_ca
         ratio_2 = side_ab/side_bc
-        pt_1 = b + (c-b) * (ratio_1/(ratio_1 + 1.0)) 
+        pt_1 = b + (c-b) * (ratio_1/(ratio_1 + 1.0))
         pt_2 = a + (c-a) * (ratio_2/(ratio_2 + 1.0))
 
         if self.is_lines_intersect_ab_to_cd(a, pt_1, b, pt_2):
@@ -2028,7 +2028,7 @@ class GeometryAlgorithms:  # TODO RETEST
             return False
         side = self.point_c_rotation_wrt_line_ab(pts[left], pts[left + 1] - pts[left], p)
         return side >= 0
-    
+
     # use a set with points if possible checking on the same polygon many times
     # return 0 for on 1 for in -1 for out
     def pt_p_position_wrt_polygon_pts(self, pts, p):  # TODO RETEST
@@ -2134,7 +2134,7 @@ class GeometryAlgorithms:  # TODO RETEST
     def closest_pair_helper(self, lo, hi):  # TODO RETEST
         """brute force function, for small range will brute force find the closet pair. O(n^2)"""
         r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
-                     self.x_ordering[lo], 
+                     self.x_ordering[lo],
                      self.x_ordering[lo+1])
         for i in range(lo, hi):
             for j in range(i+1, hi):
@@ -2314,7 +2314,7 @@ class GeometryAlgorithms:  # TODO RETEST
             else:
                 base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
         return ldo, rdo
-            
+
     def delaunay_triangulation_fast(self, pts):  # TODO RETEST
         pts.sort()
         result = self.build_triangulation(0, len(pts) - 1, pts)
@@ -2567,7 +2567,7 @@ class StringAlgorithms:
             if lcp_value > max_lcp_value and local_owners[i] != local_owners[i - 1]:
                 max_lcp_index, max_lcp_value = i, lcp_value
         return max_lcp_index, max_lcp_value
-        
+
     def compute_rolling_hash(self, new_text):  # TODO RETEST
         """For a given text compute and store the rolling hash. we use the smallest prime lower than
         2^30 since python gets slower after 2^30, p = 131 is a small prime below 256.
@@ -2803,7 +2803,7 @@ class MatrixAlgorithms:
                 aug_ab.row_reduce(rank, col, 0)
                 rank += 1
         return rank
-            
+
     def gauss_elimination(self, aug_ab: Matrix) -> int:  # TODO RETEST
         """Computes gauss with constraints, Ax=b | A -> nxn matrix, b -> nx1 matrix aug_ab = A | b.
          [translated from foreverbell 2014 c++ acm icpc cheat sheet repo]
