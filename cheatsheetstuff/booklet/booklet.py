@@ -1221,7 +1221,7 @@ class MathAlgorithms:
         self.sieve_of_eratosthenes(1000)  # comment out if different size needed
         self.gen_set_primes()  # comment out if already have bigger size
 
-    def extended_euclid_recursive(self, a, b):  # TODO RETEST
+    def extended_euclid_recursive(self, a, b):
         """Solves coefficients of Bezout identity: ax + by = gcd(a, b), recursively
 
         Complexity per call: Time: O(log n), Space: O(log n) at the deepest call.
@@ -1231,7 +1231,7 @@ class MathAlgorithms:
         x, y, d = self.extended_euclid_recursive(b, a % b)
         return y, x-y*(a//b), d
 
-    def extended_euclid_iterative(self, a, b):  # TODO RETEST
+    def extended_euclid_iterative(self, a, b):
         """Solves coefficients of Bezout identity: ax + by = gcd(a, b), iteratively.
 
         Complexity per call: Time: O(log n) about twice as fast in python vs above, Space: O(1)
