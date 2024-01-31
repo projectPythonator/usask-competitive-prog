@@ -34,7 +34,7 @@ euler_phi_plus_sum_and_number_of_diff_prime_factors: num_diff_prims tested on ka
 num_and_sum_of_divisors num_divs tested on kattis: nonprimefactors worked but was too slow vs using below method
 num_and_sum_of_prime_factors: num_divs mod tested on kattis: nonprimefactors
 fibonacci_n_iterative: tested on kattis against fibonacci_n_dp_1 up to 100k matches values
-fibonacci_n_dp_1: tested on kattis snakesandmasters
+fibonacci_n_dp_cached: tested on kattis snakesandmasters, anti11
 extended_euclid_recursive: tested on kattis modulararithmetic, candydistribution
 extended_euclid_iterative: tested on kattis modulararithmetic, candydistribution
 

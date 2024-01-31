@@ -985,6 +985,7 @@ class GraphAlgorithms:
 ####################################################################################################
 from math import isqrt, log, gcd, prod
 from itertools import takewhile
+from functools import lru_cache
 
 
 class MathAlgorithms:
@@ -1350,17 +1351,17 @@ class MathAlgorithms:
             fib_list[i] = fib_list[i - 1] + fib_list[i - 2]
         self.fibonacci_list = fib_list
 
-    def fibonacci_n_dp_1(self, n):
-        """Dynamic programming way to compute the nth fibonacci.
+    @lru_cache(maxsize=None)
+    def fibonacci_n_dp_cached(self, n):
+        """Dynamic programming way to compute the nth fibonacci. Derived from Cassini's identity.
 
         Complexity per call: Time: O(log n), Space: increase by O(log n).
+        Optimization: can go back to normal memoization with same code but using dictionary.
         """
-        if n in self.fibonacci_dict:
-            return self.fibonacci_dict[n]
-        f1 = self.fibonacci_n_dp_1(n // 2 + 1)
-        f2 = self.fibonacci_n_dp_1((n - 1) // 2)
-        self.fibonacci_dict[n] = (f1 * f1 + f2 * f2 if n & 1 else f1 * f1 - f2 * f2)
-        return self.fibonacci_dict[n]
+        if n < 3:
+            return 1 if n else 0
+        f1, f2 = self.fibonacci_n_dp_cached(n // 2 + 1), self.fibonacci_n_dp_cached((n - 1) // 2)
+        return f1 * f1 + f2 * f2 if n & 1 else f1 * f1 - f2 * f2
 
     def generate_catalan_n(self, n):  # TODO RETEST
         """Generate catalan up to n iteratively.
