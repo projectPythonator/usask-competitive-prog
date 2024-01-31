@@ -1457,7 +1457,7 @@ class MathAlgorithms:
         # self.inv_fact = inverse_factorial_mod_p
 
     @lru_cache(maxsize=None)
-    def binomial_coefficient_dp_with_cache(self, n, k):  # TODO RETEST
+    def binomial_coefficient_dp_with_cache(self, n, k):
         """Uses the recurrence to calculate binomial coefficient.
 
         Complexity per call: Time: O(n*k) I think, Space: O(n*k).
