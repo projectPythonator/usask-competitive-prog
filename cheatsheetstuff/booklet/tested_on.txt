@@ -38,6 +38,7 @@ fibonacci_n_dp_cached: tested on kattis snakesandmasters, anti11
 extended_euclid_recursive: tested on kattis modulararithmetic, candydistribution
 extended_euclid_iterative: tested on kattis modulararithmetic, candydistribution
 generate_catalan_n: tested on kattis: catalansquare and catalan
+generate_catalan_n_mod_inverse: tested on kattis: Fiat
 
 
 geometery:
