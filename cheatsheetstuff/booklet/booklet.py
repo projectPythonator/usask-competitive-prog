@@ -1436,8 +1436,8 @@ class MathAlgorithms:
         """
         if n < k:
             return 0
-        return (self.fact[n] * pow(self.fact[k], self.mod_p - 2, self.mod_p)
-                * pow(self.fact[n - k], self.mod_p - 2, self.mod_p)) % self.mod_p
+        n_fact, k_fact, n_k_fact, p = self.fact[n], self.fact[k], self.fact[n - k], self.mod_p
+        return (n_fact * pow(k_fact, p - 2, p) * pow(n_k_fact, p - 2, p)) % p
         # return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
 
     def binomial_coefficient_n_mod_p_prep(self, max_n, mod_p):
