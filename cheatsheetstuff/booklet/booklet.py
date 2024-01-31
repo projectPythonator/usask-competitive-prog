@@ -986,11 +986,20 @@ class GraphAlgorithms:
 from math import isqrt, log, gcd, prod
 from itertools import takewhile
 from functools import lru_cache
-
+from bisect import bisect_left
+from collections import Counter
 
 class MathAlgorithms:
     def __init__(self):
         """Only take what you need. This list needs to be global or instance level or passed in."""
+        self.sum_prime_factors = None
+        self.num_divisors = None
+        self.sum_divisors = None
+        self.euler_phi = None
+        self.sum_diff_prime_factors = None
+        self.num_diff_prime_factors = None
+        self.num_prime_factors = None
+        self.factor_list = {}
         self.mod_p = 0
         self.binomial = {}
         self.fact = []
@@ -1074,50 +1083,50 @@ class MathAlgorithms:
             function 3: Time: O(n log(n)), Space: O(n)
             function 2: Time: O(n lnln(n) log(n)), Space: O(n)
         """
-        def euler_phi_plus_sum_and_number_of_diff_prime_factors(limit):
-            """This is basically same as sieve just using different ops. Complexity function 1."""
-            num_diff_pf = [0] * (limit + 1)
-            sum_diff_pf = [0] * (limit + 1)
-            phi = [i for i in range(limit + 1)]
-            for i in range(2, limit):
-                if num_diff_pf[i] == 0:
-                    for j in range(i, limit, i):
-                        num_diff_pf[j] += 1
-                        sum_diff_pf[j] += i
-                        phi[j] = (phi[j]//i) * (i-1)
-            self.num_diff_prime_factors = num_diff_pf
-            self.sum_diff_prime_factors = sum_diff_pf
-            self.euler_phi = phi
+        self.euler_phi_plus_sum_and_number_of_diff_prime_factors(n)
+        self.num_and_sum_of_divisors(n)
+        self.num_and_sum_of_prime_factors(n)
 
-        def num_and_sum_of_divisors(limit):
-            """Does a basic sieve. Complexity function 2."""
-            num_div = [1] * (limit + 1)
-            sum_div = [1] * (limit + 1)
-            for i in range(2, limit):
+    def euler_phi_plus_sum_and_number_of_diff_prime_factors(self, limit):
+        """This is basically same as sieve just using different ops. Complexity function 1."""
+        num_diff_pf = [0] * (limit + 1)
+        sum_diff_pf = [0] * (limit + 1)
+        phi = [i for i in range(limit + 1)]
+        for i in range(2, limit):
+            if num_diff_pf[i] == 0:
                 for j in range(i, limit, i):
-                    num_div[j] += 1
-                    sum_div[j] += i
-            self.num_divisors = num_div
-            self.sum_divisors = sum_div
+                    num_diff_pf[j] += 1
+                    sum_diff_pf[j] += i
+                    phi[j] = (phi[j]//i) * (i-1)
+        self.num_diff_prime_factors = num_diff_pf
+        self.sum_diff_prime_factors = sum_diff_pf
+        self.euler_phi = phi
 
-        def num_and_sum_of_prime_factors(limit):
-            """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
-            num_pf = [0] * (limit + 1)
-            sum_pf = [0] * (limit + 1)
-            self.sieve_of_eratosthenes_optimized(limit)
-            for prime in self.primes_list:
-                exponent_limit = int(log(limit, prime)) + 1
-                for exponent in range(1, exponent_limit):
-                    prime_to_exponent = prime**exponent
-                    for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
-                        sum_pf[i] += prime
-                        num_pf[i] += 1
-            self.num_prime_factors = num_pf
-            self.sum_prime_factors = sum_pf
+    def num_and_sum_of_divisors(self, limit):
+        """Does a basic sieve. Complexity function 2."""
+        num_div = [1] * (limit + 1)
+        sum_div = [1] * (limit + 1)
+        for i in range(2, limit):
+            for j in range(i, limit, i):
+                num_div[j] += 1
+                sum_div[j] += i
+        self.num_divisors = num_div
+        self.sum_divisors = sum_div
 
-        euler_phi_plus_sum_and_number_of_diff_prime_factors(n)
-        num_and_sum_of_divisors(n)
-        num_and_sum_of_prime_factors(n)
+    def num_and_sum_of_prime_factors(self, limit):
+        """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
+        num_pf = [0] * (limit + 1)
+        sum_pf = [0] * (limit + 1)
+        self.sieve_of_eratosthenes_optimized(limit)
+        for prime in self.primes_list:
+            exponent_limit = int(log(limit, prime)) + 1
+            for exponent in range(1, exponent_limit):
+                prime_to_exponent = prime**exponent
+                for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
+                    sum_pf[i] += prime
+                    num_pf[i] += 1
+        self.num_prime_factors = num_pf
+        self.sum_prime_factors = sum_pf
 
     def gen_set_primes(self):
         self.primes_set = set(self.primes_list)
@@ -1136,6 +1145,7 @@ class MathAlgorithms:
                     prime_factors.append(prime)
         if n > 1:
             prime_factors.append(n)
+        self.factor_list = Counter(prime_factors)
         return prime_factors
 
     def prime_factorize_n_log_n(self, n):
@@ -1394,6 +1404,28 @@ class MathAlgorithms:
         for i in range(n-1):
             catalan[i+1] = (((4*i + 2) % p) * (catalan[i] % p) * pow(i+2, p-2, p)) % p
         self.catalan_numbers = catalan
+
+    def catalan_via_prime_facts(self, n, k, mod_m):
+        """Compute the nth Catalan number mod_n via prime factor reduction of C(2n, n)/(n+1).
+        Notes: The function "num_and_sum_of_prime_factors" needs to be modified for computing number
+        of each prime factor in all the numbers between 1-2n or 1 to n.
+
+        Complexity per call: Time: O(max(n lnln(sqrt(n)), n)), Space: O(n/ln(n)).
+        """
+        top, bottom, ans = n, k, 1  # n = 2n and k = n in C(n, k) = (2n, n)
+        self.num_and_sum_of_prime_factors(top)
+        top_factors = [el for el in self.num_prime_factors]
+        prime_array = [el for el in self.primes_list]  # saving primes to use in two lines later
+        self.num_and_sum_of_prime_factors(bottom)        # will handle n!n! in one go stored in num
+        for i, el in enumerate(self.num_prime_factors):  # num_prime_factors :)
+            top_factors[i] -= (2*el)
+        self.prime_factorize_n(k+1)  # factorizing here is faster than doing n! and (n+1)! separate
+        for p, v in self.factor_list.items():
+            top_factors[bisect_left(prime_array, p)] -= v
+        for ind, exponent in enumerate(top_factors):  # remember use multiplication not addition
+            if exponent > 0:
+                ans = (ans * pow(prime_array[ind], exponent, mod_m)) % mod_m
+        return ans
 
     def c_n_k(self, n, k):  # TODO RETEST
         """Computes C(n, k) % p. From competitive programming 4.
