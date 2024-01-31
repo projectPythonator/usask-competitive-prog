@@ -1431,10 +1431,10 @@ class MathAlgorithms:
     def c_n_k(self, n, k):
         """Computes C(n, k) % p. From competitive programming 4.
 
-        Complexity per call: v1: Time: O(log n), v2 Time: O(1), Space: O(1).
-        v1 is uncommented and did not code inv_fact, v2 is the commented out line.
+        Complexity per call: Time: v1 = O(log n), v2 = O(1), Space: O(1).
+        v1 is uncommented, v2 is the commented out line, and must be precomputed see below.
         """
-        if n < k:
+        if n < k:  # base case: could flip them to be n, k = k, n but better to just return 0
             return 0
         n_fact, k_fact, n_k_fact, p = self.fact[n], self.fact[k], self.fact[n - k], self.mod_p
         return (n_fact * pow(k_fact, p - 2, p) * pow(n_k_fact, p - 2, p)) % p
