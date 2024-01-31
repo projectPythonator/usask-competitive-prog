@@ -1375,7 +1375,7 @@ class MathAlgorithms:
     def generate_catalan_n(self, n):
         """Generate catalan up to n iteratively.
 
-        Complexity per call: Time: O(n), Space: O(n * 2^(log n)).
+        Complexity per call: Time: O(n*O(multiplication)), Space: O(n * 2^(log n)).
         """
         catalan = [0] * (n+1)
         catalan[0] = 1
@@ -1392,7 +1392,7 @@ class MathAlgorithms:
         catalan = [0] * (n+1)
         catalan[0] = 1
         for i in range(n-1):
-            catalan[i+1] = (((4*i + 2) % p) * (catalan[i] % p) * pow(i+1, p-2, p)) % p
+            catalan[i+1] = (((4*i + 2) % p) * (catalan[i] % p) * pow(i+2, p-2, p)) % p
         self.catalan_numbers = catalan
 
     def c_n_k(self, n, k):  # TODO RETEST
