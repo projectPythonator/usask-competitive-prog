@@ -1372,7 +1372,7 @@ class MathAlgorithms:
         k1, k2 = self.fibonacci_n_dp_cached_faster(k), self.fibonacci_n_dp_cached_faster(k-1)
         return k1*k1 + k2*k2 if n & 1 else (2*k2 + k1) * k1
 
-    def generate_catalan_n(self, n):  # TODO RETEST
+    def generate_catalan_n(self, n):
         """Generate catalan up to n iteratively.
 
         Complexity per call: Time: O(n), Space: O(n * 2^(log n)).
