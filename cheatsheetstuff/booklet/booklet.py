@@ -1443,8 +1443,8 @@ class MathAlgorithms:
     def binomial_coefficient_n_mod_p_prep(self, max_n, mod_p):
         """Does preprocessing for binomial coefficients. From competitive programming 4.
 
-        Complexity per call: Time: O(n), Space: O(n).
-        Optimization and notes: use uncommented lines for C(n, k) % p in O(1) time
+        Complexity per call: Time: v1 O(n), v2 = O(n), Space: O(n).
+        Optimization and notes: v2 -> uncomment lines for C(n, k) % p in O(1) time, see above.
         """
         factorial_mod_p = [1] * max_n
         for i in range(1, max_n):
@@ -1458,9 +1458,9 @@ class MathAlgorithms:
 
     @lru_cache(maxsize=None)
     def binomial_coefficient_dp_with_cache(self, n, k):
-        """Uses the recurrence to calculate binomial coefficient.
+        """Uses the recurrence to calculate binomial coefficient. Cached for memoization.
 
-        Complexity per call: Time: O(n*k) I think, Space: O(n*k).
+        Complexity per call: Time: O(n*k), Space: O(n*k).
         """
         if n == k or 0 == k:
             return 1
