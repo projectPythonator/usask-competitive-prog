@@ -989,6 +989,7 @@ from functools import lru_cache
 from bisect import bisect_left
 from collections import Counter
 
+
 class MathAlgorithms:
     def __init__(self):
         """Only take what you need. This list needs to be global or instance level or passed in."""
