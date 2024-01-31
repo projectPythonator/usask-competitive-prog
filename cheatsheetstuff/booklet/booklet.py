@@ -1339,7 +1339,7 @@ class MathAlgorithms:
                 break
         return z_m
 
-    def fibonacci_n_iterative(self, n):  # TODO RETEST
+    def fibonacci_n_iterative(self, n):
         """Classic fibonacci solver. Generates answers from 0 to n inclusive.
 
         Complexity per call: Time: O(n), Space: O(n).
