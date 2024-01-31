@@ -1383,7 +1383,7 @@ class MathAlgorithms:
             catalan[i + 1] = catalan[i] * (4*i + 2) // (i + 2)
         self.catalan_numbers = catalan
 
-    def generate_catalan_n_mod_inverse(self, n, p):  # TODO RETEST
+    def generate_catalan_n_mod_inverse(self, n, p):
         """Generate catalan up to n iteratively cat n % p.
 
         Complexity per call: Time: O(n log n), Space: O(n * (2^(log n)%p)).
