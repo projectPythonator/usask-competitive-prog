@@ -1353,7 +1353,7 @@ class MathAlgorithms:
 
     @lru_cache(maxsize=None)
     def fibonacci_n_dp_cached(self, n):
-        """Dynamic programming way to compute the nth fibonacci. Derived from Cassini's identity.
+        """Cached Dynamic programming to get the nth fibonacci. Derived from Cassini's identity.
 
         Complexity per call: Time: O(log n), Space: increase by O(log n).
         Optimization: can go back to normal memoization with same code but using dictionary.
