@@ -1428,7 +1428,7 @@ class MathAlgorithms:
                 ans = (ans * pow(prime_array[ind], exponent, mod_m)) % mod_m
         return ans
 
-    def c_n_k(self, n, k):  # TODO RETEST
+    def c_n_k(self, n, k):
         """Computes C(n, k) % p. From competitive programming 4.
 
         Complexity per call: v1: Time: O(log n), v2 Time: O(1), Space: O(1).
@@ -1440,7 +1440,7 @@ class MathAlgorithms:
                 * pow(self.fact[n - k], self.mod_p - 2, self.mod_p)) % self.mod_p
         # return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
 
-    def binomial_coefficient_n_mod_p_prep(self, max_n, mod_p):  # TODO RETEST
+    def binomial_coefficient_n_mod_p_prep(self, max_n, mod_p):
         """Does preprocessing for binomial coefficients. From competitive programming 4.
 
         Complexity per call: Time: O(n), Space: O(n).
