@@ -1456,18 +1456,17 @@ class MathAlgorithms:
         #     inverse_factorial_mod_p[i] = (inverse_factorial_mod_p[i+1] * (i+1)) % mod_p
         # self.inv_fact = inverse_factorial_mod_p
 
-    def binomial_coefficient_dp(self, n, k):  # TODO RETEST
+    @lru_cache(maxsize=None)
+    def binomial_coefficient_dp_with_cache(self, n, k):  # TODO RETEST
         """Uses the recurrence to calculate binomial coefficient.
 
         Complexity per call: Time: O(n*k) I think, Space: O(n*k).
         """
         if n == k or 0 == k:
             return 1
-        if (n, k) not in self.binomial:
-            take_case = self.binomial_coefficient_dp(n-1, k)
-            skip_case = self.binomial_coefficient_dp(n-1, k-1)
-            self.binomial[(n, k)] = take_case + skip_case
-        return self.binomial[(n, k)]
+        take_case = self.binomial_coefficient_dp_with_cache(n-1, k)
+        skip_case = self.binomial_coefficient_dp_with_cache(n-1, k-1)
+        return take_case + skip_case
 
 
 ####################################################################################################
