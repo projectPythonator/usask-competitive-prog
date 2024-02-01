@@ -711,7 +711,7 @@ class GraphAlgorithms:
                     if matrix[k][k] < 0 and matrix[i][k] != INF and matrix[k][j] != INF:
                         matrix[i][j] = -INF
 
-    def articulation_point_and_bridge_helper_via_dfs(self, u: int):  # TODO RETEST
+    def articulation_point_and_bridge_helper_via_dfs(self, u: int):
         """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
         Complexity per call: Time: O(|E|), Space: O(|V|) or O(|E|) depending on points vs edges.
@@ -733,7 +733,7 @@ class GraphAlgorithms:
             elif v != self.parent[u]:
                 self.low_values[u] = min(self.low_values[u], self.visited[v])
 
-    def articulation_points_and_bridges_via_dfs(self):  # TODO RETEST
+    def articulation_points_and_bridges_via_dfs(self):
         """Generates the name on an adj_list based graph.
 
         Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
