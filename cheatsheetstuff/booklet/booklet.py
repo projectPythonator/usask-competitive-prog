@@ -461,6 +461,7 @@ class Graph:
 
 class GraphAlgorithms:
     def __init__(self, new_graph):
+        self.path_i_j = []
         self.graph: Graph = new_graph
         self.min_spanning_cost: int = 0
         self.dfs_counter: int = 0
@@ -473,7 +474,7 @@ class GraphAlgorithms:
         self.mst_node_list: TupleListMST = []
         self.dist: NumList = []
         self.topo_sort_node_list: IntList = []
-        self.parent: IntList = []
+        self.parent = []
         self.low_values: IntList = []
         self.articulation_nodes: BoolList = []
         self.bridge_edges: EdgeTupleList = []
@@ -689,7 +690,15 @@ class GraphAlgorithms:
         self.dist = distance
         self.parent = parents
 
-    def all_pairs_shortest_path_floyd_warshall(self):  # TESTED
+    def all_pairs_shortest_path_floyd_warshall_print(self, i, j):  # TODO RETEST
+        """Generate the shortest path from i to j, used with Floyd Warshall."""
+        path = []
+        while i != j:
+            path.append(j)
+            j = self.parent[i][j]
+        self.path_i_j = path[::-1]  # we need to reverse it ???
+
+    def all_pairs_shortest_path_floyd_warshall(self):
         """Computes essentially a matrix operation on a graph.
 
         Complexity per call: Time: O(|V|^3), Space: O(|V|^2)
@@ -697,19 +706,39 @@ class GraphAlgorithms:
         Variants: Transitive closure, Maximin and Minimax path, Cheapest negative cycle,
                   Finding diameter of a graph, Finding SCC of a directed graph.
         """
-        matrix = self.graph.adj_matrix
-        for k in range(self.graph.num_nodes):
-            for i in range(self.graph.num_nodes):
-                for j in range(self.graph.num_nodes):
+        matrix, matrix_size = self.graph.adj_matrix, self.graph.num_nodes
+        parents = [[i] * matrix_size for i in range(matrix_size)]  # optional for path i to j
+        for k in range(matrix_size):
+            for i in range(matrix_size):
+                for j in range(matrix_size):
                     matrix[i][j] = min(matrix[i][j], matrix[i][k] + matrix[k][j])
+                    # if matrix[i][k] + matrix[k][j] < matrix[i][j]:  # for printing path i to j
+                    #     matrix[i][j], parents[i][j] = matrix[i][k] + matrix[k][j], parents[k][j]
+        self.parent = parents
 
-    def apsp_floyd_warshall_neg_cycles(self):  # TODO RETEST
-        matrix = self.graph.adj_matrix
-        for i in range(self.graph.num_nodes):
-            for j in range(self.graph.num_nodes):
-                for k in range(self.graph.num_nodes):
-                    if matrix[k][k] < 0 and matrix[i][k] != INF and matrix[k][j] != INF:
-                        matrix[i][j] = -INF
+    def apsp_floyd_warshall_variants(self):  # TODO RETEST
+        """Compressed Compilation of 5 variants of APSP. PICK AND CHOOSE IMPLEMENTATION.
+        Contents:
+            Variant 1: Transitive Closure to check if i is directly or indirectly connected to j.
+            Variant 2: MiniMax and MaxiMin path problem. A[i][j] = INF if no edge exists
+            Variant 3: Cheapest/Negative cycle, From APSP
+            Variant 4: Diameter of a Graph, biggest shortest path in the graph, From APSP
+            Variant 5: SCC on small graph, labeling and existence path from i->j and j->i exists
+
+        Complexity per call: Time: O(V^3), T(V^3 + V^2), Space: O(V^2)
+        """
+        matrix, matrix_size = self.graph.adj_matrix, self.graph.num_nodes
+        graph_diameter = 0
+        for k in range(matrix_size):
+            for i in range(matrix_size):
+                for j in range(matrix_size):
+                    matrix[i][j] |= matrix[i][k] and matrix[k][j]                       # Variant 1
+                    matrix[i][j] = min(matrix[i][j], max(matrix[i][k], matrix[k][j]))   # Variant 2
+                    if matrix[j][j] < 0 and matrix[k][j] < INF and matrix[j][i] < INF:  # Variant 3
+                        matrix[k][i] = -INF                                             # Variant 3
+                    # following only requires loops i and j, Variant 4 IS LINE BELOW THIS COMMENT
+                    graph_diameter = max(graph_diameter, matrix[i][j] if matrix[i][j] < INF else 0)
+                    is_j_strongly_connected_to_i = matrix[i][j] and matrix[j][i]  # Variant 5
 
     def articulation_point_and_bridge_helper_via_dfs(self, u: int):
         """Recursion part of the dfs. It kind of reminds me of how Union find works.
