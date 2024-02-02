@@ -1502,17 +1502,15 @@ class MathAlgorithms:
         a_bit_len, a_bit_half = a_len.bit_length(), (a_len.bit_length()-1)//2
         swap_size = (1 << a_bit_half) - 1
         swap_size = swap_size << (a_bit_half-1) if a_bit_len & 1 else swap_size << a_bit_half
-        swaps, bits = [None] * swap_size, [a_len >> i for i in range(1, a_bit_len+1)]
-        k, ind = 0, 0
+        swaps, k, ind = [None] * swap_size, 0, -1
         for i in range(1, a_len):
-            bit_ind = 0
-            while k & bits[bit_ind]:
-                k = k ^ bits[bit_ind]
-                bit_ind = bit_ind + 1
-            k = k ^ bits[bit_ind]
+            bit_mask = a_len >> 1
+            while k & bit_mask:
+                k = k ^ bit_mask
+                bit_mask = bit_mask >> 1
+            k = k ^ bit_mask
             if i < k:
-                swaps[ind] = (i, k)
-                ind = ind + 1
+                swaps[ind := ind + 1] = (i, k)
         self.fft_swap_indices = swaps
 
     def fft_prepare_lengths_list(self, a_len):

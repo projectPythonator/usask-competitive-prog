@@ -44,7 +44,7 @@ generate_catalan_n_mod_inverse: tested on kattis: Fiat
 binomial_coefficient_dp_with_cache: tested on kattis: election, and lockedtreasure
 binomial_coefficient_n_mod_p_prep: tested on kattis: election, and lockedtreasure
 c_n_k: tested on kattis: election, and locked treasure
-fft: tested on kattis polymul2 as well as a handful of small sample cases
+fft: tested on kattis polymul2 and polymul1 as well as a handful of small sample cases
 
 geometery:
 closest pair: works but is pretty slow
