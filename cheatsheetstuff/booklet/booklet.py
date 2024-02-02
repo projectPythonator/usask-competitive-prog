@@ -1012,11 +1012,12 @@ class GraphAlgorithms:
 
 
 ####################################################################################################
-from math import isqrt, log, gcd, prod
-from itertools import takewhile
+from math import isqrt, log, gcd, prod, cos, sin, tau
+from itertools import takewhile, accumulate
 from functools import lru_cache
 from bisect import bisect_left
 from collections import Counter
+from operator import mul as operator_mul
 
 
 class MathAlgorithms:
@@ -1496,6 +1497,80 @@ class MathAlgorithms:
         take_case = self.binomial_coefficient_dp_with_cache(n-1, k)
         skip_case = self.binomial_coefficient_dp_with_cache(n-1, k-1)
         return take_case + skip_case
+
+    def fft_prepare_swap_indices(self, a_len):
+        a_bit_len, a_bit_half = a_len.bit_length(), (a_len.bit_length()-1)//2
+        swap_size = (1 << a_bit_half) - 1
+        swap_size = swap_size << (a_bit_half-1) if a_bit_len & 1 else swap_size << a_bit_half
+        swaps, bits = [None] * swap_size, [a_len >> i for i in range(1, a_bit_len+1)]
+        k, ind = 0, 0
+        for i in range(1, a_len):
+            bit_ind = 0
+            while k & bits[bit_ind]:
+                k = k ^ bits[bit_ind]
+                bit_ind = bit_ind + 1
+            k = k ^ bits[bit_ind]
+            if i < k:
+                swaps[ind] = (i, k)
+                ind = ind + 1
+        self.fft_swap_indices = swaps
+
+    def fft_prepare_lengths_list(self, a_len):
+        self.fft_lengths = [2**i for i in range(1, a_len.bit_length())]
+
+    def fft_prepare_roots_helper(self, length, angle):
+        root_of_unity = complex(1)
+        multiplier = complex(cos(angle), sin(angle))
+        return list(accumulate([multiplier] * length, operator_mul, initial=root_of_unity))
+
+    def fft_prepare_roots_of_unity(self, invert):
+        signed_tau = -tau if invert else tau
+        self.fft_roots_of_unity = [self.fft_prepare_roots_helper(el//2 - 1, signed_tau/el)
+                                   for el in self.fft_lengths]
+
+    def fft_in_place_fast_fourier_transform(self, a_vector, invert):
+        a_len = len(a_vector)
+        for i, j in self.fft_swap_indices:
+            a_vector[i], a_vector[j] = a_vector[j], a_vector[i]
+        for k, length in enumerate(self.fft_lengths):
+            j_end = length // 2
+            for i in range(0, a_len, length):
+                for j, w in enumerate(self.fft_roots_of_unity[k]):
+                    i_j, i_j_j_end = i + j, i + j + j_end
+                    u, v = a_vector[i_j], w * a_vector[i_j_j_end]
+                    a_vector[i_j], a_vector[i_j_j_end] = u + v, u - v
+        if invert:
+            a_vector[:] = [el/a_len for el in a_vector]
+
+    def fft_multiply_in_place(self, a, b):
+        n, a_len, b_len = 1, len(a), len(b)
+        res_len = a_len + b_len
+        while n < res_len:
+            n *= 2
+        vector_a = [complex(i) for i in a] + [complex(0)] * (n - a_len)
+        vector_b = [complex(i) for i in b] + [complex(0)] * (n - b_len)
+        self.fft_prepare_swap_indices(n)
+        self.fft_prepare_lengths_list(n)
+        self.fft_prepare_roots_of_unity(False)
+        self.fft_in_place_fast_fourier_transform(vector_a, False)
+        self.fft_in_place_fast_fourier_transform(vector_b, False)
+        vector_a = [el * vector_b[i] for i, el in enumerate(vector_a)]
+        self.fft_prepare_roots_of_unity(True)
+        self.fft_in_place_fast_fourier_transform(vector_a, True)
+        vector_result = [int(round(el.real)) for el in vector_a]
+        return self.fft_normalize(vector_result, n, 10)
+
+    def fft_normalize(self, a_vector, n, base):
+        carry, end = 0, len(a_vector)-1
+        for i in range(n):
+            a_vector[i] += carry
+            carry, a_vector[i] = divmod(a_vector[i], base)
+        while a_vector[end] == 0:
+            end = end - 1
+        return a_vector[:end+1][::-1]
+
+
+
 
 
 ####################################################################################################
