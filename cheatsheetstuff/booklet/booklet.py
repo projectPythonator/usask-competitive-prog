@@ -2368,7 +2368,7 @@ class GeometryAlgorithms:  # TODO RETEST
         y_ordering = sorted(pts, key=lambda point: point.y)
         return self.closest_pair_recursive(0, len(pts), y_ordering)
 
-    def delaunay_triangulation_slow(self, pts):  # TODO RETEST
+    def delaunay_triangulation_slow(self, pts):
         """A very slow version of  Delaunay Triangulation. Can beat the faster version when n small.
 
         Complexity per call Time: O(n^4), Space O(n)
