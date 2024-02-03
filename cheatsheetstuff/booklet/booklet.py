@@ -251,7 +251,6 @@ class SegmentTree:
         return b if a == -1 else (a if b == -1 else min(a, b))
 
     def propagate(self, parent, left, right):
-        # local_lazy = self.lazy  # uncomment and use if self.lazy is too much overhead
         lazy_p = self.lazy[parent]
         if lazy_p != -1:
             self.segment_tree[parent] = lazy_p
@@ -269,8 +268,7 @@ class SegmentTree:
             left_path, right_path = self.left_child(parent), self.right_child(parent)
             self._build_segment_tree_1(left_path, left, mid)
             self._build_segment_tree_1(right_path, mid + 1, right)
-            left_val = self.segment_tree[left_path]
-            right_val = self.segment_tree[right_path]
+            left_val, right_val = self.segment_tree[left_path], self.segment_tree[right_path]
             self.segment_tree[parent] = self.conqur(left_val, right_val)
             # seg_tree = self.segment_tree  # uncomment if self.segment_tree gets too costly
             # seg_tree[parent] = self.conqur(seg_tree[left_path], seg_tree[right_path])
@@ -420,8 +418,8 @@ class Graph:
         self.edge_list = []
         self.grid = []
 
-        self.data_to_code: dict[object, int] = {}
-        self.code_to_data: list[object] = []
+        self.data_to_code = {}  # used for converting input into integer vertices
+        self.code_to_data = []  # used for integer vertices back into original input
 
     def convert_data_to_code(self, data: object) -> int:
         """Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair, then return u."""
@@ -440,7 +438,7 @@ class Graph:
         self.adj_list[u].append(v)
         # self.adj_list[u].append((v, wt))  # Adjacency list usage with weights
         self.adj_matrix[u][v] = wt          # Adjacency matrix usage
-        self.edge_list.append((wt, u, v))   # Edge list usage
+        self.edge_list.append((wt, u*self.num_nodes + v))   # Edge list usage space optimized
         # the following lines come as a pair-set used in max flow algorithm and are used in tandem.
         self.edge_list.append([v, wt, data])
         self.adj_list[u].append(len(self.edge_list) - 1)
@@ -468,20 +466,20 @@ class GraphAlgorithms:
 
         self.dir_rc = [(1, 0), (0, 1), (-1, 0), (0, -1)]
         self.visited = []
-        self.mst_node_list: TupleListMST = []
-        self.dist: NumList = []
-        self.topo_sort_node_list: IntList = []
+        self.mst_node_list = []
+        self.dist = []
+        self.topo_sort_node_list = []
         self.parent = []
-        self.low_values: IntList = []
-        self.articulation_nodes: BoolList = []
-        self.bridge_edges: EdgeTupleList = []
-        self.directed_edge_type: EdgeTypeList = []  # change last int to enum sometime
-        self.component_region: IntList = []
-        self.decrease_finish_order: IntList = []
-        self.nodes_on_stack: IntList = []
-        self.node_state: IntList = []  # change to enum type sometime
-        self.bipartite_colouring: BoolList = []
-        self.last: IntList = []
+        self.low_values = []
+        self.articulation_nodes = []
+        self.bridge_edges = []
+        self.directed_edge_type = []  # change last int to enum sometime
+        self.component_region = []
+        self.decrease_finish_order = []
+        self.nodes_on_stack = []
+        self.node_state = []  # change to enum type sometime
+        self.bipartite_colouring = []
+        self.last = []
 
     def flood_fill_via_dfs(self, row: int, col: int, old_val: object, new_val: object):
         """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
@@ -524,14 +522,15 @@ class GraphAlgorithms:
         More uses: finding min spanning tree
         Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning tree
         Optimization: We use a heap to make space comp. O(|E|). instead of O(|E|log |E|)
-        when using sort, however edge_list is CONSUMED.
+        when using sort, however edge_list is CONSUMED. Also uses space optimization u*V + u = u, v
         """
+        vertices = self.graph.num_nodes
         heapify(self.graph.edge_list)
-        ufds = UnionFindDisjointSets(self.graph.num_nodes)
-        min_spanning_tree: TupleListMST = []
+        ufds = UnionFindDisjointSets(vertices)
+        min_spanning_tree = []
         while self.graph.edge_list and ufds.num_sets > 1:
             wt, uv = heappop(self.graph.edge_list)   # uv is u*num_nodes + v
-            v, u = divmod(uv, self.graph.num_nodes)  # u, v = uv//n, uv%n
+            v, u = divmod(uv, vertices)              # u, v = uv//n, uv%n
             if not ufds.is_same_set(u, v):
                 min_spanning_tree.append((wt, u, v))
                 ufds.union_set(u, v)
