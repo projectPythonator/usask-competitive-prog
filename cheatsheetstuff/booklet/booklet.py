@@ -1733,7 +1733,7 @@ class GeometryAlgorithms:  # TODO RETEST
         self.x_ordering = None
         self.quad_edges = QuadEdgeDataStructure()
 
-    def compare_ab(self, a, b):  # TODO RETEST
+    def compare_ab(self, a, b):
         """Compare a b, for floats and ints. It is useful when you want set values to observe.
         paste directly into code and drop isclose for runtime speedup."""
         return 0 if isclose(a, b) else -1 if a < b else 1
