@@ -1321,7 +1321,7 @@ class MathAlgorithms:
             y, last_y = last_y - quotient * y, y
         return -last_x if a < 0 else last_x, -last_y if b < 0 else last_y, last_remainder
 
-    def safe_modulo(self, a, n):  # TODO RETEST
+    def safe_modulo(self, a, n):
         """Existence is much for c++ which doesn't always handle % operator nicely.
         use ((a % n) + n) % n for getting proper mod of a potential negative value
         use (a + b) % --> ((a % n) + (b % n)) % n for operations sub out + for * and -
