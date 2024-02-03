@@ -58,16 +58,15 @@ class UnionFindDisjointSets:
                     Space: Amortized O(1) stack space
         """
         if not self.is_same_set(u, v):
-            local_rank, local_set_sizes = self.rank, self.set_sizes  # avoids costly load_attr call
-            u_parent, v_parent = self.find_set(u), self.find_set(v)
-            if local_rank[u_parent] > local_rank[v_parent]:   # keep u_parent shorter than v_parent
+            u_parent, v_parent = self.find_set_iterative(u), self.find_set_iterative(v)
+            if self.rank[u_parent] > self.rank[v_parent]:   # keep u_parent shorter than v_parent
                 u_parent, v_parent = v_parent, u_parent
 
-            if local_rank[u_parent] == local_rank[v_parent]:       # an optional speedup
-                local_rank[v_parent] = local_rank[v_parent] + 1
+            if self.rank[u_parent] == self.rank[v_parent]:       # an optional speedup
+                self.rank[v_parent] = self.rank[v_parent] + 1
             self.parent[u_parent] = v_parent                        # this line joins u with v
             self.num_sets -= 1
-            local_set_sizes[v_parent] += local_set_sizes[u_parent]  # u -> v so add size_u to size_v
+            self.set_sizes[v_parent] += self.set_sizes[u_parent]  # u -> v so add size_u to size_v
 
     def size_of_u(self, u):  # optional information
         """Gives you the size of set u. TIME and SPACE Complexity is the same as find_set"""
