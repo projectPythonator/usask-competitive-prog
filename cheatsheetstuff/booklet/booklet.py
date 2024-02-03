@@ -15,7 +15,7 @@ type EdgeTypeList = List[Tuple[int, int, int]]
 setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
 
 
-class UnionFindDisjointSets:  # tested works for functions in class
+class UnionFindDisjointSets:
     """This Data structure is for non-directional disjoint sets."""
     def __init__(self, n):
         self.parent = [i for i in range(n)]
@@ -29,9 +29,8 @@ class UnionFindDisjointSets:  # tested works for functions in class
         Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
                     Space: Amortized O(1) stack space
         """
-        local_parent = self.parent  # pulls parent into the local scope to avoid load_attr call
-        root_parent = u if local_parent[u] == u else self.find_set(local_parent[u])
-        local_parent[u] = root_parent
+        root_parent = u if self.parent[u] == u else self.find_set(self.parent[u])
+        self.parent[u] = root_parent
         return root_parent
 
     def find_set_iterative(self, x):
@@ -1577,6 +1576,15 @@ class MathAlgorithms:
         if invert:
             a_vector[:] = [el/a_len for el in a_vector]
 
+    def fft_normalize(self, a_vector, n, base):
+        carry, end = 0, len(a_vector)-1
+        for i in range(n):
+            a_vector[i] += carry
+            carry, a_vector[i] = divmod(a_vector[i], base)
+        while a_vector[end] == 0:
+            end = end - 1
+        return a_vector[:end+1][::-1]
+
     def fft_multiply_in_place(self, a, b):
         n, a_len, b_len = 1, len(a), len(b)
         n = 2**((a_len + b_len).bit_length())
@@ -1594,14 +1602,6 @@ class MathAlgorithms:
         res_vector = [int(round(el.real)) for el in a_vector]
         return self.fft_normalize(res_vector, n, 10)
 
-    def fft_normalize(self, a_vector, n, base):
-        carry, end = 0, len(a_vector)-1
-        for i in range(n):
-            a_vector[i] += carry
-            carry, a_vector[i] = divmod(a_vector[i], base)
-        while a_vector[end] == 0:
-            end = end - 1
-        return a_vector[:end+1][::-1]
 
 
 
