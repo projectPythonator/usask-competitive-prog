@@ -39,13 +39,12 @@ class UnionFindDisjointSets:
         Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
                     Space: O(α(n)) stack space
         """
-        local_parent = self.parent  # pulls parent into the local scope to avoid load_attr call
         xp, local_stack = x, []
-        while xp != local_parent[xp]:
+        while xp != self.parent[xp]:
             local_stack.append(xp)
-            xp = local_parent[xp]
+            xp = self.parent[xp]
         for c in local_stack:
-            local_parent[c] = xp
+            self.parent[c] = xp
         return xp
 
     def is_same_set(self, u, v):
