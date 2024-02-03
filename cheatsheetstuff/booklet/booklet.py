@@ -1746,7 +1746,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return a.x*b.y - a.y*b.x
 
-    def distance_normalized(self, a, b):  # TODO RETEST
+    def distance_normalized(self, a, b):
         """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
         return dist(a.get_tup(), b.get_tup())
 
