@@ -83,7 +83,7 @@ class FenwickTree:
         # self.fenwick_tree_2d = [[0] for _ in range(1)]  # for 2d
 
     def last_set_bit(self, a):
-        """Will get the last set bit of a used in 1-indexing. for 0-indexing use i & (i+1)"""
+        """Will get the last set-bit of a used in 1-indexing. for 0-indexing use i & (i+1)"""
         return a & (-a)
 
     def build_tree_from_f(self, f):
@@ -1598,10 +1598,6 @@ class MathAlgorithms:
         self.fft_in_place_fast_fourier_transform(a_vector, True)
         res_vector = [int(round(el.real)) for el in a_vector]
         return self.fft_normalize(res_vector, n, 10)
-
-
-
-
 
 
 ####################################################################################################
