@@ -1023,6 +1023,9 @@ from operator import mul as operator_mul
 class MathAlgorithms:
     def __init__(self):
         """Only take what you need. This list needs to be global or instance level or passed in."""
+        self.fft_swap_indices = None
+        self.fft_lengths = None
+        self.fft_roots_of_unity = None
         self.sum_prime_factors = None
         self.num_divisors = None
         self.sum_divisors = None
@@ -1576,9 +1579,8 @@ class MathAlgorithms:
 
     def fft_multiply_in_place(self, a, b):
         n, a_len, b_len = 1, len(a), len(b)
-        res_len = a_len + b_len
-        while n < res_len:
-            n *= 2
+        n = 2**((a_len + b_len).bit_length())
+        n = n if (a_len + b_len) != n//2 else n//2
         a_vector = [complex(i) for i in a] + [complex(0)] * (n - a_len)
         b_vector = [complex(i) for i in b] + [complex(0)] * (n - b_len)
         self.fft_prepare_swap_indices(n)
@@ -1586,7 +1588,7 @@ class MathAlgorithms:
         self.fft_prepare_roots_of_unity(False)
         self.fft_in_place_fast_fourier_transform(a_vector, False)
         self.fft_in_place_fast_fourier_transform(b_vector, False)
-        a_vector = [i * j for i, j in zip(iter(a_vector), iter(b_vector))]
+        a_vector = [i * j for i, j in zip(a_vector, b_vector)]
         self.fft_prepare_roots_of_unity(True)
         self.fft_in_place_fast_fourier_transform(a_vector, True)
         res_vector = [int(round(el.real)) for el in a_vector]
