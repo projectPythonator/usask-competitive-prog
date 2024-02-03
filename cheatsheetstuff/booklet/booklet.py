@@ -712,9 +712,9 @@ class GraphAlgorithms:
                     #     matrix[i][j], parents[i][j] = matrix[i][k] + matrix[k][j], parents[k][j]
         self.parent = parents
 
-    def apsp_floyd_warshall_variants(self):  # TODO RETEST
+    def apsp_floyd_warshall_variants(self):
         """Compressed Compilation of 5 variants of APSP. PICK AND CHOOSE IMPLEMENTATION.
-        Contents:
+        Contents:  # var 2 and 4 are untested right now
             Variant 1: Transitive Closure to check if i is directly or indirectly connected to j.
             Variant 2: MiniMax and MaxiMin path problem. A[i][j] = INF if no edge exists
             Variant 3: Cheapest/Negative cycle, From APSP
