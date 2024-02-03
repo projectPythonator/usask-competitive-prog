@@ -528,7 +528,7 @@ class GraphAlgorithms:
         heapify(self.graph.edge_list)
         ufds = UnionFindDisjointSets(vertices)
         min_spanning_tree = []
-        while self.graph.edge_list and ufds.num_sets > 1:
+        while self.graph.edge_list and ufds.num_sets > 1:  # num_sets == 1 means graph connected
             wt, uv = heappop(self.graph.edge_list)   # uv is u*num_nodes + v
             v, u = divmod(uv, vertices)              # u, v = uv//n, uv%n
             if not ufds.is_same_set(u, v):
@@ -570,7 +570,7 @@ class GraphAlgorithms:
         for v, wt in self.graph.adj_list[source]:
             mst_best_dist[v] = wt
         min_spanning_tree, nodes_taken, msc, not_visited[source] = [], 0, 0, False
-        while heap and nodes_taken < vertices - 1:
+        while heap and nodes_taken < vertices - 1:  # max edges in mst == |V| - 1
             edge_wt, u_parent = heappop(heap)
             u, parent = divmod(u_parent, vertices)  # edge uncompress u, v = uv//|V|, uv%|V|
             if not_visited[u]:
