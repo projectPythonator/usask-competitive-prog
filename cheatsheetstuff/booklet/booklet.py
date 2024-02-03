@@ -49,7 +49,7 @@ class UnionFindDisjointSets:
 
     def is_same_set(self, u, v):
         """Checks if u and v in same set. TIME and SPACE Complexity is the same as find_set"""
-        return self.find_set(u) == self.find_set(v)
+        return self.find_set_iterative(u) == self.find_set_iterative(v)
 
     def union_set(self, u, v):
         """Join the set that contains u with the set that contains v.
