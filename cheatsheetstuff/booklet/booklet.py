@@ -1,4 +1,4 @@
-from typing import List, Tuple, Set
+from typing import List, Tuple
 from sys import setrecursionlimit
 
 
@@ -1105,7 +1105,7 @@ class MathAlgorithms:
                 min_primes[j] = prime
         self.min_primes_list = min_primes
 
-    def sieve_of_eratosthenes_variants(self, n):  # TODO RETEST
+    def sieve_of_eratosthenes_variants(self, n):
         """Seven variants of prime sieve listed above.
 
         Complexity:
