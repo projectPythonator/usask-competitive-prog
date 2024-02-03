@@ -1099,7 +1099,7 @@ class MathAlgorithms:
         """
         min_primes = [0] * (n + 1)
         min_primes[1] = 1
-        for prime in reversed(self.primes_list):
+        for prime in self.primes_list:
             min_primes[prime] = prime
             start, end, step = prime*prime, n+1, prime if prime == 2 else 2*prime
             for j in range(start, end, step):
@@ -1223,6 +1223,40 @@ class MathAlgorithms:
             sum_divisors *= (n + 1)
             euler_phi -= (euler_phi // n)
         return num_diff_prime_factors
+
+    def polynomial_function_f(self, x, c, m):
+        return (x * x + c) % m
+
+    def pollard_rho(self, n, x0=2, c=1):
+        x, y, g = x0, x0, 1
+        while g == 1:
+            x = self.polynomial_function_f(x, c, n)
+            y = self.polynomial_function_f(self.polynomial_function_f(y, c, n), c, n)
+            g = gcd(abs(x - y), n)
+        return g
+
+    def brent_pollard_rho(self, n, x0=2, c=1):
+        x, m = x0, 128
+        g = q = left = 1
+        xs = y = 0
+        while g == 1:
+            y, k = x, 0
+            for _ in range(1, left):
+                x = (x * x + c) % n
+            while k < left and g == 1:
+                xs, end = x, min(m, left - k)
+                for _ in range(end):
+                    x = (x * x + c) % n
+                    q = (q * abs(y - x)) % n
+                k, g = k + m, gcd(q, n)
+            left = left * 2
+        if g == n:
+            while True:
+                xs = (xs * xs + c) % n
+                g = gcd(abs(xs - y), n)
+                if g != 1:
+                    break
+        return g
 
     def is_composite(self, a, d, n, s):
         """The witness test of miller rabin.
@@ -1545,18 +1579,18 @@ class MathAlgorithms:
         res_len = a_len + b_len
         while n < res_len:
             n *= 2
-        vector_a = [complex(i) for i in a] + [complex(0)] * (n - a_len)
-        vector_b = [complex(i) for i in b] + [complex(0)] * (n - b_len)
+        a_vector = [complex(i) for i in a] + [complex(0)] * (n - a_len)
+        b_vector = [complex(i) for i in b] + [complex(0)] * (n - b_len)
         self.fft_prepare_swap_indices(n)
         self.fft_prepare_lengths_list(n)
         self.fft_prepare_roots_of_unity(False)
-        self.fft_in_place_fast_fourier_transform(vector_a, False)
-        self.fft_in_place_fast_fourier_transform(vector_b, False)
-        vector_a = [el * vector_b[i] for i, el in enumerate(vector_a)]
+        self.fft_in_place_fast_fourier_transform(a_vector, False)
+        self.fft_in_place_fast_fourier_transform(b_vector, False)
+        a_vector = [i * j for i, j in zip(iter(a_vector), iter(b_vector))]
         self.fft_prepare_roots_of_unity(True)
-        self.fft_in_place_fast_fourier_transform(vector_a, True)
-        vector_result = [int(round(el.real)) for el in vector_a]
-        return self.fft_normalize(vector_result, n, 10)
+        self.fft_in_place_fast_fourier_transform(a_vector, True)
+        res_vector = [int(round(el.real)) for el in a_vector]
+        return self.fft_normalize(res_vector, n, 10)
 
     def fft_normalize(self, a_vector, n, base):
         carry, end = 0, len(a_vector)-1
