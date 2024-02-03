@@ -1754,11 +1754,11 @@ class GeometryAlgorithms:  # TODO RETEST
         """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
         return self.dot_product(a - b, a - b)
 
-    def rotate_cw_90_wrt_origin(self, pt):  # TODO RETEST
+    def rotate_cw_90_wrt_origin(self, pt):
         """Compute a point rotation on pt. Just swap x and y and negate x."""
         return Pt2d(pt.y, -pt.x)
 
-    def rotate_ccw_90_wrt_origin(self, pt):  # TODO RETEST
+    def rotate_ccw_90_wrt_origin(self, pt):
         """Compute a point rotation on pt. Just swap x and y and negate y."""
         return Pt2d(-pt.y, pt.x)
 
