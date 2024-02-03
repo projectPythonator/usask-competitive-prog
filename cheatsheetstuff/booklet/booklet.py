@@ -1738,11 +1738,11 @@ class GeometryAlgorithms:  # TODO RETEST
         paste directly into code and drop isclose for runtime speedup."""
         return 0 if isclose(a, b) else -1 if a < b else 1
 
-    def dot_product(self, a, b):  # TODO RETEST
+    def dot_product(self, a, b):
         """Compute the scalar product a.b of a,b equivalent to: a . b"""
         return a.x*b.x + a.y*b.y
 
-    def cross_product(self, a, b):  # TODO RETEST
+    def cross_product(self, a, b):
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return a.x*b.y - a.y*b.x
 
