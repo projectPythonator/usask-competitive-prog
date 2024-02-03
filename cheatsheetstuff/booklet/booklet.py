@@ -1364,7 +1364,7 @@ class MathAlgorithms:
         x, y, d = self.extended_euclid_iterative(a, b)
         return (-1, -1) if c % d != 0 else (x * (c // d), y * (c // d))
 
-    def mod_inverse(self, b, m):  # TODO RETEST
+    def mod_inverse(self, b, m):
         """Solves b^(-1) (mod m).
 
         Complexity per call: Time: O(log n), Space: O(1)
