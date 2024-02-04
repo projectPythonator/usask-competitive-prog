@@ -2526,12 +2526,14 @@ class GeometryAlgorithms:  # TODO RETEST
         return ldo, rdo
 
     def delaunay_triangulation_fast(self, pts):  # TODO RETEST
-        pts.sort()
-        result = self.build_triangulation(0, len(pts) - 1, pts)
-        edge = result[0]
-        edges = [edge]
-        while self.point_c_rotation_wrt_line_ab(edge.o_next.dest(), edge.dest(), edge.origin) < CL:
-            edge = edge.o_next
+        def sort_3_elements(a, b, c):
+            if b < a:
+                a, b = b, a
+            if c < b:
+                b, c = c, b
+                if b < a:
+                    a, b = b, a
+            return a, b, c
 
         def add_helper():
             cur = edge
@@ -2542,16 +2544,19 @@ class GeometryAlgorithms:  # TODO RETEST
                 cur = cur.l_next()
                 if cur == edge:
                     return
+        pts.sort()
+        result = self.build_triangulation(0, len(pts) - 1, pts)
+        edge, edges = result[0], [result[0]]
+        while self.point_c_rotation_wrt_line_ab(edge.o_next.dest(), edge.dest(), edge.origin) < CL:
+            edge = edge.o_next
         add_helper()
-        pts = []
-        kek = 0
+        pts, kek = [], 0
         while kek < len(edges):
             edge = edges[kek]
             kek += 1
             if not edge.used:
                 add_helper()
-        ans = [tuple((sorted([pts[i], pts[i + 1], pts[i + 2]]))) for i in range(0, len(pts), 3)]
-        return sorted(list(set(ans)))
+        return [sort_3_elements(pts[i], pts[i + 1], pts[i + 2]) for i in range(0, len(pts), 3)]
 
 
 ####################################################################################################
