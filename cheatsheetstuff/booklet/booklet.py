@@ -1185,6 +1185,8 @@ class GraphAlgorithms:
 
 
 ####################################################################################################
+
+
 from math import isqrt, log, gcd, prod, cos, sin, tau
 from itertools import takewhile, accumulate
 from functools import lru_cache
@@ -1195,33 +1197,39 @@ from operator import mul as operator_mul
 
 class MathAlgorithms:
     def __init__(self):
-        """Only take what you need. This list needs to be global or instance level or passed in."""
-        self.fft_swap_indices = None
-        self.fft_lengths = None
-        self.fft_roots_of_unity = None
-        self.sum_prime_factors = None
-        self.num_divisors = None
-        self.sum_divisors = None
-        self.euler_phi = None
-        self.sum_diff_prime_factors = None
-        self.num_diff_prime_factors = None
-        self.num_prime_factors = None
-        self.factor_list = {}
+        """Only take what you need. This list needs to be global or instance level or passed in.
+        Attributes declared here must be passed in or global if not used in class format.
+        """
         self.mod_p = 0
+
+        self.sum_prime_factors = []
+        self.num_divisors = []
+        self.sum_divisors = []
+        self.euler_phi = []
+        self.sum_diff_prime_factors = []
+        self.num_diff_prime_factors = []
+        self.num_prime_factors = []
+
         self.binomial = {}
         self.fact = []
         self.inv_fact = []
-        self.min_primes_list = []
         self.catalan_numbers = []
-        self.primes_sieve = []
+
         self.primes_list = []
         self.primes_set = set()
         self.prime_factors = []
+        self.factor_list = {}
+        self.min_primes_list = []
+
         self.mrpt_known_bounds = []
         self.mrpt_known_tests = []
+
         self.fibonacci_list = []
-        self.fibonacci_dict = {}
         self.fibonacci_dict = {0: 0, 1: 1, 2: 1}
+
+        self.fft_lengths = []
+        self.fft_swap_indices = []
+        self.fft_roots_of_unity = []
 
     def is_prime_triv(self, n):
         """Tests if n is prime via divisors up to sqrt(n).
