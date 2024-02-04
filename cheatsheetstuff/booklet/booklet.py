@@ -1678,6 +1678,9 @@ class Pt2d:  # TODO RETEST
 
     def get_tup(self): return self.x, self.y
 
+    def dot_product(self):
+        return self.x * self.x + self.y * self.y
+
 
 class Pt3d:  # TODO RETEST
     def __init__(self, x_val, y_val, z_val):
@@ -2448,10 +2451,10 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def is_in_circle(self, a, b, c, d):  # TODO RETEST
         """Expensive calculation function that determines if """
-        a_dot = self.dot_product(a, a)
-        b_dot = self.dot_product(b, b)
-        c_dot = self.dot_product(c, c)
-        d_dot = self.dot_product(d, d)
+        a_dot = a.dot_product()
+        b_dot = b.dot_product()
+        c_dot = c.dot_product()
+        d_dot = d.dot_product()
         det = -self.det3_helper(b.x, b.y, b_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
         det += self.det3_helper(a.x, a.y, a_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
         det -= self.det3_helper(a.x, a.y, a_dot, b.x, b.y, b_dot, d.x, d.y, d_dot)
@@ -2511,7 +2514,7 @@ class GeometryAlgorithms:  # TODO RETEST
                     r_cand_edge = temp_edge
             l_check = self.pt_right_of_edge(l_cand_edge.dest(), base_edge_l)
             r_check = self.pt_right_of_edge(r_cand_edge.dest(), base_edge_l)
-            if (not l_check) and (not r_check):
+            if not (l_check or r_check):
                 break
             if ((not l_check)
                     or (r_check
