@@ -72,6 +72,40 @@ class UnionFindDisjointSets:
         """Gives you the size of set u. TIME and SPACE Complexity is the same as find_set"""
         return self.set_sizes[self.find_set(u)]
 
+class SparseTable:
+    __slots__ = ("sparse_table", "k_value", "max_n")
+
+    def __init__(self, max_n):
+        self.k_value = max_n.bit_length()
+        self.max_n = max_n
+        self.sparse_table = [[0] * max_n for _ in range(self.k_value)]
+
+    def prepare_sparse_table(self, array):
+        spare_table, i_end, local_max_n = self.sparse_table, self.k_value + 1, self.max_n + 1
+        for i, el in enumerate(array):
+            spare_table[0][i] = el
+        for i in range(1, i_end):
+            prev_i = i - 1
+            j_end, prev_pow_2 = local_max_n - (1 << i), 1 << prev_i
+            for j in range(j_end):
+                spare_table[i][j] = min(spare_table[prev_i][j], spare_table[prev_i][j + prev_pow_2])
+                spare_table[i][j] = max(spare_table[prev_i][j], spare_table[prev_i][j + prev_pow_2])
+                spare_table[i][j] = spare_table[prev_i][j] + spare_table[prev_i][j + prev_pow_2]
+                spare_table[i][j] = spare_table[prev_i][j] * spare_table[prev_i][j + prev_pow_2]
+                spare_table[i][j] = gcd(spare_table[prev_i][j], spare_table[prev_i][j + prev_pow_2])
+
+    def range_query_from_i_to_j(self, left, right):
+        result = 0  # change this to be what you need for it
+        ind = (right - left + 1).bit_length()-1  # I think this is same as log2(r - l + 1)
+        result = min(self.sparse_table[ind][left], self.sparse_table[ind][right - 2**ind + 1])
+        result = max(self.sparse_table[ind][left], self.sparse_table[ind][right - 2**ind + 1])
+        for i in range(self.k_value-1, -1, -1):
+            if (i << i) <= right - left + 1:
+                result = result + self.sparse_table[i][left]
+                result = result * self.sparse_table[i][left]
+                result = gcd(result, self.sparse_table[i][left])
+                left = left + (1 << i)
+        return result
 
 class FenwickTree:
     def __init__(self, f):
