@@ -228,7 +228,19 @@ class SparseTable:
                 left = left + (1 << i)
         return result
 
+
+####################################################################################################
+
+
 class FenwickTree:
+    """Logarithmic Data structure based around levels of Dynamic query data .
+
+    Operations Supported:
+        Supports Dynamic updates on ranges and elements
+        Range Query Operation: main use sum query, other functions exist tho like above
+    """
+    __slots__ = ("fenwick_tree", "fenwick_tree_size")
+
     def __init__(self, f):
         self.fenwick_tree = []
         self.fenwick_tree_size = 0
