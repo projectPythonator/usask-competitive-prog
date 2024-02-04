@@ -2733,20 +2733,20 @@ GREATER_THAN = 0
 
 class StringAlgorithms:
     def __init__(self):
+        """Attributes declared here must be passed in or global if not used in class format."""
         self.math_algos = None
-        self.text_len = 0
-        self.pattern_len = 0
-        self.n = 0
+        self.text_len = self.pattern_len = 0
         self.prime_p = self.mod_m = 0
-        self.text = ''
-        self.pattern = ''
+        self.text, self.pattern = '', ''
+
         self.back_table = []
+
         self.suffix_array = []
-        self.text_ord = []
-        self.pattern_ord = []
+        self.text_ord, self.pattern_ord = [], []
         self.longest_common_prefix = []
         self.owner = []
         self.seperator_list = []
+
         self.hash_powers = []
         self.hash_h_values = []
         self.left_mod_inverse = []
