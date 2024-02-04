@@ -245,7 +245,7 @@ class FenwickTree:
         """Attributes declared here must be passed in or global if not used in class format."""
         self.fenwick_tree = []
         self.fenwick_tree_size = 0
-        if frequency_array:  # None is False so we can have this optional check :)
+        if frequency_array:  # None is False, so we can have this optional check :)
             self.build_tree_from_frequency_array(frequency_array)
         # self.num_rows = self.num_cols = 0               # for 2d
         # self.fenwick_tree_2d = [[0] for _ in range(1)]  # for 2d
