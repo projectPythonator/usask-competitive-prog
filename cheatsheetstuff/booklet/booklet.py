@@ -97,7 +97,7 @@ from math import isqrt, gcd
 # min use big value, max use smallest val, sum use 0, product use 1
 # for gcd and others you will need to change the code so that you set it to the starting value
 # this might mean longer implementations but that is the cost of the way I set it up
-DEFAULT = 2 ** 32
+RQ_DEFAULT = 2 ** 32
 
 
 class SquareRootDecomposition:
@@ -122,7 +122,7 @@ class SquareRootDecomposition:
         Complexity per call: Time: O(n * O(f(x))), Space: O(n + sqrt(n)).
         """
         sqrt_len = isqrt(len(new_data)) + 1  # + 1 here to for to cover int(x) == floor(x)
-        pad_val = DEFAULT  # DEFAULT INFO AT TOP OF CLASS
+        pad_val = RQ_DEFAULT  # DEFAULT INFO AT TOP OF CLASS
         self.size_of_blocks = self.num_of_blocks = sqrt_len
         self.decomposed_blocks, self.range_of_data = [pad_val] * sqrt_len, sqrt_len ** 2
         self.data_copy = [el for el in new_data] + [pad_val] * (self.range_of_data - len(new_data))
@@ -135,7 +135,7 @@ class SquareRootDecomposition:
         Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
         """
         start, end = block_n * self.size_of_blocks, (block_n + 1) * self.size_of_blocks
-        result = DEFAULT  # DEFAULT INFO AT TOP OF CLASS
+        result = RQ_DEFAULT  # DEFAULT INFO AT TOP OF CLASS
         for i in range(start, end):
             result = min(result, self.data_copy[i])
         self.decomposed_blocks[block_n] = result
@@ -145,7 +145,7 @@ class SquareRootDecomposition:
 
         Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
         """
-        self.data_copy[position_i] = value                      #  O(1)
+        self.data_copy[position_i] = value                      # O(1)
         self.update_block_n(position_i // self.num_of_blocks)   # but this costs O(sqrt(n))
 
     def range_query_i_to_j(self, left, right):
@@ -153,7 +153,7 @@ class SquareRootDecomposition:
 
         Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
         """
-        block_size, result = self.size_of_blocks, DEFAULT  # DEFAULT INFO AT TOP OF CLASS
+        block_size, result = self.size_of_blocks, RQ_DEFAULT  # DEFAULT INFO AT TOP OF CLASS
         if (right + 1) - left <= block_size:  # special case where right-left ~= block_size
             for i in range(left, right + 1):  # right + 1 since right is inclusive in this function
                 result = min(result, self.data_copy[i])
@@ -194,8 +194,8 @@ class SparseTable:
         """Prepare a new set of data for queries. O(f(x)) is complexity of calling f(x)
 
         Complexity per call: Time: O(O(f(x)) * n ln n), Space: O(n ln n), S(n log2 n).
-        Variants shown:
-            range min query: O(f(x)) = O(ln n) here instead of O(1) like others
+        Variants shown:   f(x) might be O(ln n) like for gcd and lcm
+            range min query: O(f(x)) = O(1) like most
             range sum query: O(f(x)) = O(1) like others [is commented out]
         """
         spare_table, i_end, local_max_n = self.sparse_table, self.k_value + 1, self.max_n + 1
@@ -210,15 +210,21 @@ class SparseTable:
                 # spare_table[i][j] = spare_table[prev_i][j] + spare_table[prev_i][j + prev_pow_2]
 
     def range_query_from_i_to_j(self, left, right):
-        result = 0  # change this to be what you need for it
+        """Compute the range query over precomputed data.
+
+        Complexity per call: Time: V1 = O(O(f(x)) * 1), V2 = O(O(f(x)) * ln n), Space: O(1)
+        Variants shown:  f(x) might be O(ln n) like for gcd
+            range min query: O(f(x)) = O(1) like most  V1
+            range sum query: O(f(x)) = O(1) like others  V2
+        Notes: V1 is min and max (there might be others) but for these you need only compute
+        two ranges so long as lower_bound == left and upper_bound == right, overlap won't matter
+        """
+        result = RQ_DEFAULT  # see SquareRootDecomposition class for more info
         ind = (right - left + 1).bit_length()-1  # I think this is same as log2(r - l + 1)
         result = min(self.sparse_table[ind][left], self.sparse_table[ind][right - 2**ind + 1])
-        result = max(self.sparse_table[ind][left], self.sparse_table[ind][right - 2**ind + 1])
         for i in range(self.k_value-1, -1, -1):
             if (1 << i) <= right - left + 1:
                 result = result + self.sparse_table[i][left]
-                result = result * self.sparse_table[i][left]
-                result = gcd(result, self.sparse_table[i][left])
                 left = left + (1 << i)
         return result
 
