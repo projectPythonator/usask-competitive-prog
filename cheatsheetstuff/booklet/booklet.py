@@ -72,6 +72,77 @@ class UnionFindDisjointSets:
         """Gives you the size of set u. TIME and SPACE Complexity is the same as find_set"""
         return self.set_sizes[self.find_set(u)]
 
+
+####################################################################################################
+
+"""The following sections are here to support range query operations.
+Requirements:
+    function f(x) must commutative 
+    able to return the answer i to j 
+    when listed will support element or range updates
+"""
+
+
+from math import isqrt, gcd
+
+
+# min use big value, max use smallest val, sum use 0, product use 1
+# for gcd and others you will need to change the code so that you set it to the starting value
+# this might mean longer implementations but that is the cost of the way I set it up
+DEFAULT = 2 ** 32
+
+
+class SquareRootDecomposition:
+    __slot__ = ("decomposed_blocks", 'size_of_blocks', 'num_of_blocks', 'range_of_data', 'data')
+
+    def __init__(self):
+        self.size_of_blocks = self.num_of_blocks = self.range_of_data = 0
+        self.decomposed_blocks = []
+        self.data_copy = []
+
+    def prepare_square_root_decomposition(self, new_data):
+        sqrt_len = isqrt(len(new_data)) + 1
+        pad_val = DEFAULT  # see global DEFAULT above for more info
+        self.size_of_blocks = self.num_of_blocks = sqrt_len
+        self.decomposed_blocks, self.range_of_data = [pad_val] * sqrt_len, sqrt_len ** 2
+        self.data_copy = [el for el in new_data] + [pad_val] * (self.range_of_data - len(new_data))
+        for i in range(sqrt_len):
+            self.update_block_n(i)
+
+    def update_block_n(self, block_n):
+        start, end = block_n * self.size_of_blocks, (block_n + 1) * self.size_of_blocks
+        result = DEFAULT  # see global DEFAULT above for more info
+        for i in range(start, end):
+            result = min(result, self.data_copy[i])
+        self.decomposed_blocks[block_n] = result
+
+    def update_position_i_with_value(self, i, value):
+        self.data_copy[i] = value
+        self.update_block_n(i // self.num_of_blocks)
+
+    def range_query_i_to_j(self, left, right):
+        block_size, result = self.size_of_blocks, DEFAULT
+        if (right + 1) - left <= block_size:
+            for i in range(left, right + 1):
+                result = min(result, self.data_copy[i])
+        else:
+            left_block, right_block = left // block_size, right // block_size
+            end1, start2 = (left_block + 1) * block_size, right_block * block_size
+            for i in range(left, end1):
+                result = min(result, self.data_copy[i])
+            for i in range(start2, right + 1):
+                result = min(result, self.data_copy[i])
+            for i in range(left_block + 1, right_block):
+                result = min(result, self.decomposed_blocks[i])
+        return result
+
+
+####################################################################################################
+
+
+from math import gcd
+
+
 class SparseTable:
     __slots__ = ("sparse_table", "k_value", "max_n")
 
