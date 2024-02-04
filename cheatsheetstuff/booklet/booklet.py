@@ -194,7 +194,7 @@ class SparseTable:
         """Prepare a new set of data for queries. O(f(x)) is complexity of calling f(x)
 
         Complexity per call: Time: O(O(f(x)) * n ln n), Space: O(n ln n), S(n log2 n).
-        variants shown:
+        Variants shown:
             range min query: O(f(x)) = O(ln n) here instead of O(1) like others
             range sum query: O(f(x)) = O(1) like others [is commented out]
         """
@@ -215,7 +215,7 @@ class SparseTable:
         result = min(self.sparse_table[ind][left], self.sparse_table[ind][right - 2**ind + 1])
         result = max(self.sparse_table[ind][left], self.sparse_table[ind][right - 2**ind + 1])
         for i in range(self.k_value-1, -1, -1):
-            if (i << i) <= right - left + 1:
+            if (1 << i) <= right - left + 1:
                 result = result + self.sparse_table[i][left]
                 result = result * self.sparse_table[i][left]
                 result = gcd(result, self.sparse_table[i][left])
