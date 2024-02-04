@@ -23,17 +23,17 @@ class UnionFindDisjointSets:
         self.set_sizes = [1] * n   # optional information
         self.num_sets = n          # optional information
 
-    def find_set(self, u):
+    def find_set_recursive(self, u):
         """Recursively find which set u belongs to. Memoize on the way back up.
 
         Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
                     Space: Amortized O(1) stack space
         """
-        root_parent = u if self.parent[u] == u else self.find_set(self.parent[u])
+        root_parent = u if self.parent[u] == u else self.find_set_recursive(self.parent[u])
         self.parent[u] = root_parent
         return root_parent
 
-    def find_set_iterative(self, x):
+    def find_set(self, x):
         """Iteratively find which set u belongs to. uses stack to memoize.
 
         Complexity: Time: O(α(n)) -> O(1), inverse ackerman practically constant
@@ -49,7 +49,7 @@ class UnionFindDisjointSets:
 
     def is_same_set(self, u, v):
         """Checks if u and v in same set. TIME and SPACE Complexity is the same as find_set"""
-        return self.find_set_iterative(u) == self.find_set_iterative(v)
+        return self.find_set(u) == self.find_set(v)
 
     def union_set(self, u, v):
         """Join the set that contains u with the set that contains v.
@@ -58,7 +58,7 @@ class UnionFindDisjointSets:
                     Space: Amortized O(1) stack space
         """
         if not self.is_same_set(u, v):
-            u_parent, v_parent = self.find_set_iterative(u), self.find_set_iterative(v)
+            u_parent, v_parent = self.find_set(u), self.find_set(v)
             if self.rank[u_parent] > self.rank[v_parent]:   # keep u_parent shorter than v_parent
                 u_parent, v_parent = v_parent, u_parent
 
