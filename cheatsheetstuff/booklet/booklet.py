@@ -93,7 +93,13 @@ DEFAULT = 2 ** 32
 
 
 class SquareRootDecomposition:
-    """"""
+    """Block based query data structure based around square root sizes.
+
+    Operations Supported:
+        Update Element at position n.
+        Range Query Operation: min, max, gcd, sum, product and commutative functions.
+    """
+
     __slot__ = ("decomposed_blocks", 'size_of_blocks', 'num_of_blocks', 'range_of_data', 'data')
 
     def __init__(self):
@@ -103,6 +109,10 @@ class SquareRootDecomposition:
         self.data_copy = []
 
     def prepare_square_root_decomposition(self, new_data):
+        """Prepare a new set of data for queries. O(f(x)) is complexity of calling f(x)
+
+        Complexity per call: Time: O(n * O(f(x))), Space: O(n + sqrt(n)).
+        """
         sqrt_len = isqrt(len(new_data)) + 1
         pad_val = DEFAULT  # see global DEFAULT above for more info
         self.size_of_blocks = self.num_of_blocks = sqrt_len
@@ -112,15 +122,23 @@ class SquareRootDecomposition:
             self.update_block_n(i)
 
     def update_block_n(self, block_n):
+        """For a given block n, compute the ranged operation on the block.
+
+        Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
+        """
         start, end = block_n * self.size_of_blocks, (block_n + 1) * self.size_of_blocks
         result = DEFAULT  # see global DEFAULT above for more info
         for i in range(start, end):
             result = min(result, self.data_copy[i])
         self.decomposed_blocks[block_n] = result
 
-    def update_position_i_with_value(self, i, value):
-        self.data_copy[i] = value
-        self.update_block_n(i // self.num_of_blocks)
+    def update_position_i_with_value(self, position_i, value):
+        """Update position then follow it up with a block update.
+
+        Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
+        """
+        self.data_copy[position_i] = value
+        self.update_block_n(position_i // self.num_of_blocks)
 
     def range_query_i_to_j(self, left, right):
         block_size, result = self.size_of_blocks, DEFAULT
