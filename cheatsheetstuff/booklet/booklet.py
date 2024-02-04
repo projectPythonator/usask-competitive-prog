@@ -2734,7 +2734,6 @@ GREATER_THAN = 0
 class StringAlgorithms:
     def __init__(self):
         """Attributes declared here must be passed in or global if not used in class format."""
-        self.math_algos = None
         self.text_len = self.pattern_len = 0
         self.prime_p = self.mod_m = 0
         self.text, self.pattern = '', ''
@@ -2747,6 +2746,7 @@ class StringAlgorithms:
         self.owner = []
         self.seperator_list = []
 
+        self.math_algos = MathAlgorithms()
         self.hash_powers = []
         self.hash_h_values = []
         self.left_mod_inverse = []
@@ -2765,9 +2765,7 @@ class StringAlgorithms:
                 j = back_table[j]
             j += 1
             back_table[i + 1] = j
-        self.pattern = pattern
-        self.pattern_len = pattern_len
-        self.back_table = back_table
+        self.pattern, self.pattern_len, self.back_table = pattern, pattern_len, back_table
 
     def kmp_search_find_indices(self, text_to_search):
         """Search the text for the pattern we preprocessed.
@@ -2983,6 +2981,9 @@ class StringAlgorithms:
         return ans
 
 
+####################################################################################################
+
+
 class Matrix:
     """Optimization notes: prefixed names of form local_NAME are used to avoid expensive load_attr
     calls they can be replaced with self.NAME or passed in as global values, """
@@ -3123,6 +3124,9 @@ class Matrix:
                     r = -r
             r = r * det_matrix[i][i]
         return r
+
+
+####################################################################################################
 
 
 class MatrixAlgorithms:
