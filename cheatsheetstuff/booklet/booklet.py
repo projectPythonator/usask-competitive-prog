@@ -1859,7 +1859,7 @@ class Pt3d:  # TODO RETEST
     def __hash__(self): return hash((self.x, self.y, self.z))
 
 
-class QuadEdge:  # TODO RETEST
+class QuadEdge:
     __slots__ = ("origin", "rot", "o_next", "used")
 
     def __init__(self):
@@ -1878,7 +1878,7 @@ class QuadEdgeDataStructure:
     def __init__(self):
         pass
 
-    def make_edge(self, in_pt, out_pt):  # TODO RETEST
+    def make_edge(self, in_pt, out_pt):
         e1 = QuadEdge()
         e2 = QuadEdge()
         e3 = QuadEdge()
@@ -1897,11 +1897,11 @@ class QuadEdgeDataStructure:
         e4.o_next = e3
         return e1
 
-    def splice(self, a, b):  # TODO RETEST
+    def splice(self, a, b):
         a.o_next.rot.o_next, b.o_next.rot.o_next = b.o_next.rot.o_next, a.o_next.rot.o_next
         a.o_next, b.o_next = b.o_next, a.o_next
 
-    def delete_edge(self, edge):  # TODO RETEST
+    def delete_edge(self, edge):
         self.splice(edge, edge.o_prev())
         self.splice(edge.rev(), edge.rev().o_prev())
         # del edge.rot.rot.rot
@@ -1909,7 +1909,7 @@ class QuadEdgeDataStructure:
         # del edge.rot
         # del edge
 
-    def connect(self, a, b):  # TODO RETEST
+    def connect(self, a, b):
         e = self.make_edge(a.dest(), b.origin)
         self.splice(e, a.l_next())
         self.splice(e.rev(), b)
@@ -1960,7 +1960,7 @@ class GeometryAlgorithms:  # TODO RETEST
         return Pt2d(pt.x * cos(rad) - pt.y * sin(rad),
                     pt.x * sin(rad) + pt.y * cos(rad))
 
-    def point_c_rotation_wrt_line_ab(self, a, b, c):  # TODO RETEST
+    def point_c_rotation_wrt_line_ab(self, a, b, c):
         """Determine orientation of c wrt line ab, in terms of collinear clockwise counterclockwise.
         Since 2d cross-product is the area of the parallelogram, we can use this to accomplish this.
 

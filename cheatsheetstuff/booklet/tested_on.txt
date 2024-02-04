@@ -25,6 +25,7 @@ articulation_points_and_bridges_via_dfs : was tested on AOC 2023 problem 25 for 
 allpairsshortestpath tested on: kattis allpairspath, slow leak
 APSP negative cycle tested on allpairspath
 APSP transitive closure: tested onkattis: isahasa
+Triangulation has been tested on random inputs matched against the slower version and with itself for mst
 
 
 MathAlgorithms
