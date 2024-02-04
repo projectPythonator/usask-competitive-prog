@@ -2496,7 +2496,7 @@ class GeometryAlgorithms:  # TODO RETEST
             ans = max(ans, self.distance(p_j, convex_hull[t]))
         return sqrt(ans)
 
-    def closest_pair_helper(self, lo, hi):  # TODO RETEST
+    def closest_pair_helper(self, lo, hi):
         """brute force function, for small range will brute force find the closet pair. O(n^2)"""
         r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
                      self.x_ordering[lo],
@@ -2546,7 +2546,7 @@ class GeometryAlgorithms:  # TODO RETEST
                     best_pair = (dist_ij, y_partition[i], y_partition[j])
         return best_pair
 
-    def compute_closest_pair(self, pts):  # TODO RETEST
+    def compute_closest_pair(self, pts):
         """Compute the closest pair of points in a set of points. method is divide and conqur
 
         Complexity per call Time: O(nlog n), Space O(nlog n)
