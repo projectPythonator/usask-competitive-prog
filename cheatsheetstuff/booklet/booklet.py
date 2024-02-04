@@ -2835,24 +2835,21 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(n), T(4n), Space: O(n), S(3n)
         """
-        local_suffix_array = self.suffix_array  # optional, avoids expensive load_attr operation
-        local_text_len = self.text_len          # ignore for faster implementations, and place it
-        local_text_ord = self.text_ord          # directly in the code
-        permuted_lcp, phi = [0] * local_text_len, [0] * local_text_len
+        permuted_lcp, phi = [0] * self.text_len, [0] * self.text_len
         phi[0], left = -1, 0
-        for last, curr in pairwise_func(local_suffix_array):
+        for last, curr in pairwise_func(self.suffix_array):
             phi[curr] = last
         for i, phi_i in enumerate(phi):
             if phi_i == -1:
                 permuted_lcp[i] = 0
                 continue
-            while (i + left < local_text_len
-                   and phi_i + left < local_text_len
-                   and local_text_ord[i + left] == local_text_ord[phi_i + left]):
+            while (i + left < self.text_len
+                   and phi_i + left < self.text_len
+                   and self.text_ord[i + left] == self.text_ord[phi_i + left]):
                 left += 1
             permuted_lcp[i] = left
             left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
-        self.longest_common_prefix = [permuted_lcp[suffix] for suffix in local_suffix_array]
+        self.longest_common_prefix = [permuted_lcp[suffix] for suffix in self.suffix_array]
 
     def suffix_array_compare_from_index(self, offset):  # TODO RETEST
         """C style string compare to compare 0 is equal 1 is greater than -1 is less than.
