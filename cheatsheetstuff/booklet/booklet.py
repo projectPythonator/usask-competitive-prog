@@ -17,11 +17,13 @@ setrecursionlimit(10000000)  # 10 million should be good enough for most contest
 
 class UnionFindDisjointSets:
     """This Data structure is for non-directional disjoint sets."""
+
     def __init__(self, n):
-        self.parent = [i for i in range(n)]
+        """Attributes declared here must be passed in or global if not used in class format."""
+        self.num_sets = n          # optional information
         self.rank = [0] * n        # optional optimization
         self.set_sizes = [1] * n   # optional information
-        self.num_sets = n          # optional information
+        self.parent = [i for i in range(n)]
 
     def find_set_recursive(self, u):
         """Recursively find which set u belongs to. Memoize on the way back up.
@@ -109,7 +111,7 @@ class SquareRootDecomposition:
     __slot__ = ("decomposed_blocks", 'size_of_blocks', 'num_of_blocks', 'range_of_data', 'data')
 
     def __init__(self):
-        """These either need to be passed into functions or global if you don't use classes."""
+        """Attributes declared here must be passed in or global if not used in class format."""
         self.size_of_blocks = self.num_of_blocks = self.range_of_data = 0
         self.decomposed_blocks = []
         self.data_copy = []
@@ -183,6 +185,7 @@ class SparseTable:
     __slots__ = ("sparse_table", "k_value", "max_n")
 
     def __init__(self, max_n):
+        """Attributes declared here must be passed in or global if not used in class format."""
         self.k_value = max_n.bit_length()
         self.max_n = max_n
         self.sparse_table = [[0] * max_n for _ in range(self.k_value)]
