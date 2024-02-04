@@ -1447,7 +1447,7 @@ class MathAlgorithms:
     def is_composite(self, a, d, n, s):
         """The witness test of miller rabin.
 
-        Complexity per call: Time O(log^3(n)), Space: O(2**s) bits
+        Complexity per call: Time O(log^3(n)), Space: O(2**s, bits)
         """
         if 1 == pow(a, d, n):
             return False
