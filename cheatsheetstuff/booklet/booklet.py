@@ -1405,9 +1405,14 @@ class MathAlgorithms:
         return num_diff_prime_factors
 
     def polynomial_function_f(self, x, c, m):
-        return (x * x + c) % m
+        """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding."""
+        return (x * x + c) % m  # paste this in code for speed up. is here for clarity only
 
     def pollard_rho(self, n, x0=2, c=1):
+        """Semi fast integer factorization. Based on the birthday paradox and floyd cycle finding.
+
+        Complexity per call: Time: O(min(max(p), n^0.25) * ln n), Space: O(log2(n) bits)
+        """
         x, y, g = x0, x0, 1
         while g == 1:
             x = self.polynomial_function_f(x, c, n)
