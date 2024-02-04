@@ -2856,11 +2856,9 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(k) len of pattern, Space: O(1)
         """
-        local_text_ord = self.text_ord        # optional for avoiding expensive load_attr operation
-        local_pattern_ord = self.pattern_ord  # ignore for faster implementation of the code
-        for i, num_char in enumerate(local_pattern_ord):
-            if num_char != local_text_ord[offset + i]:
-                return -1 if local_text_ord[offset + i] < num_char else 1
+        for i, num_char in enumerate(self.pattern_ord ):
+            if num_char != self.text_ord[offset + i]:
+                return -1 if self.text_ord[offset + i] < num_char else 1
         return 0
 
     def suffix_array_binary_search(self, lo, hi, comp_val):  # TODO RETEST
@@ -2868,10 +2866,9 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(k log n) len of pattern, Space: O(1)
         """
-        local_suffix_arr = self.suffix_array
         while lo < hi:
             mid = (lo + hi) // 2
-            if self.suffix_array_compare_from_index(local_suffix_arr[mid]) > comp_val:
+            if self.suffix_array_compare_from_index(self.suffix_array[mid]) > comp_val:
                 hi = mid
             else:
                 lo = mid + 1
@@ -2883,13 +2880,12 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(k log n), T(2(k log n)), Space: O(k)
         """
-        local_suffix_array = self.suffix_array  # optional avoid expensive load_attr operation
         self.pattern_ord = [ord(c) for c in new_pattern]  # line helps avoid repeated ord calls
         lo, _ = self.suffix_array_binary_search(0, self.text_len - 1, GREATER_EQUAL)
-        if self.suffix_array_compare_from_index(local_suffix_array[lo]) != 0:
+        if self.suffix_array_compare_from_index(self.suffix_array[lo]) != 0:
             return -1, -1
         _, hi = self.suffix_array_binary_search(lo, self.text_len - 1, GREATER_THAN)
-        if self.suffix_array_compare_from_index(local_suffix_array[hi]) != 0:
+        if self.suffix_array_compare_from_index(self.suffix_array[hi]) != 0:
             hi -= 1
         return lo, hi
 
