@@ -93,9 +93,11 @@ DEFAULT = 2 ** 32
 
 
 class SquareRootDecomposition:
+    """"""
     __slot__ = ("decomposed_blocks", 'size_of_blocks', 'num_of_blocks', 'range_of_data', 'data')
 
     def __init__(self):
+        """These either need to be passed into functions or global if you don't use classes."""
         self.size_of_blocks = self.num_of_blocks = self.range_of_data = 0
         self.decomposed_blocks = []
         self.data_copy = []
