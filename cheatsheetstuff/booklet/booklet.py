@@ -385,9 +385,6 @@ class RangeUpdateRangeQuery:
 ####################################################################################################
 
 
-SEG_INF = 2**30  # can be reduced or increased to fit the max value
-
-
 class SegmentTree:
     def __init__(self, new_array):
         self.is_lazy = []
