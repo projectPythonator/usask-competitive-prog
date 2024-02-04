@@ -1465,7 +1465,7 @@ class MathAlgorithms:
         if n in self.primes_set:
             return True
         if any((n % self.primes_list[p] == 0) for p in range(16)) or n < 2 or n == 3215031751:
-            return False # 3215031751 is an edge case for this data set
+            return False  # 3215031751 is an edge case for this data set
         d, s = n-1, 0
         while d % 2 == 0:
             d, s = d//2, s+1
