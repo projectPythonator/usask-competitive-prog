@@ -233,7 +233,7 @@ class SparseTable:
 
 
 class FenwickTree:
-    """Logarithmic Data structure based around levels of Dynamic query data. 1-based indexing.
+    """Logarithmic Data structure based dynamic use of binary index tree. 1-based indexing.
 
     Operations Supported:
         Supports Dynamic updates on ranges and elements
@@ -380,6 +380,9 @@ class RangeUpdateRangeQuery:
             return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
         return (self.range_update_point_query.point_sum_query_of_index(right) * right
                 - self.point_update_range_query.range_sum_from_i_to_j(1, right))
+
+
+####################################################################################################
 
 
 SEG_INF = 2**30  # can be reduced or increased to fit the max value
