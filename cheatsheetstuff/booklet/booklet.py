@@ -2856,7 +2856,7 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(k) len of pattern, Space: O(1)
         """
-        for i, num_char in enumerate(self.pattern_ord ):
+        for i, num_char in enumerate(self.pattern_ord):
             if num_char != self.text_ord[offset + i]:
                 return -1 if self.text_ord[offset + i] < num_char else 1
         return 0
