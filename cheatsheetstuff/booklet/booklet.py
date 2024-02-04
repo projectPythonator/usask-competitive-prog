@@ -301,7 +301,7 @@ class FenwickTree:
         """
         while index <= self.fenwick_tree_size:
             self.fenwick_tree[index] += delta
-            index = index + self.last_set_bit(index)
+            index += self.last_set_bit(index)
 
     # def update_index_by_delta_2d(self, row, col, delta):
     #     i, j, fenwick_2d = row, col, self.fenwick_tree_2d
