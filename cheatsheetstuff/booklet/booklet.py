@@ -272,11 +272,12 @@ class FenwickTree:
             if pos <= n:
                 self.fenwick_tree[pos] += self.fenwick_tree[i]
 
-    def build_tree_from_s(self, m, s):
-        f = [0] * (m + 1)
+    def build_tree_from_s(self, max_n, s):
+        """Builds Fenwick tree given data s."""
+        frequency_array = [0] * (max_n + 1)
         for i in s:
-            f[i] = f[i] + 1
-        self.build_tree_from_frequency_array(f)
+            frequency_array[i] += 1
+        self.build_tree_from_frequency_array(frequency_array)
 
     def range_sum_from_i_to_j(self, left, right):
         """Returns the inclusive-exclusive range sum [i...j). version is 1-index based.
@@ -284,9 +285,9 @@ class FenwickTree:
 
         Complexity per call: Time: O(log n), Space: O(1).
         """
-        if left > 1:
+        if left > 1:  # when left isn't 1 we compute the formula above.
             return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
-        sum_up_to_right = 0
+        sum_up_to_right = RQ_DEFAULT  # is 0 but see SquareRootDecomposition class for more info
         while right:
             sum_up_to_right += self.fenwick_tree[right]
             right -= self.last_set_bit(right)
