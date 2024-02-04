@@ -2590,21 +2590,21 @@ class GeometryAlgorithms:  # TODO RETEST
                         ans.append((pts[i], pts[j], pts[k]))
         return ans
 
-    def pt_left_of_edge(self, pt, edge):  # TODO RETEST
+    def pt_left_of_edge(self, pt, edge):
         """A helper function with a name to describe the action. Remove for speedup."""
         return CCW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
-    def pt_right_of_edge(self, pt, edge):  # TODO RETEST
+    def pt_right_of_edge(self, pt, edge):
         """A helper function with a name to describe the action. Remove for speedup."""
         return CW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
-    def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):  # TODO RETEST
+    def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
         """A helper function for determining the angle. Remove for speedup."""
         return (a1 * (b2 * c3 - c2 * b3) -
                 a2 * (b1 * c3 - c1 * b3) +
                 a3 * (b1 * c2 - c1 * b2))
 
-    def is_in_circle(self, a, b, c, d):  # TODO RETEST
+    def is_in_circle(self, a, b, c, d):
         """Expensive calculation function that determines if """
         a_dot = a.dot_product()
         b_dot = b.dot_product()
@@ -2623,7 +2623,7 @@ class GeometryAlgorithms:  # TODO RETEST
         # kek = angle(a, b, c) + angle(c, d, a) - angle(b, c, d) - angle(d, a, b)
         # return self.compare_ab(kek, 0.0) > 0
 
-    def build_triangulation(self, left, right, pts):  # TODO RETEST
+    def build_triangulation(self, left, right, pts):
         if right - left + 1 == 2:
             res = self.quad_edges.make_edge(pts[left], pts[right])
             return res, res.rev()
@@ -2680,7 +2680,7 @@ class GeometryAlgorithms:  # TODO RETEST
                 base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
         return ldo, rdo
 
-    def delaunay_triangulation_fast(self, pts):  # TODO RETEST
+    def delaunay_triangulation_fast(self, pts):
         def sort_3_elements(a, b, c):
             if b < a:
                 a, b = b, a
