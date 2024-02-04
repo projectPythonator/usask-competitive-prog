@@ -1414,13 +1414,14 @@ class MathAlgorithms:
         Complexity per call: Time: O(min(max(p), n^0.25) * ln n), Space: O(log2(n) bits)
         """
         x, y, g = x0, x0, 1
-        while g == 1:
+        while g == 1:  # when g != 1 then we found a divisor of n shared with x - y
             x = self.polynomial_function_f(x, c, n)
             y = self.polynomial_function_f(self.polynomial_function_f(y, c, n), c, n)
             g = gcd(abs(x - y), n)
         return g
 
     def brent_pollard_rho(self, n, x0=2, c=1):
+        """Faster version of above. Similar time complexity. uses faster cycle finder."""
         x, m = x0, 128
         g = q = left = 1
         xs = y = 0
