@@ -1187,11 +1187,11 @@ class GraphAlgorithms:
 ####################################################################################################
 
 
-from math import isqrt, log, gcd, prod, cos, sin, tau
-from itertools import takewhile, accumulate
-from functools import lru_cache
 from bisect import bisect_left
 from collections import Counter
+from functools import lru_cache
+from itertools import takewhile, accumulate
+from math import isqrt, log, gcd, prod, cos, sin, tau
 from operator import mul as operator_mul
 
 
@@ -1358,7 +1358,7 @@ class MathAlgorithms:
                 while n % prime == 0:
                     n //= prime
                     prime_factors.append(prime)
-        if n > 1:
+        if n > 1:  # n is prime or last factor of n is prime
             prime_factors.append(n)
         self.factor_list = Counter(prime_factors)
         return prime_factors
