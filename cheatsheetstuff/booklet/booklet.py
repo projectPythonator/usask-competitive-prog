@@ -233,7 +233,7 @@ class SparseTable:
 
 
 class FenwickTree:
-    """Logarithmic Data structure based around levels of Dynamic query data .
+    """Logarithmic Data structure based around levels of Dynamic query data. 1-based indexing.
 
     Operations Supported:
         Supports Dynamic updates on ranges and elements
@@ -241,11 +241,12 @@ class FenwickTree:
     """
     __slots__ = ("fenwick_tree", "fenwick_tree_size")
 
-    def __init__(self, f):
+    def __init__(self, frequency_array=None):
+        """Attributes declared here must be passed in or global if not used in class format."""
         self.fenwick_tree = []
         self.fenwick_tree_size = 0
-        if f:
-            self.build_tree_from_f(f)
+        if frequency_array:  # None is False so we can have this optional check :)
+            self.build_tree_from_frequency_array(frequency_array)
         # self.num_rows = self.num_cols = 0               # for 2d
         # self.fenwick_tree_2d = [[0] for _ in range(1)]  # for 2d
 
@@ -253,12 +254,20 @@ class FenwickTree:
         """Will get the last set-bit of a used in 1-indexing. for 0-indexing use i & (i+1)"""
         return a & (-a)
 
-    def build_tree_from_f(self, f):
-        n = len(f)
-        self.fenwick_tree = [0] * (n + 1)
+    def build_tree_from_frequency_array(self, frequency_array):
+        """Prepare a new set of data for queries. O(f(x)) is complexity of calling f(x)
+
+        Complexity per call: Time: O(n * O(f(x)) ), T(n) usually, Space: O(n)
+
+        Variant: just call updated on each element Not shown but is like O(n ln n)
+        Variants shown:   f(x) might be O(ln n) like for gcd and lcm
+            range sum query: O(f(x)) = O(1) like others [is commented out]
+        """
+        n = len(frequency_array)
         self.fenwick_tree_size = n
-        for i in range(1, n + 1):
-            self.fenwick_tree[i] += f[i - 1]
+        self.fenwick_tree = [0] * (n + 1)
+        for i, frequency in enumerate(frequency_array, 1):  # start from 1 in 1 based indexing
+            self.fenwick_tree[i] += frequency
             pos = i + self.last_set_bit(i)
             if pos <= n:
                 self.fenwick_tree[pos] += self.fenwick_tree[i]
@@ -267,7 +276,7 @@ class FenwickTree:
         f = [0] * (m + 1)
         for i in s:
             f[i] = f[i] + 1
-        self.build_tree_from_f(f)
+        self.build_tree_from_frequency_array(f)
 
     def range_sum_from_i_to_j(self, left, right):
         """Returns the inclusive-exclusive range sum [i...j). version is 1-index based.
