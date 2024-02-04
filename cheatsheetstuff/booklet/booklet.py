@@ -191,18 +191,23 @@ class SparseTable:
         self.sparse_table = [[0] * max_n for _ in range(self.k_value)]
 
     def prepare_sparse_table(self, array):
+        """Prepare a new set of data for queries. O(f(x)) is complexity of calling f(x)
+
+        Complexity per call: Time: O(O(f(x)) * n ln n), Space: O(n ln n), S(n log2 n).
+        variants shown:
+            range min query: O(f(x)) = O(ln n) here instead of O(1) like others
+            range sum query: O(f(x)) = O(1) like others [is commented out]
+        """
         spare_table, i_end, local_max_n = self.sparse_table, self.k_value + 1, self.max_n + 1
+        #  spare_table[0] = [el for el in array]  # USE IF max_n == len(array)
         for i, el in enumerate(array):
             spare_table[0][i] = el
-        for i in range(1, i_end):
-            prev_i = i - 1
-            j_end, prev_pow_2 = local_max_n - (1 << i), 1 << prev_i
+        for i in range(1, i_end):  # start from 1 and compute sub problems lvl by lvl
+            prev_i = i - 1  # compute once here for better readability and avoid n ln n computations
+            j_end, prev_pow_2 = local_max_n - (1 << i), 1 << prev_i  # read comment above
             for j in range(j_end):
                 spare_table[i][j] = min(spare_table[prev_i][j], spare_table[prev_i][j + prev_pow_2])
-                spare_table[i][j] = max(spare_table[prev_i][j], spare_table[prev_i][j + prev_pow_2])
-                spare_table[i][j] = spare_table[prev_i][j] + spare_table[prev_i][j + prev_pow_2]
-                spare_table[i][j] = spare_table[prev_i][j] * spare_table[prev_i][j + prev_pow_2]
-                spare_table[i][j] = gcd(spare_table[prev_i][j], spare_table[prev_i][j + prev_pow_2])
+                # spare_table[i][j] = spare_table[prev_i][j] + spare_table[prev_i][j + prev_pow_2]
 
     def range_query_from_i_to_j(self, left, right):
         result = 0  # change this to be what you need for it
