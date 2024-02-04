@@ -1237,9 +1237,9 @@ class MathAlgorithms:
         Complexity per call: Time: O(sqrt(n)), T(sqrt(n)/3), Space: O(1)
         Optimizations: 6k + i method, since we checked 2 and 3 only need test form 6k + 1 and 6k + 5
         """
-        if n < 4:
+        if n < 4:  # base case of n in 0, 1, 2, 3
             return n > 1
-        if n % 2 == 0 or n % 3 == 0:
+        if n % 2 == 0 or n % 3 == 0:  # this check is what allows us to use 6k + i
             return False
         limit = isqrt(n) + 1
         for p in range(5, limit, 6):
@@ -1257,7 +1257,7 @@ class MathAlgorithms:
         prime_sieve[0] = prime_sieve[1] = False
         for i in range(2, limit):
             if prime_sieve[i]:
-                for j in range(i*i, n+1, i):
+                for j in range(i*i, n+1, i):  # n + 1 because n is an inclusive bound
                     prime_sieve[j] = False
         self.primes_list = [i for i, el in enumerate(prime_sieve) if el]
 
@@ -1361,16 +1361,15 @@ class MathAlgorithms:
         return prime_factors
 
     def prime_factorize_n_log_n(self, n):
-        """An optimized prime factorization of n function based on min primes already sieved
+        """An optimized prime factorization of n function based on min primes already sieved.
 
         Complexity: Time: O(log n), Space: O(log n)
+        Optimization: assign append to function and assign min_prime[n] to a value in the loop
         """
         prime_factors = []
-        app = prime_factors.append
         while n > 1:
-            prime = self.min_primes_list[n]
-            app(prime)
-            n = n // prime
+            prime_factors.append(self.min_primes_list[n])
+            n = n // self.min_primes_list[n]
         return prime_factors
 
     def prime_factorize_n_variants(self, n):  # TODO RETEST
