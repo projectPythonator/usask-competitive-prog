@@ -2897,9 +2897,8 @@ class StringAlgorithms:
         Complexity per call: Time: O(n), T(2n), Space: O(1)
         for optimization implement the physical forloop itself, however it's still O(n).
         """
-        local_lcp = self.longest_common_prefix
-        max_lcp = max(local_lcp)
-        return max_lcp, local_lcp.index(max_lcp)
+        max_lcp = max(self.longest_common_prefix)
+        return max_lcp, self.longest_common_prefix.index(max_lcp)
 
     def compute_owners(self):  # TODO RETEST
         """Used to compute the owners of each position in the text. O(n) time and space."""
