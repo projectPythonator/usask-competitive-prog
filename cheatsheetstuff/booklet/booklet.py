@@ -1422,7 +1422,7 @@ class MathAlgorithms:
 
     def brent_pollard_rho(self, n, x0=2, c=1):
         """Faster version of above. Similar time complexity. uses faster cycle finder."""
-        x, m = x0, 128
+        x, m = x0, 128  # 128 here is used as a small power of 2 vs using 100 more below
         g = q = left = 1
         xs = y = 0
         while g == 1:
@@ -1430,10 +1430,10 @@ class MathAlgorithms:
             for _ in range(1, left):
                 x = (x * x + c) % n
             while k < left and g == 1:
-                xs, end = x, min(m, left - k)
-                for _ in range(end):
-                    x = (x * x + c) % n
-                    q = (q * abs(y - x)) % n
+                xs, end = x, min(m, left - k)   # here we are using a technique similar to cache
+                for _ in range(end):            # and loop unrolling were we try for sets of cycles
+                    x = (x * x + c) % n         # if we over shoot we can just go back which is
+                    q = (q * abs(y - x)) % n    # technically what end computes
                 k, g = k + m, gcd(q, n)
             left = left * 2
         if g == n:
