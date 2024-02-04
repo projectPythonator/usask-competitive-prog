@@ -113,8 +113,8 @@ class SquareRootDecomposition:
 
         Complexity per call: Time: O(n * O(f(x))), Space: O(n + sqrt(n)).
         """
-        sqrt_len = isqrt(len(new_data)) + 1
-        pad_val = DEFAULT  # see global DEFAULT above for more info
+        sqrt_len = isqrt(len(new_data)) + 1  # + 1 here to for to cover int(x) == floor(x)
+        pad_val = DEFAULT  # DEFAULT INFO AT TOP OF CLASS
         self.size_of_blocks = self.num_of_blocks = sqrt_len
         self.decomposed_blocks, self.range_of_data = [pad_val] * sqrt_len, sqrt_len ** 2
         self.data_copy = [el for el in new_data] + [pad_val] * (self.range_of_data - len(new_data))
@@ -127,7 +127,7 @@ class SquareRootDecomposition:
         Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
         """
         start, end = block_n * self.size_of_blocks, (block_n + 1) * self.size_of_blocks
-        result = DEFAULT  # see global DEFAULT above for more info
+        result = DEFAULT  # DEFAULT INFO AT TOP OF CLASS
         for i in range(start, end):
             result = min(result, self.data_copy[i])
         self.decomposed_blocks[block_n] = result
@@ -137,20 +137,24 @@ class SquareRootDecomposition:
 
         Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
         """
-        self.data_copy[position_i] = value
-        self.update_block_n(position_i // self.num_of_blocks)
+        self.data_copy[position_i] = value                      #  O(1)
+        self.update_block_n(position_i // self.num_of_blocks)   # but this costs O(sqrt(n))
 
     def range_query_i_to_j(self, left, right):
-        block_size, result = self.size_of_blocks, DEFAULT
-        if (right + 1) - left <= block_size:
-            for i in range(left, right + 1):
+        """Compute a range query from left to right. Note right is inclusive not exclusive here.
+
+        Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
+        """
+        block_size, result = self.size_of_blocks, DEFAULT  # DEFAULT INFO AT TOP OF CLASS
+        if (right + 1) - left <= block_size:  # special case where right-left ~= block_size
+            for i in range(left, right + 1):  # right + 1 since right is inclusive in this function
                 result = min(result, self.data_copy[i])
         else:
             left_block, right_block = left // block_size, right // block_size
             end1, start2 = (left_block + 1) * block_size, right_block * block_size
             for i in range(left, end1):
                 result = min(result, self.data_copy[i])
-            for i in range(start2, right + 1):
+            for i in range(start2, right + 1):  # right + 1 since right is inclusive in this func
                 result = min(result, self.data_copy[i])
             for i in range(left_block + 1, right_block):
                 result = min(result, self.decomposed_blocks[i])
