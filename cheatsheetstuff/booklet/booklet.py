@@ -76,6 +76,12 @@ class UnionFindDisjointSets:
 ####################################################################################################
 
 """The following sections are here to support range query operations.
+CODE USES ONLY MIN OR SUM QUERIES EXAMPLES 
+Other functions will most of the time just be replacing this format one of the following
+    1.) name_of_variable = f(name_of_variable, data_structure[i])
+    2.) name_of_variable = f( data_structure[i], data_structure[k])
+    Where f(a, b) = a + b, a * b, gcd(a, b), max(a, b) to list a few examples 
+
 Requirements:
     function f(x) must commutative 
     able to return the answer i to j 
@@ -168,6 +174,12 @@ from math import gcd
 
 
 class SparseTable:
+    """Logarithmic Datastructure based around levels of precomputed data.
+
+    Operations Supported:
+        DOES NOT SUPPORT DYNAMIC UPDATES much recompute structure after an update or before queries
+        Range Query Operation: min, max, gcd, sum, product and commutative functions.
+    """
     __slots__ = ("sparse_table", "k_value", "max_n")
 
     def __init__(self, max_n):
