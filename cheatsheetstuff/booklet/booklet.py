@@ -404,8 +404,8 @@ class SegmentTree:
         self.lazy = [-1] * (4 * next_2_pow_n)         # 4 * n used to avoid index out of bounds
         self.segment_tree = [0] * (4 * next_2_pow_n)  # 4 * n used to avoid index out of bounds
         self.array_a = [el for el in new_array]
-        if next_2_pow_n != n:                                # we add extra padding to the end to
-            self.array_a.extend([SEG_INF]*(next_2_pow_n-n))  # make the len a power of 2
+        if next_2_pow_n != n:                                   # we add extra padding to the end to
+            self.array_a.extend([RQ_DEFAULT]*(next_2_pow_n-n))  # make the len a power of 2
         self.tree_size = len(self.array_a)
         self.build_segment_tree_1()
 
