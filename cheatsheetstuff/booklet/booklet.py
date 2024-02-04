@@ -1262,7 +1262,7 @@ class MathAlgorithms:
         self.primes_list = [i for i, el in enumerate(prime_sieve) if el]
 
     def sieve_of_eratosthenes_optimized(self, n):
-        """Odds only optimized version of the previous method
+        """Odds only optimized version of the previous method. Optimized to start at 3.
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
         """
@@ -1277,7 +1277,7 @@ class MathAlgorithms:
         self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
     def sieve_of_min_primes(self, n):
-        """Stores the min prime for each number up to n.
+        """Stores the min or max prime divisor for each number up to n.
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
         """
@@ -1342,9 +1342,6 @@ class MathAlgorithms:
                     num_pf[i] += 1
         self.num_prime_factors = num_pf
         self.sum_prime_factors = sum_pf
-
-    def gen_set_primes(self):
-        self.primes_set = set(self.primes_list)
 
     def prime_factorize_n(self, n):
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
@@ -1458,18 +1455,20 @@ class MathAlgorithms:
         """Probabilistic primality test with error rate of 4^(-k) past 341550071728321.
 
         Complexity per call: Time O(k log^3(n)), Space: O(2**s) bits
+        Note: range(16) used to just do a small test to weed out lots of numbers.
         """
         if n in self.primes_set:
             return True
-        if any((n % self.primes_list[p] == 0) for p in range(50)) or n < 2 or n == 3215031751:
-            return False
+        if any((n % self.primes_list[p] == 0) for p in range(16)) or n < 2 or n == 3215031751:
+            return False # 3215031751 is an edge case for this data set
         d, s = n-1, 0
         while d % 2 == 0:
             d, s = d//2, s+1
-        for i, bound in enumerate(self.mrpt_known_bounds, 2):
-            if n < bound:
-                return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s)
-                               for j in range(i))
+        if n < self.mrpt_known_bounds[-1]:
+            for i, bound in enumerate(self.mrpt_known_bounds, 2):
+                if n < bound:
+                    return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s)
+                                   for j in range(i))
         return not any(self.is_composite(self.primes_list[j], d, n, s)
                        for j in range(precision_for_huge_n))
 
@@ -1479,7 +1478,7 @@ class MathAlgorithms:
                                   2152302898747, 3474749660383, 341550071728321]
         self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
         self.sieve_of_eratosthenes(1000)  # comment out if different size needed
-        self.gen_set_primes()  # comment out if already have bigger size
+        self.primes_set = set(self.primes_list)  # comment out if already have bigger size
 
     def extended_euclid_recursive(self, a, b):
         """Solves coefficients of Bezout identity: ax + by = gcd(a, b), recursively
