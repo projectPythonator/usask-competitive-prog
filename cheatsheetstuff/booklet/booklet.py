@@ -2910,15 +2910,14 @@ class StringAlgorithms:
 
     def compute_owners(self):  # TODO RETEST
         """Used to compute the owners of each position in the text. O(n) time and space."""
-        local_ord_arr, local_suffix = self.text_ord, self.suffix_array  # optional avoids load_attr
         tmp_owner = [0] * self.text_len
         it = iter(self.seperator_list)
         seperator = next(it)
-        for i, ord_value in enumerate(local_ord_arr):
+        for i, ord_value in enumerate(self.text_ord):
             tmp_owner[i] = seperator
             if ord_value == seperator:
                 seperator = next(it, None)
-        self.owner = [tmp_owner[suffix_i] for suffix_i in local_suffix]
+        self.owner = [tmp_owner[suffix_i] for suffix_i in self.suffix_array]
 
     def compute_longest_common_substring(self):  # TODO RETEST
         """Computes the longest common substring between two strings. returns index, value pair.
@@ -2927,12 +2926,10 @@ class StringAlgorithms:
         Pre-Requirements: owner, and longest_common_prefix must be built (also suffix array for lcp)
         Variants: LCS pair from k strings, LCS between all k strings.
         """
-        local_lcp = self.longest_common_prefix  # optional avoid expensive load_attr operation
-        local_owners = self.owner               # can be ignored to code faster
-        it = iter(local_lcp)
+        it = iter(self.longest_common_prefix)
         max_lcp_index, max_lcp_value = 0, next(it) - 1  # - 1 here since next(it) should return 0
         for i, lcp_value in enumerate(it, 1):
-            if lcp_value > max_lcp_value and local_owners[i] != local_owners[i - 1]:
+            if lcp_value > max_lcp_value and self.owner[i] != self.owner[i - 1]:
                 max_lcp_index, max_lcp_value = i, lcp_value
         return max_lcp_index, max_lcp_value
 
