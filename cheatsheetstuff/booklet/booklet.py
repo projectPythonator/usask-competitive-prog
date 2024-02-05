@@ -1972,14 +1972,14 @@ class GeometryAlgorithms:  # TODO RETEST
         """
         return self.compare_ab(self.cross_product(middle - left, right - left), 0.0)
 
-    def angle_point_c_wrt_line_ab(self, a, b, c):  # TODO RETEST
+    def angle_point_c_wrt_line_ab(self, left: Pt2d, middle: Pt2d, right: Pt2d) -> float:
         """For a line ab and point c, determine the angle of a to b to c in radians.
         formula: arc-cos(dot(vec_ab, vec_cb) / sqrt(dist_sq(vec_ab) * dist_sq(vec_cb))) = angle
-
+        # TODO RETEST
         Complexity per call: Time: O(1), Space: O(1).
         Optimizations: for accuracy we sqrt both distances can remove if distances are ints.
         """
-        vector_ab, vector_cb = a-b, c-b
+        vector_ab, vector_cb = left - middle, right - middle
         dot_ab_cb = self.dot_product(vector_ab, vector_cb)
         dist_sq_ab = self.dot_product(vector_ab, vector_ab)
         dist_sq_cb = self.dot_product(vector_cb, vector_cb)
