@@ -1994,8 +1994,8 @@ class GeometryAlgorithms:  # TODO RETEST
         Complexity per call: Time: O(1), Space: O(1).
         """
         vec_ab, vec_ac = b_point - a_point, c_point - a_point
-        transform = vec_ab * (self.dot_product(vec_ac, vec_ab) / self.dot_product(vec_ab, vec_ab))
-        return a_point + transform
+        translation = vec_ab * (self.dot_product(vec_ac, vec_ab) / self.dot_product(vec_ab, vec_ab))
+        return a_point + translation
 
     def project_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
         """Compute the point closest to c on the line segment ab.
