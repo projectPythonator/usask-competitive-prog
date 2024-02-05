@@ -2344,7 +2344,7 @@ class GeometryAlgorithms:  # TODO RETEST
             return False if lo > 0 or hi == 0 else hi > 0
         return False
 
-    def pt_p_in_polygon_pts_1(self, pts, p):
+    def pt_p_in_polygon_pts_1(self, pts: List[Pt2d], p: Pt2d) -> bool:
         """Determine if a point is in a polygon based on the sum of the angles.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -2352,15 +2352,12 @@ class GeometryAlgorithms:  # TODO RETEST
         if len(pts) > 3:
             angle_sum = 0.0
             for a, b in pairwise_func(pts):
-                angle = self.angle_point_c_wrt_line_ab(a, b, p)
-                if 1 == self.point_c_rotation_wrt_line_ab(a, b, p):
-                    angle_sum += angle
-                else:
-                    angle_sum -= angle
-            return self.compare_ab(abs(angle_sum), pi)
+                angle = self.angle_point_c_wrt_line_ab(a, p, b)
+                angle_sum += angle if self.point_c_rotation_wrt_line_ab(p, a, b) < CL else -angle
+            return True if self.compare_ab(abs(angle_sum), pi) > 0 else False
         return False
 
-    def pt_p_in_polygon_pts_2(self, pts, p):
+    def pt_p_in_polygon_pts_2(self, pts: List[Pt2d], p: Pt2d) -> bool:
         """Determine if a point is in a polygon via, ray casting.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -2375,7 +2372,7 @@ class GeometryAlgorithms:  # TODO RETEST
                 ans = not ans
         return ans
 
-    def pt_p_on_polygon_perimeter_pts(self, pts, p):
+    def pt_p_on_polygon_perimeter_pts(self, pts: List[Pt2d], p: Pt2d) -> bool:
         """Determine if a point is on the perimeter of a polygon simply via a distance check.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -2389,8 +2386,8 @@ class GeometryAlgorithms:  # TODO RETEST
                 return True
         return p in pts
 
-    def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> bool:  # TODO RETEST
-        """For a convex Polygon we are able to search if point is in the polygon faster. TODO
+    def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> bool:
+        """For a convex Polygon we are able to search if point is in the polygon faster.
 
         Complexity per call: Time: O(log n), Space: O(1)
         Optimizations:
