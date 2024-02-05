@@ -2004,11 +2004,11 @@ class GeometryAlgorithms:  # TODO RETEST
         Complexity per call: Time: O(1), Space: O(1).
         Optimizations: use compare_ab on the last line if needed better accuracy.
         """
-        if a_point == b_point:  # base case, closest point is either so return a_point
+        if a_point == b_point:  # base case, closest point is either, avoids division by 0 below
             return a_point
         vec_ab, vec_ac = b_point - a_point, c_point - a_point
-        u = self.dot_product(vec_ac, vec_ab) / self.dot_product(vec_ab, vec_ab)  # never 0 see top
-        return (a_point if u < 0.0 else b_point if u > 1.0  # closer to a or b
+        u = self.dot_product(vec_ac, vec_ab) / self.dot_product(vec_ab, vec_ab)
+        return (a_point if u < 0.0 else b_point if u > 1.0                     # closer to a or b
                 else self.project_pt_c_to_line_ab(a_point, b_point, c_point))  # inbetween a and b
 
     def distance_pt_c_to_line_ab(self, a, b, c):  # TODO RETEST
