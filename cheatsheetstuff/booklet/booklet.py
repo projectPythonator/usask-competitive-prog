@@ -2053,21 +2053,22 @@ class GeometryAlgorithms:  # TODO RETEST
             return lo <= end_pt_c <= hi or lo <= end_pt_d <= hi
         vec_ad, vec_ab, vec_ac = end_pt_d - end_pt_a, end_pt_b - end_pt_a, end_pt_c - end_pt_a
         vec_ca, vec_cd, vec_cb = end_pt_a - end_pt_c, end_pt_d - end_pt_c, end_pt_b - end_pt_c
-        a_val = self.cross_product(vec_ad, vec_ab) * self.cross_product(vec_ac, vec_ab)
-        c_val = self.cross_product(vec_ca, vec_cd) * self.cross_product(vec_cb, vec_cd)
-        return not (a_val > 0 or c_val > 0)
+        point_a_value = self.cross_product(vec_ad, vec_ab) * self.cross_product(vec_ac, vec_ab)
+        point_c_value = self.cross_product(vec_ca, vec_cd) * self.cross_product(vec_cb, vec_cd)
+        return not (point_a_value > 0 or point_c_value > 0)
 
-    def is_lines_intersect_ab_to_cd(self, a, b, c, d):  # TODO RETEST
+    def is_lines_intersect_ab_to_cd(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
+                                    end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:  # TODO RETEST
         """Two lines intersect if they aren't parallel or if they collinear."""
-        return (not self.is_parallel_lines_ab_and_cd(a, b, c, d)
-                or self.is_collinear_lines_ab_and_cd_2(a, b, c, d))
+        return (not self.is_parallel_lines_ab_and_cd(end_pt_a, end_pt_b, end_pt_c, end_pt_d)
+                or self.is_collinear_lines_ab_and_cd_2(end_pt_a, end_pt_b, end_pt_c, end_pt_d))
 
-    def pt_lines_intersect_ab_to_cd(self, a, b, c, d):  # TODO RETEST
-        """Compute the intersection point between two lines.
-        Explain TODO
-        """
-        vec_ba, vec_ca, vec_cd = b-a, c-a, c-d
-        return a + vec_ba*(self.cross_product(vec_ca, vec_cd) / self.cross_product(vec_ba, vec_cd))
+    def pt_lines_intersect_ab_to_cd(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
+                                    end_pt_c: Pt2d, end_pt_d: Pt2d) -> Pt2d:  # TODO RETEST
+        """Compute the intersection point between two lines via cross products of the vectors."""
+        vec_ab, vec_ac, vec_dc = end_pt_b - end_pt_a, end_pt_c - end_pt_a, end_pt_c - end_pt_d
+        vec_t = vec_ab * (self.cross_product(vec_ac, vec_dc) / self.cross_product(vec_ab, vec_dc))
+        return end_pt_a + vec_t
 
     def pt_line_seg_intersect_ab_to_cd(self, a, b, c, d):  # TODO RETEST
         """Same as for line intersect but this time we need to use a specific formula.
