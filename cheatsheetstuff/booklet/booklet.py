@@ -1962,7 +1962,7 @@ class GeometryAlgorithms:  # TODO RETEST
         return Pt2d(point.x * cos(degree_in_radians) - point.y * sin(degree_in_radians),
                     point.x * sin(degree_in_radians) + point.y * cos(degree_in_radians))
 
-    def point_c_rotation_wrt_line_ab(self, left: Pt2d, middle: Pt2d, right: Pt2d) -> int:
+    def point_c_rotation_wrt_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> int:
         """Determine orientation of c wrt line ab, in terms of collinear clockwise counterclockwise.
         Since 2d cross-product is the area of the parallelogram, we can use this to accomplish this.
 
@@ -1970,16 +1970,16 @@ class GeometryAlgorithms:  # TODO RETEST
         Returns collinear(cl): 0, counterclockwise(ccw): 1, clockwise(cw): -1
         Optimizations: if x,y are ints, use 0 instead of 0.0 or just paste the code here directly.
         """
-        return self.compare_ab(self.cross_product(middle - left, right - left), 0.0)
+        return self.compare_ab(self.cross_product(b_point - a_point, c_point - a_point), 0.0)
 
-    def angle_point_c_wrt_line_ab(self, left: Pt2d, middle: Pt2d, right: Pt2d) -> float:
+    def angle_point_c_wrt_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> float:
         """For a line ab and point c, determine the angle of a to b to c in radians.
         formula: arc-cos(dot(vec_ab, vec_cb) / sqrt(dist_sq(vec_ab) * dist_sq(vec_cb))) = angle
         # TODO RETEST
         Complexity per call: Time: O(1), Space: O(1).
         Optimizations: for accuracy we sqrt both distances can remove if distances are ints.
         """
-        vector_ab, vector_cb = left - middle, right - middle
+        vector_ab, vector_cb = a_point - b_point, c_point - b_point
         dot_ab_cb = self.dot_product(vector_ab, vector_cb)
         dist_sq_ab = self.dot_product(vector_ab, vector_ab)
         dist_sq_cb = self.dot_product(vector_cb, vector_cb)
