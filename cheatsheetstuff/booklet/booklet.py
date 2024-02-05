@@ -2301,7 +2301,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def signed_area_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Compute sum of area of polygon, via shoelace method: half the sum of the pairwise
-        cross-products."""
+        cross-products."""  # see start of booklet for pairwise
         return fsum([self.cross_product(a, b) for a, b in pairwise_func(pts)]) / 2
         # return fsum([self.cross_product(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]) / 2
 
@@ -2351,7 +2351,6 @@ class GeometryAlgorithms:  # TODO RETEST
         """
         if len(pts) > 3:
             angle_sum = 0.0
-            # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
             for a, b in pairwise_func(pts):
                 angle = self.angle_point_c_wrt_line_ab(a, b, p)
                 if 1 == self.point_c_rotation_wrt_line_ab(a, b, p):
@@ -2383,7 +2382,7 @@ class GeometryAlgorithms:  # TODO RETEST
         Optimizations: move old_dist and new_dist before loop and only call function on new_dist.
         """
         # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
-        for a, b in pairwise_func(pts):
+        for a, b in pairwise_func(pts):  # defined at start of booklet
             old_dist = self.distance_normalized(a, p)
             new_dist = self.distance_normalized(p, b)
             ij_dist = self.distance_normalized(a, b)
@@ -2430,8 +2429,7 @@ class GeometryAlgorithms:  # TODO RETEST
         Optimizations:
         """
         ans, n = Pt2d(0, 0), len(pts)
-        # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
-        for a, b in pairwise_func(pts):
+        for a, b in pairwise_func(pts):  # defined at start of booklet
             ans = ans + (a + b) * self.cross_product(a, b)
         return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
 
