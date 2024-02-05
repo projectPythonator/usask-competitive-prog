@@ -2083,14 +2083,15 @@ class GeometryAlgorithms:  # TODO RETEST
         # TODO RETEST
         return self.compare_ab(self.distance_normalized(point, center_point), radius) < 0
 
-    def pt_circle_center_given_pt_abc(self, a, b, c):  # TODO RETEST
+    def pt_circle_center_given_pt_abc(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> Pt2d:
         """Find the center of a circle based of 3 distinct points
-        TODO add in teh formula
+        TODO add in the formula
+        =# TODO RETEST
         """
-        ab, ac = (a+b)/2, (a+c)/2
-        ab_rot = self.rotate_cw_90_wrt_origin(a - ab) + ab
-        ac_rot = self.rotate_cw_90_wrt_origin(a - ac) + ac
-        return self.pt_lines_intersect_ab_to_cd(ab, ab_rot, ac, ac_rot)
+        ab, ac = (a_point + b_point) / 2, (a_point + c_point) / 2
+        ab_rotated: Pt2d = self.rotate_cw_90_wrt_origin(a_point - ab) + ab
+        ac_rotated: Pt2d = self.rotate_cw_90_wrt_origin(a_point - ac) + ac
+        return self.pt_lines_intersect_ab_to_cd(ab, ab_rotated, ac, ac_rotated)
 
     def pts_line_ab_intersects_circle_cr(self, a, b, c, r):  # TODO RETEST
         """Compute the point(s) that line ab intersects circle c radius r. from stanford 2016
