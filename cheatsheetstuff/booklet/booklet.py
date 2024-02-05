@@ -1952,15 +1952,15 @@ class GeometryAlgorithms:  # TODO RETEST
         """Compute a point rotation on pt. Just swap x and y and negate y."""
         return Pt2d(-point.y, point.x)
 
-    def rotate_ccw_rad_wrt_origin(self, point: Pt2d, rad: float) -> Pt2d:  # TODO RETEST
+    def rotate_ccw_rad_wrt_origin(self, point: Pt2d, degree_in_radians: float) -> Pt2d:
         """Compute a counterclockwise point rotation on pt. Accurate only for floating point cords.
         formula: x = (x cos(rad) - y sin(rad)), y = (x sin(rad) + y cos (rad)).
-
+        # TODO RETEST
         Complexity per call: Time: O(1), Space: O(1).
         Optimizations: calculate cos and sin outside the return, so you don't double call each.
         """
-        return Pt2d(point.x * cos(rad) - point.y * sin(rad),
-                    point.x * sin(rad) + point.y * cos(rad))
+        return Pt2d(point.x * cos(degree_in_radians) - point.y * sin(degree_in_radians),
+                    point.x * sin(degree_in_radians) + point.y * cos(degree_in_radians))
 
     def point_c_rotation_wrt_line_ab(self, a, b, c) -> int:
         """Determine orientation of c wrt line ab, in terms of collinear clockwise counterclockwise.
