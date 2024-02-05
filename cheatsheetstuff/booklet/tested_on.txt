@@ -53,6 +53,7 @@ fft: tested on kattis polymul2 and polymul1 as well as a handful of small sample
 
 geometery:
 closest pair: works but is pretty slow
+convex hull works: tested on convex hull 1 and 2
 
 StringAlgorithms
 suffix_array_build_array tested on kattis suffixarray, Dvaput, repeatedsubstrings
