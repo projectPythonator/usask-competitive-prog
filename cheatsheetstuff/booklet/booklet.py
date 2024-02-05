@@ -2435,7 +2435,7 @@ class GeometryAlgorithms:  # TODO RETEST
             ans = ans + (a + b) * self.cross_product(a, b)
         return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
 
-    def is_polygon_pts_simple_quadratic(self, pts):  # TODO RETEST
+    def is_polygon_pts_simple_quadratic(self, pts: List[Pt2d]) -> bool:  # TODO RETEST
         """Brute force method to check if a polygon is simple. check all line pairs
 
         Complexity per call: Time: O(n^2), Space: O(1)
