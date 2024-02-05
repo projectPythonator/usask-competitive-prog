@@ -2391,7 +2391,7 @@ class GeometryAlgorithms:  # TODO RETEST
                 return True
         return p in pts
 
-    def pt_p_in_convex_polygon_pts(self, pts, p):  # TODO RETEST
+    def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> bool:  # TODO RETEST
         """For a convex Polygon we are able to search if point is in the polygon faster. TODO
 
         Complexity per call: Time: O(log n), Space: O(1)
@@ -2414,7 +2414,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     # use a set with points if possible checking on the same polygon many times
     # return 0 for on 1 for in -1 for out
-    def pt_p_position_wrt_polygon_pts(self, pts, p):  # TODO RETEST
+    def pt_position_wrt_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> int:  # TODO RETEST
         """Will determine if a point is in on or outside a polygon.
 
         Complexity per call: Time: O(n) Convex(log n), Space: O(1)
@@ -2423,7 +2423,7 @@ class GeometryAlgorithms:  # TODO RETEST
         return (0 if self.pt_p_on_polygon_perimeter_pts(pts, p)
                 else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1)
 
-    def centroid_pt_of_convex_polygon(self, pts):  # TODO RETEST
+    def centroid_pt_of_convex_polygon(self, pts: List[Pt2d]) -> Pt2d:  # TODO RETEST
         """Compute the centroid of a convex polygon.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -2451,7 +2451,7 @@ class GeometryAlgorithms:  # TODO RETEST
                     return False
         return True
 
-    def polygon_cut_from_line_ab(self, pts: List[Pt2d], a, b) -> List[Pt2d]:  # TODO RETEST
+    def polygon_cut_from_line_ab(self, pts: List[Pt2d], left, right) -> List[Pt2d]:  # TODO RETEST
         """Method computes the left side polygon resulting from a cut from the line a-b.
         Method: Walk around the polygon and only take points that return CCW to line ab
 
@@ -2461,14 +2461,14 @@ class GeometryAlgorithms:  # TODO RETEST
         left_partition = []
         # for i in range(len(pts) - 1):
         for u, v in pairwise_func(pts):
-            rot_1 = self.point_c_rotation_wrt_line_ab(a, b, u)
-            rot_2 = self.point_c_rotation_wrt_line_ab(a, b, v)
+            rot_1 = self.point_c_rotation_wrt_line_ab(left, right, u)
+            rot_2 = self.point_c_rotation_wrt_line_ab(left, right, v)
             if 0 >= rot_1:
                 left_partition.append(u)
                 if 0 == rot_1:
                     continue
             if rot_1 * rot_2 < 0:  # CCW -1, CW 1 so tests if they are opposite ie lines intersect.
-                left_partition.append(self.pt_line_seg_intersect_ab_to_cd(u, v, a, b))
+                left_partition.append(self.pt_line_seg_intersect_ab_to_cd(u, v, left, right))
         if left_partition and left_partition[0] != left_partition[-1]:
             left_partition.append(left_partition[0])
         return left_partition
