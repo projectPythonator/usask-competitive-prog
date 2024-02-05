@@ -2294,7 +2294,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """
         return a + b + c - self.circumcenter_pt_of_triangle_abc_2(a, b, c) * 2
 
-    def perimeter_of_polygon_pts(self, pts):
+    def perimeter_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Compute summed pairwise perimeter of polygon in CCW ordering."""
         return fsum([self.distance_normalized(a, b) for a, b in pairwise_func(pts)])
         # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
