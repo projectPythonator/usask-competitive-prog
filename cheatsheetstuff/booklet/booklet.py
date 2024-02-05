@@ -1936,7 +1936,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return left_vector.x*right_vector.y - left_vector.y*right_vector.x
 
-    def distance_normalized(self, left_point: Pt2d, right_point: Pt2d) -> Numeric:
+    def distance_normalized(self, left_point: Pt2d, right_point: Pt2d) -> float:
         """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
         return dist(left_point, right_point)
 
@@ -2011,9 +2011,10 @@ class GeometryAlgorithms:  # TODO RETEST
         return (a_point if u < 0.0 else b_point if u > 1.0                     # closer to a or b
                 else self.project_pt_c_to_line_ab(a_point, b_point, c_point))  # inbetween a and b
 
-    def distance_pt_c_to_line_ab(self, a, b, c):  # TODO RETEST
+    def distance_pt_c_to_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> float:
         """Just return the distance between c and the projected point :)."""
-        return self.distance_normalized(c, self.project_pt_c_to_line_ab(a, b, c))
+        closest_point: Pt2d = self.project_pt_c_to_line_ab(a_point, b_point, c_point)
+        return self.distance_normalized(c_point, closest_point)
 
     def distance_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
         """Same as above, just return the distance between c and the projected point :)."""
