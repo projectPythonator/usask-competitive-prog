@@ -2063,19 +2063,18 @@ class GeometryAlgorithms:  # TODO RETEST
         return (not self.is_parallel_lines_ab_and_cd(end_pt_a, end_pt_b, end_pt_c, end_pt_d)
                 or self.is_collinear_lines_ab_and_cd_2(end_pt_a, end_pt_b, end_pt_c, end_pt_d))
 
-    def pt_lines_intersect_ab_to_cd(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
-                                    end_pt_c: Pt2d, end_pt_d: Pt2d) -> Pt2d:  # TODO RETEST
+    def pt_lines_intersect_ab_to_cd(self, end_pt_a: Pt2d, end_pt_b: Pt2d, end_pt_c: Pt2d, end_pt_d: Pt2d) -> Pt2d:  # TODO RETEST
         """Compute the intersection point between two lines via cross products of the vectors."""
         vec_ab, vec_ac, vec_dc = end_pt_b - end_pt_a, end_pt_c - end_pt_a, end_pt_c - end_pt_d
         vec_t = vec_ab * (self.cross_product(vec_ac, vec_dc) / self.cross_product(vec_ab, vec_dc))
         return end_pt_a + vec_t
 
-    def pt_line_seg_intersect_ab_to_cd(self, a, b, c, d):  # TODO RETEST
+    def pt_line_seg_intersect_ab_to_cd(self, a: Pt2d, b: Pt2d, c: Pt2d, d: Pt2d) -> Pt2d:
         """Same as for line intersect but this time we need to use a specific formula.
-        Formula: TODO"""
-        x, y, cross_prod = c.x-d.x, d.y-c.y, self.cross_product(d, c)
-        u = abs(y*a.x + x*a.y + cross_prod)
-        v = abs(y*b.x + x*b.y + cross_prod)
+        Formula: # TODO RETEST"""
+        x, y, cross_prod = c.x - d.x, d.y - c.y, self.cross_product(d, c)
+        u = abs(y * a.x + x * a.y + cross_prod)
+        v = abs(y * b.x + x * b.y + cross_prod)
         return Pt2d((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u))
 
     def is_point_p_in_circle_c_radius_r(self, p, c, r):  # TODO RETEST
