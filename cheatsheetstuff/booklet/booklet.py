@@ -1,6 +1,9 @@
 from typing import TypeVar, List, Tuple
 
 Numeric = TypeVar('Numeric', int, float, complex)
+Reals = TypeVar('Reals', int, float, complex)
+Rationals = TypeVar('Rationals', int, float)
+Integers = int
 type Num = int | float
 type IntList = List[int]
 type FloatList = List[float]
@@ -1928,11 +1931,11 @@ class GeometryAlgorithms:  # TODO RETEST
         paste directly into code and drop isclose for runtime speedup."""
         return 0 if isclose(a, b) else -1 if a < b else 1
 
-    def dot_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Numeric:
+    def dot_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Reals:
         """Compute the scalar product a.b of a,b equivalent to: a . b"""
         return left_vector.x*right_vector.x + left_vector.y*right_vector.y
 
-    def cross_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Numeric:
+    def cross_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Reals:
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return left_vector.x*right_vector.y - left_vector.y*right_vector.x
 
@@ -1940,7 +1943,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
         return dist(left_point, right_point)
 
-    def distance(self, left_point: Pt2d, right_point: Pt2d) -> Numeric:
+    def distance(self, left_point: Pt2d, right_point: Pt2d) -> Reals:
         """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
         return self.dot_product(left_point - right_point, left_point - right_point)
 
@@ -2016,20 +2019,26 @@ class GeometryAlgorithms:  # TODO RETEST
         closest_point: Pt2d = self.project_pt_c_to_line_ab(a_point, b_point, c_point)
         return self.distance_normalized(c_point, closest_point)
 
-    def distance_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
+    def distance_pt_c_to_line_seg_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> float:
         """Same as above, just return the distance between c and the projected point :)."""
-        return self.distance_normalized(c, self.project_pt_c_to_line_seg_ab(a, b, c))
+        # TODO RETEST
+        closest_point: Pt2d = self.project_pt_c_to_line_seg_ab(a_point, b_point, c_point)
+        return self.distance_normalized(c_point, closest_point)
 
-    def is_parallel_lines_ab_and_cd(self, a, b, c, d):  # TODO RETEST
-        """Two lines are parallel if the cross_product between vec_ba and vec_cd is 0."""
-        vec_ba, vec_cd = b - a, c - d
-        return self.compare_ab(self.cross_product(vec_ba, vec_cd), 0.0) == 0
+    def is_parallel_lines_ab_and_cd(self, endpoint_a: Pt2d, endpoint_b: Pt2d,
+                                    endpoint_c: Pt2d, endpoint_d: Pt2d) -> bool:
+        """Two lines are parallel if the cross_product between vec_ab and vec_dc is 0."""
+        # TODO RETEST
+        vec_ab, vec_dc = endpoint_b - endpoint_a, endpoint_c - endpoint_d
+        return self.compare_ab(self.cross_product(vec_ab, vec_dc), 0.0) == 0
 
-    def is_collinear_lines_ab_and_cd_1(self, a, b, c, d):  # TODO RETEST
+    def is_collinear_lines_ab_and_cd_1(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
+                                       end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:
         """Old function. a!=b and c!=d and then returns correctly"""
-        return (self.is_parallel_lines_ab_and_cd(a, b, c, d)
-                and self.is_parallel_lines_ab_and_cd(b, a, a, c)
-                and self.is_parallel_lines_ab_and_cd(d, c, c, a))
+        # TODO RETEST
+        return (self.is_parallel_lines_ab_and_cd(end_pt_a, end_pt_b, end_pt_c, end_pt_d)
+                and self.is_parallel_lines_ab_and_cd(end_pt_b, end_pt_a, end_pt_a, end_pt_c)
+                and self.is_parallel_lines_ab_and_cd(end_pt_d, end_pt_c, end_pt_c, end_pt_a))
 
     def is_collinear_lines_ab_and_cd_2(self, a, b, c, d):  # TODO RETEST
         """Two lines are collinear iff a!=b and c!=d, and both c and d are collinear to line ab."""
