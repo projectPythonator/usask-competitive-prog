@@ -2080,7 +2080,6 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def is_point_in_radius_of_circle(self, point: Pt2d, center_point: Pt2d, radius: float) -> bool:
         """True if point p in circle False otherwise. Use <= for circumference inclusion."""
-        # TODO RETEST
         return self.compare_ab(self.distance_normalized(point, center_point), radius) < 0
 
     def pt_circle_center_given_pt_abc(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> Pt2d:
