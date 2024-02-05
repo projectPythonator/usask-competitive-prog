@@ -2294,7 +2294,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """
         return a + b + c - self.circumcenter_pt_of_triangle_abc_2(a, b, c) * 2
 
-    def perimeter_of_polygon_pts(self, pts):  # TODO RETEST
+    def perimeter_of_polygon_pts(self, pts):
         """Compute summed pairwise perimeter of polygon in CCW ordering."""
         return fsum([self.distance_normalized(a, b) for a, b in pairwise_func(pts)])
         # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
@@ -2494,13 +2494,14 @@ class GeometryAlgorithms:  # TODO RETEST
             return convex_hull
         return unique_points
 
-    def rotating_caliper_of_polygon_pts(self, pts):  # TODO RETEST
+    def rotating_caliper_of_polygon_pts(self, pts):
         """Computes the max distance of two points in the convex polygon?
 
         Complexity per call: Time: O(nlog n) unsorted O(n) sorted, Space: O(1)
         Optimizations:
         """
         convex_hull = self.convex_hull_monotone_chain(pts)
+        convex_hull.append(convex_hull[0])
         n, t, ans = len(convex_hull) - 1, 1, 0.0
         for i in range(n):
             p_i, p_j = convex_hull[i], convex_hull[(i + 1) % n]
