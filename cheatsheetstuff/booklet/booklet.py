@@ -1997,19 +1997,19 @@ class GeometryAlgorithms:  # TODO RETEST
         translation = vec_ab * (self.dot_product(vec_ac, vec_ab) / self.dot_product(vec_ab, vec_ab))
         return a_point + translation
 
-    def project_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
+    def project_pt_c_to_line_seg_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> Pt2d:
         """Compute the point closest to c on the line segment ab.
         Rule if a==b, then if c closer to a or b, otherwise we can just use the line version.
-
+        # TODO RETEST
         Complexity per call: Time: O(1), Space: O(1).
         Optimizations: use compare_ab on the last line if needed better accuracy.
         """
-        vec_ba, vec_ca = b-a, c-a
-        dist_sq_ba = self.dot_product(vec_ba, vec_ba)
-        if self.compare_ab(dist_sq_ba, 0.0) == 0:  # a == b return either, maybe turn into a==b??
-            return a
-        u = self.dot_product(vec_ca, vec_ba) / dist_sq_ba
-        return a if u < 0.0 else b if u > 1.0 else self.project_pt_c_to_line_ab(a, b, c)
+        if a_point == b_point:  # base case, closest point is either so return a_point
+            return a_point
+        vec_ab, vec_ac = b_point - a_point, c_point - a_point
+        u = self.dot_product(vec_ac, vec_ab) / self.dot_product(vec_ab, vec_ab)  # never 0 see top
+        return (a_point if u < 0.0 else b_point if u > 1.0  # closer to a or b
+                else self.project_pt_c_to_line_ab(a_point, b_point, c_point))  # inbetween a and b
 
     def distance_pt_c_to_line_ab(self, a, b, c):  # TODO RETEST
         """Just return the distance between c and the projected point :)."""
