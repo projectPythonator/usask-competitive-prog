@@ -1978,7 +1978,7 @@ class GeometryAlgorithms:  # TODO RETEST
     def angle_point_c_wrt_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> float:
         """For a line ab and point c, determine the angle of a to b to c in radians.
         formula: arc-cos(dot(vec_ba, vec_bc) / sqrt(dist_sq(vec_ba) * dist_sq(vec_bc))) = angle
-        # TODO RETEST
+
         Complexity per call: Time: O(1), Space: O(1).
         Optimizations: for accuracy we sqrt both distances can remove if distances are ints.
         """
@@ -2344,7 +2344,7 @@ class GeometryAlgorithms:  # TODO RETEST
             return False if lo > 0 or hi == 0 else hi > 0
         return False
 
-    def pt_p_in_polygon_pts_1(self, pts, p):  # TODO RETEST
+    def pt_p_in_polygon_pts_1(self, pts, p):
         """Determine if a point is in a polygon based on the sum of the angles.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -2360,7 +2360,7 @@ class GeometryAlgorithms:  # TODO RETEST
             return self.compare_ab(abs(angle_sum), pi)
         return False
 
-    def pt_p_in_polygon_pts_2(self, pts, p):  # TODO RETEST
+    def pt_p_in_polygon_pts_2(self, pts, p):
         """Determine if a point is in a polygon via, ray casting.
 
         Complexity per call: Time: O(n), Space: O(1)
@@ -2375,13 +2375,12 @@ class GeometryAlgorithms:  # TODO RETEST
                 ans = not ans
         return ans
 
-    def pt_p_on_polygon_perimeter_pts(self, pts, p):  # TODO RETEST
+    def pt_p_on_polygon_perimeter_pts(self, pts, p):
         """Determine if a point is on the perimeter of a polygon simply via a distance check.
 
         Complexity per call: Time: O(n), Space: O(1)
         Optimizations: move old_dist and new_dist before loop and only call function on new_dist.
         """
-        # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
         for a, b in pairwise_func(pts):  # defined at start of booklet
             old_dist = self.distance_normalized(a, p)
             new_dist = self.distance_normalized(p, b)
@@ -2413,7 +2412,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     # use a set with points if possible checking on the same polygon many times
     # return 0 for on 1 for in -1 for out
-    def pt_position_wrt_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> int:  # TODO RETEST
+    def pt_position_wrt_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> int:
         """Will determine if a point is in on or outside a polygon.
 
         Complexity per call: Time: O(n) Convex(log n), Space: O(1)
