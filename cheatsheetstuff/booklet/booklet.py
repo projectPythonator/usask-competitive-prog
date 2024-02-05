@@ -1986,15 +1986,15 @@ class GeometryAlgorithms:  # TODO RETEST
         return acos(dot_ba_bc / (sqrt(dist_sq_ba) * sqrt(dist_sq_bc)))
         # return acos(dot_ba_bc / sqrt(dist_sq_ba * dist_sq_bc))
 
-    def project_pt_c_to_line_ab(self, a_point, b_point, c_point) -> Pt2d:  # TODO RETEST
+    def project_pt_c_to_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> Pt2d:
         """Compute the point closest to c on the line ab.
         formula: pt = a + u x vector_ba, where u is the scalar projection of vector_ca onto
         vector_ba via dot-product
-
+        # TODO RETEST
         Complexity per call: Time: O(1), Space: O(1).
         """
-        vec_ba, vec_ca = b_point - a_point, c_point - a_point
-        transform = vec_ba * (self.dot_product(vec_ca, vec_ba) / self.dot_product(vec_ba, vec_ba))
+        vec_ab, vec_ac = b_point - a_point, c_point - a_point
+        transform = vec_ab * (self.dot_product(vec_ac, vec_ab) / self.dot_product(vec_ab, vec_ab))
         return a_point + transform
 
     def project_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
