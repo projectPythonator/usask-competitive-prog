@@ -1962,7 +1962,7 @@ class GeometryAlgorithms:  # TODO RETEST
         return Pt2d(point.x * cos(degree_in_radians) - point.y * sin(degree_in_radians),
                     point.x * sin(degree_in_radians) + point.y * cos(degree_in_radians))
 
-    def point_c_rotation_wrt_line_ab(self, a, b, c) -> int:
+    def point_c_rotation_wrt_line_ab(self, left: Pt2d, middle: Pt2d, right: Pt2d) -> int:
         """Determine orientation of c wrt line ab, in terms of collinear clockwise counterclockwise.
         Since 2d cross-product is the area of the parallelogram, we can use this to accomplish this.
 
@@ -1970,7 +1970,7 @@ class GeometryAlgorithms:  # TODO RETEST
         Returns collinear(cl): 0, counterclockwise(ccw): 1, clockwise(cw): -1
         Optimizations: if x,y are ints, use 0 instead of 0.0 or just paste the code here directly.
         """
-        return self.compare_ab(self.cross_product(b - a, c - a), 0.0)
+        return self.compare_ab(self.cross_product(middle - left, right - left), 0.0)
 
     def angle_point_c_wrt_line_ab(self, a, b, c):  # TODO RETEST
         """For a line ab and point c, determine the angle of a to b to c in radians.
