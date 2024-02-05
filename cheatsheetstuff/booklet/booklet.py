@@ -2026,24 +2026,23 @@ class GeometryAlgorithms:  # TODO RETEST
         return self.distance_normalized(c_point, closest_point)
 
     def is_parallel_lines_ab_and_cd(self, endpoint_a: Pt2d, endpoint_b: Pt2d,
-                                    endpoint_c: Pt2d, endpoint_d: Pt2d) -> bool:
+                                    endpoint_c: Pt2d, endpoint_d: Pt2d) -> bool:  # TODO RETEST
         """Two lines are parallel if the cross_product between vec_ab and vec_dc is 0."""
-        # TODO RETEST
         vec_ab, vec_dc = endpoint_b - endpoint_a, endpoint_c - endpoint_d
         return self.compare_ab(self.cross_product(vec_ab, vec_dc), 0.0) == 0
 
     def is_collinear_lines_ab_and_cd_1(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
-                                       end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:
+                                       end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:  # TODO RETEST
         """Old function. a!=b and c!=d and then returns correctly"""
-        # TODO RETEST
         return (self.is_parallel_lines_ab_and_cd(end_pt_a, end_pt_b, end_pt_c, end_pt_d)
                 and self.is_parallel_lines_ab_and_cd(end_pt_b, end_pt_a, end_pt_a, end_pt_c)
                 and self.is_parallel_lines_ab_and_cd(end_pt_d, end_pt_c, end_pt_c, end_pt_a))
 
-    def is_collinear_lines_ab_and_cd_2(self, a, b, c, d):  # TODO RETEST
+    def is_collinear_lines_ab_and_cd_2(self, end_point_a: Pt2d, endpoint_b: Pt2d,
+                                       endpoint_c: Pt2d, endpoint_d: Pt2d) -> bool:  # TODO RETEST
         """Two lines are collinear iff a!=b and c!=d, and both c and d are collinear to line ab."""
-        return (self.point_c_rotation_wrt_line_ab(a, b, c) == 0
-                and self.point_c_rotation_wrt_line_ab(a, b, d) == 0)
+        return (self.point_c_rotation_wrt_line_ab(end_point_a, endpoint_b, endpoint_c) == 0
+                and self.point_c_rotation_wrt_line_ab(end_point_a, endpoint_b, endpoint_d) == 0)
 
     def is_segments_intersect_ab_to_cd(self, a, b, c, d):
         """4 distinct points as two lines intersect if they are collinear and at least one of the
