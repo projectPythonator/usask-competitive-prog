@@ -1,3 +1,15 @@
+from typing import TypeVar, List, Tuple
+
+Numeric = TypeVar('Numeric', int, float, complex)
+type Num = int | float
+type IntList = List[int]
+type FloatList = List[float]
+type BoolList = List[float]
+type NumList = List[Num]
+type TupleListMST = List[Tuple[Num, int, int]]
+type EdgeTupleList = List[Tuple[int, int]]
+type EdgeTypeList = List[Tuple[int, int, int]]
+
 ####################################################################################################
 
 
@@ -8,19 +20,7 @@ def pairwise_func(seq):
 
 
 ####################################################################################################
-
-from typing import List, Tuple
 from sys import setrecursionlimit
-
-
-type Num = int | float
-type IntList = List[int]
-type FloatList = List[float]
-type BoolList = List[float]
-type NumList = List[Num]
-type TupleListMST = List[Tuple[Num, int, int]]
-type EdgeTupleList = List[Tuple[int, int]]
-type EdgeTypeList = List[Tuple[int, int, int]]
 
 
 setrecursionlimit(10000000)  # 10 million should be good enough for most contest problems
@@ -1813,7 +1813,6 @@ CL = 0   # collinear
 EPS = 1e-12  # used in some spots
 
 
-
 class Pt2d:  # TODO RETEST
     __slots__ = ("x", "y")
     # def __init__(self, x_val, y_val): self.x, self.y = map(float, (x_val, y_val))
@@ -1924,32 +1923,32 @@ class GeometryAlgorithms:  # TODO RETEST
         self.x_ordering = None
         self.quad_edges = QuadEdgeDataStructure()
 
-    def compare_ab(self, a, b):
+    def compare_ab(self, a: Numeric, b: Numeric) -> int:
         """Compare a b, for floats and ints. It is useful when you want set values to observe.
         paste directly into code and drop isclose for runtime speedup."""
         return 0 if isclose(a, b) else -1 if a < b else 1
 
-    def dot_product(self, left_vector: Pt2d, right_vector: Pt2d):
+    def dot_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Numeric:
         """Compute the scalar product a.b of a,b equivalent to: a . b"""
         return left_vector.x*right_vector.x + left_vector.y*right_vector.y
 
-    def cross_product(self, left_vector: Pt2d, right_vector: Pt2d):
+    def cross_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Numeric:
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
         return left_vector.x*right_vector.y - left_vector.y*right_vector.x
 
-    def distance_normalized(self, a, b):
+    def distance_normalized(self, left_point: Pt2d, right_point: Pt2d) -> Numeric:
         """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
-        return dist(a.get_tup(), b.get_tup())
+        return dist(left_point, right_point)
 
-    def distance(self, a, b):
+    def distance(self, left_point: Pt2d, right_point: Pt2d) -> Numeric:
         """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
-        return self.dot_product(a - b, a - b)
+        return self.dot_product(left_point - right_point, left_point - right_point)
 
     def rotate_cw_90_wrt_origin(self, pt):
         """Compute a point rotation on pt. Just swap x and y and negate x."""
         return Pt2d(pt.y, -pt.x)
 
-    def rotate_ccw_90_wrt_origin(self, pt):
+    def rotate_ccw_90_wrt_origin(self, pt: Pt2d) -> Pt2d:
         """Compute a point rotation on pt. Just swap x and y and negate y."""
         return Pt2d(-pt.y, pt.x)
 
@@ -1963,7 +1962,7 @@ class GeometryAlgorithms:  # TODO RETEST
         return Pt2d(pt.x * cos(rad) - pt.y * sin(rad),
                     pt.x * sin(rad) + pt.y * cos(rad))
 
-    def point_c_rotation_wrt_line_ab(self, a, b, c):
+    def point_c_rotation_wrt_line_ab(self, a, b, c) -> int:
         """Determine orientation of c wrt line ab, in terms of collinear clockwise counterclockwise.
         Since 2d cross-product is the area of the parallelogram, we can use this to accomplish this.
 
@@ -2108,19 +2107,20 @@ class GeometryAlgorithms:  # TODO RETEST
             return (pt1 + pt2) if self.compare_ab(y, 0.0) <= 0 else (pt1+pt2, pt1-pt2)
         return None  # no overlap
 
-    def pt_tangent_to_circle_cr(self, c, r, p):  # TODO RETEST
+    def pt_tangent_to_circle_cr(self, center_point: Pt2d, radius: Numeric, pt: Pt2d) -> List[Pt2d]:
         """Find the two points that create tangent lines from p to the circumference.
         TODO add in teh formula
+        # TODO RETEST
         """
-        vec_pc = p-c
+        vec_pc = pt - center_point
         x = self.dot_product(vec_pc, vec_pc)
-        dist_sq = x - r*r
+        dist_sq = x - radius * radius
         result = self.compare_ab(dist_sq, 0.0)
         if result >= 0:
             dist_sq = dist_sq if result else 0
-            q1 = vec_pc * (r*r / x)
-            q2 = self.rotate_ccw_90_wrt_origin(vec_pc * (-r * sqrt(dist_sq) / x))
-            return [c+q1-q2, c+q1+q2]
+            q1 = vec_pc * (radius * radius / x)
+            q2 = self.rotate_ccw_90_wrt_origin(vec_pc * (-radius * sqrt(dist_sq) / x))
+            return [center_point + q1 - q2, center_point + q1 + q2]
         return []
 
     def tangents_between_2_circles(self, c1, r1, c2, r2):  # TODO RETEST
@@ -2507,7 +2507,7 @@ class GeometryAlgorithms:  # TODO RETEST
         for i in range(lo, hi):
             for j in range(i+1, hi):
                 distance_ij = self.distance(self.x_ordering[i], self.x_ordering[j])
-                if self.compare_ab(distance_ij, r_closest) < 0:
+                if self.compare_ab(distance_ij, r_closest[0]) < 0:
                     r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
         return r_closest
 
