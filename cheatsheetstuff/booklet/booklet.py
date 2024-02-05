@@ -2044,14 +2044,17 @@ class GeometryAlgorithms:  # TODO RETEST
         return (self.point_c_rotation_wrt_line_ab(end_point_a, endpoint_b, endpoint_c) == 0
                 and self.point_c_rotation_wrt_line_ab(end_point_a, endpoint_b, endpoint_d) == 0)
 
-    def is_segments_intersect_ab_to_cd(self, a, b, c, d):
+    def is_segments_intersect_ab_to_cd(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
+                                       end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:
         """4 distinct points as two lines intersect if they are collinear and at least one of the
-         end points c or d are in between a and b otherwise, TODO"""
-        if self.is_collinear_lines_ab_and_cd_2(a, b, c, d):
-            lo, hi = (a, b) if a < b else (b, a)
-            return lo <= c <= hi or lo <= d <= hi
-        a_val = self.cross_product(d - a, b - a) * self.cross_product(c - a, b - a)
-        c_val = self.cross_product(a - c, d - c) * self.cross_product(b - c, d - c)
+         end points c or d are in between a and b otherwise, need to compute cross products."""
+        if self.is_collinear_lines_ab_and_cd_2(end_pt_a, end_pt_b, end_pt_c, end_pt_d):
+            lo, hi = (end_pt_a, end_pt_b) if end_pt_a < end_pt_b else (end_pt_b, end_pt_a)
+            return lo <= end_pt_c <= hi or lo <= end_pt_d <= hi
+        vec_ad, vec_ab, vec_ac = end_pt_d - end_pt_a, end_pt_b - end_pt_a, end_pt_c - end_pt_a
+        vec_ca, vec_cd, vec_cb = end_pt_a - end_pt_c, end_pt_d - end_pt_c, end_pt_b - end_pt_c
+        a_val = self.cross_product(vec_ad, vec_ab) * self.cross_product(vec_ac, vec_ab)
+        c_val = self.cross_product(vec_ca, vec_cd) * self.cross_product(vec_cb, vec_cd)
         return not (a_val > 0 or c_val > 0)
 
     def is_lines_intersect_ab_to_cd(self, a, b, c, d):  # TODO RETEST
