@@ -2299,13 +2299,13 @@ class GeometryAlgorithms:  # TODO RETEST
         return fsum([self.distance_normalized(a, b) for a, b in pairwise_func(pts)])
         # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
 
-    def signed_area_of_polygon_pts(self, pts):  # TODO RETEST
+    def signed_area_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Compute sum of area of polygon, via shoelace method: half the sum of the pairwise
         cross-products."""
         return fsum([self.cross_product(a, b) for a, b in pairwise_func(pts)]) / 2
         # return fsum([self.cross_product(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]) / 2
 
-    def area_of_polygon_pts(self, pts):  # TODO RETEST
+    def area_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Positive area of polygon using above method."""
         return abs(self.signed_area_of_polygon_pts(pts))
 
@@ -2473,7 +2473,7 @@ class GeometryAlgorithms:  # TODO RETEST
             left_partition.append(left_partition[0])
         return left_partition
 
-    def convex_hull_monotone_chain(self, pts: List[Pt2d]) -> List[Pt2d]:  # TODO RETEST
+    def convex_hull_monotone_chain(self, pts: List[Pt2d]) -> List[Pt2d]:
         """Compute convex hull of a list of points via Monotone Chain method. CCW ordering returned.
 
         Complexity per call: Time: O(nlog n), Space: final O(n), aux O(nlog n)
