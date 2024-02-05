@@ -1,3 +1,14 @@
+####################################################################################################
+
+
+def pairwise_func(seq):
+    it = iter(seq)
+    next(it)
+    return zip(iter(seq), it)
+
+
+####################################################################################################
+
 from typing import List, Tuple
 from sys import setrecursionlimit
 
@@ -1802,11 +1813,6 @@ CL = 0   # collinear
 EPS = 1e-12  # used in some spots
 
 
-def pairwise(seq):
-    it = iter(seq)
-    next(it)
-    return zip(iter(seq), it)
-
 
 class Pt2d:  # TODO RETEST
     __slots__ = ("x", "y")
@@ -1832,9 +1838,6 @@ class Pt2d:  # TODO RETEST
     def __hash__(self): return hash((self.x, self.y))
 
     def get_tup(self): return self.x, self.y
-
-    def dot_product(self):
-        return self.x * self.x + self.y * self.y
 
 
 class Pt3d:  # TODO RETEST
@@ -1926,13 +1929,13 @@ class GeometryAlgorithms:  # TODO RETEST
         paste directly into code and drop isclose for runtime speedup."""
         return 0 if isclose(a, b) else -1 if a < b else 1
 
-    def dot_product(self, a, b):
+    def dot_product(self, left_vector: Pt2d, right_vector: Pt2d):
         """Compute the scalar product a.b of a,b equivalent to: a . b"""
-        return a.x*b.x + a.y*b.y
+        return left_vector.x*right_vector.x + left_vector.y*right_vector.y
 
-    def cross_product(self, a, b):
+    def cross_product(self, left_vector: Pt2d, right_vector: Pt2d):
         """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
-        return a.x*b.y - a.y*b.x
+        return left_vector.x*right_vector.y - left_vector.y*right_vector.x
 
     def distance_normalized(self, a, b):
         """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
@@ -2278,13 +2281,13 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def perimeter_of_polygon_pts(self, pts):  # TODO RETEST
         """Compute summed pairwise perimeter of polygon in CCW ordering."""
-        return fsum([self.distance_normalized(a, b) for a, b in pairwise(pts)])
+        return fsum([self.distance_normalized(a, b) for a, b in pairwise_func(pts)])
         # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
 
     def signed_area_of_polygon_pts(self, pts):  # TODO RETEST
         """Compute sum of area of polygon, via shoelace method: half the sum of the pairwise
         cross-products."""
-        return fsum([self.cross_product(a, b) for a, b in pairwise(pts)]) / 2
+        return fsum([self.cross_product(a, b) for a, b in pairwise_func(pts)]) / 2
         # return fsum([self.cross_product(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]) / 2
 
     def area_of_polygon_pts(self, pts):  # TODO RETEST
@@ -2334,7 +2337,7 @@ class GeometryAlgorithms:  # TODO RETEST
         if len(pts) > 3:
             angle_sum = 0.0
             # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
-            for a, b in pairwise(pts):
+            for a, b in pairwise_func(pts):
                 angle = self.angle_point_c_wrt_line_ab(a, b, p)
                 if 1 == self.point_c_rotation_wrt_line_ab(a, b, p):
                     angle_sum += angle
@@ -2365,7 +2368,7 @@ class GeometryAlgorithms:  # TODO RETEST
         Optimizations: move old_dist and new_dist before loop and only call function on new_dist.
         """
         # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
-        for a, b in pairwise(pts):
+        for a, b in pairwise_func(pts):
             old_dist = self.distance_normalized(a, p)
             new_dist = self.distance_normalized(p, b)
             ij_dist = self.distance_normalized(a, b)
@@ -2413,7 +2416,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """
         ans, n = Pt2d(0, 0), len(pts)
         # for i in range(len(pts) - 1):  # a = pts[i], b = pts[i+1]
-        for a, b in pairwise(pts):
+        for a, b in pairwise_func(pts):
             ans = ans + (a + b) * self.cross_product(a, b)
         return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
 
@@ -2442,7 +2445,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """
         left_partition = []
         # for i in range(len(pts) - 1):
-        for u, v in pairwise(pts):
+        for u, v in pairwise_func(pts):
             rot_1 = self.point_c_rotation_wrt_line_ab(a, b, u)
             rot_2 = self.point_c_rotation_wrt_line_ab(a, b, v)
             if 0 >= rot_1:
@@ -2606,10 +2609,10 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def is_in_circle(self, a, b, c, d):
         """Expensive calculation function that determines if """
-        a_dot = a.dot_product()
-        b_dot = b.dot_product()
-        c_dot = c.dot_product()
-        d_dot = d.dot_product()
+        a_dot = self.dot_product(a, a)
+        b_dot = self.dot_product(b, b)
+        c_dot = self.dot_product(c, c)
+        d_dot = self.dot_product(d, d)
         det = -self.det3_helper(b.x, b.y, b_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
         det += self.det3_helper(a.x, a.y, a_dot, c.x, c.y, c_dot, d.x, d.y, d_dot)
         det -= self.det3_helper(a.x, a.y, a_dot, b.x, b.y, b_dot, d.x, d.y, d_dot)
@@ -2717,13 +2720,7 @@ class GeometryAlgorithms:  # TODO RETEST
 ####################################################################################################
 
 
-from itertools import takewhile, pairwise
-
-
-def pairwise_func(seq):
-    it = iter(seq)
-    next(it)
-    return zip(iter(seq), it)
+from itertools import takewhile
 
 
 # constants can paste into code for speedup
