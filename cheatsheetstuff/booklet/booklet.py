@@ -1974,27 +1974,28 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def angle_point_c_wrt_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> float:
         """For a line ab and point c, determine the angle of a to b to c in radians.
-        formula: arc-cos(dot(vec_ab, vec_cb) / sqrt(dist_sq(vec_ab) * dist_sq(vec_cb))) = angle
+        formula: arc-cos(dot(vec_ba, vec_bc) / sqrt(dist_sq(vec_ba) * dist_sq(vec_bc))) = angle
         # TODO RETEST
         Complexity per call: Time: O(1), Space: O(1).
         Optimizations: for accuracy we sqrt both distances can remove if distances are ints.
         """
-        vector_ab, vector_cb = a_point - b_point, c_point - b_point
-        dot_ab_cb = self.dot_product(vector_ab, vector_cb)
-        dist_sq_ab = self.dot_product(vector_ab, vector_ab)
-        dist_sq_cb = self.dot_product(vector_cb, vector_cb)
-        return acos(dot_ab_cb / (sqrt(dist_sq_ab) * sqrt(dist_sq_cb)))
-        # return acos(dot_ab_cb / sqrt(dist_sq_ab * dist_sq_cb))
+        vector_ba, vector_bc = a_point - b_point, c_point - b_point
+        dot_ba_bc = self.dot_product(vector_ba, vector_bc)
+        dist_sq_ba = self.dot_product(vector_ba, vector_ba)
+        dist_sq_bc = self.dot_product(vector_bc, vector_bc)
+        return acos(dot_ba_bc / (sqrt(dist_sq_ba) * sqrt(dist_sq_bc)))
+        # return acos(dot_ba_bc / sqrt(dist_sq_ba * dist_sq_bc))
 
-    def project_pt_c_to_line_ab(self, a, b, c):  # TODO RETEST
+    def project_pt_c_to_line_ab(self, a_point, b_point, c_point) -> Pt2d:  # TODO RETEST
         """Compute the point closest to c on the line ab.
         formula: pt = a + u x vector_ba, where u is the scalar projection of vector_ca onto
         vector_ba via dot-product
 
         Complexity per call: Time: O(1), Space: O(1).
         """
-        vec_ba, vec_ca = b-a, c-a
-        return a + vec_ba*(self.dot_product(vec_ca, vec_ba) / self.dot_product(vec_ba, vec_ba))
+        vec_ba, vec_ca = b_point - a_point, c_point - a_point
+        transform = vec_ba * (self.dot_product(vec_ca, vec_ba) / self.dot_product(vec_ba, vec_ba))
+        return a_point + transform
 
     def project_pt_c_to_line_seg_ab(self, a, b, c):  # TODO RETEST
         """Compute the point closest to c on the line segment ab.
