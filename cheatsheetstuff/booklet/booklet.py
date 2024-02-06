@@ -1893,6 +1893,9 @@ class QuadEdge:
     def dest(self): return self.rot.rot.origin
 
 
+QuadEdgePair = Tuple[QuadEdge, QuadEdge]
+
+
 class QuadEdgeDataStructure:
     def __init__(self):
         pass
@@ -2643,7 +2646,7 @@ class GeometryAlgorithms:  # TODO RETEST
         # kek = angle(a, b, c) + angle(c, d, a) - angle(b, c, d) - angle(d, a, b)
         # return self.compare_ab(kek, 0.0) > 0
 
-    def build_triangulation(self, left, right, pts):
+    def build_triangulation(self, left: int, right: int, pts: List[Pt2d]) -> QuadEdgePair:
         if right - left + 1 == 2:
             res = self.quad_edges.make_edge(pts[left], pts[right])
             return res, res.rev()
