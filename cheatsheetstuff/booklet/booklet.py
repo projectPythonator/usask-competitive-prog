@@ -22,6 +22,16 @@ def pairwise_func(seq):
     return zip(iter(seq), it)
 
 
+def sort_3_elements(a, b, c):
+    if b < a:
+        a, b = b, a
+    if c < b:
+        b, c = c, b
+        if b < a:
+            a, b = b, a
+    return a, b, c
+
+
 ####################################################################################################
 from sys import setrecursionlimit
 
@@ -1921,6 +1931,9 @@ class QuadEdgeDataStructure:
         return e
 
 
+Triangle = Tuple[Pt2d, Pt2d, Pt2d] | None
+
+
 class GeometryAlgorithms:  # TODO RETEST
     def __init__(self):
         self.x_ordering = None
@@ -2559,7 +2572,7 @@ class GeometryAlgorithms:  # TODO RETEST
                     best_pair = (dist_ij, y_partition[i], y_partition[j])
         return best_pair
 
-    def compute_closest_pair(self, pts):
+    def compute_closest_pair(self, pts: List[Pt2d]) -> List[Triangle]:
         """Compute the closest pair of points in a set of points. method is divide and conqur
 
         Complexity per call Time: O(nlog n), Space O(nlog n)
@@ -2569,14 +2582,14 @@ class GeometryAlgorithms:  # TODO RETEST
         y_ordering = sorted(pts, key=lambda point: point.y)
         return self.closest_pair_recursive(0, len(pts), y_ordering)
 
-    def delaunay_triangulation_slow(self, pts: List[Pt2d]) -> List[Pt2d]:
+    def delaunay_triangulation_slow(self, pts: List[Pt2d]) -> List[Triangle]:
         """A very slow version of  Delaunay Triangulation. Can beat the faster version when n small.
 
         Complexity per call Time: O(n^4), Space O(n)
         Optimizations: use c++ if too much memory, haven't found the way to do it without nlog n
         """
         n = len(pts)
-        ans = []
+        ans: List[Triangle] = []
         z_arr = [el.x ** 2 + el.y ** 2 for el in pts]
         x_arr = [el.x for el in pts]
         y_arr = [el.y for el in pts]
@@ -2694,15 +2707,6 @@ class GeometryAlgorithms:  # TODO RETEST
         return ldo, rdo
 
     def delaunay_triangulation_fast(self, pts):
-        def sort_3_elements(a, b, c):
-            if b < a:
-                a, b = b, a
-            if c < b:
-                b, c = c, b
-                if b < a:
-                    a, b = b, a
-            return a, b, c
-
         def add_helper():
             cur = edge
             while True:
