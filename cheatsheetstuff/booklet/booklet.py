@@ -1817,6 +1817,7 @@ class MathAlgorithms:
 
 
 from math import isclose, dist, sin, cos, acos, sqrt, fsum, pi
+from itertools import combinations
 # remember to sub stuff out for integer ops when you want only integers
 # for ints need to change init, eq and
 # hard code these in for performance speedup
@@ -2520,19 +2521,17 @@ class GeometryAlgorithms:
             ans = max(ans, self.distance(b, convex_hull[t]))
         return sqrt(ans)
 
-    def closest_pair_helper(self, lo: int, hi: int) -> ClosestPair:
+    def closest_pair_helper(self, lo: int, hi: int, x_ord: List[Pt2d]) -> ClosestPair:
         """brute force function, for small range will brute force find the closet pair. O(n^2)"""
-        r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
-                     self.x_ordering[lo],
-                     self.x_ordering[lo+1])
-        for i in range(lo, hi):
-            for j in range(i+1, hi):
-                distance_ij = self.distance(self.x_ordering[i], self.x_ordering[j])
-                if self.compare_ab(distance_ij, r_closest[0]) < 0:
-                    r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
-        return r_closest
+        closest_pair = (self.distance(x_ord[lo], x_ord[lo + 1]), x_ord[lo], x_ord[lo + 1])
+        for pt_a, pt_b in combinations(x_ord[lo:hi], 2):  # 2 for every pair of combinations
+            distance_ij = self.distance(pt_a, pt_b)
+            if distance_ij < closest_pair[0]:
+                closest_pair = (distance_ij, pt_a, pt_b)
+        return closest_pair
 
-    def closest_pair_recursive(self, lo: int, hi: int, y_ordering: List[Pt2d]) -> ClosestPair:
+    def closest_pair_recursive(self, lo: int, hi: int,
+                               x_ord: List[Pt2d], y_ord: List[Pt2d]) -> ClosestPair:
         """Recursive part of computing the closest pair. Divide by y recurse then do a special check
 
         Complexity per call T(n/2) halves each time, T(n/2) halves each call, O(n) at max tho
@@ -2541,33 +2540,29 @@ class GeometryAlgorithms:
         also can remove compare_ab for direct compare
         """
         n = hi - lo
-        if n < 5:  # base case we brute force the small set of points
-            return self.closest_pair_helper(lo, hi)
-        left_len, right_len = lo + n - n//2, lo + n//2
-        mid = round((self.x_ordering[left_len].x + self.x_ordering[right_len].x)/2)
-        # y_part_left = [el for el in y_ordering if self.compare_ab(el.x, mid) <= 0]
-        # y_part_right = [el for el in y_ordering if self.compare_ab(el.x, mid) > 0]
-        y_bools = [self.compare_ab(point.x, mid) <= 0 for point in y_ordering]
-        y_partition = [point for i, point in enumerate(y_ordering) if y_bools[i]]
-        best_left = self.closest_pair_recursive(lo, left_len, y_partition)
-        if self.compare_ab(best_left[0], 0.0) == 0:
-            return best_left
-        y_partition = [point for i, point in enumerate(y_ordering) if not y_bools[i]]
-        best_right = self.closest_pair_recursive(left_len, hi, y_partition)
-        if self.compare_ab(best_right[0], 0.0) == 0:
-            return best_right
-        best_pair = best_left if self.compare_ab(best_left[0], best_right[0]) <= 0 else best_right
-        y_partition = [point for point in y_ordering
-                       if self.compare_ab((point.x-mid) * (point.x-mid), best_pair[0]) < 0]
-        y_end = len(y_partition)
-        for i in range(y_end):
-            for j in range(i+1, y_end):
-                dist_ij = y_partition[i].y - y_partition[j].y
-                if self.compare_ab(dist_ij * dist_ij, best_pair[0]) > 0:
+        if n < 32:  # base case, just brute force: powers of 2 between with 32 working the fastest.
+            return self.closest_pair_helper(lo, hi, x_ord)
+        left_len, right_len = lo + n - n // 2, lo + n // 2
+        mid = round((x_ord[left_len].x + x_ord[right_len].x) / 2)
+        partition_left, partition_right = [], []
+        append_left, append_right = partition_left.append, partition_right.append
+        for pt in y_ord:
+            append_right(pt) if pt.x > mid else append_left(pt)
+        best_left = self.closest_pair_recursive(lo, left_len, x_ord, partition_left)
+        best_right = self.closest_pair_recursive(left_len, hi, x_ord, partition_right)
+        best_pair = best_left if best_left[0] <= best_right[0] else best_right
+        if self.compare_ab(best_pair[0], 0) == 0:
+            return best_pair
+        y_partition = [pt for pt in y_ord if best_pair[0] > (pt.x - mid) ** 2]
+        for i, pt_a in enumerate(y_partition):
+            a_y = pt_a.y
+            for pt_b in y_partition[i+1:]:  # slicing seemed to run the fastest, range was second.
+                dist_ij = a_y - pt_b.y
+                if dist_ij ** 2 >= best_pair[0]:
                     break
-                dist_ij = self.distance(y_partition[i], y_partition[j])
-                if self.compare_ab(dist_ij, best_pair[0]) < 0:
-                    best_pair = (dist_ij, y_partition[i], y_partition[j])
+                dist_ij = self.distance(pt_a, pt_b)
+                if dist_ij < best_pair[0]:
+                    best_pair = (dist_ij, pt_a, pt_b)
         return best_pair
 
     def compute_closest_pair(self, pts: List[Pt2d]) -> ClosestPair:
@@ -2576,9 +2571,9 @@ class GeometryAlgorithms:
         Complexity per call Time: O(nlog n), Space O(nlog n)
         Optimizations: use c++ if too much memory, haven't found the way to do it without nlog n
         """
-        self.x_ordering = sorted(pts, key=lambda point: point.x)
-        y_ordering = sorted(pts, key=lambda point: point.y)
-        return self.closest_pair_recursive(0, len(pts), y_ordering)
+        x_ord = sorted(pts, key=lambda pt: pt.x)
+        y_ord = sorted(pts, key=lambda pt: pt.y)
+        return self.closest_pair_recursive(0, len(pts), x_ord, y_ord)
 
     def delaunay_triangulation_slow(self, pts: List[Pt2d]) -> List[Triangle]:
         """A very slow version of  Delaunay Triangulation. Can beat the faster version when n small.
