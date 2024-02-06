@@ -2323,7 +2323,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """Positive area of polygon using above method."""
         return abs(self.signed_area_of_polygon_pts(pts))
 
-    def is_convex_polygon_pts_no_collinear(self, pts):  # TODO RETEST
+    def is_convex_polygon_pts_no_collinear(self, pts: List[Pt2d]) -> bool:  # TODO RETEST
         """Determines if polygon is convex, only works when no collinear lines.
 
         Complexity per call: Time: O(n), Space: O(1)
