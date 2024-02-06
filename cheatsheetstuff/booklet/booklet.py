@@ -2197,7 +2197,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def incircle_radius_of_triangle_abc(self, a, b, c):  # TODO RETEST
         """Computes the radius of the incircle, achieved by computing the side lengths then finding
-        the area and perimeter to use in this Formula: r = area/(perimeter/2) Author: TODO
+        the area and perimeter to use in this Formula: r = area/(perimeter/2) Author: TODO Author
         """
         side_ab, side_bc, side_ca = self.sides_of_triangle_abc(a, b, c)
         area = self.triangle_area_from_heron_abc(side_ab, side_bc, side_ca)
@@ -2210,7 +2210,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def circumcircle_radius_of_triangle_abc(self, a, b, c):  # TODO RETEST
         """Computes the radius of the circum-circle, achieved by computing the side lengths then
-        gets the area for Formula: r = (ab * bc * ca) / (4 * area) Author: TODO
+        gets the area for Formula: r = (ab * bc * ca) / (4 * area) Author: TODO Author
         """
         side_ab, side_bc, side_ca = self.sides_of_triangle_abc(a, b, c)
         area = self.triangle_area_from_heron_abc(side_ab, side_bc, side_ca)
@@ -2239,7 +2239,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def triangle_circle_center_pt_abcd(self, a, b, c, d):  # TODO RETEST
         """A 2 in one method that can get the middle point of both incircle circumcenter.
-        Method: TODO
+        Method: TODO add in the formula
 
         Complexity per call: Time: lots of ops but still O(1), Space O(1)
         Optimization: paste rotation code instead of function call
@@ -2257,7 +2257,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def angle_bisector_for_triangle_abc(self, a, b, c):  # TODO RETEST
         """Compute the angle bisector point.
-        Method: TODO
+        Method: TODO add in the formula
         """
         dist_ba = self.distance_normalized(b, a)
         dist_ca = self.distance_normalized(c, a)
@@ -2266,14 +2266,14 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def perpendicular_bisector_for_triangle_ab(self, a, b):  # TODO RETEST
         """Compute the perpendicular bisector point.
-        Method: TODO
+        Method: TODO add in the formula
         """
         rotated_vector_ba = self.rotate_ccw_90_wrt_origin(b-a)  # code is a ccw turn. check formula
         return rotated_vector_ba + (a+b)/2
 
     def incircle_pt_for_triangle_abc_2(self, a, b, c):  # TODO RETEST
         """An alternative way to compute incircle. This one uses bisectors
-        Method: TODO
+        Method: TODO add in the formula
         """
         bisector_abc = self.angle_bisector_for_triangle_abc(a, b, c)
         bisector_bca = self.angle_bisector_for_triangle_abc(b, c, a)
@@ -2281,7 +2281,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def circumcenter_pt_of_triangle_abc_2(self, a, b, c):  # TODO RETEST
         """An alternative way to compute circumcenter. This one uses bisectors
-        Method: TODO
+        Method: TODO add in the formula
         """
         bisector_ab = self.perpendicular_bisector_for_triangle_ab(a, b)
         bisector_bc = self.perpendicular_bisector_for_triangle_ab(b, c)
@@ -2290,7 +2290,7 @@ class GeometryAlgorithms:  # TODO RETEST
 
     def orthocenter_pt_of_triangle_abc_v2(self, a, b, c):  # TODO RETEST
         """Compute the orthogonal center of triangle abc.Z
-        Method: TODO
+        Method: TODO add in the formula
         """
         return a + b + c - self.circumcenter_pt_of_triangle_abc_2(a, b, c) * 2
 
