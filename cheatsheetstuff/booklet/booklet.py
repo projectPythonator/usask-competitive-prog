@@ -2220,7 +2220,7 @@ class GeometryAlgorithms:  # TODO RETEST
         """Get the circle center of an incircle.
 
         Complexity per call: Time: lots of ops but still O(1), Space O(1)
-        Formula: TODO
+        Formula: TODO add in the formula
         Optimization: get sides individually instead of through another call
         """
         radius = self.incircle_radius_of_triangle_abc(a, b, c)
@@ -2569,7 +2569,7 @@ class GeometryAlgorithms:  # TODO RETEST
         y_ordering = sorted(pts, key=lambda point: point.y)
         return self.closest_pair_recursive(0, len(pts), y_ordering)
 
-    def delaunay_triangulation_slow(self, pts):
+    def delaunay_triangulation_slow(self, pts: List[Pt2d]) -> List[Pt2d]:
         """A very slow version of  Delaunay Triangulation. Can beat the faster version when n small.
 
         Complexity per call Time: O(n^4), Space O(n)
