@@ -1855,6 +1855,7 @@ class Pt2d:  # TODO RETEST
 Triangle = Tuple[Pt2d, Pt2d, Pt2d] | None
 ClosestPair = Tuple[Numeric, Pt2d, Pt2d]
 
+
 class Pt3d:  # TODO RETEST
     def __init__(self, x_val, y_val, z_val):
         self.x, self.y, self.z = map(float, (x_val, y_val, z_val))
@@ -2501,7 +2502,7 @@ class GeometryAlgorithms:  # TODO RETEST
             return convex_hull
         return unique_points
 
-    def rotating_caliper_of_polygon_pts(self, pts):
+    def rotating_caliper_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Computes the max distance of two points in the convex polygon?
 
         Complexity per call: Time: O(nlog n) unsorted O(n) sorted, Space: O(1)
