@@ -2376,13 +2376,11 @@ class GeometryAlgorithms:  # TODO RETEST
 
         Complexity per call: Time: O(n), Space: O(1)
         """
-        ans = False
-        px, py = p.get_tup()
-        xi, yi, xj, yj = 0, 0, pts[0].x, pts[0].y
-        for i in range(len(pts)-1):
-            xi, yi = xj, yj
-            xj, yj = pts[i+1].x, pts[i+1].y
-            if (yi <= py < yj or yj <= py < yi) and px < (xi + (xj - xi) * (py - yi) / (yj - yi)):
+        ans, px, py = False, p.x, p.y
+        for a, b in pairwise_func(pts):
+            xi, yi = a.x, a.y
+            xj, yj = b.x, b.y
+            if min(yi, yj) <= py < max(yi, yj) and px < (xi + (xj - xi) * (py - yi) / (yj - yi)):
                 ans = not ans
         return ans
 
