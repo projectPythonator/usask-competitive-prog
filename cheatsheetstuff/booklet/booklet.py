@@ -2499,8 +2499,8 @@ class GeometryAlgorithms:  # TODO RETEST
         if len(unique_points) > 1:
             func(unique_points, convex_hull, 1)
             func(unique_points[::-1], convex_hull, 1 + len(convex_hull))
-            return convex_hull
-        return unique_points
+            return convex_hull + [convex_hull[0]]  # add the first point because lots of our methods
+        return unique_points                       # require the first and last point be the same
 
     def rotating_caliper_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Computes the max distance of two points in the convex polygon?
@@ -2509,18 +2509,15 @@ class GeometryAlgorithms:  # TODO RETEST
         Optimizations:
         """
         convex_hull = self.convex_hull_monotone_chain(pts)
-        convex_hull.append(convex_hull[0])
         n, t, ans = len(convex_hull) - 1, 1, 0.0
-        for i in range(n):
-            p_i, p_j = convex_hull[i], convex_hull[(i + 1) % n]
-            p = p_j - p_i
-            while (t + 1) % n != i:
-                if (self.cross_product(p, convex_hull[(t + 1) % n] - p_i) <
-                        self.cross_product(p, convex_hull[t] - p_i)):
-                    break
+        for i, (a, b) in enumerate(pairwise_func(convex_hull)):
+            p = b - a
+            while ((t + 1) % n != i
+                   and self.compare_ab(self.cross_product(p, convex_hull[(t + 1) % n] - a),
+                                       self.cross_product(p, convex_hull[t] - a)) >= 0):
                 t = (t + 1) % n
-            ans = max(ans, self.distance(p_i, convex_hull[t]))
-            ans = max(ans, self.distance(p_j, convex_hull[t]))
+            ans = max(ans, self.distance(a, convex_hull[t]))
+            ans = max(ans, self.distance(b, convex_hull[t]))
         return sqrt(ans)
 
     def closest_pair_helper(self, lo: int, hi: int) -> ClosestPair:
