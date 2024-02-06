@@ -2588,8 +2588,7 @@ class GeometryAlgorithms:  # TODO RETEST
         Complexity per call Time: O(n^4), Space O(n)
         Optimizations: use c++ if too much memory, haven't found the way to do it without nlog n
         """
-        n = len(pts)
-        ans: List[Triangle] = []
+        n, ans = len(pts), []
         z_arr = [el.x ** 2 + el.y ** 2 for el in pts]
         x_arr = [el.x for el in pts]
         y_arr = [el.y for el in pts]
