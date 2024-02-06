@@ -2627,7 +2627,7 @@ class GeometryAlgorithms:  # TODO RETEST
                 a2 * (b1 * c3 - c1 * b3) +
                 a3 * (b1 * c2 - c1 * b2))
 
-    def is_in_circle(self, a, b, c, d) -> bool:
+    def is_in_circle(self, a: Pt2d, b: Pt2d, c: Pt2d, d: Pt2d) -> bool:
         """Expensive calculation function that determines if """
         a_dot = self.dot_product(a, a)
         b_dot = self.dot_product(b, b)
