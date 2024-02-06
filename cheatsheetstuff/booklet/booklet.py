@@ -1852,6 +1852,9 @@ class Pt2d:  # TODO RETEST
     def get_tup(self): return self.x, self.y
 
 
+Triangle = Tuple[Pt2d, Pt2d, Pt2d] | None
+ClosestPair = Tuple[Numeric, Pt2d, Pt2d]
+
 class Pt3d:  # TODO RETEST
     def __init__(self, x_val, y_val, z_val):
         self.x, self.y, self.z = map(float, (x_val, y_val, z_val))
@@ -1929,9 +1932,6 @@ class QuadEdgeDataStructure:
         self.splice(e, a.l_next())
         self.splice(e.rev(), b)
         return e
-
-
-Triangle = Tuple[Pt2d, Pt2d, Pt2d] | None
 
 
 class GeometryAlgorithms:  # TODO RETEST
@@ -2522,7 +2522,7 @@ class GeometryAlgorithms:  # TODO RETEST
             ans = max(ans, self.distance(p_j, convex_hull[t]))
         return sqrt(ans)
 
-    def closest_pair_helper(self, lo, hi):
+    def closest_pair_helper(self, lo: int, hi: int) -> ClosestPair:
         """brute force function, for small range will brute force find the closet pair. O(n^2)"""
         r_closest = (self.distance(self.x_ordering[lo], self.x_ordering[lo + 1]),
                      self.x_ordering[lo],
@@ -2534,7 +2534,7 @@ class GeometryAlgorithms:  # TODO RETEST
                     r_closest = (distance_ij, self.x_ordering[i], self.x_ordering[j])
         return r_closest
 
-    def closest_pair_recursive(self, lo, hi, y_ordering):
+    def closest_pair_recursive(self, lo: int, hi: int, y_ordering: List[Pt2d]) -> ClosestPair:
         """Recursive part of computing the closest pair. Divide by y recurse then do a special check
 
         Complexity per call T(n/2) halves each time, T(n/2) halves each call, O(n) at max tho
@@ -2572,7 +2572,7 @@ class GeometryAlgorithms:  # TODO RETEST
                     best_pair = (dist_ij, y_partition[i], y_partition[j])
         return best_pair
 
-    def compute_closest_pair(self, pts: List[Pt2d]) -> List[Triangle]:
+    def compute_closest_pair(self, pts: List[Pt2d]) -> ClosestPair:
         """Compute the closest pair of points in a set of points. method is divide and conqur
 
         Complexity per call Time: O(nlog n), Space O(nlog n)
@@ -2612,7 +2612,7 @@ class GeometryAlgorithms:  # TODO RETEST
                         else:
                             break
                     if flag:
-                        ans.append((pts[i], pts[j], pts[k]))
+                        ans.append(sort_3_elements(pts[i], pts[j], pts[k]))
         return ans
 
     def pt_left_of_edge(self, pt, edge):
@@ -2705,7 +2705,7 @@ class GeometryAlgorithms:  # TODO RETEST
                 base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
         return ldo, rdo
 
-    def delaunay_triangulation_fast(self, pts):
+    def delaunay_triangulation_fast(self, pts: List[Pt2d]) -> List[Triangle]:
         def add_helper():
             cur = edge
             while True:
