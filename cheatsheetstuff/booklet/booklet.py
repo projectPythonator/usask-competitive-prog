@@ -2618,13 +2618,13 @@ class GeometryAlgorithms:  # TODO RETEST
         """A helper function with a name to describe the action. Remove for speedup."""
         return CW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
-    def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3):
+    def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3) -> Numeric:
         """A helper function for determining the angle. Remove for speedup."""
         return (a1 * (b2 * c3 - c2 * b3) -
                 a2 * (b1 * c3 - c1 * b3) +
                 a3 * (b1 * c2 - c1 * b2))
 
-    def is_in_circle(self, a, b, c, d):
+    def is_in_circle(self, a, b, c, d) -> bool:
         """Expensive calculation function that determines if """
         a_dot = self.dot_product(a, a)
         b_dot = self.dot_product(b, b)
