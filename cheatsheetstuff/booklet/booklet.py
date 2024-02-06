@@ -2610,11 +2610,11 @@ class GeometryAlgorithms:  # TODO RETEST
                         ans.append(sort_3_elements(pts[i], pts[j], pts[k]))
         return ans
 
-    def pt_left_of_edge(self, pt, edge):
+    def is_pt_left_of_edge(self, pt: Pt2d, edge: QuadEdge) -> bool:
         """A helper function with a name to describe the action. Remove for speedup."""
         return CCW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
-    def pt_right_of_edge(self, pt, edge):
+    def is_pt_right_of_edge(self, pt: Pt2d, edge: QuadEdge) -> bool:
         """A helper function with a name to describe the action. Remove for speedup."""
         return CW == self.point_c_rotation_wrt_line_ab(pt, edge.origin, edge.dest())
 
@@ -2660,10 +2660,10 @@ class GeometryAlgorithms:  # TODO RETEST
         ldo, ldi = self.build_triangulation(left, mid, pts)
         rdi, rdo = self.build_triangulation(mid + 1, right, pts)
         while True:
-            if self.pt_left_of_edge(rdi.origin, ldi):
+            if self.is_pt_left_of_edge(rdi.origin, ldi):
                 ldi = ldi.l_next()
                 continue
-            if self.pt_right_of_edge(ldi.origin, rdi):
+            if self.is_pt_right_of_edge(ldi.origin, rdi):
                 rdi = rdi.rev().o_next
                 continue
             break
@@ -2674,21 +2674,21 @@ class GeometryAlgorithms:  # TODO RETEST
             rdo = base_edge_l
         while True:
             l_cand_edge = base_edge_l.rev().o_next
-            if self.pt_right_of_edge(l_cand_edge.dest(), base_edge_l):
+            if self.is_pt_right_of_edge(l_cand_edge.dest(), base_edge_l):
                 while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin,
                                         l_cand_edge.dest(), l_cand_edge.o_next.dest()):
                     temp_edge = l_cand_edge.o_next
                     self.quad_edges.delete_edge(l_cand_edge)
                     l_cand_edge = temp_edge
             r_cand_edge = base_edge_l.o_prev()
-            if self.pt_right_of_edge(r_cand_edge.dest(), base_edge_l):
+            if self.is_pt_right_of_edge(r_cand_edge.dest(), base_edge_l):
                 while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin,
                                         r_cand_edge.dest(), r_cand_edge.o_prev().dest()):
                     temp_edge = r_cand_edge.o_prev()
                     self.quad_edges.delete_edge(r_cand_edge)
                     r_cand_edge = temp_edge
-            l_check = self.pt_right_of_edge(l_cand_edge.dest(), base_edge_l)
-            r_check = self.pt_right_of_edge(r_cand_edge.dest(), base_edge_l)
+            l_check = self.is_pt_right_of_edge(l_cand_edge.dest(), base_edge_l)
+            r_check = self.is_pt_right_of_edge(r_cand_edge.dest(), base_edge_l)
             if not (l_check or r_check):
                 break
             if ((not l_check)
