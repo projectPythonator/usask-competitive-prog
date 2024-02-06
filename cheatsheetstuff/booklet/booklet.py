@@ -1938,7 +1938,7 @@ class QuadEdgeDataStructure:
         return e
 
 
-class GeometryAlgorithms:  # TODO RETEST
+class GeometryAlgorithms:
     def __init__(self):
         self.x_ordering = None
         self.quad_edges = QuadEdgeDataStructure()
@@ -1975,7 +1975,7 @@ class GeometryAlgorithms:  # TODO RETEST
     def rotate_ccw_rad_wrt_origin(self, point: Pt2d, degree_in_radians: float) -> Pt2d:
         """Compute a counterclockwise point rotation on pt. Accurate only for floating point cords.
         formula: x = (x cos(rad) - y sin(rad)), y = (x sin(rad) + y cos (rad)).
-        # TODO RETEST
+
         Complexity per call: Time: O(1), Space: O(1).
         Optimizations: calculate cos and sin outside the return, so you don't double call each.
         """
