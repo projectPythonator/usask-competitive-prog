@@ -2467,7 +2467,6 @@ class GeometryAlgorithms:  # TODO RETEST
         Optimizations:
         """
         left_partition = []
-        # for i in range(len(pts) - 1):
         for u, v in pairwise_func(pts):
             rot_1 = self.point_c_rotation_wrt_line_ab(left, right, u)
             rot_2 = self.point_c_rotation_wrt_line_ab(left, right, v)
