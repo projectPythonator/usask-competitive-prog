@@ -2340,7 +2340,7 @@ class GeometryAlgorithms:  # TODO RETEST
             return result
         return False
 
-    def is_convex_polygon_pts_has_collinear(self, pts):  # TODO RETEST
+    def is_convex_polygon_pts_has_collinear(self, pts: List[Pt2d]) -> bool:  # TODO RETEST
         """Determines if polygon is convex, works with collinear but takes more time and space.
 
         Complexity per call: Time: O(n), Space: O(n)
