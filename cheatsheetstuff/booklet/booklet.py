@@ -2568,7 +2568,7 @@ class GeometryAlgorithms:  # TODO RETEST
                 if self.compare_ab(dist_ij * dist_ij, best_pair[0]) > 0:
                     break
                 dist_ij = self.distance(y_partition[i], y_partition[j])
-                if self.compare_ab(dist_ij, best_pair) < 0:
+                if self.compare_ab(dist_ij, best_pair[0]) < 0:
                     best_pair = (dist_ij, y_partition[i], y_partition[j])
         return best_pair
 
