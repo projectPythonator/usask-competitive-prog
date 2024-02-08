@@ -2439,7 +2439,7 @@ class GeometryAlgorithms:
 
     def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], query_pt: Pt2d) -> bool:
         """For a convex Polygon we are able to search if point is in the polygon fast.
-        Must be ordered in CounterClockWise ordering. [Our convex hull algorithms does this]
+        Must be ordered in CounterClockWise ordering and no collinear points.
 
         Complexity per call: Time: O(log n), Space: O(1)
         Optimizations: pre-compute pts[mid] - pts[0] for all values then use cross product.
@@ -2463,6 +2463,7 @@ class GeometryAlgorithms:
 
         Complexity per call: Time: O(n) Convex(log n), Space: O(1)
         Optimizations: use log n version if you need superfast, and it's a convex polygon
+        Return: 0 for on, 1 for in, -1 for out
         """
         return (0 if self.pt_p_on_polygon_perimeter_pts(pts, p)
                 else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1)
