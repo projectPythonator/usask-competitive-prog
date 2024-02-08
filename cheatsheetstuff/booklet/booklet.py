@@ -1831,16 +1831,16 @@ class MathAlgorithms:
         n = n if (a_len + b_len) != n//2 else n//2  # optimization that fixes n when (a+b) % 2 == 0
         a_vector = [complex(i) for i in polynomial_a] + [complex(0)] * (n - a_len)
         b_vector = [complex(i) for i in polynomial_b] + [complex(0)] * (n - b_len)
-        self.fft_prepare_swap_indices(n)
-        self.fft_prepare_lengths_list(n)
-        self.fft_prepare_roots_of_unity(False)
+        self.fft_prepare_swap_indices(n)        # these three calls are for optimization with
+        self.fft_prepare_lengths_list(n)        # multiplying, if calling fft outside multiply
+        self.fft_prepare_roots_of_unity(False)  # you will need to call for each size of array.
         self.fft_in_place_fast_fourier_transform(a_vector, False)
         self.fft_in_place_fast_fourier_transform(b_vector, False)
         a_vector = [i * j for i, j in zip(a_vector, b_vector)]
         self.fft_prepare_roots_of_unity(True)
         self.fft_in_place_fast_fourier_transform(a_vector, True)
-        res_vector = [int(round(el.real)) for el in a_vector]
-        return self.fft_normalize(res_vector, 10)
+        a_vector = [int(round(el.real)) for el in a_vector]     # optional
+        return self.fft_normalize(a_vector, 10)           # optional turns into base 10 num
 
 
 ####################################################################################################
