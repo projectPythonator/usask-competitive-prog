@@ -2437,26 +2437,24 @@ class GeometryAlgorithms:
         pts[:] = [pts[i] for i in range(1, len(pts) - 1)
                   if self.point_c_rotation_wrt_line_ab(pts[i - 1], pts[i], pts[i + 1]) != CL]
 
-    def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> bool:
-        """For a convex Polygon we are able to search if point is in the polygon faster.
+    def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], query_pt: Pt2d) -> bool:
+        """For a convex Polygon we are able to search if point is in the polygon fast.
+        Must be ordered in CounterClockWise ordering. [Our convex hull algorithms does this]
 
         Complexity per call: Time: O(log n), Space: O(1)
-        Optimizations:
+        Optimizations: pre-compute pts[mid] - pts[0] for all values then use cross product.
         """
-        n = len(pts)
-        if n == 2:
-            distance = self.distance_pt_c_to_line_seg_ab(pts[0], pts[1], p)
-            return self.compare_ab(distance, 0.0) == 0
-        left, right = 1, n
+        left, right, min_point = 1, len(pts) - 1, pts[0]
         while left < right:
-            mid = (left + right)/2 + 1
-            side = self.point_c_rotation_wrt_line_ab(pts[0], pts[mid], p)
-            left, right = (mid, right) if side == 1 else (left, mid-1)
-        side = self.point_c_rotation_wrt_line_ab(pts[0], pts[left], p)
-        if side == -1 or left == n:
+            mid = 1 + ((left + right) // 2)
+            if self.point_c_rotation_wrt_line_ab(min_point, pts[mid], query_pt) == 1:
+                left = mid
+            else:
+                right = mid - 1
+        if (self.point_c_rotation_wrt_line_ab(min_point, pts[left], query_pt) == -1
+                or left == len(pts) - 1):
             return False
-        side = self.point_c_rotation_wrt_line_ab(pts[left], pts[left + 1] - pts[left], p)
-        return side >= 0
+        return self.point_c_rotation_wrt_line_ab(pts[left], pts[left + 1], query_pt) >= 0
 
     # use a set with points if possible checking on the same polygon many times
     # return 0 for on 1 for in -1 for out
