@@ -2362,39 +2362,19 @@ class GeometryAlgorithms:
         """Positive area of polygon using above method."""
         return abs(self.signed_area_of_polygon_pts(pts))
 
-    def is_convex_polygon_pts_no_collinear(self, pts: List[Pt2d]) -> bool:  # TODO RETEST
-        """Determines if polygon is convex, only works when no collinear lines.
+    def is_polygon_pts_convex(self, pts: List[Pt2d]) -> bool:  # TODO RETEST
+        """Determines if polygon is collinear.
 
-        Complexity per call: Time: O(n), Space: O(1)
+        Complexity per call: Time: O(n), Space: O(1) ? maybe its O(n)
         """
         if len(pts) > 3:
-            pts.append(pts[1])
-            end, result = len(pts) - 2, True
-            first_turn = self.point_c_rotation_wrt_line_ab(pts[0], pts[1], pts[2])
-            for i in range(end):
-                if self.point_c_rotation_wrt_line_ab(pts[i], pts[i+1], pts[i+2]) != first_turn:
-                    result = False
-                    break
-            pts.pop()
-            return result
-        return False
-
-    def is_convex_polygon_pts_has_collinear(self, pts: List[Pt2d]) -> bool:  # TODO RETEST
-        """Determines if polygon is convex, works with collinear but takes more time and space.
-
-        Complexity per call: Time: O(n), Space: O(n)
-        """
-        if len(pts) > 3:
-            pts.append(pts[1])
-            end = len(pts) - 2
-            rotations = [self.point_c_rotation_wrt_line_ab(pts[i], pts[i+1], pts[i+2])
-                         for i in range(end)]
-            tally = [0] * 3  # ccw cl cw only 3 types
-            for el in rotations:
-                tally[el + 1] += 1
-            pts.pop()
-            lo, hi = min(tally[0], tally[2]), max(tally[0], tally[2])
-            return False if lo > 0 or hi == 0 else hi > 0
+            func = self.point_c_rotation_wrt_line_ab
+            a_it, b_it, c_it = iter(pts), iter(pts), iter(pts)
+            _ = next(b_it), next(c_it), next(c_it)
+            rotations = {func(a, b, c) for a, b, c in zip(a_it, b_it, c_it)}.union(
+                {func(pts[-1], pts[0], pts[1]), func(pts[-2], pts[-1], pts[0])})
+            # return (len(rotations) == 1) and (CL not in rotations)    # use when CL not allowed
+            return (CCW in rotations) != (CW in rotations)              # use when CL is allowed
         return False
 
     def pt_p_in_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> bool:
