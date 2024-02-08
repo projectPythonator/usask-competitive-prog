@@ -1255,7 +1255,7 @@ class MathAlgorithms:
         self.fft_swap_indices = []
         self.fft_roots_of_unity = []
 
-    def is_prime_triv(self, n):
+    def is_prime_triv(self, n: int) -> bool:
         """Tests if n is prime via divisors up to sqrt(n).
 
         Complexity per call: Time: O(sqrt(n)), T(sqrt(n)/3), Space: O(1)
@@ -1271,26 +1271,26 @@ class MathAlgorithms:
                 return False
         return True
 
-    def sieve_of_eratosthenes(self, n):
+    def sieve_of_eratosthenes(self, n_inclusive: int) -> None:
         """Generates list of primes up to n via eratosthenes method.
 
         Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
         Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
         """
-        limit, prime_sieve = isqrt(n) + 1, [True] * (n + 1)
+        limit, prime_sieve = isqrt(n_inclusive) + 1, [True] * (n_inclusive + 1)
         prime_sieve[0] = prime_sieve[1] = False
         for i in range(2, limit):
             if prime_sieve[i]:
-                for j in range(i*i, n+1, i):  # n + 1 because n is an inclusive bound
+                for j in range(i*i, n_inclusive + 1, i):  # n + 1 because n is an inclusive bound
                     prime_sieve[j] = False
         self.primes_list = [i for i, el in enumerate(prime_sieve) if el]
 
-    def sieve_of_eratosthenes_optimized(self, n):
+    def sieve_of_eratosthenes_optimized(self, n_inclusive: int) -> None:
         """Odds only optimized version of the previous method. Optimized to start at 3.
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
         """
-        sqrt_n, limit = ((isqrt(n) - 3)//2) + 1, ((n - 3)//2) + 1
+        sqrt_n, limit = ((isqrt(n_inclusive) - 3) // 2) + 1, ((n_inclusive - 3) // 2) + 1
         primes_sieve = [True] * limit
         for i in range(sqrt_n):
             if primes_sieve[i]:
@@ -1300,21 +1300,21 @@ class MathAlgorithms:
                     primes_sieve[j] = False
         self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
-    def sieve_of_min_primes(self, n):
+    def sieve_of_min_primes(self, n_inclusive: int) -> None:
         """Stores the min or max prime divisor for each number up to n.
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
         """
-        min_primes = [0] * (n + 1)
+        min_primes = [0] * (n_inclusive + 1)
         min_primes[1] = 1
         for prime in self.primes_list:
             min_primes[prime] = prime
-            start, end, step = prime*prime, n+1, prime if prime == 2 else 2*prime
+            start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2 * prime
             for j in range(start, end, step):
                 min_primes[j] = prime
         self.min_primes_list = min_primes
 
-    def sieve_of_eratosthenes_variants(self, n):
+    def sieve_of_eratosthenes_variants(self, n_inclusive: int) -> None:
         """Seven variants of prime sieve listed above.
 
         Complexity:
@@ -1322,9 +1322,9 @@ class MathAlgorithms:
             function 3: Time: O(n log(n)), Space: O(n)
             function 2: Time: O(n lnln(n) log(n)), Space: O(n)
         """
-        self.euler_phi_plus_sum_and_number_of_diff_prime_factors(n)
-        self.num_and_sum_of_divisors(n)
-        self.num_and_sum_of_prime_factors(n)
+        self.euler_phi_plus_sum_and_number_of_diff_prime_factors(n_inclusive)
+        self.num_and_sum_of_divisors(n_inclusive)
+        self.num_and_sum_of_prime_factors(n_inclusive)
 
     def euler_phi_plus_sum_and_number_of_diff_prime_factors(self, limit):
         """This is basically same as sieve just using different ops. Complexity function 1."""
