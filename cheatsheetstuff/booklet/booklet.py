@@ -1744,7 +1744,11 @@ class MathAlgorithms:
         skip_case = self.binomial_coefficient_dp_with_cache(n-1, k-1)
         return take_case + skip_case
 
-    def fft_prepare_swap_indices(self, a_len):
+    def fft_prepare_swap_indices(self, a_len: int):
+        """Gives us all the swap pairs needed to for an FFT call stored in fft_swap_indices.
+
+        Complexity per call: Time: O(n), Space: O(n), S(n/2) | n == 2^i -> minimax value of i.
+        """
         a_bit_len, a_bit_half = a_len.bit_length(), (a_len.bit_length()-1)//2
         swap_size = (1 << a_bit_half) - 1
         swap_size = swap_size << (a_bit_half-1) if a_bit_len & 1 else swap_size << a_bit_half
@@ -1759,18 +1763,28 @@ class MathAlgorithms:
                 swaps[ind := ind + 1] = (i, k)
         self.fft_swap_indices = swaps
 
-    def fft_prepare_lengths_list(self, a_len):
+    def fft_prepare_lengths_list(self, a_len: int):
+        """Function for all powers 2 from 2 - a_len, inclusive. O(log n) complexity."""
         self.fft_lengths = [2**i for i in range(1, a_len.bit_length())]
 
-    def fft_prepare_roots_helper(self, length, angle):
-        root_of_unity = complex(1)
-        multiplier = complex(cos(angle), sin(angle))
-        return list(accumulate([multiplier] * length, operator_mul, initial=root_of_unity))
+    def fft_prepare_roots_helper(self, length: int, angle: float) -> List[complex]:
+        """Precomputes roots of unity for a given length and angle. accumulate used here :).
 
-    def fft_prepare_roots_of_unity(self, invert):
-        signed_tau = -tau if invert else tau
-        self.fft_roots_of_unity = [self.fft_prepare_roots_helper(el//2 - 1, signed_tau/el)
-                                   for el in self.fft_lengths]
+        Complexity per call: Time: O(n), Space: O(n) | n == 2^i.
+        """
+        initial_root_of_unity = complex(1)
+        multiplier = complex(cos(angle), sin(angle))
+        return list(accumulate([multiplier] * length, operator_mul, initial=initial_root_of_unity))
+
+    def fft_prepare_roots_of_unity(self, invert: bool):
+        """Precomputes all roots of unity for all lengths. Stores the result for later use.
+
+        Complexity per call: Time: O(2^((log n)+1)-1) = O(n),
+                            Space: O(n), S(2^((log n)+1)-1) | n == len of our data, which is 2^i.
+        """
+        signed_tau: float = -tau if invert else tau
+        self.fft_roots_of_unity = [self.fft_prepare_roots_helper(length//2 - 1, signed_tau/length)
+                                   for length in self.fft_lengths]
 
     def fft_in_place_fast_fourier_transform(self, a_vector, invert):
         a_len = len(a_vector)
