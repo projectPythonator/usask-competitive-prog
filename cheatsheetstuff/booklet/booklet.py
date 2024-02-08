@@ -1806,7 +1806,7 @@ class MathAlgorithms:
         if invert:
             a_vector[:] = [complex_number/a_len for complex_number in a_vector]
 
-    def fft_normalize(self, a_vector, n, base):
+    def fft_normalize(self, a_vector: List[int], n: int, base: int) -> List[int]:
         carry, end = 0, len(a_vector)-1
         for i in range(n):
             a_vector[i] += carry
