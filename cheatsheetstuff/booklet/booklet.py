@@ -2037,7 +2037,7 @@ class GeometryAlgorithms:
         # return acos(dot_ba_bc / sqrt(dist_sq_ba * dist_sq_bc))
 
     def pt_on_line_segment_ab(self, point_a: Pt2d, point_b: Pt2d, point: Pt2d) -> bool:
-        """Check if a point is between two endpoints on the line segment"""
+        """Logic is cross == 0 mean parallel, and dot being <= 0 means different directions."""
         vec_pa, vec_pb = point_a - point, point_b - point
         return (self.compare_ab(self.cross_product(vec_pa, vec_pb), 0) == 0
                 and self.compare_ab(self.dot_product(vec_pa, vec_pb), 0) <= 0)
@@ -2427,7 +2427,7 @@ class GeometryAlgorithms:
         """Determine if a point is on the perimeter of a polygon simply via a distance check.
 
         Complexity per call: Time: O(n), Space: O(1)
-        Optimizations: move old_dist and new_dist before loop and only call function on new_dist.
+        Optimizations: turn pts into a set and check that case first
         """
         return any(self.pt_on_line_segment_ab(a, b, p) for a, b in pairwise_func(pts)) or p in pts
 
