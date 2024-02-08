@@ -1718,7 +1718,7 @@ class MathAlgorithms:
         return (n_fact * pow(k_fact, p - 2, p) * pow(n_k_fact, p - 2, p)) % p
         # return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
 
-    def binomial_coefficient_n_mod_p_prep(self, max_n, mod_p):
+    def binomial_coefficient_n_mod_p_prep(self, max_n: int, mod_p: int):
         """Does preprocessing for binomial coefficients. From competitive programming 4.
 
         Complexity per call: Time: v1 O(n), v2 = O(n), Space: O(n).
@@ -1735,7 +1735,7 @@ class MathAlgorithms:
         # self.inv_fact = inverse_factorial_mod_p
 
     @lru_cache(maxsize=None)
-    def binomial_coefficient_dp_with_cache(self, n, k):
+    def binomial_coefficient_dp_with_cache(self, n: int, k: int) -> int:
         """Uses the recurrence to calculate binomial coefficient. Cached for memoization.
 
         Complexity per call: Time: O(n*k), Space: O(n*k).
