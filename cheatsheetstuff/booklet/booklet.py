@@ -2350,13 +2350,11 @@ class GeometryAlgorithms:
     def perimeter_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Compute summed pairwise perimeter of polygon in CCW ordering."""
         return fsum([self.distance_normalized(a, b) for a, b in pairwise_func(pts)])
-        # return fsum([self.distance_normalized(pts[i], pts[i + 1]) for i in range(len(pts) - 1)])
 
     def signed_area_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Compute sum of area of polygon, via shoelace method: half the sum of the pairwise
         cross-products."""  # see start of booklet for pairwise
         return fsum([self.cross_product(a, b) for a, b in pairwise_func(pts)]) / 2
-        # return fsum([self.cross_product(pts[i], pts[i + 1]) for i in range(len(pts) - 1)]) / 2
 
     def area_of_polygon_pts(self, pts: List[Pt2d]) -> float:
         """Positive area of polygon using above method."""
