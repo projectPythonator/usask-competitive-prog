@@ -2431,6 +2431,18 @@ class GeometryAlgorithms:
         """
         return any(self.pt_on_line_segment_ab(a, b, p) for a, b in pairwise_func(pts)) or p in pts
 
+    # use a set with points if possible checking on the same polygon many times
+    # return 0 for on 1 for in -1 for out
+    def pt_position_wrt_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> int:
+        """Will determine if a point is in on or outside a polygon.
+
+        Complexity per call: Time: O(n) Convex(log n), Space: O(1)
+        Optimizations: use log n version if you need superfast, and it's a convex polygon
+        Return: 0 for on, 1 for in, -1 for out
+        """
+        return (0 if self.pt_p_on_polygon_perimeter_pts(pts, p)
+                else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1)
+
     def remove_collinear_points(self, pts: List[Pt2d]):
         """Removes all collinear points in O(n) time. MUTATES pts."""
         pts[:] = [pts[-1]] + [pt for pt in pts] + [pts[0]]
@@ -2455,18 +2467,6 @@ class GeometryAlgorithms:
                 or left == len(pts) - 1):
             return False
         return self.point_c_rotation_wrt_line_ab(pts[left], pts[left + 1], query_pt) >= 0
-
-    # use a set with points if possible checking on the same polygon many times
-    # return 0 for on 1 for in -1 for out
-    def pt_position_wrt_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> int:
-        """Will determine if a point is in on or outside a polygon.
-
-        Complexity per call: Time: O(n) Convex(log n), Space: O(1)
-        Optimizations: use log n version if you need superfast, and it's a convex polygon
-        Return: 0 for on, 1 for in, -1 for out
-        """
-        return (0 if self.pt_p_on_polygon_perimeter_pts(pts, p)
-                else 1 if self.pt_p_in_polygon_pts_2(pts, p) else -1)
 
     def centroid_pt_of_convex_polygon(self, pts: List[Pt2d]) -> Pt2d:  # TODO RETEST
         """Compute the centroid of a convex polygon.
