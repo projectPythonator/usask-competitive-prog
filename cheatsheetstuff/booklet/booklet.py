@@ -1971,7 +1971,6 @@ class QuadEdgeDataStructure:
 
 class GeometryAlgorithms:
     def __init__(self):
-        self.x_ordering = None
         self.quad_edges = QuadEdgeDataStructure()
 
     def compare_ab(self, a: Numeric, b: Numeric) -> int:
