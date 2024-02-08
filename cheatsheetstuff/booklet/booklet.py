@@ -1396,7 +1396,7 @@ class MathAlgorithms:
             n = n // self.min_primes_list[n]
         return prime_factors
 
-    def prime_factorize_n_variants(self, n):  # TODO RETEST
+    def prime_factorize_n_variants(self, n: int) -> int:  # TODO RETEST
         """Covers all the variants listed above, holds the same time complexity with O(1) space."""
         limit = isqrt(n) + 1
         sum_diff_prime_factors, num_diff_prime_factors = 0, 0
@@ -1428,11 +1428,11 @@ class MathAlgorithms:
             euler_phi -= (euler_phi // n)
         return num_diff_prime_factors
 
-    def polynomial_function_f(self, x, c, m):
+    def polynomial_function_f(self, x: int, c: int, m: int) -> int:
         """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding."""
         return (x * x + c) % m  # paste this in code for speed up. is here for clarity only
 
-    def pollard_rho(self, n, x0=2, c=1):
+    def pollard_rho(self, n: int, x0=2, c=1) -> int:
         """Semi fast integer factorization. Based on the birthday paradox and floyd cycle finding.
 
         Complexity per call: Time: O(min(max(p), n^0.25) * ln n), Space: O(log2(n) bits)
@@ -1444,7 +1444,7 @@ class MathAlgorithms:
             g = gcd(abs(x - y), n)
         return g
 
-    def brent_pollard_rho(self, n, x0=2, c=1):
+    def brent_pollard_rho(self, n: int, x0=2, c=1) -> int:
         """Faster version of above. Similar time complexity. uses faster cycle finder."""
         x, m = x0, 128  # 128 here is used as a small power of 2 vs using 100 more below
         g = q = left = 1
