@@ -1806,11 +1806,11 @@ class MathAlgorithms:
         if invert:
             a_vector[:] = [complex_number/a_len for complex_number in a_vector]
 
-    def fft_normalize(self, a_vector: List[int], n: int, base: int) -> List[int]:
-        carry, end = 0, len(a_vector)-1
-        for i in range(n):
-            a_vector[i] += carry
-            carry, a_vector[i] = divmod(a_vector[i], base)
+    def fft_normalize(self, a_vector: List[int], base: int) -> List[int]:
+        carry, end = 0, len(a_vector) - 1
+        for number in a_vector:
+            number = number + carry
+            carry, number = divmod(number, base)
         while a_vector[end] == 0:
             end = end - 1
         return a_vector[:end+1][::-1]
@@ -1830,7 +1830,7 @@ class MathAlgorithms:
         self.fft_prepare_roots_of_unity(True)
         self.fft_in_place_fast_fourier_transform(a_vector, True)
         res_vector = [int(round(el.real)) for el in a_vector]
-        return self.fft_normalize(res_vector, n, 10)
+        return self.fft_normalize(res_vector, 10)
 
 
 ####################################################################################################
