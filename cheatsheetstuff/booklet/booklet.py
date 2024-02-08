@@ -1786,20 +1786,25 @@ class MathAlgorithms:
         self.fft_roots_of_unity = [self.fft_prepare_roots_helper(length//2 - 1, signed_tau/length)
                                    for length in self.fft_lengths]
 
-    def fft_in_place_fast_fourier_transform(self, a_vector, invert):
+    def fft_in_place_fast_fourier_transform(self, a_vector: List[complex], invert: bool):
+        """Optimized in-place Cooley–Tukey FFT algorithm. Modifies a_vector.
 
+        Complexity per call: Time: O(n log n), Space: O(1) | technically O(n) but we precompute.
+        Optimizations: swap indices, lengths, and roots of unity all have be calculated beforehand.
+            This allows us to only do those once in when doing multiplication
+        """
         a_len = len(a_vector)
         for i, j in self.fft_swap_indices:
             a_vector[i], a_vector[j] = a_vector[j], a_vector[i]
-        for k, length in enumerate(self.fft_lengths):
-            j_end = length // 2
+        for k, length in enumerate(self.fft_lengths):  # is [2, 4, 8..., 2^(i-1), 2^i] | n == 2^i
+            j_end = length // 2  # j_end is to avoid repeated divisions in the innermost loop
             for i in range(0, a_len, length):
                 for j, w in enumerate(self.fft_roots_of_unity[k]):
                     i_j, i_j_j_end = i + j, i + j + j_end
                     u, v = a_vector[i_j], w * a_vector[i_j_j_end]
                     a_vector[i_j], a_vector[i_j_j_end] = u + v, u - v
         if invert:
-            a_vector[:] = [el/a_len for el in a_vector]
+            a_vector[:] = [complex_number/a_len for complex_number in a_vector]
 
     def fft_normalize(self, a_vector, n, base):
         carry, end = 0, len(a_vector)-1
