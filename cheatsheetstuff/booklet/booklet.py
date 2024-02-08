@@ -1534,14 +1534,14 @@ class MathAlgorithms:
             y, last_y = last_y - quotient * y, y
         return -last_x if a < 0 else last_x, -last_y if b < 0 else last_y, last_remainder
 
-    def safe_modulo(self, a, n):
+    def safe_modulo(self, a: int, n: int) -> int:
         """Existence is much for c++ which doesn't always handle % operator nicely.
         use ((a % n) + n) % n for getting proper mod of a potential negative value
         use (a + b) % --> ((a % n) + (b % n)) % n for operations sub out + for * and -
         """
         return ((a % n) + n) % n
 
-    def modular_linear_equation_solver(self, a, b, n):  # TODO RETEST
+    def modular_linear_equation_solver(self, a: int, b: int, n: int) -> List[int]:  # TODO RETEST
         """Solves gives the solution x in ax = b(mod n).
 
         Complexity per call: Time: O(log n), Space: O(d)
@@ -1552,7 +1552,7 @@ class MathAlgorithms:
             return [(x + i*(n//d)) % n for i in range(d)]
         return []
 
-    def linear_diophantine_1(self, a, b, c):  # TODO RETEST
+    def linear_diophantine_1(self, a: int, b: int, c: int) -> Tuple[int, int]:  # TODO RETEST
         """Solves for x, y in ax + by = c. From stanford icpc 2013-14
 
         Complexity per call: Time: O(log n), Space: O(1).
@@ -1564,7 +1564,7 @@ class MathAlgorithms:
             return x, (c - a * x) // b
         return -1, -1
 
-    def linear_diophantine_2(self, a, b, c):  # TODO RETEST
+    def linear_diophantine_2(self, a: int, b: int, c: int) -> Tuple[int, int]:  # TODO RETEST
         """Solves for x0, y0 in x = x0 + (b/d)n, y = y0 - (a/d)n.
         derived from ax + by = c, d = gcd(a, b), and d|c.
         Can further derive into: n = x0 (d/b), and n = y0 (d/a).
@@ -1577,7 +1577,7 @@ class MathAlgorithms:
         x, y, d = self.extended_euclid_iterative(a, b)
         return (-1, -1) if c % d != 0 else (x * (c // d), y * (c // d))
 
-    def mod_inverse(self, b, m):
+    def mod_inverse(self, b: int, m: int) -> None | int:
         """Solves b^(-1) (mod m).
 
         Complexity per call: Time: O(log n), Space: O(1)
@@ -1585,9 +1585,9 @@ class MathAlgorithms:
         x, y, d = self.extended_euclid_iterative(b, m)
         return None if d != 1 else x % m  # -1 instead of None if we intend to go on with the prog
 
-    def chinese_remainder_theorem_1(self, remainders, modulos):  # TODO RETEST
+    def chinese_remainder_theorem_1(self, remainders: List[int], modulos: List[int]) -> int:
         """Steven's CRT version to solve x in x = r[0] (mod m[0]) ... x = r[n-1] (mod m[n-1]).
-
+        # TODO RETEST
         Complexity per call: Time: O(n log n), Space: O(1)? O(mt) bit size:
         Optimizations:
             prod is used from math since 3.8,
