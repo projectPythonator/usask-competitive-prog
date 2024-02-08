@@ -1629,7 +1629,7 @@ class MathAlgorithms:
                 break
         return z_m
 
-    def fibonacci_n_iterative(self, n):
+    def fibonacci_n_iterative(self, n: int) -> None:
         """Classic fibonacci solver. Generates answers from 0 to n inclusive.
 
         Complexity per call: Time: O(n), Space: O(n).
@@ -1641,7 +1641,7 @@ class MathAlgorithms:
         self.fibonacci_list = fib_list
 
     @lru_cache(maxsize=None)
-    def fibonacci_n_dp_cached(self, n):
+    def fibonacci_n_dp_cached(self, n: int) -> int:
         """Cached Dynamic programming to get the nth fibonacci. Derived from Cassini's identity.
 
         Complexity per call: Time: O(log n), Space: increase by O(log n).
@@ -1653,7 +1653,7 @@ class MathAlgorithms:
         return f1 * f1 + f2 * f2 if n & 1 else f1 * f1 - f2 * f2
 
     @lru_cache(maxsize=None)
-    def fibonacci_n_dp_cached_faster(self, n):
+    def fibonacci_n_dp_cached_faster(self, n: int) -> int:
         """Same as above but runs in ~Time*0.75 i.e. Above takes 20 seconds this takes 15."""
         if n < 3:
             return 1 if n else 0
@@ -1661,7 +1661,7 @@ class MathAlgorithms:
         k1, k2 = self.fibonacci_n_dp_cached_faster(k), self.fibonacci_n_dp_cached_faster(k-1)
         return k1*k1 + k2*k2 if n & 1 else (2*k2 + k1) * k1
 
-    def generate_catalan_n(self, n):
+    def generate_catalan_n(self, n: int) -> None:
         """Generate catalan up to n iteratively.
 
         Complexity per call: Time: O(n*O(multiplication)), Space: O(n * 2^(log n)).
