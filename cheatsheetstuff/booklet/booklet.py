@@ -2364,7 +2364,7 @@ class GeometryAlgorithms:
         """Determines if polygon is convex with options of allowing or disallowing collinearity.
 
         Complexity per call: Time: O(n), Space: O(1) ? maybe its O(n)
-        Optimizations and Notes: pts[0] != pts[-1], use iterators with zip instead of costly mod.
+        Optimizations and Notes: pts[0] != pts[-1], Use iterators with zip instead of costly mod.
         """
         if len(pts) > 3:
             n, func = len(pts), self.point_c_rotation_wrt_line_ab
