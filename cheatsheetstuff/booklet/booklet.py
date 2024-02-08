@@ -2369,7 +2369,7 @@ class GeometryAlgorithms:
         Optimizations and Notes: pts[0] != pts[-1], use iterators with zip instead of costly mod.
         """
         if len(pts) > 3:
-            func, n = self.point_c_rotation_wrt_line_ab, len(pts)
+            n, func = len(pts), self.point_c_rotation_wrt_line_ab
             rotations = {func(pts[i], pts[(i + 1) % n], pts[(i + 2) % n]) for i in range(n)}
             # return (len(rotations) == 1) and (CL not in rotations)    # use when CL not allowed
             return (CCW in rotations) != (CW in rotations)              # use when CL is allowed
