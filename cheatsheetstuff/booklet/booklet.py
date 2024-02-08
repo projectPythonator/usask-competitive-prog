@@ -1820,6 +1820,12 @@ class MathAlgorithms:
         return a_vector[:end+1][::-1]
 
     def fft_multiply_in_place(self, polynomial_a: List[int], polynomial_b: List[int]) -> List[int]:
+        """Multiply two polynomials with the option to normalize then after.
+
+        Complexity per call: Time: O(n log n), T(4(n log n)),
+                            Space: O(n),  S(4n) | [n == |a| + |b|]
+        Optimizations: listed fft_in_place_fast_fourier_transform.
+        """
         a_len, b_len = len(polynomial_a), len(polynomial_b)
         n = 2**((a_len + b_len).bit_length())       # computes 2^(log2(a+b) + 1)
         n = n if (a_len + b_len) != n//2 else n//2  # optimization that fixes n when (a+b) % 2 == 0
