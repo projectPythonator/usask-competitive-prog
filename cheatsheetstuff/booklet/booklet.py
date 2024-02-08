@@ -2431,6 +2431,12 @@ class GeometryAlgorithms:
         """
         return any(self.pt_on_line_segment_ab(a, b, p) for a, b in pairwise_func(pts)) or p in pts
 
+    def remove_collinear_points(self, pts: List[Pt2d]):
+        """Removes all collinear points in O(n) time. MUTATES pts."""
+        pts[:] = [pts[-1]] + [pt for pt in pts] + [pts[0]]
+        pts[:] = [pts[i] for i in range(1, len(pts) - 1)
+                  if self.point_c_rotation_wrt_line_ab(pts[i - 1], pts[i], pts[i + 1]) != CL]
+
     def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> bool:
         """For a convex Polygon we are able to search if point is in the polygon faster.
 
