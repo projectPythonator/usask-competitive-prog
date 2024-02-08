@@ -1807,20 +1807,24 @@ class MathAlgorithms:
             a_vector[:] = [complex_number/a_len for complex_number in a_vector]
 
     def fft_normalize(self, a_vector: List[int], base: int) -> List[int]:
+        """Normalizes polynomial a for a given base. base 10 will result in a base 10 number
+
+        Complexity per call: Time: O(n), Space: O(1) -> in fact we often reduce overall space.
+        """
         carry, end = 0, len(a_vector) - 1
         for number in a_vector:
-            number = number + carry
+            number += carry
             carry, number = divmod(number, base)
-        while a_vector[end] == 0:
-            end = end - 1
+        while 0 == a_vector[end]:
+            end -= 1
         return a_vector[:end+1][::-1]
 
-    def fft_multiply_in_place(self, a, b):
-        n, a_len, b_len = 1, len(a), len(b)
-        n = 2**((a_len + b_len).bit_length())
-        n = n if (a_len + b_len) != n//2 else n//2
-        a_vector = [complex(i) for i in a] + [complex(0)] * (n - a_len)
-        b_vector = [complex(i) for i in b] + [complex(0)] * (n - b_len)
+    def fft_multiply_in_place(self, polynomial_a: List[int], polynomial_b: List[int]) -> List[int]:
+        a_len, b_len = len(polynomial_a), len(polynomial_b)
+        n = 2**((a_len + b_len).bit_length())       # computes 2^(log2(a+b) + 1)
+        n = n if (a_len + b_len) != n//2 else n//2  # optimization that fixes n when (a+b) % 2 == 0
+        a_vector = [complex(i) for i in polynomial_a] + [complex(0)] * (n - a_len)
+        b_vector = [complex(i) for i in polynomial_b] + [complex(0)] * (n - b_len)
         self.fft_prepare_swap_indices(n)
         self.fft_prepare_lengths_list(n)
         self.fft_prepare_roots_of_unity(False)
