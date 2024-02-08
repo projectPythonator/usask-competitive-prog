@@ -1672,7 +1672,7 @@ class MathAlgorithms:
             catalan[i + 1] = catalan[i] * (4*i + 2) // (i + 2)
         self.catalan_numbers = catalan
 
-    def generate_catalan_n_mod_inverse(self, n, p):
+    def generate_catalan_n_mod_inverse(self, n: int, p: int) -> None:
         """Generate catalan up to n iteratively cat n % p.
 
         Complexity per call: Time: O(n log n), Space: O(n * (2^(log n)%p)).
@@ -1684,7 +1684,7 @@ class MathAlgorithms:
             catalan[i+1] = (((4*i + 2) % p) * (catalan[i] % p) * pow(i+2, p-2, p)) % p
         self.catalan_numbers = catalan
 
-    def catalan_via_prime_facts(self, n, k, mod_m):
+    def catalan_via_prime_facts(self, n: int, k: int, mod_m: int) -> int:
         """Compute the nth Catalan number mod_n via prime factor reduction of C(2n, n)/(n+1).
         Notes: The function "num_and_sum_of_prime_factors" needs to be modified for computing number
         of each prime factor in all the numbers between 1-2n or 1 to n.
@@ -1706,7 +1706,7 @@ class MathAlgorithms:
                 ans = (ans * pow(prime_array[ind], exponent, mod_m)) % mod_m
         return ans
 
-    def c_n_k(self, n, k):
+    def c_n_k(self, n: int, k: int) -> int:
         """Computes C(n, k) % p. From competitive programming 4.
 
         Complexity per call: Time: v1 = O(log n), v2 = O(1), Space: O(1).
