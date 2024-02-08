@@ -1367,7 +1367,7 @@ class MathAlgorithms:
         self.num_prime_factors = num_pf
         self.sum_prime_factors = sum_pf
 
-    def prime_factorize_n(self, n: int) -> [int]:
+    def prime_factorize_n(self, n: int) -> List[int]:
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
 
         Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
