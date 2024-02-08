@@ -2036,6 +2036,12 @@ class GeometryAlgorithms:
         return acos(dot_ba_bc / (sqrt(dist_sq_ba) * sqrt(dist_sq_bc)))
         # return acos(dot_ba_bc / sqrt(dist_sq_ba * dist_sq_bc))
 
+    def pt_on_line_segment_ab(self, point_a: Pt2d, point_b: Pt2d, point: Pt2d) -> bool:
+        """Check if a point is between two endpoints on the line segment"""
+        vec_pa, vec_pb = point_a - point, point_b - point
+        return (self.compare_ab(self.cross_product(vec_pa, vec_pb), 0) == 0
+                and self.compare_ab(self.dot_product(vec_pa, vec_pb), 0) <= 0)
+
     def project_pt_c_to_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> Pt2d:
         """Compute the point closest to c on the line ab.
         formula: pt = a + u x vector_ba, where u is the scalar projection of vector_ca onto
@@ -2423,13 +2429,7 @@ class GeometryAlgorithms:
         Complexity per call: Time: O(n), Space: O(1)
         Optimizations: move old_dist and new_dist before loop and only call function on new_dist.
         """
-        for a, b in pairwise_func(pts):  # defined at start of booklet
-            old_dist = self.distance_normalized(a, p)
-            new_dist = self.distance_normalized(p, b)
-            ij_dist = self.distance_normalized(a, b)
-            if self.compare_ab(new_dist+old_dist, ij_dist) == 0:
-                return True
-        return p in pts
+        return any(self.pt_on_line_segment_ab(a, b, p) for a, b in pairwise_func(pts)) or p in pts
 
     def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> bool:
         """For a convex Polygon we are able to search if point is in the polygon faster.
