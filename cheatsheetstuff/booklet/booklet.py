@@ -1787,6 +1787,7 @@ class MathAlgorithms:
                                    for length in self.fft_lengths]
 
     def fft_in_place_fast_fourier_transform(self, a_vector, invert):
+
         a_len = len(a_vector)
         for i, j in self.fft_swap_indices:
             a_vector[i], a_vector[j] = a_vector[j], a_vector[i]
