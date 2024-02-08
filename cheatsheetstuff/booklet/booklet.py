@@ -1468,7 +1468,7 @@ class MathAlgorithms:
                     break
         return g
 
-    def is_composite(self, a, d, n, s):
+    def is_composite(self, a: int, d: int, n: int, s: int) -> bool:
         """The witness test of miller rabin.
 
         Complexity per call: Time O(log^3(n)), Space: O(2**s, bits)
@@ -1480,7 +1480,7 @@ class MathAlgorithms:
                 return False
         return True
 
-    def miller_rabin_primality_test(self, n, precision_for_huge_n=16):
+    def miller_rabin_primality_test(self, n: int, precision_for_huge_n=16) -> bool:
         """Probabilistic primality test with error rate of 4^(-k) past 341550071728321.
 
         Complexity per call: Time O(k log^3(n)), Space: O(2**s) bits
@@ -1509,7 +1509,7 @@ class MathAlgorithms:
         self.sieve_of_eratosthenes(1000)  # comment out if different size needed
         self.primes_set = set(self.primes_list)  # comment out if already have bigger size
 
-    def extended_euclid_recursive(self, a, b):
+    def extended_euclid_recursive(self, a: int, b: int) -> Tuple[int, int, int]:
         """Solves coefficients of Bezout identity: ax + by = gcd(a, b), recursively
 
         Complexity per call: Time: O(log n), Space: O(log n) at the deepest call.
@@ -1519,7 +1519,7 @@ class MathAlgorithms:
         x, y, d = self.extended_euclid_recursive(b, a % b)
         return y, x-y*(a//b), d
 
-    def extended_euclid_iterative(self, a, b):
+    def extended_euclid_iterative(self, a: int, b: int) -> Tuple[int, int, int]:
         """Solves coefficients of Bezout identity: ax + by = gcd(a, b), iteratively.
 
         Complexity per call: Time: O(log n) about twice as fast in python vs above, Space: O(1)
