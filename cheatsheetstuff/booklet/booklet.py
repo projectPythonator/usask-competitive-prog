@@ -1384,7 +1384,7 @@ class MathAlgorithms:
         self.factor_list = Counter(prime_factors)
         return prime_factors
 
-    def prime_factorize_n_log_n(self, n):
+    def prime_factorize_n_log_n(self, n: int) -> List[int]:
         """An optimized prime factorization of n function based on min primes already sieved.
 
         Complexity: Time: O(log n), Space: O(log n)
