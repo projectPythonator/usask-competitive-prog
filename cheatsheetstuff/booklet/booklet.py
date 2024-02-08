@@ -1599,11 +1599,12 @@ class MathAlgorithms:
             x = (x + (remainders[i] * self.mod_inverse(p, modulo) * p)) % mt
         return x
 
-    def chinese_remainder_theorem_helper(self, mod1, rem1, mod2, rem2):  # TODO RETEST
+    def chinese_remainder_theorem_helper(self, mod1: int, rem1: int,
+                                         mod2: int, rem2: int) -> Tuple[int, int]:
         """Chinese remainder theorem (special case): find z such that z % m1 = r1, z % m2 = r2.
         Here, z is unique modulo M = lcm(m1, m2). Return (z, M).  On failure, M = -1.
         from: stanford icpc 2016
-
+        # TODO RETEST
         Complexity per call: Time: O(log n), Space: O(1)
         """
         s, t, d = self.extended_euclid_iterative(mod1, mod2)
@@ -1612,12 +1613,13 @@ class MathAlgorithms:
             return ((s_rem_mod + t_rem_mod) % mod3) // d, mod3 // d
         return 0, -1
 
-    def chinese_remainder_theorem_2(self, remainders, modulos):  # TODO RETEST
+    def chinese_remainder_theorem_2(self, remainders: List[int],
+                                    modulos: List[int]) -> Tuple[int, int]:
         """Chinese remainder theorem: find z such that z % m[i] = r[i] for all i.  Note that the
         solution is unique modulo M = lcm_i (m[i]).  Return (z, M). On failure, M = -1. Note that
         we do not require the r[i]'s to be relatively prime.
         from: stanford icpc 2016
-
+        # TODO RETEST
         Complexity per call: Time: O(n log n), Space: O(1)? O(mt) bit size
         """
         z_m = remainders[0], modulos[0]
