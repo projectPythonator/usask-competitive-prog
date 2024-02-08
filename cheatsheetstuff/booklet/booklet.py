@@ -2366,13 +2366,11 @@ class GeometryAlgorithms:
         """Determines if polygon is convex with options of allowing or disallowing collinearity.
 
         Complexity per call: Time: O(n), Space: O(1) ? maybe its O(n)
+        Optimizations and Notes: pts[0] != pts[-1], use iterators with zip instead of costly mod.
         """
         if len(pts) > 3:
-            func, pts_len = self.point_c_rotation_wrt_line_ab, len(pts)
-            a_it, b_it, c_it = iter(pts), iter(pts), iter(pts)
-            _ = next(b_it), next(c_it), next(c_it)
-            rotations = {func(pts[i], pts[(i + 1) % pts_len], pts[(i + 2) % pts_len])
-                         for i in range(pts_len)}
+            func, n = self.point_c_rotation_wrt_line_ab, len(pts)
+            rotations = {func(pts[i], pts[(i + 1) % n], pts[(i + 2) % n]) for i in range(n)}
             # return (len(rotations) == 1) and (CL not in rotations)    # use when CL not allowed
             return (CCW in rotations) != (CW in rotations)              # use when CL is allowed
         return False
