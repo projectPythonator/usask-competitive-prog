@@ -1326,7 +1326,7 @@ class MathAlgorithms:
         self.num_and_sum_of_divisors(n_inclusive)
         self.num_and_sum_of_prime_factors(n_inclusive)
 
-    def euler_phi_plus_sum_and_number_of_diff_prime_factors(self, limit):
+    def euler_phi_plus_sum_and_number_of_diff_prime_factors(self, limit: int) -> None:
         """This is basically same as sieve just using different ops. Complexity function 1."""
         num_diff_pf = [0] * (limit + 1)
         sum_diff_pf = [0] * (limit + 1)
@@ -1341,7 +1341,7 @@ class MathAlgorithms:
         self.sum_diff_prime_factors = sum_diff_pf
         self.euler_phi = phi
 
-    def num_and_sum_of_divisors(self, limit):
+    def num_and_sum_of_divisors(self, limit: int) -> None:
         """Does a basic sieve. Complexity function 2."""
         num_div = [1] * (limit + 1)
         sum_div = [1] * (limit + 1)
@@ -1352,7 +1352,7 @@ class MathAlgorithms:
         self.num_divisors = num_div
         self.sum_divisors = sum_div
 
-    def num_and_sum_of_prime_factors(self, limit):
+    def num_and_sum_of_prime_factors(self, limit: int) -> None:
         """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
         num_pf = [0] * (limit + 1)
         sum_pf = [0] * (limit + 1)
@@ -1367,7 +1367,7 @@ class MathAlgorithms:
         self.num_prime_factors = num_pf
         self.sum_prime_factors = sum_pf
 
-    def prime_factorize_n(self, n):
+    def prime_factorize_n(self, n: int) -> [int]:
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
 
         Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
