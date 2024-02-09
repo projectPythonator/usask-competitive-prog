@@ -2460,7 +2460,7 @@ class GeometryAlgorithms:
     def is_polygon_pts_simple_quadratic(self, pts: List[Pt2d]) -> bool:
         """Brute force method to check if a polygon is simple. check all line pairs
 
-        Complexity per call: Time: O(n^2), Space: O(1)
+        Complexity per call: Time: O(n^2), Space: O(n)
         """
         lines = [(a, b) for a, b in pairwise_func(pts)]
         return not any(self.is_segments_intersect_ab_to_cd(pt_a, pt_b, pt_c, pt_d)
