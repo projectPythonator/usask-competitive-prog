@@ -2409,8 +2409,6 @@ class GeometryAlgorithms:
         """
         return any(self.pt_on_line_segment_ab(a, b, p) for a, b in pairwise_func(pts)) or p in pts
 
-    # use a set with points if possible checking on the same polygon many times
-    # return 0 for on 1 for in -1 for out
     def pt_position_wrt_polygon_pts(self, pts: List[Pt2d], p: Pt2d) -> int:
         """Will determine if a point is in on or outside a polygon.
 
@@ -2452,7 +2450,7 @@ class GeometryAlgorithms:
         Complexity per call: Time: O(n), Space: O(1)
         Optimizations:
         """
-        ans, n = Pt2d(0, 0), len(pts)
+        ans = Pt2d(0, 0)
         for a, b in pairwise_func(pts):  # defined at start of booklet
             ans = ans + (a + b) * self.cross_product(a, b)
         return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
