@@ -2457,21 +2457,15 @@ class GeometryAlgorithms:
             ans = ans + (a + b) * self.cross_product(a, b)
         return ans / (6.0 * self.signed_area_of_polygon_pts(pts))
 
-    def is_polygon_pts_simple_quadratic(self, pts: List[Pt2d]) -> bool:  # TODO RETEST
+    def is_polygon_pts_simple_quadratic(self, pts: List[Pt2d]) -> bool:
         """Brute force method to check if a polygon is simple. check all line pairs
 
         Complexity per call: Time: O(n^2), Space: O(1)
-        Optimizations:
         """
-        n = len(pts)
-        for i in range(n-1):
-            for k in range(i+1, n-1):
-                j, m = (i+1) % n, (k+1) % n
-                if i == m or j == k:
-                    continue
-                if self.is_segments_intersect_ab_to_cd(pts[i], pts[j], pts[k], pts[m]):
-                    return False
-        return True
+        lines = [(a, b) for a, b in pairwise_func(pts)]
+        return not any(self.is_segments_intersect_ab_to_cd(pt_a, pt_b, pt_c, pt_d)
+                       for (pt_a, pt_b), (pt_c, pt_d) in combinations(lines, 2)
+                       if pt_a != pt_d and pt_b != pt_c)  # avoids lines that neighbor each other
 
     def polygon_cut_from_line_ab(self, pts: List[Pt2d], left, right) -> List[Pt2d]:  # TODO RETEST
         """Method computes the left side polygon resulting from a cut from the line a-b.
