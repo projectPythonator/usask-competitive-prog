@@ -4,14 +4,14 @@ Numeric = TypeVar('Numeric', int, float, complex)
 Reals = TypeVar('Reals', int, float, complex)
 Rationals = TypeVar('Rationals', int, float)
 Integers = int
-type Num = int | float
-type IntList = List[int]
-type FloatList = List[float]
-type BoolList = List[float]
-type NumList = List[Num]
-type TupleListMST = List[Tuple[Num, int, int]]
-type EdgeTupleList = List[Tuple[int, int]]
-type EdgeTypeList = List[Tuple[int, int, int]]
+Num = int | float
+IntList = List[int]
+FloatList = List[float]
+BoolList = List[float]
+NumList = List[Num]
+TupleListMST = List[Tuple[Num, int, int]]
+EdgeTupleList = List[Tuple[int, int]]
+EdgeTypeList = List[Tuple[int, int, int]]
 
 ####################################################################################################
 
