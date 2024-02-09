@@ -2362,7 +2362,7 @@ class GeometryAlgorithms:
         """Positive area of polygon using above method."""
         return abs(self.signed_area_of_polygon_pts(pts))
 
-    def is_polygon_pts_convex(self, pts: List[Pt2d]) -> bool:  # TODO RETEST
+    def is_polygon_pts_convex(self, pts: List[Pt2d]) -> bool:
         """Determines if polygon is convex with options of allowing or disallowing collinearity.
 
         Complexity per call: Time: O(n), Space: O(1) ? maybe its O(n)
