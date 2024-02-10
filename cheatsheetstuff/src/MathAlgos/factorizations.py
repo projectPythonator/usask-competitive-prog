@@ -9,6 +9,15 @@ class MathAlgorithms:
         self.min_primes_list = None
         self.primes_list = []
         self.primes_set = set()
+    def prime_factorize_n_trivial(self, n: int) -> Dict:
+        limit, prime_factors = isqrt(n) + 1, []
+        for prime in range(2, limit):
+            while n % prime == 0:
+                n //= prime
+                prime_factors.append(prime)
+        if n > 1:  # n is prime or last factor of n is prime
+            prime_factors.append(n)
+        return Counter(prime_factors)
 
     def sieve_of_eratosthenes_optimized(self, n_inclusive: int) -> None:
         """Odds only optimized version of the previous method. Optimized to start at 3.
@@ -38,16 +47,6 @@ class MathAlgorithms:
             for j in range(start, end, step):
                 min_primes[j] = prime
         self.min_primes_list = min_primes
-
-    def prime_factorize_n_trivial(self, n: int) -> Dict:
-        limit, prime_factors = isqrt(n) + 1, []
-        for prime in range(2, limit):
-            while n % prime == 0:
-                n //= prime
-                prime_factors.append(prime)
-        if n > 1:  # n is prime or last factor of n is prime
-            prime_factors.append(n)
-        return Counter(prime_factors)
 
     def prime_factorize_n(self, n: int) -> Dict:  # using this for testing
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
