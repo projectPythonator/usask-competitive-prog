@@ -23,3 +23,12 @@ class TestMathMethods(unittest.TestCase):
                 self.assertTrue(number in primes_generated_by_sieve)
             else:
                 self.assertTrue(number not in primes_generated_by_sieve)
+
+    def test_miller_rabin_primality_test(self):
+        limit = 1000000
+        obj = prime_tests.MathAlgorithms()
+        obj.miller_rabin_primality_test_prep()
+        for number in range(limit):
+            trivial_result = obj.is_prime_trivial(number)
+            miller_rabin_result = obj.miller_rabin_primality_test(number)
+            self.assertEqual(trivial_result, miller_rabin_result)
