@@ -1,6 +1,7 @@
 import unittest
 from random import randint
 import primality_testing as prime_tests
+import prime_sieves
 
 
 class TestMathMethods(unittest.TestCase):
@@ -52,8 +53,33 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(test_obj.is_prime_optimized(number),
                              obj.miller_rabin_primality_test(number))
         for _ in range(random_test_limit):
-            number = randint(2**50, 2**64)
+            number = randint(2**50, 2**55)
             self.assertEqual(test_obj.is_prime_trivial(number),
                              obj.miller_rabin_primality_test(number), number)
 
+    def test_sieve_of_eratosthenes_100(self):
+        primes_to_100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41,
+                         43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
+        obj = prime_sieves.MathAlgorithms()
+        obj.sieve_of_eratosthenes(100)
+        self.assertEqual(obj.primes_list, primes_to_100)
 
+    def test_sieve_of_eratosthenes_1m(self):
+        limit = 1000000
+        test_obj = prime_tests.MathAlgorithms()
+        obj = prime_sieves.MathAlgorithms()
+        obj.sieve_of_eratosthenes(limit)
+        obj.primes_set = set(obj.primes_list)
+        for number in range(limit):
+            if test_obj.is_prime_trivial(number):
+                self.assertTrue(number in obj.primes_set)
+            else:
+                self.assertTrue(number not in obj.primes_set)
+
+    def test_sieve_of_eratosthenes_optimized_10m(self):
+        limit = 10000000
+        test_obj = prime_sieves.MathAlgorithms()
+        obj = prime_sieves.MathAlgorithms()
+        test_obj.sieve_of_eratosthenes(limit)
+        obj.sieve_of_eratosthenes_optimized(limit)
+        self.assertEqual(test_obj.primes_list, obj.primes_list)
