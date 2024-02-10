@@ -3,7 +3,7 @@ from random import randint
 import primality_testing as prime_tests
 import prime_sieves
 import prime_sieve_variants
-
+import factorizations
 
 class TestMathMethods(unittest.TestCase):
     def test_is_prime_optimized_up_to_100(self):
@@ -152,5 +152,17 @@ class TestMathMethods(unittest.TestCase):
             factors = obj.prime_factorize_n(i)
             self.assertEqual(sum(factors.values()), num_pf, i)
             self.assertEqual(sum(prime * power for prime, power in factors.items()), sum_pf, i)
+
+    def test_prime_factorize_n_against_prime_factorize_n_trivial_1m(self):
+        limit = 1000000
+        obj = factorizations.MathAlgorithms()
+        obj.sieve_of_eratosthenes_optimized(limit)
+        for number in range(2, limit):
+            expected_factors = obj.prime_factorize_n_trivial(number)
+            result_factors = obj.prime_factorize_n_trivial(number)
+            self.assertEqual(len(expected_factors), len(result_factors))
+            for prime, power in result_factors.items():
+                self.assertTrue(prime in expected_factors)
+                self.assertEqual(power, expected_factors[prime])
 
 
