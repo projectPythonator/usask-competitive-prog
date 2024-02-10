@@ -1343,12 +1343,13 @@ class MathAlgorithms:
 
     def euler_phi_plus_sum_and_number_of_diff_prime_factors(self, limit: int) -> None:
         """This is basically same as sieve just using different ops. Complexity function 2."""
-        num_diff_pf = [0] * (limit + 1)
-        sum_diff_pf = [0] * (limit + 1)
-        phi = [i for i in range(limit + 1)]
-        for i in range(2, limit + 1):
+        size_n = limit + 1
+        num_diff_pf = [0] * size_n
+        sum_diff_pf = [0] * size_n
+        phi = [i for i in range(size_n)]
+        for i in range(2, size_n):
             if num_diff_pf[i] == 0:
-                for j in range(i, limit + 1, i):
+                for j in range(i, size_n, i):
                     num_diff_pf[j] += 1
                     sum_diff_pf[j] += i
                     phi[j] = (phi[j]//i) * (i-1)
