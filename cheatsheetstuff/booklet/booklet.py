@@ -1326,6 +1326,7 @@ class MathAlgorithms:
         self.euler_phi_plus_sum_and_number_of_diff_prime_factors(n_inclusive)
         self.num_and_sum_of_divisors(n_inclusive)
         self.num_and_sum_of_prime_factors(n_inclusive)
+
     def num_and_sum_of_divisors(self, limit: int) -> None:
         """Does a basic sieve. Complexity function 1."""
         num_div = [1] * (limit + 1)
