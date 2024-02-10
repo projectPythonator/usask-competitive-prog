@@ -1,5 +1,6 @@
 from math import isqrt
 from itertools import takewhile
+from random import choices
 
 
 class MathAlgorithms:
@@ -69,7 +70,7 @@ class MathAlgorithms:
         """
         if n < self.primes_list[-1]:
             return n in self.primes_set
-        if any((n % self.primes_list[p] == 0) for p in range(16)) or n == 3215031751:
+        if any((n % self.primes_list[p] == 0) for p in range(32)) or n == 3215031751:
             return False  # 3215031751 is an edge case for this data set
         d, s = n-1, 0
         while d % 2 == 0:
@@ -79,8 +80,8 @@ class MathAlgorithms:
                 if n < bound:
                     return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s)
                                    for j in range(i))
-        return not any(self.is_composite(self.primes_list[j], d, n, s)
-                       for j in range(precision_for_huge_n))
+        return not any(self.is_composite(prime, d, n, s)
+                       for prime in choices(self.primes_list, k=precision_for_huge_n))
 
     def miller_rabin_primality_test_prep(self):
         """This function needs to be called before miller rabin"""
