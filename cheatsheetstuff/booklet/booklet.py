@@ -1306,11 +1306,12 @@ class MathAlgorithms:
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
         """
-        min_primes = [0] * (n_inclusive + 1)
+        size_n = n_inclusive + 1
+        min_primes = [0] * size_n
         min_primes[1] = 1
-        for prime in self.primes_list:
+        for prime in reversed(self.primes_list):
             min_primes[prime] = prime
-            start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2 * prime
+            start, end, step = prime * prime, size_n, prime if prime == 2 else 2 * prime
             for j in range(start, end, step):
                 min_primes[j] = prime
         self.min_primes_list = min_primes
