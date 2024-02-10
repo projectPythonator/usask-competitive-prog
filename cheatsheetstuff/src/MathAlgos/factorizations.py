@@ -6,6 +6,7 @@ from typing import Dict
 
 class MathAlgorithms:
     def __init__(self):
+        self.min_primes_list = None
         self.primes_list = []
         self.primes_set = set()
 
@@ -31,7 +32,7 @@ class MathAlgorithms:
         """
         min_primes = [0] * (n_inclusive + 1)
         min_primes[1] = 1
-        for prime in self.primes_list:
+        for prime in reversed(self.primes_list):
             min_primes[prime] = prime
             start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2 * prime
             for j in range(start, end, step):
@@ -64,7 +65,17 @@ class MathAlgorithms:
             prime_factors.append(n)
         return Counter(prime_factors)
 
+    def prime_factorize_n_log_n(self, n: int) -> Dict:
+        """An optimized prime factorization of n function based on min primes already sieved.
 
+        Complexity: Time: O(log n), Space: O(log n)
+        Optimization: assign append to function and assign min_prime[n] to a value in the loop
+        """
+        prime_factors = []
+        while n > 1:
+            prime_factors.append(self.min_primes_list[n])
+            n = n // self.min_primes_list[n]
+        return Counter(prime_factors)
     def polynomial_function_f(self, x: int, c: int, m: int) -> int:
         """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding."""
         return (x * x + c) % m  # paste this in code for speed up. is here for clarity only

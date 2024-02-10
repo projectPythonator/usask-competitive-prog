@@ -154,15 +154,28 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(sum(prime * power for prime, power in factors.items()), sum_pf, i)
 
     def test_prime_factorize_n_against_prime_factorize_n_trivial_1m(self):
+        """Assumes prime_factorize_n_trivial works."""
         limit = 1000000
         obj = factorizations.MathAlgorithms()
         obj.sieve_of_eratosthenes_optimized(limit)
         for number in range(2, limit):
             expected_factors = obj.prime_factorize_n_trivial(number)
-            result_factors = obj.prime_factorize_n_trivial(number)
+            result_factors = obj.prime_factorize_n(number)
             self.assertEqual(len(expected_factors), len(result_factors))
             for prime, power in result_factors.items():
                 self.assertTrue(prime in expected_factors)
                 self.assertEqual(power, expected_factors[prime])
 
-
+    def test_prime_factorize_n_log_n_1m(self):
+        """Assumes prime_factorize_n_trivial works."""
+        limit = 1000000
+        obj = factorizations.MathAlgorithms()
+        obj.sieve_of_eratosthenes_optimized(limit)
+        obj.sieve_of_min_primes(limit)
+        for number in range(2, limit):
+            expected_factors = obj.prime_factorize_n(number)
+            result_factors = obj.prime_factorize_n_log_n(number)
+            self.assertEqual(len(expected_factors), len(result_factors))
+            for prime, power in result_factors.items():
+                self.assertTrue(prime in expected_factors)
+                self.assertEqual(power, expected_factors[prime])
