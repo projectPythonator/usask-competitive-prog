@@ -1,4 +1,5 @@
 from math import isqrt
+from itertools import takewhile
 
 
 class MathAlgorithms:
@@ -35,6 +36,15 @@ class MathAlgorithms:
         limit = isqrt(n) + 1
         for p in range(5, limit, 6):
             if n % p == 0 or n % (p+2) == 0:
+                return False
+        return True
+
+    def is_prime_optimized(self, n):
+        if n < self.primes_list[-1]:
+            return n in self.primes_set
+        limit = isqrt(n) + 1
+        for prime in takewhile(lambda x: x < limit, self.primes_list):
+            if n % prime == 0:
                 return False
         return True
 
