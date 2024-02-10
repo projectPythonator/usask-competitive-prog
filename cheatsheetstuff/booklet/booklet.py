@@ -1255,7 +1255,7 @@ class MathAlgorithms:
         self.fft_swap_indices = []
         self.fft_roots_of_unity = []
 
-    def is_prime_triv(self, n: int) -> bool:
+    def is_prime_trivial(self, n: int) -> bool:
         """Tests if n is prime via divisors up to sqrt(n).
 
         Complexity per call: Time: O(sqrt(n)), T(sqrt(n)/3), Space: O(1)
