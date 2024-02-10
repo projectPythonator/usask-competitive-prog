@@ -2981,9 +2981,9 @@ class Matrix:
     """Optimization notes: prefixed names of form local_NAME are used to avoid expensive load_attr
     calls they can be replaced with self.NAME or passed in as global values, """
     def __init__(self, n, m, init_value: Num):
+        self.matrix = [[init_value] * m for _ in range(n)]
         self.num_rows = n
         self.num_cols = m
-        self.matrix = [[init_value] * m for _ in range(n)]
         self.matrix_left = []
         self.matrix_right = []
 
