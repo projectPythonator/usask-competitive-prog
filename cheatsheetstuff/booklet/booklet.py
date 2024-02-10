@@ -1396,7 +1396,7 @@ class MathAlgorithms:
             n = n // self.min_primes_list[n]
         return prime_factors
 
-    def prime_factorize_n_variants(self, n: int) -> int:  # TODO RETEST
+    def prime_factorize_n_variants(self, n: int) -> int:
         """Covers all the variants listed above, holds the same time complexity with O(1) space."""
         limit = isqrt(n) + 1
         sum_diff_prime_factors, num_diff_prime_factors = 0, 0
