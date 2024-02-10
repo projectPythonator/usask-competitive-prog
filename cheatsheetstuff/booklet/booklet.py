@@ -2979,7 +2979,9 @@ class StringAlgorithms:
 
 class Matrix:
     """Optimization notes: prefixed names of form local_NAME are used to avoid expensive load_attr
-    calls they can be replaced with self.NAME or passed in as global values, """
+    calls they can be replaced with self.NAME or passed in as global values,
+    REASON: even in pypy it seems N^3 operations can be speed up by doing this.
+    """
     def __init__(self, n, m, init_value: Num):
         self.matrix = [[init_value] * m for _ in range(n)]
         self.num_rows = n
