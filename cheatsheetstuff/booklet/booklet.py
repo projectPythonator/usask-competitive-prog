@@ -1331,10 +1331,11 @@ class MathAlgorithms:
 
     def num_and_sum_of_divisors(self, limit: int) -> None:
         """Does a basic sieve. Complexity function 1."""
-        num_div = [1] * (limit + 1)
-        sum_div = [1] * (limit + 1)
-        for i in range(2, limit + 1):
-            for j in range(i, limit + 1, i):
+        size_n = limit + 1
+        num_div = [1] * size_n
+        sum_div = [1] * size_n
+        for i in range(2, size_n):
+            for j in range(i, size_n, i):
                 num_div[j] += 1
                 sum_div[j] += i
         self.num_divisors = num_div
