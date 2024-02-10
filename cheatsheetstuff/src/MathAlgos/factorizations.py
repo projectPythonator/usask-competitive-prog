@@ -109,6 +109,7 @@ class MathAlgorithms:
         return (num_diff_prime_factors, sum_diff_prime_factors,
                 num_prime_factors, sum_prime_factors,
                 num_divisors, sum_divisors, euler_phi)
+
     def polynomial_function_f(self, x: int, c: int, m: int) -> int:
         """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding."""
         return (x * x + c) % m  # paste this in code for speed up. is here for clarity only
@@ -120,8 +121,9 @@ class MathAlgorithms:
         """
         x, y, g = x0, x0, 1
         while g == 1:  # when g != 1 then we found a divisor of n shared with x - y
-            x = self.polynomial_function_f(x, c, n)
-            y = self.polynomial_function_f(self.polynomial_function_f(y, c, n), c, n)
+            x = (x * x + c) % n
+            y = (y * y + c) % n
+            y = (y * y + c) % n
             g = gcd(abs(x - y), n)
         return g
 
