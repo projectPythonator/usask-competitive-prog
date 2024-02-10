@@ -87,7 +87,6 @@ class MathAlgorithms:
         """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
         num_pf = [0] * (limit + 1)
         sum_pf = [0] * (limit + 1)
-        self.sieve_of_eratosthenes_optimized(limit)
         for prime in self.primes_list:
             exponent_limit = int(log(limit, prime)) + 1
             for exponent in range(1, exponent_limit):
