@@ -2955,12 +2955,10 @@ class StringAlgorithms:
 
         Complexity per call: Time: O(log mod_m), Space: O(1)
         """
-        loc_h_vals = self.hash_h_values  # optional avoids expensive load_attr operation
-        ans = loc_h_vals[right]
+        ans = self.hash_h_values[right]
         if left != 0:
-            loc_mod = self.mod_m  # optional avoids expensive load_attr operation
-            ans = ((ans - loc_h_vals[left - 1])
-                   * pow(self.hash_powers[left], loc_mod-2, loc_mod)) % loc_mod
+            ans = ((ans - self.hash_h_values[left - 1])
+                   * pow(self.hash_powers[left], self.mod_m - 2, self.mod_m)) % self.mod_m
         return ans
 
     def hash_fast_constant(self, left, right):  # TODO RETEST
@@ -2970,10 +2968,9 @@ class StringAlgorithms:
         more uses: string matching in n + m or constant if you know that it's a set size
         kattis typo: uses a variant of this were you will expand on the code further.
         """
-        loc_h_vals = self.hash_h_values  # optional avoids expensive load_attr operation
-        ans = loc_h_vals[right]
+        ans = self.hash_h_values[right]
         if left != 0:
-            ans = ((ans - loc_h_vals[left - 1]) * self.left_mod_inverse[left]) % self.mod_m
+            ans = ((ans - self.hash_h_values[left - 1]) * self.left_mod_inverse[left]) % self.mod_m
         return ans
 
 
