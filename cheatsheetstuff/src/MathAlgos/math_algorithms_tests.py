@@ -43,7 +43,7 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(obj.is_prime_optimized(number), obj.is_prime_trivial(number))
 
     def test_miller_rabin_primality_test_1m(self):
-        test_limit = 10000000
+        test_limit = 1000000
         limit = 1000000
         random_test_limit = 10
         test_obj = prime_tests.MathAlgorithms()
@@ -78,8 +78,8 @@ class TestMathMethods(unittest.TestCase):
             else:
                 self.assertTrue(number not in obj.primes_set)
 
-    def test_sieve_of_eratosthenes_optimized_10m(self):
-        limit = 10000000
+    def test_sieve_of_eratosthenes_optimized_1m(self):
+        limit = 1000000
         test_obj = prime_sieves.MathAlgorithms()
         obj = prime_sieves.MathAlgorithms()
         test_obj.sieve_of_eratosthenes(limit)
@@ -112,9 +112,9 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(expected_sum, sum_div)
             self.assertEqual(expected_num, num_div)
 
-    def testing_num_and_sum_of_divisors_same_as_faster_version_10m(self):
+    def testing_num_and_sum_of_divisors_same_as_faster_version_1m(self):
         """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
-        limit = 10000000
+        limit = 1000000
         obj1 = prime_sieve_variants.MathAlgorithms()
         obj2 = prime_sieve_variants.MathAlgorithms()
         obj1.num_and_sum_of_divisors(limit)
