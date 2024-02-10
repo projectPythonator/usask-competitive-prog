@@ -94,4 +94,14 @@ class TestMathMethods(unittest.TestCase):
         for i in range(2, limit):
             self.assertEqual(obj.min_primes_list[i], min(obj.prime_factorize_n(i)))
 
+    def testing_num_and_sum_of_divisors_same_as_faster_version_10m(self):
+        """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
+        limit = 10000000
+        obj1 = prime_sieve_variants.MathAlgorithms()
+        obj2 = prime_sieve_variants.MathAlgorithms()
+        obj1.num_and_sum_of_divisors(limit)
+        obj2.num_and_sum_of_divisors_faster(limit)
+        self.assertEqual(obj1.num_divisors, obj2.num_divisors)
+        self.assertEqual(obj1.sum_divisors, obj2.sum_divisors)
+
 
