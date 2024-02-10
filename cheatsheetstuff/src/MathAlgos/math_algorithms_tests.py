@@ -55,3 +55,5 @@ class TestMathMethods(unittest.TestCase):
             number = randint(2**50, 2**64)
             self.assertEqual(test_obj.is_prime_trivial(number),
                              obj.miller_rabin_primality_test(number), number)
+
+
