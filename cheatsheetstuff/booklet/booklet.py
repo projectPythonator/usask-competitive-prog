@@ -1277,11 +1277,12 @@ class MathAlgorithms:
         Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
         Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
         """
-        limit, prime_sieve = isqrt(n_inclusive) + 1, [True] * (n_inclusive + 1)
+        size_n = n_inclusive + 1
+        limit, prime_sieve = isqrt(n_inclusive) + 1, [True] * size_n
         prime_sieve[0] = prime_sieve[1] = False
-        for prime in range(2, limit):
+        for prime in range(2, size_n):
             if prime_sieve[prime]:
-                for composite in range(prime * prime, n_inclusive + 1, prime):
+                for composite in range(prime * prime, size_n, prime):
                     prime_sieve[composite] = False
         self.primes_list = [i for i, is_prime in enumerate(prime_sieve) if is_prime]
 
