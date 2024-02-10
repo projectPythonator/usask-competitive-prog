@@ -2996,6 +2996,7 @@ class Matrix:
 
     def fast_copy(self, other):  # TODO RETEST
         """Quickly copy one matrix to another. MIGHT CHANGE SIZE, O(n^2), is fast copy tho."""
+        other_mat = other.matrix
         self.matrix = [[el for el in row] for row in other.matrix]
 
     def fill_matrix_from_row_col(self, new_matrix, row_offset: int, col_offset: int):  # TODO RETEST
