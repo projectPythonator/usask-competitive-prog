@@ -5,6 +5,7 @@ import prime_sieves
 import prime_sieve_variants
 import factorizations
 
+
 class TestMathMethods(unittest.TestCase):
     def test_is_prime_optimized_up_to_100(self):
         primes_to_100 = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41,
@@ -54,7 +55,7 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(test_obj.is_prime_optimized(number),
                              obj.miller_rabin_primality_test(number))
         for _ in range(random_test_limit):
-            number = randint(2**50, 2**55)
+            number = randint(2 ** 50, 2 ** 55)
             self.assertEqual(test_obj.is_prime_trivial(number),
                              obj.miller_rabin_primality_test(number), number)
 
@@ -107,7 +108,7 @@ class TestMathMethods(unittest.TestCase):
             expected_num = expected_sum = 1
             for prime, power in factors.items():
                 expected_num *= (power + 1)
-                expected_sum *= ((prime ** (power + 1)-1)//(prime - 1))
+                expected_sum *= ((prime ** (power + 1) - 1) // (prime - 1))
             self.assertEqual(expected_sum, sum_div)
             self.assertEqual(expected_num, num_div)
 
@@ -179,3 +180,23 @@ class TestMathMethods(unittest.TestCase):
             for prime, power in result_factors.items():
                 self.assertTrue(prime in expected_factors)
                 self.assertEqual(power, expected_factors[prime])
+
+    def test_prime_factorize_n_variants_1m(self):
+        limit = 1000000
+        obj_base = prime_sieve_variants.MathAlgorithms()
+        obj = factorizations.MathAlgorithms()
+        obj_base.num_and_sum_of_divisors_faster(limit)
+        obj_base.num_and_sum_of_prime_factors(limit)
+        obj_base.euler_phi_plus_sum_and_number_of_diff_prime_factors(limit)
+        obj.sieve_of_eratosthenes_optimized(limit)
+        for i, expected_tuple in enumerate(zip(obj_base.num_diff_prime_factors,
+                                               obj_base.sum_diff_prime_factors,
+                                               obj_base.num_prime_factors,
+                                               obj_base.sum_prime_factors,
+                                               obj_base.num_divisors,
+                                               obj_base.sum_divisors,
+                                               obj_base.euler_phi)):
+            if i < 2:
+                continue
+            result_tuple = obj.prime_factorize_n_variants(i)
+            self.assertEqual(result_tuple, expected_tuple)

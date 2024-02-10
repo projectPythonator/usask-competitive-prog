@@ -1,7 +1,7 @@
 from math import gcd, isqrt
 from collections import Counter
 from itertools import takewhile
-from typing import Dict
+from typing import Dict, Tuple
 
 
 class MathAlgorithms:
@@ -75,6 +75,40 @@ class MathAlgorithms:
             prime_factors.append(self.min_primes_list[n])
             n = n // self.min_primes_list[n]
         return Counter(prime_factors)
+
+    def prime_factorize_n_variants(self, n: int) -> Tuple:
+        """Covers all the variants listed above, holds the same time complexity with O(1) space."""
+        limit = isqrt(n) + 1
+        sum_diff_prime_factors, num_diff_prime_factors = 0, 0
+        sum_prime_factors, num_prime_factors = 0, 0
+        sum_divisors, num_divisors, euler_phi = 1, 1, n
+        for prime in takewhile(lambda x: x < limit, self.primes_list):
+            if n % prime == 0:
+                mul, total = prime, 1  # for sum of divisors
+                power = 0              # for num of divisors
+                while n % prime == 0:
+                    n //= prime
+                    power += 1         # for num prime factors, num divisors, and sum prime factors
+                    total += mul       # for sum divisors
+                    mul *= prime       # for sum divisors
+                sum_diff_prime_factors += prime
+                num_diff_prime_factors += 1
+                sum_prime_factors += (prime * power)
+                num_prime_factors += power
+                num_divisors *= (power + 1)
+                sum_divisors *= total
+                euler_phi -= (euler_phi//prime)
+        if n > 1:
+            num_diff_prime_factors += 1
+            sum_diff_prime_factors += n
+            num_prime_factors += 1
+            sum_prime_factors += n
+            num_divisors *= 2
+            sum_divisors *= (n + 1)
+            euler_phi -= (euler_phi // n)
+        return (num_diff_prime_factors, sum_diff_prime_factors,
+                num_prime_factors, sum_prime_factors,
+                num_divisors, sum_divisors, euler_phi)
     def polynomial_function_f(self, x: int, c: int, m: int) -> int:
         """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding."""
         return (x * x + c) % m  # paste this in code for speed up. is here for clarity only
