@@ -2,6 +2,7 @@ import unittest
 from random import randint
 import primality_testing as prime_tests
 import prime_sieves
+import prime_sieve_variants
 
 
 class TestMathMethods(unittest.TestCase):
@@ -83,3 +84,14 @@ class TestMathMethods(unittest.TestCase):
         test_obj.sieve_of_eratosthenes(limit)
         obj.sieve_of_eratosthenes_optimized(limit)
         self.assertEqual(test_obj.primes_list, obj.primes_list)
+
+    def testing_sieve_of_min_primes_1m(self):
+        """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
+        limit = 1000000
+        obj = prime_sieve_variants.MathAlgorithms()
+        obj.sieve_of_eratosthenes_optimized(limit)
+        obj.sieve_of_min_primes(limit)
+        for i in range(2, limit):
+            self.assertEqual(obj.min_primes_list[i], min(obj.prime_factorize_n(i)))
+
+
