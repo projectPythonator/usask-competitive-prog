@@ -1279,11 +1279,11 @@ class MathAlgorithms:
         """
         limit, prime_sieve = isqrt(n_inclusive) + 1, [True] * (n_inclusive + 1)
         prime_sieve[0] = prime_sieve[1] = False
-        for i in range(2, limit):
-            if prime_sieve[i]:
-                for j in range(i*i, n_inclusive + 1, i):  # n + 1 because n is an inclusive bound
-                    prime_sieve[j] = False
-        self.primes_list = [i for i, el in enumerate(prime_sieve) if el]
+        for prime in range(2, limit):
+            if prime_sieve[prime]:
+                for composite in range(prime * prime, n_inclusive + 1, prime):
+                    prime_sieve[composite] = False
+        self.primes_list = [i for i, is_prime in enumerate(prime_sieve) if is_prime]
 
     def sieve_of_eratosthenes_optimized(self, n_inclusive: int) -> None:
         """Odds only optimized version of the previous method. Optimized to start at 3.
