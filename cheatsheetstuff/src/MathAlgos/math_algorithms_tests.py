@@ -121,7 +121,7 @@ class TestMathMethods(unittest.TestCase):
         self.assertEqual(obj1.num_divisors, obj2.num_divisors)
         self.assertEqual(obj1.sum_divisors, obj2.sum_divisors)
 
-    def testing_euler_phi_plus_sum_and_number_of_diff_prime_factors(self):
+    def testing_euler_phi_plus_sum_and_number_of_diff_prime_factors_1m(self):
         """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
         limit = 1000000
         obj = prime_sieve_variants.MathAlgorithms()
@@ -139,5 +139,18 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(len(factors), num_diff_pf, i)
             self.assertEqual(sum(factors), sum_diff_pf, i)
             self.assertEqual(expected_phi, phi)
+
+    def testing_num_and_sum_of_prime_factors_1m(self):
+        """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
+        limit = 1000000
+        obj = prime_sieve_variants.MathAlgorithms()
+        obj.sieve_of_eratosthenes_optimized(limit)
+        obj.num_and_sum_of_prime_factors(limit)
+        for i, (num_pf, sum_pf) in enumerate(zip(obj.num_prime_factors, obj.sum_prime_factors)):
+            if i < 2:
+                continue
+            factors = obj.prime_factorize_n(i)
+            self.assertEqual(sum(factors.values()), num_pf, i)
+            self.assertEqual(sum(prime * power for prime, power in factors.items()), sum_pf, i)
 
 
