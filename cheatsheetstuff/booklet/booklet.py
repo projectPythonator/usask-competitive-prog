@@ -1,4 +1,4 @@
-from typing import TypeVar, List, Tuple
+from typing import TypeVar, List, Tuple, Dict
 
 Numeric = TypeVar('Numeric', int, float, complex)
 Reals = TypeVar('Reals', int, float, complex)
@@ -1389,7 +1389,7 @@ class MathAlgorithms:
         self.num_divisors = num_divs
         self.sum_divisors = sum_divs
 
-    def prime_factorize_n(self, n: int) -> List[int]:
+    def prime_factorize_n(self, n: int) -> Dict:
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
 
         Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
@@ -1404,9 +1404,9 @@ class MathAlgorithms:
         if n > 1:  # n is prime or last factor of n is prime
             prime_factors.append(n)
         self.factor_list = Counter(prime_factors)
-        return prime_factors
+        return Counter(prime_factors)
 
-    def prime_factorize_n_log_n(self, n: int) -> List[int]:
+    def prime_factorize_n_log_n(self, n: int) -> Dict:
         """An optimized prime factorization of n function based on min primes already sieved.
 
         Complexity: Time: O(log n), Space: O(log n)
@@ -1416,7 +1416,8 @@ class MathAlgorithms:
         while n > 1:
             prime_factors.append(self.min_primes_list[n])
             n = n // self.min_primes_list[n]
-        return prime_factors
+        self.factor_list = Counter(prime_factors)
+        return Counter(prime_factors)
 
     def prime_factorize_n_variants(self, n: int) -> int:
         """Covers all the variants listed above, holds the same time complexity with O(1) space."""
