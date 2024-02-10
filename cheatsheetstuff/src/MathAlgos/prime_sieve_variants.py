@@ -1,5 +1,7 @@
 from math import isqrt, log
-
+from typing import Dict
+from itertools import takewhile
+from collections import Counter
 
 class MathAlgorithms:
     def __init__(self):
@@ -15,6 +17,22 @@ class MathAlgorithms:
         self.num_diff_prime_factors = []
         self.num_prime_factors = []
 
+    def prime_factorize_n(self, n: int) -> Dict:  # using this for testing
+        """A basic prime factorization of n function. without primes its just O(sqrt(n))
+
+        Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
+        Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
+        """
+        limit, prime_factors = isqrt(n) + 1, []
+        for prime in takewhile(lambda x: x < limit, self.primes_list):
+            if n % prime == 0:
+                while n % prime == 0:
+                    n //= prime
+                    prime_factors.append(prime)
+        if n > 1:  # n is prime or last factor of n is prime
+            prime_factors.append(n)
+        return Counter(prime_factors)
+
     def sieve_of_eratosthenes_optimized(self, n_inclusive: int) -> None:
         """Odds only optimized version of the previous method. Optimized to start at 3.
 
@@ -29,7 +47,6 @@ class MathAlgorithms:
                 for j in range(start, limit, prime):
                     primes_sieve[j] = False
         self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
-
 
     def sieve_of_min_primes(self, n_inclusive: int) -> None:
         """Stores the min or max prime divisor for each number up to n.
