@@ -5,6 +5,8 @@ from math import isqrt
 class MathAlgorithms:
     def __init__(self):
         self.primes_list = []
+        self.mrpt_known_bounds = []
+        self.mrpt_known_tests = []
         self.primes_set = set()
 
     def sieve_of_eratosthenes(self, n_inclusive: int) -> None:
@@ -15,12 +17,11 @@ class MathAlgorithms:
         """
         limit, prime_sieve = isqrt(n_inclusive) + 1, [True] * (n_inclusive + 1)
         prime_sieve[0] = prime_sieve[1] = False
-        for i in range(2, limit):
-            if prime_sieve[i]:
-                for j in range(i * i, n_inclusive + 1,
-                               i):  # n + 1 because n is an inclusive bound
-                    prime_sieve[j] = False
-        self.primes_list = [i for i, el in enumerate(prime_sieve) if el]
+        for prime in range(2, limit):
+            if prime_sieve[prime]:
+                for composite in range(prime * prime, n_inclusive + 1, prime):
+                    prime_sieve[composite] = False
+        self.primes_list = [i for i, is_prime in enumerate(prime_sieve) if is_prime]
 
     def is_prime_trivial(self, n: int) -> bool:
         """Tests if n is prime via divisors up to sqrt(n).
@@ -76,5 +77,5 @@ class MathAlgorithms:
         self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
                                   2152302898747, 3474749660383, 341550071728321]
         self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
-        self.sieve_of_eratosthenes(1000)  # comment out if different size needed
+        self.sieve_of_eratosthenes(1000)         # comment out if different size needed
         self.primes_set = set(self.primes_list)  # comment out if already have bigger size
