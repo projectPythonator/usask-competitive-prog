@@ -1486,9 +1486,9 @@ class MathAlgorithms:
         Complexity per call: Time O(k log^3(n)), Space: O(2**s) bits
         Note: range(16) used to just do a small test to weed out lots of numbers.
         """
-        if n in self.primes_set:
-            return True
-        if any((n % self.primes_list[p] == 0) for p in range(16)) or n < 2 or n == 3215031751:
+        if n < self.primes_list[-1]:
+            return n in self.primes_set
+        if any((n % self.primes_list[p] == 0) for p in range(16)) or n == 3215031751:
             return False  # 3215031751 is an edge case for this data set
         d, s = n-1, 0
         while d % 2 == 0:
