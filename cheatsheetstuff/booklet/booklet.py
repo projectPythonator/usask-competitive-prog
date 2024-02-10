@@ -1343,9 +1343,9 @@ class MathAlgorithms:
         num_diff_pf = [0] * (limit + 1)
         sum_diff_pf = [0] * (limit + 1)
         phi = [i for i in range(limit + 1)]
-        for i in range(2, limit):
+        for i in range(2, limit + 1):
             if num_diff_pf[i] == 0:
-                for j in range(i, limit, i):
+                for j in range(i, limit + 1, i):
                     num_diff_pf[j] += 1
                     sum_diff_pf[j] += i
                     phi[j] = (phi[j]//i) * (i-1)
