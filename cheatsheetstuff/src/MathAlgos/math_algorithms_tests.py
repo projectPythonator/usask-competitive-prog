@@ -200,3 +200,12 @@ class TestMathMethods(unittest.TestCase):
                 continue
             result_tuple = obj.prime_factorize_n_variants(i)
             self.assertEqual(result_tuple, expected_tuple)
+
+    def test_block_sieve_odd(self):
+        limit = 10000
+        obj_base = prime_sieves.MathAlgorithms()
+        obj = prime_sieves.MathAlgorithms()
+        for i in range(10, limit):
+            obj_base.sieve_of_eratosthenes_optimized(i)
+            obj.block_sieve_odd(i)
+            self.assertEqual(obj_base.primes_list, obj.primes_list, i)
