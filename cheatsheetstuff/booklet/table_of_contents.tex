@@ -1,0 +1,34 @@
+\documentclass[12pt]{article}
+
+\usepackage[landscape,
+            left=0.25in, right=0.25in, top=0.25in, bottom=0.5in]{geometry}
+\setlength{\columnseprule}{0.1pt}
+\usepackage{multicol}
+
+\usepackage{listings}
+
+\lstdefinestyle{mystyle}{
+    xleftmargin={1em},
+    %xrightmargin={1em},
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\tiny,
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    showspaces=false,
+    showstringspaces=false,
+    showtabs=false,
+    tabsize=2
+}
+
+\lstset{style=mystyle}
+
+\begin{document}
+\begin{multicols}{4}
+\lstinputlisting{table_of_contents.txt}
+\end{multicols}
+\end{document}
