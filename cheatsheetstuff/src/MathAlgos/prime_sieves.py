@@ -36,7 +36,8 @@ class MathAlgorithms:
         self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
     def block_sieve_odd(self, limit):
-        end_sqrt, end_limit = isqrt(limit) + 1, (limit-1)//2
+        limit += 10
+        end_sqrt, end_limit = isqrt(limit) + 1, (limit - 1) // 2
         sieve_and_block, primes, smaller_primes = [True] * (end_sqrt + 1), [2], []
         app, smaller_app = primes.append, smaller_primes.append
         for prime in range(3, end_sqrt, 2):
@@ -57,3 +58,5 @@ class MathAlgorithms:
                 if sieve_and_block[i]:
                     app((low + i) * 2 + 1)
         self.primes_list = primes
+        while self.primes_list[-1] > limit-10:
+            self.primes_list.pop()
