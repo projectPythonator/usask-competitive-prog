@@ -1,17 +1,11 @@
-\documentclass[11pt]{article}
+\documentclass[12pt]{article}
 
-\usepackage[landscape, twocolumn,
+\usepackage[landscape,
             left=0.25in, right=0.25in, top=0.25in, bottom=0.5in]{geometry}
-\setlength{\columnseprule}{0.5pt}
+\setlength{\columnseprule}{0.1pt}
+\usepackage{multicol}
 
-\usepackage{xcolor}
 \usepackage{listings}
-
-% Code Block Settings:
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 \lstdefinestyle{mystyle}{
     xleftmargin={1em},
@@ -33,13 +27,8 @@
 
 \lstset{style=mystyle}
 
-\usepackage{fancyhdr}
-\renewcommand{\headrulewidth}{0pt}
-\fancyhf{}
-\rfoot{\thepage}
-
-
 \begin{document}
-\pagestyle{fancy}
-\lstinputlisting[language=Python]{booklet.py}
+\begin{multicols}{4}
+\lstinputlisting{table_of_contents.txt}
+\end{multicols}
 \end{document}

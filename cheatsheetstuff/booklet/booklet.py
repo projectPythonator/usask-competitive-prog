@@ -1,5 +1,4 @@
 from typing import TypeVar, List, Tuple, Dict
-
 Numeric = TypeVar('Numeric', int, float, complex)
 Reals = TypeVar('Reals', int, float, complex)
 Rationals = TypeVar('Rationals', int, float)
@@ -12,6 +11,7 @@ NumList = List[Num]
 TupleListMST = List[Tuple[Num, int, int]]
 EdgeTupleList = List[Tuple[int, int]]
 EdgeTypeList = List[Tuple[int, int, int]]
+
 
 def pairwise_func(seq):
   it = iter(seq)
@@ -400,7 +400,7 @@ class RangeUpdateRangeQuery:
     if left > 1:
       return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
     return (self.range_update_point_query.point_sum_query_of_index(right) * right
-        - self.point_update_range_query.range_sum_from_i_to_j(1, right))
+            - self.point_update_range_query.range_sum_from_i_to_j(1, right))
 
 
 ##################################################
@@ -482,7 +482,7 @@ class SegmentTree:
       left_ind = self.segment_tree[left_path]
       right_ind = self.segment_tree[right_path]
       self.segment_tree[parent] = (left_ind if (self.array_a[left_ind]
-                            <= self.array_a[right_ind]) else right_ind)
+                                                <= self.array_a[right_ind]) else right_ind)
 
   def _range_min_query_1(self, parent, left, right, i, j):
     self.propagate(parent, left, right)
@@ -492,9 +492,9 @@ class SegmentTree:
       return self.segment_tree[parent]
     mid = (left + right) // 2
     left_min = self._range_min_query_1(self.left_child(parent), left, mid,
-                       i, min(mid, j))
+                                       i, min(mid, j))
     right_min = self._range_min_query_1(self.right_child(parent), mid + 1, right,
-                      max(i, mid + 1), j)
+                                        max(i, mid + 1), j)
     return self.conqur(left_min, right_min)
 
   def _range_min_query_2(self, parent, left, right, i, j):
@@ -527,12 +527,12 @@ class SegmentTree:
       self._update_segment_tree_1(left_path, left, mid, i, min(mid, j), value)
       self._update_segment_tree_1(right_path, mid + 1, right, max(i, mid + 1), j, value)
       left_subtree = (self.lazy[left_path] if self.lazy[left_path] != -1
-              else self.segment_tree[left_path])
+                      else self.segment_tree[left_path])
       right_subtree = (self.lazy[right_path] if self.lazy[right_path] != -1
-               else self.segment_tree[right_path])
+                       else self.segment_tree[right_path])
       self.segment_tree[parent] = (self.segment_tree[left_path]
-                     if left_subtree <= right_subtree
-                     else self.segment_tree[right_path])
+                                   if left_subtree <= right_subtree
+                                   else self.segment_tree[right_path])
 
   def _update_segment_tree_2(self, parent, left, right, i, j, new_value):
     if right < i or j < left:
@@ -555,11 +555,11 @@ class SegmentTree:
       self.segment_tree[left_path] = left
       self.segment_tree[right_path] = mid
     left_ind = self._update_segment_tree_2(left_path, left, mid,
-                         max(i, left), min(j, mid), new_value)
+                                           max(i, left), min(j, mid), new_value)
     right_ind = self._update_segment_tree_2(right_path, mid+1, right,
-                        max(i, mid+1), min(j, right), new_value)
-    self.segment_tree[parent] = (left_ind if (self.array_a[left_ind]
-                          <= self.array_a[right_ind]) else right_ind)
+                                            max(i, mid+1), min(j, right), new_value)
+    self.segment_tree[parent] = (left_ind if (self.array_a[left_ind] <= self.array_a[right_ind])
+                                 else right_ind)
     return self.segment_tree[parent]
 
   def build_segment_tree_1(self):
@@ -1516,15 +1516,14 @@ class MathAlgorithms:
     if n < self.mrpt_known_bounds[-1]:
       for i, bound in enumerate(self.mrpt_known_bounds, 2):
         if n < bound:
-          return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s)
-                   for j in range(i))
+          return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s) for j in range(i))
     return not any(self.is_composite(self.primes_list[j], d, n, s)
-             for j in range(precision_for_huge_n))
+                   for j in range(precision_for_huge_n))
 
   def miller_rabin_primality_test_prep(self):
     """This function needs to be called before miller rabin"""
     self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
-                  2152302898747, 3474749660383, 341550071728321]
+                              2152302898747, 3474749660383, 341550071728321]
     self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
     self.sieve_of_eratosthenes(1000)  # comment out if different size needed
     self.primes_set = set(self.primes_list)  # comment out if already have bigger size
@@ -1620,7 +1619,7 @@ class MathAlgorithms:
     return x
 
   def chinese_remainder_theorem_helper(self, mod1: int, rem1: int,
-                     mod2: int, rem2: int) -> Tuple[int, int]:
+                                       mod2: int, rem2: int) -> Tuple[int, int]:
     """Chinese remainder theorem (special case): find z such that z % m1 = r1, z % m2 = r2.
     Here, z is unique modulo M = lcm(m1, m2). Return (z, M).  On failure, M = -1.
     from: stanford icpc 2016
@@ -1634,7 +1633,7 @@ class MathAlgorithms:
     return 0, -1
 
   def chinese_remainder_theorem_2(self, remainders: List[int],
-                  modulos: List[int]) -> Tuple[int, int]:
+                                  modulos: List[int]) -> Tuple[int, int]:
     """Chinese remainder theorem: find z such that z % m[i] = r[i] for all i.  Note that the
     solution is unique modulo M = lcm_i (m[i]).  Return (z, M). On failure, M = -1. Note that
     we do not require the r[i]'s to be relatively prime.
@@ -1806,7 +1805,7 @@ class MathAlgorithms:
     """
     signed_tau: float = -tau if invert else tau
     self.fft_roots_of_unity = [self.fft_prepare_roots_helper(length//2 - 1, signed_tau/length)
-                   for length in self.fft_lengths]
+                               for length in self.fft_lengths]
 
   def fft_in_place_fast_fourier_transform(self, a_vector: List[complex], invert: bool):
     """Optimized in-place Cooley-Tukey FFT algorithm. Modifies a_vector.
@@ -2032,7 +2031,7 @@ class GeometryAlgorithms:
     Optimizations: calculate cos and sin outside the return, so you don't double call each.
     """
     return Pt2d(point.x * cos(degree_in_radians) - point.y * sin(degree_in_radians),
-          point.x * sin(degree_in_radians) + point.y * cos(degree_in_radians))
+                point.x * sin(degree_in_radians) + point.y * cos(degree_in_radians))
 
   def point_c_rotation_wrt_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> int:
     """Determine orientation of c wrt line ab, in terms of collinear clockwise counterclockwise.
@@ -2062,7 +2061,7 @@ class GeometryAlgorithms:
     """Logic is cross == 0 mean parallel, and dot being <= 0 means different directions."""
     vec_pa, vec_pb = point_a - point, point_b - point
     return (self.compare_ab(self.cross_product(vec_pa, vec_pb), 0) == 0
-        and self.compare_ab(self.dot_product(vec_pa, vec_pb), 0) <= 0)
+            and self.compare_ab(self.dot_product(vec_pa, vec_pb), 0) <= 0)
 
   def project_pt_c_to_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> Pt2d:
     """Compute the point closest to c on the line ab.
@@ -2087,7 +2086,7 @@ class GeometryAlgorithms:
     vec_ab, vec_ac = b_point - a_point, c_point - a_point
     u = self.dot_product(vec_ac, vec_ab) / self.dot_product(vec_ab, vec_ab)
     return (a_point if u < 0.0 else b_point if u > 1.0           # closer to a or b
-        else self.project_pt_c_to_line_ab(a_point, b_point, c_point))  # inbetween a and b
+            else self.project_pt_c_to_line_ab(a_point, b_point, c_point))  # inbetween a and b
 
   def distance_pt_c_to_line_ab(self, a_point: Pt2d, b_point: Pt2d, c_point: Pt2d) -> float:
     """Just return the distance between c and the projected point :)."""
@@ -2101,26 +2100,26 @@ class GeometryAlgorithms:
     return self.distance_normalized(c_point, closest_point)
 
   def is_parallel_lines_ab_and_cd(self, endpoint_a: Pt2d, endpoint_b: Pt2d,
-                  endpoint_c: Pt2d, endpoint_d: Pt2d) -> bool:  # TODO RETEST
+                                  endpoint_c: Pt2d, endpoint_d: Pt2d) -> bool:  # TODO RETEST
     """Two lines are parallel if the cross_product between vec_ab and vec_dc is 0."""
     vec_ab, vec_dc = endpoint_b - endpoint_a, endpoint_c - endpoint_d
     return self.compare_ab(self.cross_product(vec_ab, vec_dc), 0.0) == 0
 
   def is_collinear_lines_ab_and_cd_1(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
-                     end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:  # TODO RETEST
+                                     end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:  # TODO RETEST
     """Old function. a!=b and c!=d and then returns correctly"""
     return (self.is_parallel_lines_ab_and_cd(end_pt_a, end_pt_b, end_pt_c, end_pt_d)
-        and self.is_parallel_lines_ab_and_cd(end_pt_b, end_pt_a, end_pt_a, end_pt_c)
-        and self.is_parallel_lines_ab_and_cd(end_pt_d, end_pt_c, end_pt_c, end_pt_a))
+            and self.is_parallel_lines_ab_and_cd(end_pt_b, end_pt_a, end_pt_a, end_pt_c)
+            and self.is_parallel_lines_ab_and_cd(end_pt_d, end_pt_c, end_pt_c, end_pt_a))
 
   def is_collinear_lines_ab_and_cd_2(self, end_point_a: Pt2d, endpoint_b: Pt2d,
-                     endpoint_c: Pt2d, endpoint_d: Pt2d) -> bool:  # TODO RETEST
+                                     endpoint_c: Pt2d, endpoint_d: Pt2d) -> bool:  # TODO RETEST
     """Two lines are collinear iff a!=b and c!=d, and both c and d are collinear to line ab."""
     return (self.point_c_rotation_wrt_line_ab(end_point_a, endpoint_b, endpoint_c) == 0
-        and self.point_c_rotation_wrt_line_ab(end_point_a, endpoint_b, endpoint_d) == 0)
+            and self.point_c_rotation_wrt_line_ab(end_point_a, endpoint_b, endpoint_d) == 0)
 
   def is_segments_intersect_ab_to_cd(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
-                     end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:
+                                     end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:
     """4 distinct points as two lines intersect if they are collinear and at least one of the
      end points c or d are in between a and b otherwise, need to compute cross products."""
     if self.is_collinear_lines_ab_and_cd_2(end_pt_a, end_pt_b, end_pt_c, end_pt_d):
@@ -2133,13 +2132,13 @@ class GeometryAlgorithms:
     return not (point_a_value > 0 or point_c_value > 0)
 
   def is_lines_intersect_ab_to_cd(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
-                  end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:
+                                  end_pt_c: Pt2d, end_pt_d: Pt2d) -> bool:
     """Two lines intersect if they aren't parallel or if they collinear."""
     return (not self.is_parallel_lines_ab_and_cd(end_pt_a, end_pt_b, end_pt_c, end_pt_d)
-        or self.is_collinear_lines_ab_and_cd_2(end_pt_a, end_pt_b, end_pt_c, end_pt_d))
+            or self.is_collinear_lines_ab_and_cd_2(end_pt_a, end_pt_b, end_pt_c, end_pt_d))
 
   def pt_lines_intersect_ab_to_cd(self, end_pt_a: Pt2d, end_pt_b: Pt2d,
-                  end_pt_c: Pt2d, end_pt_d: Pt2d) -> Pt2d:  # TODO RETEST
+                                  end_pt_c: Pt2d, end_pt_d: Pt2d) -> Pt2d:  # TODO RETEST
     """Compute the intersection point between two lines via cross products of the vectors."""
     vec_ab, vec_ac, vec_dc = end_pt_b - end_pt_a, end_pt_c - end_pt_a, end_pt_c - end_pt_d
     vec_t = vec_ab * (self.cross_product(vec_ac, vec_dc) / self.cross_product(vec_ab, vec_dc))
@@ -2188,8 +2187,8 @@ class GeometryAlgorithms:
     TODO add in teh formula
     """
     center_dist = self.distance_normalized(c1, c2)
-    if (self.compare_ab(center_dist, r1 + r2) <= 0
-        <= self.compare_ab(center_dist + min(r1, r2), max(r1, r2))):
+    if (self.compare_ab(center_dist, r1 + r2) <= 0 <= self.compare_ab(center_dist + min(r1, r2),
+                                                                      max(r1, r2))):
       x = (center_dist*center_dist - r2*r2 + r1*r1)/(2*center_dist)
       y = sqrt(r1*r1 - x*x)
       v = (c2-c1)/center_dist
@@ -2245,8 +2244,8 @@ class GeometryAlgorithms:
     """Compute if a point is in or on a triangle. If all edges return the same orientation this
     should return true and the point should be in or on the triangle."""
     return (self.point_c_rotation_wrt_line_ab(a, b, p) >= 0
-        and self.point_c_rotation_wrt_line_ab(b, c, p) >= 0
-        and self.point_c_rotation_wrt_line_ab(c, a, p) >= 0)
+            and self.point_c_rotation_wrt_line_ab(b, c, p) >= 0
+            and self.point_c_rotation_wrt_line_ab(c, a, p) >= 0)
 
   def perimeter_of_triangle_abc(self, side_ab, side_bc, side_ca):  # TODO RETEST
     """Computes the perimeter of triangle given the side lengths."""
@@ -2437,13 +2436,13 @@ class GeometryAlgorithms:
     Return: 0 for on, 1 for in, -1 for out
     """
     return (0 if self.pt_p_on_polygon_perimeter_pts(pts, p)
-        else 1 if self.pt_p_in_polygon_pts(pts, p) else -1)
+            else 1 if self.pt_p_in_polygon_pts(pts, p) else -1)
 
   def remove_collinear_points(self, pts: List[Pt2d]):
     """Removes all collinear points in O(n) time. MUTATES pts."""
     pts[:] = [pts[-1]] + [pt for pt in pts] + [pts[0]]
     pts[:] = [pts[i] for i in range(1, len(pts) - 1)
-          if self.point_c_rotation_wrt_line_ab(pts[i - 1], pts[i], pts[i + 1]) != CL]
+              if self.point_c_rotation_wrt_line_ab(pts[i - 1], pts[i], pts[i + 1]) != CL]
 
   def pt_p_in_convex_polygon_pts(self, pts: List[Pt2d], query_pt: Pt2d) -> bool:
     """For a convex Polygon we are able to search if point is in the polygon fast.
@@ -2482,8 +2481,8 @@ class GeometryAlgorithms:
     """
     lines = [(a, b) for a, b in pairwise_func(pts)]
     return not any(self.is_segments_intersect_ab_to_cd(pt_a, pt_b, pt_c, pt_d)
-             for (pt_a, pt_b), (pt_c, pt_d) in combinations(lines, 2)
-             if pt_a != pt_d and pt_b != pt_c)  # avoids lines that neighbor each other
+                   for (pt_a, pt_b), (pt_c, pt_d) in combinations(lines, 2)
+                   if pt_a != pt_d and pt_b != pt_c)  # avoids lines that neighbor each other
 
   def polygon_cut_from_line_ab(self, pts: List[Pt2d], left, right) -> List[Pt2d]:  # TODO RETEST
     """Method computes the left side polygon resulting from a cut from the line a-b.
@@ -2516,7 +2515,7 @@ class GeometryAlgorithms:
     def func(points, cur_hull, min_size):
       for p in points:
         while (len(cur_hull) > min_size
-             and self.point_c_rotation_wrt_line_ab(cur_hull[-2], cur_hull[-1], p) == CW):
+               and self.point_c_rotation_wrt_line_ab(cur_hull[-2], cur_hull[-1], p) == CW):
           cur_hull.pop()
         cur_hull.append(p)
       cur_hull.pop()
@@ -2538,8 +2537,8 @@ class GeometryAlgorithms:
     for i, (a, b) in enumerate(pairwise_func(convex_hull)):
       p = b - a
       while ((t + 1) % n != i
-           and self.compare_ab(self.cross_product(p, convex_hull[(t + 1) % n] - a),
-                     self.cross_product(p, convex_hull[t] - a)) >= 0):
+             and self.compare_ab(self.cross_product(p, convex_hull[(t + 1) % n] - a),
+                                 self.cross_product(p, convex_hull[t] - a)) >= 0):
         t = (t + 1) % n
       ans = max(ans, self.distance(a, convex_hull[t]))
       ans = max(ans, self.distance(b, convex_hull[t]))
@@ -2555,7 +2554,7 @@ class GeometryAlgorithms:
     return closest_pair
 
   def closest_pair_recursive(self, lo: int, hi: int,
-                 x_ord: List[Pt2d], y_ord: List[Pt2d]) -> ClosestPair:
+                             x_ord: List[Pt2d], y_ord: List[Pt2d]) -> ClosestPair:
     """Recursive part of computing the closest pair. Divide by y recurse then do a special check
 
     Complexity per call T(n/2) halves each time, T(n/2) halves each call, O(n) at max tho
@@ -2615,11 +2614,11 @@ class GeometryAlgorithms:
           if j == k:
             continue
           xn = ((y_arr[j] - y_arr[i]) * (z_arr[k] - z_arr[i])
-              - (y_arr[k] - y_arr[i]) * (z_arr[j] - z_arr[i]))
+                - (y_arr[k] - y_arr[i]) * (z_arr[j] - z_arr[i]))
           yn = ((x_arr[k] - x_arr[i]) * (z_arr[j] - z_arr[i])
-              - (x_arr[j] - x_arr[i]) * (z_arr[k] - z_arr[i]))
+                - (x_arr[j] - x_arr[i]) * (z_arr[k] - z_arr[i]))
           zn = ((x_arr[j] - x_arr[i]) * (y_arr[k] - y_arr[i])
-              - (x_arr[k] - x_arr[i]) * (y_arr[j] - y_arr[i]))
+                - (x_arr[k] - x_arr[i]) * (y_arr[j] - y_arr[i]))
           flag = zn < 0.0
           for m in range(n):
             if flag:
@@ -2643,8 +2642,8 @@ class GeometryAlgorithms:
   def det3_helper(self, a1, a2, a3, b1, b2, b3, c1, c2, c3) -> Numeric:
     """A helper function for determining the angle. Remove for speedup."""
     return (a1 * (b2 * c3 - c2 * b3) -
-        a2 * (b1 * c3 - c1 * b3) +
-        a3 * (b1 * c2 - c1 * b2))
+            a2 * (b1 * c3 - c1 * b3) +
+            a3 * (b1 * c2 - c1 * b2))
 
   def is_in_circle(self, a: Pt2d, b: Pt2d, c: Pt2d, d: Pt2d) -> bool:
     """Expensive calculation function that determines if """
@@ -2698,14 +2697,14 @@ class GeometryAlgorithms:
       l_cand_edge = base_edge_l.rev().o_next
       if self.is_pt_right_of_edge(l_cand_edge.dest(), base_edge_l):
         while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin,
-                    l_cand_edge.dest(), l_cand_edge.o_next.dest()):
+                                l_cand_edge.dest(), l_cand_edge.o_next.dest()):
           temp_edge = l_cand_edge.o_next
           self.quad_edges.delete_edge(l_cand_edge)
           l_cand_edge = temp_edge
       r_cand_edge = base_edge_l.o_prev()
       if self.is_pt_right_of_edge(r_cand_edge.dest(), base_edge_l):
         while self.is_in_circle(base_edge_l.dest(), base_edge_l.origin,
-                    r_cand_edge.dest(), r_cand_edge.o_prev().dest()):
+                                r_cand_edge.dest(), r_cand_edge.o_prev().dest()):
           temp_edge = r_cand_edge.o_prev()
           self.quad_edges.delete_edge(r_cand_edge)
           r_cand_edge = temp_edge
@@ -2714,9 +2713,8 @@ class GeometryAlgorithms:
       if not (l_check or r_check):
         break
       if ((not l_check)
-          or (r_check
-            and self.is_in_circle(l_cand_edge.dest(), l_cand_edge.origin,
-                        r_cand_edge.origin, r_cand_edge.dest()))):
+          or (r_check and self.is_in_circle(l_cand_edge.dest(), l_cand_edge.origin,
+                                            r_cand_edge.origin, r_cand_edge.dest()))):
         base_edge_l = self.quad_edges.connect(r_cand_edge, base_edge_l.rev())
       else:
         base_edge_l = self.quad_edges.connect(base_edge_l.rev(), l_cand_edge.rev())
@@ -2848,7 +2846,7 @@ class StringAlgorithms:
       rank = 0
       for last, curr in pairwise_func(suffix_arr):  # suffix[i] = curr, suffix[i - 1] last
         rank = rank if (rank_arr[curr] == rank_arr[last]
-                and rank_arr[curr + k] == rank_arr[last + k]) else rank + 1
+                        and rank_arr[curr + k] == rank_arr[last + k]) else rank + 1
         rank_array_temp[curr] = rank
       rank_arr = rank_array_temp
       if rank_arr[suffix_arr[-1]] == new_len - 1:  # exit loop early optimization
@@ -2871,8 +2869,8 @@ class StringAlgorithms:
         permuted_lcp[i] = 0
         continue
       while (i + left < self.text_len
-           and phi_i + left < self.text_len
-           and self.text_ord[i + left] == self.text_ord[phi_i + left]):
+             and phi_i + left < self.text_len
+             and self.text_ord[i + left] == self.text_ord[phi_i + left]):
         left += 1
       permuted_lcp[i] = left
       left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
@@ -2977,8 +2975,9 @@ class StringAlgorithms:
     """
     ans = self.hash_h_values[right]
     if left != 0:
-      ans = ((ans - self.hash_h_values[left - 1])
-           * pow(self.hash_powers[left], self.mod_m - 2, self.mod_m)) % self.mod_m
+      ans = ((ans - self.hash_h_values[left - 1]) * pow(self.hash_powers[left],
+                                                        self.mod_m - 2,
+                                                        self.mod_m)) % self.mod_m
     return ans
 
   def hash_fast_constant(self, left, right):  # TODO RETEST
@@ -3085,7 +3084,7 @@ class Matrix:
     Complexity per call: Time: O(n), Space: during O(n), post O(1)
     """
     local_matrix[i] = [el - val * local_matrix[row][col]
-               for col, el in enumerate(local_matrix[i])]
+                       for col, el in enumerate(local_matrix[i])]
 
   def row_reduce(self, row: int, col: int, row_begin: int):  # TODO RETEST
     """Applies the whole row reduction step to the matrix.
@@ -3113,8 +3112,8 @@ class Matrix:
     Complexity per call: Time: O(n^2), Space: O(n^2)
     """
     augmented = Matrix(self.num_rows + matrix_b.num_rows,
-               self.num_cols + matrix_b.num_cols,
-               self.matrix[0][0])
+                       self.num_cols + matrix_b.num_cols,
+                       self.matrix[0][0])
     augmented.fill_matrix_from_row_col(self.matrix, 0, 0)
     augmented.fill_matrix_from_row_col(matrix_b.matrix, 0, self.num_cols)
     return augmented
@@ -3268,6 +3267,5 @@ class MatrixAlgorithms:
       if i_row[p] != i_col[p]:
         i_row_p, i_col_p = i_row[p], i_col[p]
         for k in range(n):
-          matrix_a[k][i_row_p], matrix_a[k][i_col_p] = (matrix_a[k][i_col_p],
-                                  matrix_a[k][i_row_p])
+          matrix_a[k][i_row_p], matrix_a[k][i_col_p] = (matrix_a[k][i_col_p], matrix_a[k][i_row_p])
     return det

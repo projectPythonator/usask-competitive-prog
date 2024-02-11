@@ -4,6 +4,7 @@ import primality_testing as prime_tests
 import prime_sieves
 import prime_sieve_variants
 import factorizations
+import fibonacci as fib
 
 
 class TestMathMethods(unittest.TestCase):
@@ -200,3 +201,35 @@ class TestMathMethods(unittest.TestCase):
                 continue
             result_tuple = obj.prime_factorize_n_variants(i)
             self.assertEqual(result_tuple, expected_tuple)
+
+    def test_block_sieve_odd_10k(self):
+        limit = 10000
+        start = 1000
+        obj_base = prime_sieves.MathAlgorithms()
+        obj = prime_sieves.MathAlgorithms()
+        for i in range(start, start+limit):
+            obj_base.sieve_of_eratosthenes_optimized(i)
+            obj.block_sieve_odd(i)
+            self.assertEqual(len(obj_base.primes_list), len(obj.primes_list), i)
+            self.assertEqual(obj_base.primes_list[-1], obj.primes_list[-1], i)
+
+    def test_fibonacci_n_iterative_10(self):
+        limit = 10
+        obj = fib.MathAlgorithms()
+        obj.fibonacci_n_iterative(limit)
+        self.assertEqual([0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55], obj.fibonacci_list)
+
+    def test_fibonacci_n_dp_cached_faster_10k(self):
+        limit = 10000
+        obj = fib.MathAlgorithms()
+        obj.fibonacci_n_iterative(limit)
+        for i in range(limit):
+            self.assertEqual(obj.fibonacci_n_dp_cached_faster(i), obj.fibonacci_list[i], i)
+
+    def test_fibonacci_n_dp_cached_10k_or_1m(self):
+        limit = 10000
+        limit_higher = 10000000
+        obj = fib.MathAlgorithms()
+        fib_set_1 = [obj.fibonacci_n_dp_cached(i) for i in range(limit)]
+        fib_set_2 = [obj.fibonacci_n_dp_cached_faster(i) for i in range(limit)]
+        self.assertEqual(fib_set_1, fib_set_2)
