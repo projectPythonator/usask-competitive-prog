@@ -1,6 +1,7 @@
 \documentclass[11pt]{article}
 
-\usepackage[landscape, twocolumn, margin=0.25in]{geometry}
+\usepackage[landscape, twocolumn,
+            left=0.25in, right=0.25in, top=0.25in, bottom=0.5in]{geometry}
 \setlength{\columnseprule}{0.5pt}
 
 \usepackage{xcolor}
@@ -32,9 +33,13 @@
 
 \lstset{style=mystyle}
 
+\usepackage{fancyhdr}
+\renewcommand{\headrulewidth}{0pt}
+\fancyhf{}
+\rfoot{\thepage}
+
 
 \begin{document}
-\begin{small}
+\pagestyle{fancy}
 \lstinputlisting[language=Python]{booklet.py}
-\end{small}
 \end{document}
