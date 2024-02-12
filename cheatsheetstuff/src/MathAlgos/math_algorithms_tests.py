@@ -348,3 +348,33 @@ class TestMathMethods(unittest.TestCase):
             expected = test_obj.c_n_k(n, k, test_inverse)
             result = obj.c_n_k(n, k, inverse)
             self.assertEqual(result, expected, "{} {}".format(n, k))
+
+    def test_binomial_coefficient_n_mod_p_prep_inv_300(self):
+        """tested up to 500 but takes long."""
+        limit = 300
+        mod_m = 10**9+7
+        obj_inv_2 = True
+        obj_3 = binomial_coefficient.MathAlgorithms()
+        for max_n in range(10, limit+1):
+            obj_2 = binomial_coefficient.MathAlgorithms()
+            obj_2.binomial_coefficient_n_mod_p_prep(max_n+1, mod_m, obj_inv_2)
+            for n in range(max_n+1):
+                for k in range(n+1):
+                    expected = obj_3.binomial_coefficient_dp_with_cache(n, k) % mod_m
+                    result_2 = obj_2.c_n_k(n, k, obj_inv_2)
+                    self.assertEqual(result_2, expected, "{} {} {}".format(max_n, n, k))
+
+    def test_binomial_coefficient_n_mod_p_prep_no_inv_200(self):
+        """tested up to 500 but takes long."""
+        limit = 200
+        mod_m = 10**9+7
+        obj_inv_1 = False
+        obj_3 = binomial_coefficient.MathAlgorithms()
+        for max_n in range(10, limit+1):
+            obj_1 = binomial_coefficient.MathAlgorithms()
+            obj_1.binomial_coefficient_n_mod_p_prep(max_n+1, mod_m, obj_inv_1)
+            for n in range(max_n+1):
+                for k in range(n+1):
+                    expected = obj_3.binomial_coefficient_dp_with_cache(n, k) % mod_m
+                    result_1 = obj_1.c_n_k(n, k, obj_inv_1)
+                    self.assertEqual(result_1, expected, "{} {} {}".format(max_n, n, k))
