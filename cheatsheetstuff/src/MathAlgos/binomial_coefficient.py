@@ -13,8 +13,8 @@ class MathAlgorithms:
     Complexity per call: Time: v1 = O(log n), v2 = O(1), Space: O(1).
     v1 is uncommented, v2 is the commented out line, and must be precomputed see below.
     """
-    if n < k:  # base case: could flip them to be n, k = k, n but better to just return 0
-      return 0
+    if n <= k or k == 0:  # base case: could flip them to be n, k = k, n but better to just return 0
+      return 0 if n < k else 1
     if inverse:
       return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
     n_fact, k_fact, n_k_fact, p = self.fact[n], self.fact[k], self.fact[n - k], self.mod_p
