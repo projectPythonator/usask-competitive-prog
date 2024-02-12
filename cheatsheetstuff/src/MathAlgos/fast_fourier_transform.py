@@ -78,9 +78,8 @@ class MathAlgorithms:
     Complexity per call: Time: O(n), Space: O(1) -> in fact we often reduce overall space.
     """
     carry, end = 0, len(a_vector) - 1
-    for number in a_vector:
-      number += carry
-      carry, number = divmod(number, base)
+    for i in range(end + 1):
+      carry, a_vector[i] = divmod(a_vector[i] + carry, base)
     while 0 == a_vector[end]:
       end -= 1
     return a_vector[:end+1][::-1]
