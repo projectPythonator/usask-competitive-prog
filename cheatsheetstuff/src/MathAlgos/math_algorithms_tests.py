@@ -6,6 +6,7 @@ import prime_sieve_variants
 import factorizations
 import fibonacci as fib
 import catalan_functions
+import binomial_coefficient
 
 
 class TestMathMethods(unittest.TestCase):
@@ -287,3 +288,19 @@ class TestMathMethods(unittest.TestCase):
         obj = catalan_functions.MathAlgorithms()
         self.assertEqual(test_obj.catalan_via_prime_factors_slower(2 * limit, limit, mod_m),
                          obj.catalan_via_prime_factors_faster(2 * limit, limit, mod_m))
+
+    def test_binomial_coefficient_up_to_n_8(self):
+        pascal = [[1],
+                  [1, 1],
+                  [1, 2, 1],
+                  [1, 3, 3, 1],
+                  [1, 4, 6, 4, 1],
+                  [1, 5, 10, 10, 5, 1],
+                  [1, 6, 15, 20, 15, 6, 1],
+                  [1, 7, 21, 35, 35, 21, 7, 1],
+                  [1, 8, 28, 56, 70, 56, 28, 8, 1]]
+        obj = binomial_coefficient.MathAlgorithms()
+        for n, row in enumerate(pascal):
+            for k, expected in enumerate(row):
+                result = obj.binomial_coefficient_dp_with_cache(n, k)
+                self.assertEqual(result, expected)
