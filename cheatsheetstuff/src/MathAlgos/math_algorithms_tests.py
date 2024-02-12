@@ -7,6 +7,7 @@ import factorizations
 import fibonacci as fib
 import catalan_functions
 import binomial_coefficient
+import fast_fourier_transform
 
 
 class TestMathMethods(unittest.TestCase):
