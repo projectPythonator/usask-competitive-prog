@@ -460,3 +460,13 @@ class TestMathMethods(unittest.TestCase):
             result_1 = obj_1.extended_euclid_recursive(a, b)
             result_2 = obj_2.extended_euclid_iterative(a, b)
             self.assertEqual(result_1, result_2, "{} {}".format(a, b))
+
+    def test_fast_sieve(self):
+        limit = 1000000
+        obj1 = prime_sieves.MathAlgorithms()
+        obj2 = prime_sieves.MathAlgorithms()
+        for i in range(100000, limit):
+            print(i)
+            obj1.prime_sieve_super_fast(i)
+            obj2.block_sieve_odd(i)
+            self.assertEqual(obj1.primes_list, obj2.primes_list)
