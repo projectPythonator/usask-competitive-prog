@@ -379,3 +379,26 @@ class TestMathMethods(unittest.TestCase):
                     expected = obj_3.binomial_coefficient_dp_with_cache(n, k) % mod_m
                     result_1 = obj_1.c_n_k(n, k, obj_inv_1)
                     self.assertEqual(result_1, expected, "{} {} {}".format(max_n, n, k))
+
+    def test_fft_prepare_swap_indices_hard_coded_tests(self):
+        obj = fast_fourier_transform.MathAlgorithms()
+        obj.fft_prepare_swap_indices(16)
+        expected = [(1, 8), (2, 4), (3, 12), (5, 10), (7, 14), (11, 13)]
+        self.assertEqual(obj.fft_swap_indices, expected)
+
+    def test_fft_prepare_swap_indices_thorough_4m(self):
+        """tested up to 16m"""
+        limit = 22
+        binary_strings = [bin(i)[-1:1:-1] for i in range(2**limit)]
+
+        def get_reversed(n):
+            def get_rev(num, bit_size):
+                return int(binary_strings[num].ljust(bit_size, '0'), 2)
+            bit = n.bit_length()-1
+            ans = [(i, get_rev(i, bit)) for i in range(n)]
+            return [(a, b) for a, b in ans if a < b]
+        for i in range(1, limit):
+            expected = get_reversed(2**i)
+            obj = fast_fourier_transform.MathAlgorithms()
+            obj.fft_prepare_swap_indices(2**i)
+            self.assertEqual(obj.fft_swap_indices, expected)
