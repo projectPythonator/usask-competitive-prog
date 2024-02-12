@@ -11,6 +11,7 @@ import fast_fourier_transform
 
 
 class TestMathMethods(unittest.TestCase):
+    """Pypy runs the tests pretty fast."""
     def test_is_prime_optimized_up_to_100(self):
         primes_to_100 = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41,
                          43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97}
@@ -413,3 +414,24 @@ class TestMathMethods(unittest.TestCase):
         for i in range(1, limit + 1):
             obj.fft_prepare_lengths_list(2**i)
             self.assertEqual(obj.fft_lengths, expected[:i])
+
+    def test_fft_multiply_in_place_1k(self):
+        obj = fast_fourier_transform.MathAlgorithms()
+        limit = 1000
+        for i in range(1, limit+1):
+            for j in range(1, limit+1):
+                expected = i*j
+                a, b = list(map(int, str(i))), list(map(int, str(j)))
+                result = obj.fft_multiply_in_place(a[::-1], b[::-1])
+                self.assertEqual(result, list(map(int, str(expected))))
+
+    def test_fft_multiply_in_place_100k_large_random_100_bit_size(self):
+        limit_power = 101
+        limit = 100000
+        queries = [(randint(1, 2**limit_power), randint(1, 2**limit_power)) for _ in range(limit)]
+        obj = fast_fourier_transform.MathAlgorithms()
+        for a, b in queries:
+            expected = a*b
+            a_vec, b_vec = list(map(int, str(a))), list(map(int, str(b)))
+            result = obj.fft_multiply_in_place(a_vec[::-1], b_vec[::-1])
+            self.assertEqual(result, list(map(int, str(expected))))
