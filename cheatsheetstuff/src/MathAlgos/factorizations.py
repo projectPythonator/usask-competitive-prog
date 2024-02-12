@@ -9,6 +9,7 @@ class MathAlgorithms:
         self.min_primes_list = None
         self.primes_list = []
         self.primes_set = set()
+
     def prime_factorize_n_trivial(self, n: int) -> Dict:
         limit, prime_factors = isqrt(n) + 1, []
         for prime in range(2, limit):
