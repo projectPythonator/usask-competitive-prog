@@ -5,6 +5,7 @@ import prime_sieves
 import prime_sieve_variants
 import factorizations
 import fibonacci as fib
+import catalan_functions
 
 
 class TestMathMethods(unittest.TestCase):
@@ -233,3 +234,28 @@ class TestMathMethods(unittest.TestCase):
         fib_set_1 = [obj.fibonacci_n_dp_cached(i) for i in range(limit)]
         fib_set_2 = [obj.fibonacci_n_dp_cached_faster(i) for i in range(limit)]
         self.assertEqual(fib_set_1, fib_set_2)
+
+    def test_generate_catalan_n_31(self):
+        expected = [1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796, 58786, 208012, 742900,
+                    2674440, 9694845, 35357670, 129644790, 477638700, 1767263190, 6564120420,
+                    24466267020, 91482563640, 343059613650, 1289904147324, 4861946401452,
+                    18367353072152, 69533550916004, 263747951750360, 1002242216651368,
+                    3814986502092304]
+        limit = len(expected)
+        obj = catalan_functions.MathAlgorithms()
+        obj.generate_catalan_n(limit)
+        self.assertEqual(obj.catalan_numbers, expected)
+
+    def test_generate_catalan_n_mod_inverse_31(self):
+        expected = [1, 1, 2, 5, 14, 42, 132, 429, 1430, 4862, 16796, 58786, 208012, 742900,
+                    2674440, 9694845, 35357670, 129644790, 477638700, 1767263190, 6564120420,
+                    24466267020, 91482563640, 343059613650, 1289904147324, 4861946401452,
+                    18367353072152, 69533550916004, 263747951750360, 1002242216651368,
+                    3814986502092304]
+        mod_m = 10**9+7
+        expected = [num % mod_m for num in expected]
+        limit = len(expected)
+        obj = catalan_functions.MathAlgorithms()
+        obj.generate_catalan_n_mod_inverse(limit, mod_m)
+        self.assertEqual(obj.catalan_numbers, expected)
+
