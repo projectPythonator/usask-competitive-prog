@@ -131,4 +131,4 @@ class MathAlgorithms:
     catalan[0] = 1
     for i in range(n - 1):
       catalan[i + 1] = (((4 * i + 2) % p) * (catalan[i] % p) * pow(i + 2, p - 2, p)) % p
-    self.catalan_numbers = catalan
+    self.catalan_numbers = catalan[:-1]  # cut the last number off for inclusive reasons
