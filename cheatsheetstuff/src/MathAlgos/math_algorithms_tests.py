@@ -304,3 +304,17 @@ class TestMathMethods(unittest.TestCase):
             for k, expected in enumerate(row):
                 result = obj.binomial_coefficient_dp_with_cache(n, k)
                 self.assertEqual(result, expected)
+
+    def test_binomial_coefficient_n_mod_p_prep_and_c_n_k_up_to_100(self):
+        limit = 1000
+        mod_m = 10**9+7
+        inverse = False
+        test_obj = binomial_coefficient.MathAlgorithms()
+        obj = binomial_coefficient.MathAlgorithms()
+        obj.binomial_coefficient_n_mod_p_prep(limit+1, mod_m, inverse)
+        for n in range(limit):
+            for k in range(n+1):
+                expected = test_obj.binomial_coefficient_dp_with_cache(n, k) % mod_m
+                result = obj.c_n_k(n, k, inverse)
+                self.assertEqual(result, expected, "{} {}".format(n, k))
+
