@@ -8,6 +8,7 @@ import fibonacci as fib
 import catalan_functions
 import binomial_coefficient
 import fast_fourier_transform
+import chinese_remainder_theorem
 
 
 class TestMathMethods(unittest.TestCase):
@@ -435,3 +436,27 @@ class TestMathMethods(unittest.TestCase):
             a_vec, b_vec = list(map(int, str(a))), list(map(int, str(b)))
             result = obj.fft_multiply_in_place(a_vec[::-1], b_vec[::-1])
             self.assertEqual(result, list(map(int, str(expected))))
+
+    def test_extended_euclid_recursive_vs_extended_euclid_iterative_1000(self):
+        """tested on 10k but takes a while TODO test some base cases"""
+        limit = 1000
+        obj_1 = chinese_remainder_theorem.MathAlgorithms()
+        obj_2 = chinese_remainder_theorem.MathAlgorithms()
+        for a in range(1, limit + 1):
+            for b in range(1, limit + 1):
+                result_1 = obj_1.extended_euclid_recursive(a, b)
+                result_2 = obj_2.extended_euclid_iterative(a, b)
+                self.assertEqual(result_1, result_2, "{} {}".format(a, b))
+
+    def test_extended_euclid_recursive_vs_extended_euclid_iterative_1m_random_100_bit_size(self):
+        """tested on 10k but takes a while TODO test some base cases"""
+        limit = 1000000
+        limit_power = 100
+        obj_1 = chinese_remainder_theorem.MathAlgorithms()
+        obj_2 = chinese_remainder_theorem.MathAlgorithms()
+        queries = [(2**randint(10, limit_power), 2**randint(10, limit_power))
+                   for _ in range(limit)]
+        for a, b in queries:
+            result_1 = obj_1.extended_euclid_recursive(a, b)
+            result_2 = obj_2.extended_euclid_iterative(a, b)
+            self.assertEqual(result_1, result_2, "{} {}".format(a, b))
