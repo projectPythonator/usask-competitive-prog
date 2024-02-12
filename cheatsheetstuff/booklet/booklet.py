@@ -1372,7 +1372,7 @@ class MathAlgorithms:
     cur_pows = [1] * (limit + 1)
     for prime in range(2, limit + 1):
       if num_divs[prime] == 1:
-        exponent_limit = int(log(limit, prime)) + 1
+        exponent_limit = int(log(limit, prime)) + 1  # bug here on some inputs n
         for exponent in range(1, exponent_limit):
           prime_to_exponent = prime ** exponent
           for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
