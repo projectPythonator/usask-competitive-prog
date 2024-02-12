@@ -305,7 +305,7 @@ class TestMathMethods(unittest.TestCase):
                 result = obj.binomial_coefficient_dp_with_cache(n, k)
                 self.assertEqual(result, expected)
 
-    def test_binomial_coefficient_n_mod_p_prep_and_c_n_k_up_to_100(self):
+    def test_binomial_coefficient_n_mod_p_prep_and_c_n_k_up_to_1k(self):
         limit = 1000
         mod_m = 10**9+7
         inverse = False
@@ -318,3 +318,33 @@ class TestMathMethods(unittest.TestCase):
                 result = obj.c_n_k(n, k, inverse)
                 self.assertEqual(result, expected, "{} {}".format(n, k))
 
+    def test_binomial_coefficient_n_mod_p_prep_and_c_n_k_up_to_1k_inverse(self):
+        limit = 1000
+        mod_m = 10**9+7
+        inverse = True
+        test_obj = binomial_coefficient.MathAlgorithms()
+        obj = binomial_coefficient.MathAlgorithms()
+        obj.binomial_coefficient_n_mod_p_prep(limit+1, mod_m, inverse)
+        for n in range(limit):
+            for k in range(n+1):
+                expected = test_obj.binomial_coefficient_dp_with_cache(n, k) % mod_m
+                result = obj.c_n_k(n, k, inverse)
+                self.assertEqual(result, expected, "{} {}".format(n, k))
+
+    def test_binomial_coefficient_n_mod_p_prep_and_c_n_k_up_to_1m_vs_inverse_random(self):
+        limit = 1000000
+        mod_m = 10**9+7
+        inverse = False
+        test_inverse = True
+        test_obj = binomial_coefficient.MathAlgorithms()
+        obj = binomial_coefficient.MathAlgorithms()
+        test_obj.binomial_coefficient_n_mod_p_prep(limit+1, mod_m, test_inverse)
+        obj.binomial_coefficient_n_mod_p_prep(limit+1, mod_m, inverse)
+        queries = set()
+        while len(queries) < limit:
+            a, b = randint(0, limit+1), randint(0, limit+1)
+            queries.add((a, b) if a < b else (b, a))
+        for n, k in queries:
+            expected = test_obj.c_n_k(n, k, test_inverse)
+            result = obj.c_n_k(n, k, inverse)
+            self.assertEqual(result, expected, "{} {}".format(n, k))
