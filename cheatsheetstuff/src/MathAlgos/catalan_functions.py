@@ -119,7 +119,7 @@ class MathAlgorithms:
     catalan[0] = 1
     for i in range(n - 1):
       catalan[i + 1] = catalan[i] * (4 * i + 2) // (i + 2)
-    self.catalan_numbers = catalan
+    self.catalan_numbers = catalan[:-1]  # cut the last number off for inclusive reasons
 
   def generate_catalan_n_mod_inverse(self, n: int, p: int) -> None:
     """Generate catalan up to n iteratively cat n % p.
