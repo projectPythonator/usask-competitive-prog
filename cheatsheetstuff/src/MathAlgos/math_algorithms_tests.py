@@ -259,3 +259,31 @@ class TestMathMethods(unittest.TestCase):
         obj.generate_catalan_n_mod_inverse(limit, mod_m)
         self.assertEqual(obj.catalan_numbers, expected)
 
+    def test_catalan_via_prime_factors_faster_10k(self):
+        """was tested on 100k but keeping it on 10k for default"""
+        mod_m = 10**9+7
+        limit = 10000
+        test_obj = catalan_functions.MathAlgorithms()
+        obj = catalan_functions.MathAlgorithms()
+        test_obj.generate_catalan_n_mod_inverse(limit, mod_m)
+        for n in range(1, limit):
+            self.assertEqual(obj.catalan_via_prime_factors_faster(2*n, n, mod_m),
+                             test_obj.catalan_numbers[n])
+
+    def test_catalan_via_prime_factors_slower_10k(self):
+        mod_m = 10**9+7
+        limit = 10000
+        test_obj = catalan_functions.MathAlgorithms()
+        obj = catalan_functions.MathAlgorithms()
+        test_obj.generate_catalan_n_mod_inverse(limit, mod_m)
+        for n in range(1, limit):
+            self.assertEqual(obj.catalan_via_prime_factors_slower(2*n, n, mod_m),
+                             test_obj.catalan_numbers[n])
+
+    def test_catalan_via_prime_factors_fast_and_slow_random_n_1m_100m(self):
+        mod_m = 10**9+7
+        limit = randint(1000000, 100000000)
+        test_obj = catalan_functions.MathAlgorithms()
+        obj = catalan_functions.MathAlgorithms()
+        self.assertEqual(test_obj.catalan_via_prime_factors_slower(2 * limit, limit, mod_m),
+                         obj.catalan_via_prime_factors_faster(2 * limit, limit, mod_m))
