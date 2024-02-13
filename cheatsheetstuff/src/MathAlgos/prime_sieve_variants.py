@@ -1,7 +1,8 @@
 from math import isqrt, log
 from typing import Dict
-from itertools import takewhile
+from itertools import takewhile, repeat
 from collections import Counter
+from array import array
 
 class MathAlgorithms:
     def __init__(self):
@@ -33,36 +34,28 @@ class MathAlgorithms:
             prime_factors.append(n)
         return Counter(prime_factors)
 
-    def sieve_of_eratosthenes_optimized(self, limit: int) -> None:
-        """Odds only optimized version of the previous method. Optimized to start at 3.
 
-        Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
-        """
-        limit += 10
-        end_sqrt, end_limit = isqrt(limit) + 1, (limit - 1) // 2
-        sieve_and_block, primes, smaller_primes = [True] * (end_sqrt + 1), [2], []
-        app, smaller_app = primes.append, smaller_primes.append
-        for prime in range(3, end_sqrt, 2):
-            if sieve_and_block[prime]:
-                smaller_app([prime, (prime * prime - 1)//2])
-                for j in range(prime * prime, end_sqrt + 1, prime * 2):
-                    sieve_and_block[j] = False
-        for low in range(0, end_limit, end_sqrt):
-            for i in range(end_sqrt):
-                sieve_and_block[i] = True
-            for i, [p, idx] in enumerate(smaller_primes):
-                for idx in range(idx, end_sqrt, p):
-                    sieve_and_block[idx] = False
-                smaller_primes[i][1] = idx - end_sqrt + (0 if idx >= end_sqrt else p)
-            if low == 0:
-                sieve_and_block[0] = False
-            for i in range(min(end_sqrt, (end_limit + 1) - low)):
-                if sieve_and_block[i]:
-                    app((low + i) * 2 + 1)
-        self.primes_list = primes
-        while self.primes_list[-1] > limit-10:
-            self.primes_list.pop()
+    def prime_sieve_super_fast_helper(self, n):
+        """returns a sieve of primes >= 5 and < n from
+        https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
+        flag = n % 6 == 2
+        sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
+        for i in range(1, isqrt(n) // 3 + 1):
+            if not (sieve[i >> 5] >> (i & 31)) & 1:
+                k = (3 * i + 1) | 1
+                for j in range(k * k // 3, n // 3 + flag, 2 * k):
+                    sieve[j >> 5] |= 1 << (j & 31)
+                for j in range(k * (k - 2 * (i & 1) + 4) // 3, n // 3 + flag, 2 * k):
+                    sieve[j >> 5] |= 1 << (j & 31)
+        return sieve
 
+    def sieve_of_eratosthenes_optimized(self, n: int) -> None:
+        res = [] if n < 2 else [2] if n == 2 else [2, 3]
+        if n > 4:
+            sieve = self.prime_sieve_super_fast_helper(n + 1)
+            res.extend(3 * i + 1 | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1))
+                       if not (sieve[i >> 5] >> (i & 31)) & 1)
+        self.primes_list = res
     def sieve_of_min_primes(self, n_inclusive: int) -> None:
         """Stores the min or max prime divisor for each number up to n.
 
