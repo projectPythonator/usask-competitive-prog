@@ -1,10 +1,10 @@
-from point2d import Pt2d, CW
+from point2d import Pt2d, ClosestPair
 from geometry_utility_2d import GeometryAlgorithms as basicPointFunctions
-from point_to_line_functions import GeometryAlgorithms as pointToLineFunctions
 from typing import List
+from itertools import combinations
 
 
-class GeometryAlgorithms(basicPointFunctions, pointToLineFunctions):
+class GeometryAlgorithms(basicPointFunctions):
   def closest_pair_helper(self, lo: int, hi: int, x_ord: List[Pt2d]) -> ClosestPair:
     """brute force function, for small range will brute force find the closet pair. O(n^2)"""
     closest_pair = (self.distance(x_ord[lo], x_ord[lo + 1]), x_ord[lo], x_ord[lo + 1])
