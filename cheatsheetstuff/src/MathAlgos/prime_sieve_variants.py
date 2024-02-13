@@ -66,7 +66,7 @@ class MathAlgorithms:
         num_diff_pf = [0] * (limit + 1)
         sum_diff_pf = [0] * (limit + 1)
         phi = [i for i in range(limit + 1)]
-        for i in range(2, limit):
+        for i in range(2, limit + 1):
             if num_diff_pf[i] == 0:
                 for j in range(i, limit + 1, i):
                     num_diff_pf[j] += 1
@@ -82,7 +82,7 @@ class MathAlgorithms:
         sum_pf = [0] * (limit + 1)
         for prime in range(2, limit + 1):
             if num_pf[prime] == 0:  # or sum_pf if using that one
-                exponent_limit = int(log(limit, prime)) + 1
+                exponent_limit = int(log(limit, prime)) + 2
                 for exponent in range(1, exponent_limit):
                     prime_to_exponent = prime**exponent
                     for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
