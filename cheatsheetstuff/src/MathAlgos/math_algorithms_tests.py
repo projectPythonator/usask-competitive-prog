@@ -151,31 +151,101 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(obj1.primes_list, obj3.primes_list)
             self.assertEqual(obj1.primes_list, obj4.primes_list)
 
-    def testing_sieve_of_min_primes_1m(self):
-        """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
-        limit = 1000000
+    def testing_sieve_of_min_primes_10k_runs(self):
+        """tested on 100k runs"""
+        limit = 10000
+        factor_obj = factorizations.MathAlgorithms()
         obj = prime_sieve_variants.MathAlgorithms()
-        obj.sieve_of_eratosthenes_optimized(limit)
-        obj.sieve_of_min_primes(limit)
+        expected = [0, 1] + [min(factor_obj.prime_factorize_n_trivial(i))
+                             for i in range(2, limit + 10)]
         for i in range(2, limit):
-            self.assertEqual(obj.min_primes_list[i], min(obj.prime_factorize_n(i)))
+            obj.sieve_of_min_primes(i)
+            self.assertEqual(obj.min_primes_list,
+                             expected[:len(obj.min_primes_list)], i)
 
-    def testing_num_and_sum_of_divisors_faster_1m(self):
-        """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
-        limit = 1000000
+    def testing_sieve_of_min_primes_on_powers_2_and_10_up_to_100k(self):
+        """tested up to 1m"""
+        limit_2 = 2**20
+        power_10 = 6
+        power_2 = 20
+        factor_obj = factorizations.MathAlgorithms()
+        factor_obj.fill_primes_list_and_set(limit_2)
+        expected = [0, 1] + [min(factor_obj.prime_factorize_n(i))
+                             for i in range(2, limit_2)]
         obj = prime_sieve_variants.MathAlgorithms()
-        obj.sieve_of_eratosthenes_optimized(limit)
-        obj.num_and_sum_of_divisors_faster(limit)
-        for i, (num_div, sum_div) in enumerate(zip(obj.num_divisors, obj.sum_divisors)):
-            if i < 2:
-                continue
-            factors = obj.prime_factorize_n(i)
+        for i in range(1, power_10):
+            limit = 10 ** i
+            obj.sieve_of_min_primes(limit)
+            self.assertEqual(obj.min_primes_list,
+                             expected[:limit+1])
+        for i in range(1, power_2):
+            limit = 2 ** i
+            obj.sieve_of_min_primes(limit)
+            self.assertEqual(obj.min_primes_list,
+                             expected[:limit+1])
+
+    def testing_num_and_sum_of_divisors_faster_5k_runs(self):
+        """tested up to 30k"""
+        limit = 5000
+        test_obj = factorizations.MathAlgorithms()
+        test_obj.fill_min_primes_list(limit)
+        expected = [(1, 1), (1, 1)]
+        for i in range(2, limit):
+            factors = test_obj.prime_factorize_n_log_n(i)
             expected_num = expected_sum = 1
             for prime, power in factors.items():
                 expected_num *= (power + 1)
                 expected_sum *= ((prime ** (power + 1) - 1) // (prime - 1))
-            self.assertEqual(expected_sum, sum_div)
-            self.assertEqual(expected_num, num_div)
+            expected.append((expected_num, expected_sum))
+        for i in range(2, limit):
+            obj = prime_sieve_variants.MathAlgorithms()
+            obj.num_and_sum_of_divisors_faster(i)
+            result = list(zip(obj.num_divisors, obj.sum_divisors))
+            self.assertEqual(result, expected[:i+1], i)
+
+    def testing_sieve_of_min_primes_on_powers_10_up_to_1m(self):
+        """tested up to 1m"""
+        limit = 2*(10 ** 6)
+        power_limit = 7
+        test_obj = factorizations.MathAlgorithms()
+        test_obj.fill_min_primes_list(limit)
+        expected = [(1, 1), (1, 1)]
+        app = expected.append
+        for i in range(2, limit):
+            factors = test_obj.prime_factorize_n_log_n(i)
+            expected_num = expected_sum = 1
+            for prime, power in factors.items():
+                expected_num *= (power + 1)
+                expected_sum *= ((prime ** (power + 1) - 1) // (prime - 1))
+            app((expected_num, expected_sum))
+        for i in range(1, power_limit):
+            cur = 10 ** i
+            obj = prime_sieve_variants.MathAlgorithms()
+            obj.num_and_sum_of_divisors_faster(cur)
+            result = list(zip(obj.num_divisors, obj.sum_divisors))
+            self.assertEqual(result, expected[:cur+1], i)
+
+    def testing_sieve_of_min_primes_on_powers_2_up_to_1m(self):
+        """tested up to 1m"""
+        limit = 2**21
+        power_limit = 21
+        test_obj = factorizations.MathAlgorithms()
+        test_obj.fill_min_primes_list(limit)
+        expected = [(1, 1), (1, 1)]
+        app = expected.append
+        for i in range(2, limit):
+            factors = test_obj.prime_factorize_n_log_n(i)
+            expected_num = expected_sum = 1
+            for prime, power in factors.items():
+                expected_num *= (power + 1)
+                expected_sum *= ((prime ** (power + 1) - 1) // (prime - 1))
+            app((expected_num, expected_sum))
+        for i in range(1, power_limit):
+            cur = 2 ** i
+            obj = prime_sieve_variants.MathAlgorithms()
+            obj.num_and_sum_of_divisors_faster(cur)
+            result = list(zip(obj.num_divisors, obj.sum_divisors))
+            self.assertEqual(result, expected[:cur+1], i)
 
     def testing_num_and_sum_of_divisors_same_as_faster_version_1m(self):
         """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""

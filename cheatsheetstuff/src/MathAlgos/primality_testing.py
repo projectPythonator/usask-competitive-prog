@@ -1,18 +1,17 @@
 from math import isqrt
-from itertools import takewhile, repeat
+from itertools import takewhile
 from random import choices
-from array import array
 import prime_sieves
 
 
 class MathAlgorithms:
     def __init__(self):
-        self.primes_list = []
         self.mrpt_known_bounds = []
         self.mrpt_known_tests = []
-        self.primes_set = set()
         self.sieve_obj = prime_sieves.MathAlgorithms()
         self.sieve_function = self.sieve_obj.prime_sieve_super_fast
+        self.primes_list = []
+        self.primes_set = set()
 
     def fill_primes_list_and_set(self, n):
         """Fills primes list using sieve function"""

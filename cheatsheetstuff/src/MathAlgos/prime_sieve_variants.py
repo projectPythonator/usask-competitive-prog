@@ -1,14 +1,9 @@
-from math import isqrt, log
-from typing import Dict
-from itertools import takewhile, repeat
-from collections import Counter
-from array import array
+from math import log
+import prime_sieves
+
 
 class MathAlgorithms:
     def __init__(self):
-        self.primes_list = []
-        self.primes_set = set()
-
         self.min_primes_list = []
         self.sum_prime_factors = []
         self.num_divisors = []
@@ -18,49 +13,21 @@ class MathAlgorithms:
         self.num_diff_prime_factors = []
         self.num_prime_factors = []
 
-    def prime_factorize_n(self, n: int) -> Dict:  # using this for testing
-        """A basic prime factorization of n function. without primes its just O(sqrt(n))
+        self.sieve_obj = prime_sieves.MathAlgorithms()
+        self.sieve_function = self.sieve_obj.prime_sieve_super_fast
+        self.primes_list = []
 
-        Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
-        Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
-        """
-        limit, prime_factors = isqrt(n) + 1, []
-        for prime in takewhile(lambda x: x < limit, self.primes_list):
-            if n % prime == 0:
-                while n % prime == 0:
-                    n //= prime
-                    prime_factors.append(prime)
-        if n > 1:  # n is prime or last factor of n is prime
-            prime_factors.append(n)
-        return Counter(prime_factors)
+    def fill_primes_list_and_set(self, n):
+        """Fills primes list using sieve function"""
+        self.sieve_function(n)
+        self.primes_list = self.sieve_obj.primes_list
 
-
-    def prime_sieve_super_fast_helper(self, n):
-        """returns a sieve of primes >= 5 and < n from
-        https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
-        flag = n % 6 == 2
-        sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
-        for i in range(1, isqrt(n) // 3 + 1):
-            if not (sieve[i >> 5] >> (i & 31)) & 1:
-                k = (3 * i + 1) | 1
-                for j in range(k * k // 3, n // 3 + flag, 2 * k):
-                    sieve[j >> 5] |= 1 << (j & 31)
-                for j in range(k * (k - 2 * (i & 1) + 4) // 3, n // 3 + flag, 2 * k):
-                    sieve[j >> 5] |= 1 << (j & 31)
-        return sieve
-
-    def sieve_of_eratosthenes_optimized(self, n: int) -> None:
-        res = [] if n < 2 else [2] if n == 2 else [2, 3]
-        if n > 4:
-            sieve = self.prime_sieve_super_fast_helper(n + 1)
-            res.extend(3 * i + 1 | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1))
-                       if not (sieve[i >> 5] >> (i & 31)) & 1)
-        self.primes_list = res
     def sieve_of_min_primes(self, n_inclusive: int) -> None:
         """Stores the min or max prime divisor for each number up to n.
 
         Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
         """
+        self.fill_primes_list_and_set(n_inclusive)
         min_primes = [0] * (n_inclusive + 1)
         min_primes[1] = 1
         for prime in reversed(self.primes_list):
@@ -82,6 +49,7 @@ class MathAlgorithms:
         self.euler_phi_plus_sum_and_number_of_diff_prime_factors(n_inclusive)
         self.num_and_sum_of_divisors(n_inclusive)
         self.num_and_sum_of_prime_factors(n_inclusive)
+
     def num_and_sum_of_divisors(self, limit: int) -> None:
         """Does a basic sieve. Complexity function 1."""
         num_div = [1] * (limit + 1)
@@ -130,7 +98,7 @@ class MathAlgorithms:
         cur_pows = [1] * (limit + 1)
         for prime in range(2, limit + 1):
             if num_divs[prime] == 1:
-                exponent_limit = int(log(limit, prime)) + 1
+                exponent_limit = int(log(limit, prime)) + 2
                 for exponent in range(1, exponent_limit):
                     prime_to_exponent = prime ** exponent
                     for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
@@ -143,4 +111,3 @@ class MathAlgorithms:
                     cur_pows[i] = 1
         self.num_divisors = num_divs
         self.sum_divisors = sum_divs
-

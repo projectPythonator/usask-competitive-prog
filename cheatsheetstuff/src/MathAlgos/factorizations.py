@@ -1,15 +1,33 @@
 from math import gcd, isqrt
 from collections import Counter
-from itertools import takewhile, repeat
+from itertools import takewhile
 from typing import Dict, Tuple
-from array import array
+import prime_sieves
+import prime_sieve_variants
 
 
 class MathAlgorithms:
     def __init__(self):
         self.min_primes_list = None
+        self.sieve_obj = prime_sieves.MathAlgorithms()
+        self.sieve_function = self.sieve_obj.prime_sieve_super_fast
         self.primes_list = []
         self.primes_set = set()
+
+        self.min_primes_obj = prime_sieve_variants.MathAlgorithms()
+        self.min_prime_function = self.min_primes_obj.sieve_of_min_primes
+        self.min_primes_list = []
+
+    def fill_primes_list_and_set(self, n):
+        """Fills primes list using sieve function"""
+        self.sieve_function(n)
+        self.primes_list = self.sieve_obj.primes_list
+        self.primes_set = set(self.primes_list)
+
+    def fill_min_primes_list(self, n):
+        self.min_prime_function(n)
+        self.min_primes_list = self.min_primes_obj.min_primes_list
+        self.primes_list = self.min_primes_obj.primes_list
 
     def prime_factorize_n_trivial(self, n: int) -> Dict:
         limit, prime_factors = isqrt(n) + 1, []
@@ -20,41 +38,6 @@ class MathAlgorithms:
         if n > 1:  # n is prime or last factor of n is prime
             prime_factors.append(n)
         return Counter(prime_factors)
-
-    def prime_sieve_super_fast_helper(self, n):
-        """returns a sieve of primes >= 5 and < n from
-        https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
-        flag = n % 6 == 2
-        sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
-        for i in range(1, isqrt(n) // 3 + 1):
-            if not (sieve[i >> 5] >> (i & 31)) & 1:
-                k = (3 * i + 1) | 1
-                for j in range(k * k // 3, n // 3 + flag, 2 * k):
-                    sieve[j >> 5] |= 1 << (j & 31)
-                for j in range(k * (k - 2 * (i & 1) + 4) // 3, n // 3 + flag, 2 * k):
-                    sieve[j >> 5] |= 1 << (j & 31)
-        return sieve
-
-    def sieve_of_eratosthenes_optimized(self, n: int) -> None:
-        res = [] if n < 2 else [2] if n == 2 else [2, 3]
-        if n > 4:
-            sieve = self.prime_sieve_super_fast_helper(n + 1)
-            res.extend(3 * i + 1 | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1))
-                       if not (sieve[i >> 5] >> (i & 31)) & 1)
-        self.primes_list = res
-    def sieve_of_min_primes(self, n_inclusive: int) -> None:
-        """Stores the min or max prime divisor for each number up to n.
-
-        Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
-        """
-        min_primes = [0] * (n_inclusive + 1)
-        min_primes[1] = 1
-        for prime in reversed(self.primes_list):
-            min_primes[prime] = prime
-            start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2 * prime
-            for j in range(start, end, step):
-                min_primes[j] = prime
-        self.min_primes_list = min_primes
 
     def prime_factorize_n(self, n: int) -> Dict:  # using this for testing
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
