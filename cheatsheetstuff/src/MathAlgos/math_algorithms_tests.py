@@ -415,32 +415,27 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(obj.num_prime_factors, expected_1[:n_limit+1], n_limit)
             self.assertEqual(obj.sum_prime_factors, expected_2[:n_limit+1], n_limit)
 
-    def test_prime_factorize_n_against_prime_factorize_n_trivial_1m(self):
+    def test_prime_factorize_n_log_n_against_prime_factorize_n_trivial_1m(self):
         """Assumes prime_factorize_n_trivial works."""
         limit = 1000000
         obj = factorizations.MathAlgorithms()
-        obj.sieve_of_eratosthenes_optimized(limit)
+        obj.fill_min_primes_list(limit)
         for number in range(2, limit):
             expected_factors = obj.prime_factorize_n_trivial(number)
-            result_factors = obj.prime_factorize_n(number)
+            result_factors = obj.prime_factorize_n_log_n(number)
             self.assertEqual(len(expected_factors), len(result_factors))
-            for prime, power in result_factors.items():
-                self.assertTrue(prime in expected_factors)
-                self.assertEqual(power, expected_factors[prime])
+            self.assertEqual(result_factors.items(), expected_factors.items())
 
-    def test_prime_factorize_n_log_n_1m(self):
+    def test_prime_factorize_against_prime_factorize_n_log_n_1m(self):
         """Assumes prime_factorize_n_trivial works."""
         limit = 1000000
         obj = factorizations.MathAlgorithms()
-        obj.sieve_of_eratosthenes_optimized(limit)
-        obj.sieve_of_min_primes(limit)
+        obj.fill_min_primes_list(limit)
         for number in range(2, limit):
-            expected_factors = obj.prime_factorize_n(number)
-            result_factors = obj.prime_factorize_n_log_n(number)
+            expected_factors = obj.prime_factorize_n_log_n(number)
+            result_factors = obj.prime_factorize_n(number)
             self.assertEqual(len(expected_factors), len(result_factors))
-            for prime, power in result_factors.items():
-                self.assertTrue(prime in expected_factors)
-                self.assertEqual(power, expected_factors[prime])
+            self.assertEqual(result_factors.items(), expected_factors.items())
 
     def test_prime_factorize_n_variants_1m(self):
         limit = 1000000
@@ -449,7 +444,7 @@ class TestMathMethods(unittest.TestCase):
         obj_base.num_and_sum_of_divisors_faster(limit)
         obj_base.num_and_sum_of_prime_factors(limit)
         obj_base.euler_phi_plus_sum_and_number_of_diff_prime_factors(limit)
-        obj.sieve_of_eratosthenes_optimized(limit)
+        obj.fill_primes_list_and_set(limit)
         for i, expected_tuple in enumerate(zip(obj_base.num_diff_prime_factors,
                                                obj_base.sum_diff_prime_factors,
                                                obj_base.num_prime_factors,
