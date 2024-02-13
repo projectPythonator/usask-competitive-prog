@@ -1,6 +1,5 @@
 from point2d import Pt2d, Numeric
 from math import isclose, dist, sin, cos
-from typing import TypeVar
 
 
 class GeometryAlgorithms:
