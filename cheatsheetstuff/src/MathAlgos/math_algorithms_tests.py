@@ -357,39 +357,63 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(obj.sum_diff_prime_factors, expected_2[:n_limit+1], n_limit)
             self.assertEqual(obj.euler_phi, expected_3[:n_limit+1], n_limit)
 
-
-
-    def testing_euler_phi_plus_sum_and_number_of_diff_prime_factors_1m(self):
-        """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
-        limit = 1000000
+    def testing_num_and_sum_of_prime_factors_5k_runs(self):
+        """tested up to 10k"""
+        limit = 5000
+        test_obj = factorizations.MathAlgorithms()
+        test_obj.fill_min_primes_list(limit)
         obj = prime_sieve_variants.MathAlgorithms()
-        obj.sieve_of_eratosthenes_optimized(limit)
-        obj.euler_phi_plus_sum_and_number_of_diff_prime_factors(limit)
-        for i, (num_diff_pf, sum_diff_pf, phi) in enumerate(zip(obj.num_diff_prime_factors,
-                                                                obj.sum_diff_prime_factors,
-                                                                obj.euler_phi)):
-            if i < 2:
-                continue
-            factors = obj.prime_factorize_n(i)
-            expected_phi = i
-            for prime in factors:
-                expected_phi -= (expected_phi // prime)
-            self.assertEqual(len(factors), num_diff_pf, i)
-            self.assertEqual(sum(factors), sum_diff_pf, i)
-            self.assertEqual(expected_phi, phi)
+        expected_1 = [0, 0]
+        expected_2 = [0, 0]
+        app1, app2 = expected_1.append, expected_2.append
+        for i in range(2, limit):
+            factors = test_obj.prime_factorize_n_log_n(i)
+            app1(sum(factors.values()))
+            app2(sum(prime * power for prime, power in factors.items()))
+        for i in range(10, limit):
+            obj.num_and_sum_of_prime_factors(i)
+            self.assertEqual(obj.num_prime_factors, expected_1[:i+1], i)
+            self.assertEqual(obj.sum_prime_factors, expected_2[:i+1], i)
 
-    def testing_num_and_sum_of_prime_factors_1m(self):
-        """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
-        limit = 1000000
+    def testing_num_and_sum_of_prime_factors_powers_10(self):
+        """tested up to 10m before."""
+        power_limit = 6
+        limit = 2*(10 ** power_limit)
+        test_obj = factorizations.MathAlgorithms()
+        test_obj.fill_min_primes_list(limit)
         obj = prime_sieve_variants.MathAlgorithms()
-        obj.sieve_of_eratosthenes_optimized(limit)
-        obj.num_and_sum_of_prime_factors(limit)
-        for i, (num_pf, sum_pf) in enumerate(zip(obj.num_prime_factors, obj.sum_prime_factors)):
-            if i < 2:
-                continue
-            factors = obj.prime_factorize_n(i)
-            self.assertEqual(sum(factors.values()), num_pf, i)
-            self.assertEqual(sum(prime * power for prime, power in factors.items()), sum_pf, i)
+        expected_1 = [0, 0]
+        expected_2 = [0, 0]
+        app1, app2 = expected_1.append, expected_2.append
+        for i in range(2, limit):
+            factors = test_obj.prime_factorize_n_log_n(i)
+            app1(sum(factors.values()))
+            app2(sum(prime * power for prime, power in factors.items()))
+        for power in range(1, power_limit):
+            n_limit = 10 ** power
+            obj.num_and_sum_of_prime_factors(n_limit)
+            self.assertEqual(obj.num_prime_factors, expected_1[:n_limit+1], n_limit)
+            self.assertEqual(obj.sum_prime_factors, expected_2[:n_limit+1], n_limit)
+
+    def testing_num_and_sum_of_prime_factors_powers_2(self):
+        """tested up to 10m before."""
+        power_limit = 21
+        limit = 2*(2 ** power_limit)
+        test_obj = factorizations.MathAlgorithms()
+        test_obj.fill_min_primes_list(limit)
+        obj = prime_sieve_variants.MathAlgorithms()
+        expected_1 = [0, 0]
+        expected_2 = [0, 0]
+        app1, app2 = expected_1.append, expected_2.append
+        for i in range(2, limit):
+            factors = test_obj.prime_factorize_n_log_n(i)
+            app1(sum(factors.values()))
+            app2(sum(prime * power for prime, power in factors.items()))
+        for power in range(1, power_limit):
+            n_limit = 2 ** power
+            obj.num_and_sum_of_prime_factors(n_limit)
+            self.assertEqual(obj.num_prime_factors, expected_1[:n_limit+1], n_limit)
+            self.assertEqual(obj.sum_prime_factors, expected_2[:n_limit+1], n_limit)
 
     def test_prime_factorize_n_against_prime_factorize_n_trivial_1m(self):
         """Assumes prime_factorize_n_trivial works."""
