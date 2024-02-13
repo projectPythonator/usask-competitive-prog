@@ -1,5 +1,6 @@
 from math import isqrt
-
+from array import array
+from itertools import repeat
 
 class MathAlgorithms:
     def __init__(self):
@@ -65,26 +66,23 @@ class MathAlgorithms:
         """returns a sieve of primes >= 5 and < n from
         https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
         flag = n % 6 == 2
-        sieve = bytearray((n // 3 + flag >> 3) + 1)
+        sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
         for i in range(1, isqrt(n) // 3 + 1):
-            if not (sieve[i >> 3] >> (i & 7)) & 1:
+            if not (sieve[i >> 5] >> (i & 31)) & 1:
                 k = (3 * i + 1) | 1
                 for j in range(k * k // 3, n // 3 + flag, 2 * k):
-                    sieve[j >> 3] |= 1 << (j & 7)
+                    sieve[j >> 5] |= 1 << (j & 31)
                 for j in range(k * (k - 2 * (i & 1) + 4) // 3, n // 3 + flag, 2 * k):
-                    sieve[j >> 3] |= 1 << (j & 7)
+                    sieve[j >> 5] |= 1 << (j & 31)
         return sieve
 
     def prime_sieve_super_fast(self, n):
         """returns a list of primes <= n from
         https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
-        res = []
-        if n > 1:
-            res.append(2)
-        if n > 2:
-            res.append(3)
+        res = [] if n < 2 else [2] if n == 2 else [2, 3]
         if n > 4:
             sieve = self.prime_sieve_super_fast_helper(n + 1)
-            res.extend(3 * i + 1 | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1)) if
-                       not (sieve[i >> 3] >> (i & 7)) & 1)
+            res.extend(3 * i + 1 | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1))
+                       if not (sieve[i >> 5] >> (i & 31)) & 1)
         self.primes_list = res
+
