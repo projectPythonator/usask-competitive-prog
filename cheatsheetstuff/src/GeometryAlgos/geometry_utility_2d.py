@@ -1,9 +1,6 @@
-from point2d import Pt2d
+from point2d import Pt2d, Numeric
 from math import isclose, dist, sin, cos
 from typing import TypeVar
-
-Numeric = TypeVar('Numeric', int, float, complex)
-Reals = TypeVar('Reals', int, float, complex)
 
 
 class GeometryAlgorithms:
