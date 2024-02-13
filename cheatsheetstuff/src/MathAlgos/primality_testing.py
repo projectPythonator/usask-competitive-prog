@@ -19,7 +19,6 @@ class MathAlgorithms:
         self.primes_list = self.sieve_obj.primes_list
         self.primes_set = set(self.primes_list)
 
-
     def is_prime_trivial(self, n: int) -> bool:
         """Tests if n is prime via divisors up to sqrt(n).
 
