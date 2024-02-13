@@ -37,6 +37,9 @@ class MathAlgorithms:
         self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
     def block_sieve_odd(self, limit):
+        """block sieve on odd numbers only found from:
+        https://github.com/ngthanhtrung23/CompetitiveProgramming/blob/master/benchmark/sieve.cpp
+        c++ version translated into python second fastest in python I have found so far."""
         limit += 10
         end_sqrt, end_limit = isqrt(limit) + 1, (limit - 1) // 2
         sieve_and_block, primes, smaller_primes = [True] * (end_sqrt + 1), [2], []
@@ -63,8 +66,10 @@ class MathAlgorithms:
             self.primes_list.pop()
 
     def prime_sieve_super_fast_helper(self, n):
-        """returns a sieve of primes >= 5 and < n from
-        https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
+        """returns a sieve of primes >= 5 and < n found from
+        https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py
+        the fastest version in python I have found so far. I modified it to use arrays
+        over bytearrays."""
         flag = n % 6 == 2
         sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
         for i in range(1, isqrt(n) // 3 + 1):
@@ -77,8 +82,10 @@ class MathAlgorithms:
         return sieve
 
     def prime_sieve_super_fast(self, n):
-        """returns a list of primes <= n from
-        https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
+        """returns a sieve of primes from
+        https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py
+        the fastest version in python I have found so far. I modified it to use arrays
+        over bytearrays."""
         res = [] if n < 2 else [2] if n == 2 else [2, 3]
         if n > 4:
             sieve = self.prime_sieve_super_fast_helper(n + 1)
