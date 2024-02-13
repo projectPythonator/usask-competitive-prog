@@ -69,11 +69,11 @@ class MathAlgorithms:
         """returns a sieve of primes >= 5 and < n found from
         https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py
         the fastest version in python I have found so far. I modified it to use arrays
-        over bytearrays."""
+        over bytearrays. as is can be translated in c++ if needed"""
         flag = n % 6 == 2
         sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
         for i in range(1, isqrt(n) // 3 + 1):
-            if not (sieve[i >> 5] >> (i & 31)) & 1:
+            if not ((sieve[i >> 5] >> (i & 31)) & 1):
                 k = (3 * i + 1) | 1
                 for j in range(k * k // 3, n // 3 + flag, 2 * k):
                     sieve[j >> 5] |= 1 << (j & 31)
@@ -89,7 +89,7 @@ class MathAlgorithms:
         res = [] if n < 2 else [2] if n == 2 else [2, 3]
         if n > 4:
             sieve = self.prime_sieve_super_fast_helper(n + 1)
-            res.extend(3 * i + 1 | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1))
-                       if not (sieve[i >> 5] >> (i & 31)) & 1)
+            res.extend((3 * i + 1) | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1))
+                       if not ((sieve[i >> 5] >> (i & 31)) & 1))
         self.primes_list = res
 
