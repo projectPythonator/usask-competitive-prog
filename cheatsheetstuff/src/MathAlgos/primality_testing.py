@@ -2,6 +2,7 @@ from math import isqrt
 from itertools import takewhile, repeat
 from random import choices
 from array import array
+import prime_sieves
 
 
 class MathAlgorithms:
@@ -10,32 +11,15 @@ class MathAlgorithms:
         self.mrpt_known_bounds = []
         self.mrpt_known_tests = []
         self.primes_set = set()
+        self.sieve_obj = prime_sieves.MathAlgorithms()
+        self.sieve_function = self.sieve_obj.prime_sieve_super_fast
 
-    def prime_sieve_super_fast_helper(self, n):
-        """returns a sieve of primes >= 5 and < n from
-        https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
-        flag = n % 6 == 2
-        sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
-        for i in range(1, isqrt(n) // 3 + 1):
-            if not (sieve[i >> 5] >> (i & 31)) & 1:
-                k = (3 * i + 1) | 1
-                for j in range(k * k // 3, n // 3 + flag, 2 * k):
-                    sieve[j >> 5] |= 1 << (j & 31)
-                for j in range(k * (k - 2 * (i & 1) + 4) // 3, n // 3 + flag, 2 * k):
-                    sieve[j >> 5] |= 1 << (j & 31)
-        return sieve
+    def fill_primes_list_and_set(self, n):
+        """Fills primes list using sieve function"""
+        self.sieve_function(n)
+        self.primes_list = self.sieve_obj.primes_list
+        self.primes_set = set(self.primes_list)
 
-    def sieve_of_eratosthenes(self, n: int) -> None:
-        """Odds only optimized version of the previous method. Optimized to start at 3.
-
-        Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
-        """
-        res = [] if n < 2 else [2] if n == 2 else [2, 3]
-        if n > 4:
-            sieve = self.prime_sieve_super_fast_helper(n + 1)
-            res.extend(3 * i + 1 | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1))
-                       if not (sieve[i >> 5] >> (i & 31)) & 1)
-        self.primes_list = res
 
     def is_prime_trivial(self, n: int) -> bool:
         """Tests if n is prime via divisors up to sqrt(n).
@@ -100,5 +84,6 @@ class MathAlgorithms:
         self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
                                   2152302898747, 3474749660383, 341550071728321]
         self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
-        self.sieve_of_eratosthenes(1000)         # comment out if different size needed
-        self.primes_set = set(self.primes_list)  # comment out if already have bigger size
+        self.fill_primes_list_and_set(1000)
+        # self.sieve_of_eratosthenes(1000)         # comment out if different size needed
+        # self.primes_set = set(self.primes_list)  # comment out if already have bigger size
