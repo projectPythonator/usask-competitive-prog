@@ -1,5 +1,5 @@
 from math import isclose
-from typing import TypeVar
+from typing import TypeVar, Tuple
 
 
 Numeric = TypeVar('Numeric', int, float, complex)
@@ -38,3 +38,6 @@ class Pt2d:  # float default version
   def __str__(self): return "{} {}".format(self.x, self.y)
   def __hash__(self): return hash((self.x, self.y))
   def get_tup(self): return self.x, self.y
+
+
+ClosestPair = Tuple[Numeric, Pt2d, Pt2d]
