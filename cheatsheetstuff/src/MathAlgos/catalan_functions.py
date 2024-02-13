@@ -1,8 +1,9 @@
 from math import isqrt, log
 from bisect import bisect_right
-from itertools import takewhile, repeat
+from itertools import takewhile
 from collections import Counter
-from array import array
+import prime_sieves
+import factorizations
 
 
 class MathAlgorithms:
@@ -13,43 +14,19 @@ class MathAlgorithms:
     self.sum_prime_factors = None
     self.catalan_numbers = None
 
-  def prime_sieve_super_fast_helper(self, n):
-      """returns a sieve of primes >= 5 and < n from
-      https://github.com/cheran-senthil/PyRival/blob/master/pyrival/algebra/sieve.py"""
-      flag = n % 6 == 2
-      sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
-      for i in range(1, isqrt(n) // 3 + 1):
-          if not (sieve[i >> 5] >> (i & 31)) & 1:
-              k = (3 * i + 1) | 1
-              for j in range(k * k // 3, n // 3 + flag, 2 * k):
-                  sieve[j >> 5] |= 1 << (j & 31)
-              for j in range(k * (k - 2 * (i & 1) + 4) // 3, n // 3 + flag, 2 * k):
-                  sieve[j >> 5] |= 1 << (j & 31)
-      return sieve
+    self.sieve_obj = prime_sieves.MathAlgorithms()
+    self.sieve_function = self.sieve_obj.prime_sieve_super_fast
+    self.primes_list = []
+    self.primes_set = set()
 
-  def block_sieve_odd(self, n):
-    res = [] if n < 2 else [2] if n == 2 else [2, 3]
-    if n > 4:
-      sieve = self.prime_sieve_super_fast_helper(n + 1)
-      res.extend(3 * i + 1 | 1 for i in range(1, (n + 1) // 3 + (n % 6 == 1))
-                 if not (sieve[i >> 5] >> (i & 31)) & 1)
-    self.primes_list = res
+    self.factor_obj = factorizations.MathAlgorithms()
+    self.factor_n_function = self.factor_obj.prime_factorize_n
 
-  def prime_factorize_n(self, n: int) -> None:  # using this for testing
-    """A basic prime factorization of n function. without primes its just O(sqrt(n))
-
-    Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
-    Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
-    """
-    limit, prime_factors = isqrt(n) + 1, []
-    for prime in takewhile(lambda x: x < limit, self.primes_list):
-      if n % prime == 0:
-        while n % prime == 0:
-          n //= prime
-          prime_factors.append(prime)
-    if n > 1:  # n is prime or last factor of n is prime
-      prime_factors.append(n)
-    self.factor_list = Counter(prime_factors)
+  def fill_primes_list_factor_function(self, n):
+    """Fills primes list using sieve function"""
+    self.sieve_function(n)
+    self.primes_list = self.sieve_obj.primes_list
+    self.factor_obj.primes_list = self.sieve_obj.primes_list
 
   def factorial_prime_factors(self, limit: int) -> None:
     """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
@@ -71,14 +48,13 @@ class MathAlgorithms:
     Complexity per call: Time: O(max(n lnln(sqrt(n)), n)), Space: O(n/ln(n)).
     """
     top, bottom, ans = n, k, 1  # n = 2n and k = n in C(n, k) = (2n, n)
-    self.block_sieve_odd(n)  # or use any prime sieve this one is fastest in python
+    self.fill_primes_list_factor_function(n)
     self.factorial_prime_factors(top)
     top_factors = [amt for amt in self.num_prime_factors]
     self.factorial_prime_factors(bottom)  # will handle n!n! in one go stored in num
-    self.prime_factorize_n(k + 1)  # factorizing here is faster than doing n! and (n+1)!
     for prime_ind, exponent in enumerate(self.num_prime_factors):
       top_factors[prime_ind] -= (2 * exponent)
-    for prime, exponent in self.factor_list.items():
+    for prime, exponent in self.factor_n_function(k+1).items():  # k + 1 factor > (k+1)! factor
       top_factors[bisect_right(self.primes_list, prime) - 1] -= exponent
     for prime_ind, exponent in enumerate(top_factors):  # remember use multiplication not add
       if exponent > 0:
@@ -93,7 +69,7 @@ class MathAlgorithms:
     Complexity per call: Time: O(max(n lnln(sqrt(n)), n)), Space: O(n/ln(n)).
     """
     top, bottom, ans = n, k, 1  # n = 2n and k = n in C(n, k) = (2n, n)
-    self.block_sieve_odd(n)
+    self.fill_primes_list_factor_function(n)
     self.factorial_prime_factors(top)
     top_factors = [amt for amt in self.num_prime_factors]
     self.factorial_prime_factors(bottom)  # will handle n!n! in one go stored in num
