@@ -124,15 +124,18 @@ class TestMathMethods(unittest.TestCase):
         obj2 = prime_sieves.MathAlgorithms()
         obj3 = prime_sieves.MathAlgorithms()
         obj4 = prime_sieves.MathAlgorithms()
+        obj5 = prime_sieves.MathAlgorithms()
         for power in range(1, limit):
             n_limit = 10 ** power
             obj1.sieve_of_eratosthenes(n_limit)
             obj2.sieve_of_eratosthenes_optimized(n_limit)
             obj3.block_sieve_odd(n_limit)
             obj4.prime_sieve_super_fast(n_limit)
+            obj5.prime_sieve_super_fast_faster_maybe(n_limit)
             self.assertEqual(obj1.primes_list, obj2.primes_list)
             self.assertEqual(obj1.primes_list, obj3.primes_list)
             self.assertEqual(obj1.primes_list, obj4.primes_list)
+            self.assertEqual(obj1.primes_list, obj5.primes_list)
 
     def test_all_4_sieves_on_powers_of_2_up_to_100m(self):
         """tested up to 100m before."""
@@ -141,15 +144,18 @@ class TestMathMethods(unittest.TestCase):
         obj2 = prime_sieves.MathAlgorithms()
         obj3 = prime_sieves.MathAlgorithms()
         obj4 = prime_sieves.MathAlgorithms()
+        obj5 = prime_sieves.MathAlgorithms()
         for power in range(1, limit):
             n_limit = 2 ** power
             obj1.sieve_of_eratosthenes(n_limit)
             obj2.sieve_of_eratosthenes_optimized(n_limit)
             obj3.block_sieve_odd(n_limit)
             obj4.prime_sieve_super_fast(n_limit)
+            obj5.prime_sieve_super_fast_faster_maybe(n_limit)
             self.assertEqual(obj1.primes_list, obj2.primes_list)
             self.assertEqual(obj1.primes_list, obj3.primes_list)
             self.assertEqual(obj1.primes_list, obj4.primes_list)
+            self.assertEqual(obj1.primes_list, obj5.primes_list)
 
     def testing_sieve_of_min_primes_10k_runs(self):
         """tested on 100k runs"""
