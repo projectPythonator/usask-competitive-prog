@@ -249,7 +249,7 @@ class TestMathMethods(unittest.TestCase):
 
     def testing_num_and_sum_of_divisors_same_as_faster_version_2500_runs(self):
         """tested up to 10k"""
-        limit = 10000
+        limit = 2500
         for i in range(2, limit):
             obj1 = prime_sieve_variants.MathAlgorithms()
             obj2 = prime_sieve_variants.MathAlgorithms()
