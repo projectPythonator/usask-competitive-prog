@@ -9,6 +9,7 @@ import catalan_functions
 import binomial_coefficient
 import fast_fourier_transform
 import chinese_remainder_theorem
+from bisect import bisect_right
 
 
 class TestMathMethods(unittest.TestCase):
@@ -80,13 +81,75 @@ class TestMathMethods(unittest.TestCase):
             else:
                 self.assertTrue(number not in obj.primes_set)
 
-    def test_sieve_of_eratosthenes_optimized_1m(self):
-        limit = 1000000
-        test_obj = prime_sieves.MathAlgorithms()
-        obj = prime_sieves.MathAlgorithms()
-        test_obj.sieve_of_eratosthenes(limit)
-        obj.sieve_of_eratosthenes_optimized(limit)
-        self.assertEqual(test_obj.primes_list, obj.primes_list)
+    def test_prime_sieve_super_fast_10k_runs(self):
+        """tested up to 100k to match sieves."""
+        limit = 10000
+        obj1 = prime_sieves.MathAlgorithms()
+        obj2 = prime_sieves.MathAlgorithms()
+        obj2.sieve_of_eratosthenes(limit+1)
+        for i in range(10, limit):
+            obj1.prime_sieve_super_fast(i)
+            self.assertEqual(obj1.primes_list,
+                             obj2.primes_list[:bisect_right(obj2.primes_list,
+                                                            obj1.primes_list[-1])])
+
+    def test_sieve_of_eratosthenes_optimized_10k_runs(self):
+        """tested up to 100k to match sieves."""
+        limit = 10000
+        obj1 = prime_sieves.MathAlgorithms()
+        obj2 = prime_sieves.MathAlgorithms()
+        obj2.prime_sieve_super_fast(limit+1)
+        for i in range(10, limit):
+            obj1.sieve_of_eratosthenes_optimized(i)
+            self.assertEqual(obj1.primes_list,
+                             obj2.primes_list[:bisect_right(obj2.primes_list,
+                                                            obj1.primes_list[-1])])
+
+    def test_block_sieve_odd_10k_runs(self):
+        """tested up to 100k to match sieves."""
+        limit = 10000
+        obj1 = prime_sieves.MathAlgorithms()
+        obj2 = prime_sieves.MathAlgorithms()
+        obj2.prime_sieve_super_fast(limit+1)
+        for i in range(10, limit):
+            obj1.block_sieve_odd(i)
+            self.assertEqual(obj1.primes_list,
+                             obj2.primes_list[:bisect_right(obj2.primes_list,
+                                                            obj1.primes_list[-1])])
+
+    def test_all_4_sieves_on_powers_of_10_up_to_10m(self):
+        """tested up to 100m before."""
+        limit = 9
+        obj1 = prime_sieves.MathAlgorithms()
+        obj2 = prime_sieves.MathAlgorithms()
+        obj3 = prime_sieves.MathAlgorithms()
+        obj4 = prime_sieves.MathAlgorithms()
+        for power in range(1, limit):
+            n_limit = 10 ** power
+            obj1.sieve_of_eratosthenes(n_limit)
+            obj2.sieve_of_eratosthenes_optimized(n_limit)
+            obj3.block_sieve_odd(n_limit)
+            obj4.prime_sieve_super_fast(n_limit)
+            self.assertEqual(obj1.primes_list, obj2.primes_list)
+            self.assertEqual(obj1.primes_list, obj3.primes_list)
+            self.assertEqual(obj1.primes_list, obj4.primes_list)
+
+    def test_all_4_sieves_on_powers_of_2_up_to_100m(self):
+        """tested up to 100m before."""
+        limit = 24
+        obj1 = prime_sieves.MathAlgorithms()
+        obj2 = prime_sieves.MathAlgorithms()
+        obj3 = prime_sieves.MathAlgorithms()
+        obj4 = prime_sieves.MathAlgorithms()
+        for power in range(1, limit):
+            n_limit = 2 ** power
+            obj1.sieve_of_eratosthenes(n_limit)
+            obj2.sieve_of_eratosthenes_optimized(n_limit)
+            obj3.block_sieve_odd(n_limit)
+            obj4.prime_sieve_super_fast(n_limit)
+            self.assertEqual(obj1.primes_list, obj2.primes_list)
+            self.assertEqual(obj1.primes_list, obj3.primes_list)
+            self.assertEqual(obj1.primes_list, obj4.primes_list)
 
     def testing_sieve_of_min_primes_1m(self):
         """Depends on sieve_of_eratosthenes_optimized and prime_factorize_n working."""
@@ -202,17 +265,6 @@ class TestMathMethods(unittest.TestCase):
                 continue
             result_tuple = obj.prime_factorize_n_variants(i)
             self.assertEqual(result_tuple, expected_tuple)
-
-    def test_block_sieve_odd_10k(self):
-        limit = 10000
-        start = 1000
-        obj_base = prime_sieves.MathAlgorithms()
-        obj = prime_sieves.MathAlgorithms()
-        for i in range(start, start+limit):
-            obj_base.sieve_of_eratosthenes_optimized(i)
-            obj.block_sieve_odd(i)
-            self.assertEqual(len(obj_base.primes_list), len(obj.primes_list), i)
-            self.assertEqual(obj_base.primes_list[-1], obj.primes_list[-1], i)
 
     def test_fibonacci_n_iterative_10(self):
         limit = 10
@@ -457,12 +509,4 @@ class TestMathMethods(unittest.TestCase):
             result_2 = obj_2.extended_euclid_iterative(a, b)
             self.assertEqual(result_1, result_2, "{} {}".format(a, b))
 
-    def test_fast_sieve_10k(self):
-        "tested up to 100k to match sieves."
-        limit = 10000
-        obj1 = prime_sieves.MathAlgorithms()
-        obj2 = prime_sieves.MathAlgorithms()
-        for i in range(10, limit):
-            obj1.prime_sieve_super_fast(i)
-            obj2.block_sieve_odd(i)
-            self.assertEqual(obj1.primes_list, obj2.primes_list)
+
