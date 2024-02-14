@@ -2068,11 +2068,11 @@ class GeometryAlgorithms:
     paste directly into code and drop isclose for runtime speedup."""
     return 0 if isclose(a, b) else -1 if a < b else 1
 
-  def dot_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Reals:
+  def dot_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Numeric:
     """Compute the scalar product a.b of a,b equivalent to: a . b"""
     return left_vector.x*right_vector.x + left_vector.y*right_vector.y
 
-  def cross_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Reals:
+  def cross_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Numeric:
     """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
     return left_vector.x*right_vector.y - left_vector.y*right_vector.x
 
@@ -2080,7 +2080,7 @@ class GeometryAlgorithms:
     """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
     return dist(left_point, right_point)
 
-  def distance(self, left_point: Pt2d, right_point: Pt2d) -> Reals:
+  def distance(self, left_point: Pt2d, right_point: Pt2d) -> Numeric:
     """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
     return self.dot_product(left_point - right_point, left_point - right_point)
 
