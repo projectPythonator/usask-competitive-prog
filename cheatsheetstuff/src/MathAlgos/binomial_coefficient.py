@@ -1,5 +1,6 @@
 from functools import lru_cache
 
+
 class MathAlgorithms:
   def __init__(self):
     self.mod_p = None
