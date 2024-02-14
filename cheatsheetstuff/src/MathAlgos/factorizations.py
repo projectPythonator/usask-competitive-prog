@@ -47,12 +47,12 @@ class MathAlgorithms:
         """
         limit, prime_factors = isqrt(n) + 1, []
         for prime in takewhile(lambda x: x < limit, self.primes_list):
-            if n % prime == 0:
-                while n % prime == 0:
-                    n //= prime
-                    prime_factors.append(prime)
+            while n % prime == 0:
+                n //= prime
+                prime_factors.append(prime)
         if n > 1:  # n is prime or last factor of n is prime
             prime_factors.append(n)
+        self.factor_list = Counter(prime_factors)
         return Counter(prime_factors)
 
     def prime_factorize_n_log_n(self, n: int) -> Dict:
