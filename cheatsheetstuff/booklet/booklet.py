@@ -1211,10 +1211,11 @@ class GraphAlgorithms:
 from bisect import bisect_left
 from collections import Counter
 from functools import lru_cache
-from itertools import takewhile, accumulate
+from itertools import takewhile, accumulate, repeat
 from math import isqrt, log, gcd, prod, cos, sin, tau
 from operator import mul as operator_mul
 from random import choices
+from array import array
 
 
 class MathAlgorithms:
@@ -1282,6 +1283,56 @@ class MathAlgorithms:
           primes_sieve[j] = False
     self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
+  def block_sieve_odd(self, limit: int):
+    """Block sieve that builds up block by block to the correct amount needed.
+
+    Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(sqrt(n))
+    """
+    n, limit = limit, limit + 10
+    end_sqrt, end_limit = isqrt(limit) + 1, (limit - 1) // 2
+    sieve_and_block, primes, smaller_primes = [True] * (end_sqrt + 1), [2], []
+    app, smaller_app = primes.append, smaller_primes.append
+    for prime in range(3, end_sqrt, 2):
+      if sieve_and_block[prime]:
+        smaller_app([prime, (prime * prime - 1) // 2])
+        for j in range(prime * prime, end_sqrt + 1, prime * 2):
+          sieve_and_block[j] = False
+    for low in range(0, end_limit, end_sqrt):
+      for i in range(end_sqrt):
+        sieve_and_block[i] = True
+      for i, [p, idx] in enumerate(smaller_primes):
+        for idx in range(idx, end_sqrt, p):
+          sieve_and_block[idx] = False
+        smaller_primes[i][1] = idx - end_sqrt + (0 if idx >= end_sqrt else p)
+      if low == 0:
+        sieve_and_block[0] = False
+      for i in range(min(end_sqrt, (end_limit + 1) - low)):
+        if sieve_and_block[i] and (low + i) * 2 + 1 <= n:
+          app((low + i) * 2 + 1)
+    self.primes_list = primes
+
+  def prime_sieve_super_fast(self, limit: int):
+    """Optimized wheel sieve with bit compression.
+
+    Complexity: Time: O(max(n lnln(sqrt(n)), n)),
+               Space: post call O(n/ln(n)), mid-call S((n/3)/8)  4/32 == 1/8
+    """
+    res = [] if limit < 2 else [2] if limit == 2 else [2, 3]
+    if limit > 4:
+      n = limit + 1
+      flag = n % 6 == 2
+      sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
+      for i in range(1, isqrt(n) // 3 + 1):
+        if not ((sieve[i >> 5] >> (i & 31)) & 1):
+          k = (3 * i + 1) | 1
+          for j in range(k * k // 3, n // 3 + flag, 2 * k):
+            sieve[j >> 5] |= 1 << (j & 31)
+          for j in range(k * (k - 2 * (i & 1) + 4) // 3, n // 3 + flag, 2 * k):
+            sieve[j >> 5] |= 1 << (j & 31)
+      res.extend([(3 * i + 1) | 1 for i in range(1, n // 3 + (limit % 6 == 1))
+                  if not ((sieve[i >> 5] >> (i & 31)) & 1)])
+    self.primes_list = res
+
   def sieve_of_min_primes(self, n_inclusive: int) -> None:
     """Stores the min or max prime divisor for each number up to n.
 
@@ -1292,8 +1343,8 @@ class MathAlgorithms:
     for prime in self.primes_list:
       min_primes[prime] = prime
       start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2 * prime
-      for j in range(start, end, step):
-        min_primes[j] = prime
+      for multiple in range(start, end, step):
+        min_primes[multiple] = prime
     self.min_primes_list = min_primes
 
   def sieve_of_eratosthenes_variants(self, n_inclusive: int) -> None:
