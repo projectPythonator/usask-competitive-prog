@@ -15,7 +15,7 @@ class MathAlgorithms:
     self.catalan_numbers = None
 
     self.sieve_obj = prime_sieves.MathAlgorithms()
-    self.sieve_function = self.sieve_obj.prime_sieve_super_fast
+    self.sieve_function = self.sieve_obj.prime_sieve_super_fast_faster_maybe
     self.primes_list = []
     self.primes_set = set()
 
@@ -33,10 +33,10 @@ class MathAlgorithms:
     end_point = bisect_right(self.primes_list, limit)
     prime_factors = [0] * end_point
     for i in range(end_point):
-      prime, prime_amount = self.primes_list[i], 0
-      exponent_limit = int(log(limit, prime)) + 2
-      for exponent in range(1, exponent_limit):
-        prime_amount += (limit // prime ** exponent)
+      prime, prime_amount, x = self.primes_list[i], 0, limit
+      while x:
+        x //= prime
+        prime_amount += x
       prime_factors[i] = prime_amount
     self.num_prime_factors = prime_factors
 
@@ -105,3 +105,22 @@ class MathAlgorithms:
     for i in range(n - 1):
       catalan[i + 1] = (((4 * i + 2) % p) * (catalan[i] % p) * pow(i + 2, p - 2, p)) % p
     self.catalan_numbers = catalan[:-1]  # cut the last number off for inclusive reasons
+
+#
+# def test_1():
+#   limit = 10**7
+#   mod_m = 10**9+7
+#   obj = MathAlgorithms()
+#   obj.generate_catalan_n_mod_inverse(limit, mod_m)
+#
+#
+# def test_2():
+#   limit = 10**7
+#   mod_m = 10**9+7
+#   obj = MathAlgorithms()
+#   obj.catalan_via_prime_factors_faster(2*limit, limit, mod_m)
+#
+#
+# import cProfile
+# cProfile.run("test_2()", sort='tottime')
+# cProfile.run("test_1()", sort='tottime')
