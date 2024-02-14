@@ -1208,7 +1208,7 @@ class GraphAlgorithms:
 ##################################################
 
 
-from bisect import bisect_left
+from bisect import bisect_left, bisect_right
 from collections import Counter
 from functools import lru_cache
 from itertools import takewhile, accumulate, repeat
@@ -1511,6 +1511,18 @@ class MathAlgorithms:
     self.factor_list = Counter(prime_factors)
     return Counter(prime_factors)
 
+  def factorial_prime_factors(self, limit: int) -> None:
+    """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
+    end_point = bisect_right(self.primes_list, limit)
+    prime_factors = [0] * end_point
+    for i in range(end_point):
+      prime, prime_amount, x = self.primes_list[i], 0, limit
+      while x:
+        x //= prime
+        prime_amount += x
+      prime_factors[i] = prime_amount
+    self.num_prime_factors = prime_factors
+
   def prime_factorize_n_variants(self, n: int) -> int:
     """Covers all the variants listed above, holds the same time complexity with O(1) space."""
     limit = isqrt(n) + 1
@@ -1758,26 +1770,27 @@ class MathAlgorithms:
       catalan[i+1] = (((4*i + 2) % p) * (catalan[i] % p) * pow(i+2, p-2, p)) % p
     self.catalan_numbers = catalan
 
-  def catalan_via_prime_facts(self, n: int, k: int, mod_m: int) -> int:
+  def catalan_via_prime_factors_slower(self, n: int, k: int, mod_m: int) -> int:
     """Compute the nth Catalan number mod_n via prime factor reduction of C(2n, n)/(n+1).
     Notes: The function "num_and_sum_of_prime_factors" needs to be modified for computing number
     of each prime factor in all the numbers between 1-2n or 1 to n.
 
     Complexity per call: Time: O(max(n lnln(sqrt(n)), n)), Space: O(n/ln(n)).
+    Optimization: compute bottom! once and factorize k+1 instead of two calls to factorial factor.
     """
     top, bottom, ans = n, k, 1  # n = 2n and k = n in C(n, k) = (2n, n)
-    self.num_and_sum_of_prime_factors(top)
-    top_factors = [el for el in self.num_prime_factors]
-    prime_array = [el for el in self.primes_list]  # saving primes to use in two lines later
-    self.num_and_sum_of_prime_factors(bottom)    # will handle n!n! in one go stored in num
-    for i, el in enumerate(self.num_prime_factors):  # num_prime_factors :)
-      top_factors[i] -= (2*el)
-    self.prime_factorize_n(k+1)  # factorizing here is faster than doing n! and (n+1)! separate
-    for p, v in self.factor_list.items():
-      top_factors[bisect_left(prime_array, p)] -= v
-    for ind, exponent in enumerate(top_factors):  # remember use multiplication not addition
+    self.prime_sieve_super_fast(n)  # or any sieve
+    self.factorial_prime_factors(top)
+    top_factors = [amt for amt in self.num_prime_factors]
+    self.factorial_prime_factors(bottom)  # will handle n!n! in one go stored in num
+    for prime_ind, exponent in enumerate(self.num_prime_factors):
+      top_factors[prime_ind] -= exponent
+    self.factorial_prime_factors(bottom + 1)  # will handle n!n! in one go stored in num
+    for prime_ind, exponent in enumerate(self.num_prime_factors):
+      top_factors[prime_ind] -= exponent
+    for prime_ind, exponent in enumerate(top_factors):  # remember use multiplication not add
       if exponent > 0:
-        ans = (ans * pow(prime_array[ind], exponent, mod_m)) % mod_m
+        ans = (ans * pow(self.primes_list[prime_ind], exponent, mod_m)) % mod_m
     return ans
 
   def c_n_k(self, n: int, k: int) -> int:
