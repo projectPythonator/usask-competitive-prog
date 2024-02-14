@@ -1412,17 +1412,17 @@ class MathAlgorithms:
     cur_pows = [1] * inclusive_limit
     for prime in range(2, inclusive_limit):
       if num_divs[prime] == 1:
-        exponent_limit = int(log(limit, prime)) + 1  # bug here on some inputs n
+        exponent_limit = int(log(limit, prime)) + 2
         for exponent in range(1, exponent_limit):
           prime_to_exponent = prime ** exponent
-          for i in range(prime_to_exponent, inclusive_limit, prime_to_exponent):
-            cur_pows[i] += 1
+          for multiple in range(prime_to_exponent, inclusive_limit, prime_to_exponent):
+            cur_pows[multiple] += 1
         tmp = prime - 1  # this line and the line below used for sum_divs
-        prime_powers = [prime ** exponent for exponent in range(0, exponent_limit+1)]
-        for i in range(prime, inclusive_limit, prime):
-          num_divs[i] *= cur_pows[i]
-          sum_divs[i] *= ((prime_powers[cur_pows[i]] - 1) // tmp)
-          cur_pows[i] = 1
+        prime_powers = [prime ** exponent for exponent in range(0, exponent_limit + 1)]
+        for multiple in range(prime, inclusive_limit, prime):
+          num_divs[multiple] *= cur_pows[multiple]
+          sum_divs[multiple] *= ((prime_powers[cur_pows[multiple]] - 1) // tmp)
+          cur_pows[multiple] = 1
     self.num_divisors = num_divs
     self.sum_divisors = sum_divs
 
