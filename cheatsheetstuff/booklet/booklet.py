@@ -1397,9 +1397,9 @@ class MathAlgorithms:
         exponent_limit = int(log(limit, prime)) + 1
         for exponent in range(1, exponent_limit):
           prime_to_exponent = prime**exponent
-          for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
-            sum_pf[i] += prime
-            num_pf[i] += 1
+          for multiple in range(prime_to_exponent, limit + 1, prime_to_exponent):
+            sum_pf[multiple] += prime
+            num_pf[multiple] += 1
     self.num_prime_factors = num_pf
     self.sum_prime_factors = sum_pf
 
