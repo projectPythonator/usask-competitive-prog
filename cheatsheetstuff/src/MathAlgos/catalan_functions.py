@@ -105,22 +105,3 @@ class MathAlgorithms:
     for i in range(n - 1):
       catalan[i + 1] = (((4 * i + 2) % p) * (catalan[i] % p) * pow(i + 2, p - 2, p)) % p
     self.catalan_numbers = catalan[:-1]  # cut the last number off for inclusive reasons
-
-#
-# def test_1():
-#   limit = 10**7
-#   mod_m = 10**9+7
-#   obj = MathAlgorithms()
-#   obj.generate_catalan_n_mod_inverse(limit, mod_m)
-#
-#
-# def test_2():
-#   limit = 10**7
-#   mod_m = 10**9+7
-#   obj = MathAlgorithms()
-#   obj.catalan_via_prime_factors_faster(2*limit, limit, mod_m)
-#
-#
-# import cProfile
-# cProfile.run("test_2()", sort='tottime')
-# cProfile.run("test_1()", sort='tottime')
