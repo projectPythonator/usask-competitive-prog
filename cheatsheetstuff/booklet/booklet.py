@@ -39,7 +39,7 @@ class UnionFindDisjointSets:
   """This Data structure is for non-directional disjoint sets."""
 
   def __init__(self, n):
-    """Attributes declared here must be passed in or global if not used in class format."""
+    """Attributes declared here must be passed in or global if not used in classes."""
     self.num_sets = n      # optional information
     self.rank = [0] * n    # optional optimization
     self.set_sizes = [1] * n   # optional information
@@ -81,14 +81,14 @@ class UnionFindDisjointSets:
     """
     if not self.is_same_set(u, v):
       u_parent, v_parent = self.find_set(u), self.find_set(v)
-      if self.rank[u_parent] > self.rank[v_parent]:   # keep u_parent shorter than v_parent
+      if self.rank[u_parent] > self.rank[v_parent]:   # u_parent shorter than v_parent
         u_parent, v_parent = v_parent, u_parent
 
       if self.rank[u_parent] == self.rank[v_parent]:     # an optional speedup
         self.rank[v_parent] = self.rank[v_parent] + 1
       self.parent[u_parent] = v_parent            # this line joins u with v
       self.num_sets -= 1
-      self.set_sizes[v_parent] += self.set_sizes[u_parent]  # u -> v so add size_u to size_v
+      self.set_sizes[v_parent] += self.set_sizes[u_parent]  # u = v so add them
 
   def size_of_u(self, u):  # optional information
     """Gives you the size of set u. TIME and SPACE Complexity is the same as find_set"""
@@ -115,8 +115,8 @@ from math import isqrt, gcd
 
 
 # min use big value, max use smallest val, sum use 0, product use 1
-# for gcd and others you will need to change the code so that you set it to the starting value
-# this might mean longer implementations but that is the cost of the way I set it up
+# for gcd and others you will need to change the code so that you set it to the starting
+# value this might mean longer implementations but that is the cost of the way I set it up
 RQ_DEFAULT = 2 ** 32
 
 
@@ -128,11 +128,9 @@ class SquareRootDecomposition:
     Range Query Operation: min, max, gcd, sum, product and commutative functions.
   """
 
-  __slot__ = ("decomposed_blocks", 'size_of_blocks', 'num_of_blocks', 'range_of_data', 'data')
-
   def __init__(self):
-    """Attributes declared here must be passed in or global if not used in class format."""
-    self.size_of_blocks = self.num_of_blocks = self.range_of_data = 0
+    """Attributes declared here must be passed in or global if not used in class."""
+    self.size_of_blocks = self.num_of_blocks = self.data_range = 0
     self.decomposed_blocks = []
     self.data_copy = []
 
@@ -144,8 +142,8 @@ class SquareRootDecomposition:
     sqrt_len = isqrt(len(new_data)) + 1  # + 1 here to for to cover int(x) == floor(x)
     pad_val = RQ_DEFAULT  # DEFAULT INFO AT TOP OF CLASS
     self.size_of_blocks = self.num_of_blocks = sqrt_len
-    self.decomposed_blocks, self.range_of_data = [pad_val] * sqrt_len, sqrt_len ** 2
-    self.data_copy = [el for el in new_data] + [pad_val] * (self.range_of_data - len(new_data))
+    self.decomposed_blocks, self.data_range = [pad_val] * sqrt_len, sqrt_len ** 2
+    self.data_copy = [i for i in new_data] + [pad_val] * (self.data_range - len(new_data))
     for i in range(sqrt_len):
       self.update_block_n(i)
 
@@ -169,20 +167,20 @@ class SquareRootDecomposition:
     self.update_block_n(position_i // self.num_of_blocks)   # but this costs O(sqrt(n))
 
   def range_query_i_to_j(self, left, right):
-    """Compute a range query from left to right. Note right is inclusive not exclusive here.
+    """Compute a range query from left to right. Note right is inclusive here.
 
     Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
     """
     block_size, result = self.size_of_blocks, RQ_DEFAULT  # DEFAULT INFO AT TOP OF CLASS
     if (right + 1) - left <= block_size:  # special case where right-left ~= block_size
-      for i in range(left, right + 1):  # right + 1 since right is inclusive in this function
+      for i in range(left, right + 1):  # right + 1 since right is inclusive
         result = min(result, self.data_copy[i])
     else:
       left_block, right_block = left // block_size, right // block_size
       end1, start2 = (left_block + 1) * block_size, right_block * block_size
       for i in range(left, end1):
         result = min(result, self.data_copy[i])
-      for i in range(start2, right + 1):  # right + 1 since right is inclusive in this func
+      for i in range(start2, right + 1):  # right + 1 since right is inclusive
         result = min(result, self.data_copy[i])
       for i in range(left_block + 1, right_block):
         result = min(result, self.decomposed_blocks[i])
@@ -199,13 +197,13 @@ class SparseTable:
   """Logarithmic Datastructure based around levels of precomputed data.
 
   Operations Supported:
-    DOES NOT SUPPORT DYNAMIC UPDATES much recompute structure after an update or before queries
+    DOES NOT SUPPORT DYNAMIC UPDATES must recompute structure after an update
     Range Query Operation: min, max, gcd, sum, product and commutative functions.
   """
   __slots__ = ("sparse_table", "k_value", "max_n")
 
   def __init__(self, max_n):
-    """Attributes declared here must be passed in or global if not used in class format."""
+    """Attributes declared here must be passed in or global if not used in class."""
     self.k_value = max_n.bit_length()
     self.max_n = max_n
     self.sparse_table = [[0] * max_n for _ in range(self.k_value)]
@@ -223,10 +221,10 @@ class SparseTable:
     for i, el in enumerate(array):
       spare_table[0][i] = el
     for i in range(1, i_end):  # start from 1 and compute sub problems lvl by lvl
-      prev_i = i - 1  # compute once here for better readability and avoid n ln n computations
+      prev_i = i - 1  # compute once here for better readability and avoid n ln n
       j_end, prev_pow_2 = local_max_n - (1 << i), 1 << prev_i  # read comment above
       for j in range(j_end):
-        spare_table[i][j] = min(spare_table[prev_i][j], spare_table[prev_i][j + prev_pow_2])
+        spare_table[i][j] = min(spare_table[prev_i][j], spare_table[prev_i][j+prev_pow_2])
         # spare_table[i][j] = spare_table[prev_i][j] + spare_table[prev_i][j + prev_pow_2]
 
   def range_query_from_i_to_j(self, left, right):
@@ -237,7 +235,7 @@ class SparseTable:
       range min query: O(f(x)) = O(1) like most  V1
       range sum query: O(f(x)) = O(1) like others  V2
     Notes: V1 is min and max (there might be others) but for these you need only compute
-    two ranges so long as lower_bound == left and upper_bound == right, overlap won't matter
+    two ranges so long as lower_bound == left and upper_bound == right, overlap is fine
     """
     result = RQ_DEFAULT  # see SquareRootDecomposition class for more info
     ind = (right - left + 1).bit_length()-1  # I think this is same as log2(r - l + 1)
@@ -262,7 +260,7 @@ class FenwickTree:
   __slots__ = ("fenwick_tree", "fenwick_tree_size")
 
   def __init__(self, frequency_array=None):
-    """Attributes declared here must be passed in or global if not used in class format."""
+    """Attributes declared here must be passed in or global if not used in class."""
     self.fenwick_tree = []
     self.fenwick_tree_size = 0
     if frequency_array:  # None is False, so we can have this optional check :)
@@ -306,8 +304,8 @@ class FenwickTree:
     Complexity per call: Time: O(log n), Space: O(1).
     """
     if left > 1:  # when left isn't 1 we compute the formula above.
-      return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
-    sum_up_to_right = RQ_DEFAULT  # is 0 but see SquareRootDecomposition class for more info
+      return self.range_sum_from_i_to_j(1, right)-self.range_sum_from_i_to_j(1, left-1)
+    sum_up_to_right = RQ_DEFAULT  # is 0, see SquareRootDecomposition class for more info
     while right:
       sum_up_to_right += self.fenwick_tree[right]
       right -= self.last_set_bit(right)
@@ -315,7 +313,7 @@ class FenwickTree:
 
   def update_index_by_delta(self, index, delta):
     """Updates the branch that follows index by delta. version is 1-index based.
-    Branch defined as "for i in range(index, tree_size, f(i)=i & (-i))", for(start, end, step)
+    Branch defined as "for i in range(index,tree_size,f(i)=i & (-i))", for(start,end,step)
 
     Complexity per call: Time: O(log n), Space: O(1).
     """
@@ -355,8 +353,8 @@ class RangeUpdatePointQuery:
     self.point_update_range_query = FenwickTree([0] * m)
 
   def update_range_i_to_j_by_delta(self, left, right, delta):  # TODO semi tested
-    """For a range update we need only update all indices in [i,i+1...n] to have +delta and
-    then all indices in [j+1,j+2...n] with -delta to negate range(j+1, n) that was affected
+    """For a range update we need only update all indices in [i,i+1...n] to have +delta +
+    then all indices in [j+1,j+2...n] with -delta to negate range(j+1, n) that was changed
 
     Complexity per call: Time: O(log n), Space: O(1).
     """
@@ -387,7 +385,7 @@ class RangeUpdateRangeQuery:
     self.point_update_range_query.update_index_by_delta(right + 1, -delta * right)
 
   def range_sum_from_i_to_j(self, left, right):  # TODO semi tested
-    """Similar to the Fenwick tree we use inclusion exclusion, but we need to use our augmented
+    """Similar to the Fenwick tree we use inclusion exclusion, but we need to use our aug
     tree to handle 3 cases to compute formula sum[0, i] = sum(rupq, i) * i - sum(purq, i)
           | original            | simplified      |   conditions
     sum[0,i] =  | 0*i - 0             | 0           |   i < left
@@ -397,7 +395,7 @@ class RangeUpdateRangeQuery:
     Complexity per call: Time: O(log n), Space: O(1).
     """
     if left > 1:
-      return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
+      return self.range_sum_from_i_to_j(1, right)-self.range_sum_from_i_to_j(1, left-1)
     return (self.range_update_point_query.point_sum_query_of_index(right) * right
             - self.point_update_range_query.range_sum_from_i_to_j(1, right))
 
@@ -419,7 +417,7 @@ class SegmentTree:
     n = len(new_array)
     next_2_pow_n = n if 2**(n.bit_length()-1) == n else 2**n.bit_length()
     self.lazy = [-1] * (4 * next_2_pow_n)     # 4 * n used to avoid index out of bounds
-    self.segment_tree = [0] * (4 * next_2_pow_n)  # 4 * n used to avoid index out of bounds
+    self.segment_tree = [0] * (4 * next_2_pow_n)  # 4 * n used to avoid index out of bound
     self.array_a = [el for el in new_array]
     if next_2_pow_n != n:                   # we add extra padding to the end to
       self.array_a.extend([RQ_DEFAULT]*(next_2_pow_n-n))  # make the len a power of 2
@@ -436,11 +434,11 @@ class SegmentTree:
     self.build_segment_tree_2()
 
   def left_child(self, parent):
-    """Macro function, gets left child in array based binary tree, paste in code for speedup."""
+    """Macro function, gets left child in array based binary tree, hardcode to speedup."""
     return parent << 1
 
   def right_child(self, parent):
-    """Macro function, gets right child in array based binary tree, paste in code to speedup."""
+    """Macro function, gets right child in array based binary tree,"""
     return (parent << 1) + 1
 
   def conqur(self, a, b):
@@ -478,10 +476,10 @@ class SegmentTree:
       left_path, right_path = self.left_child(parent), self.right_child(parent)
       self._build_segment_tree_2(left_path, left, mid)
       self._build_segment_tree_2(right_path, mid + 1, right)
-      left_ind = self.segment_tree[left_path]
-      right_ind = self.segment_tree[right_path]
-      self.segment_tree[parent] = (left_ind if (self.array_a[left_ind]
-                                                <= self.array_a[right_ind]) else right_ind)
+      left_i = self.segment_tree[left_path]
+      right_i = self.segment_tree[right_path]
+      self.segment_tree[parent] = (left_i if (self.array_a[left_i]
+                                              <= self.array_a[right_i]) else right_i)
 
   def _range_min_query_1(self, parent, left, right, i, j):
     self.propagate(parent, left, right)
@@ -505,7 +503,8 @@ class SegmentTree:
       return self.segment_tree[parent], self.array_a[self.segment_tree[parent]]
     mid = (left + right) // 2
     left_ind, left_val = self._range_min_query_2(self.left_child(parent), left, mid, i, j)
-    right_ind, right_val = self._range_min_query_2(self.right_child(parent), mid+1, right, i, j)
+    right_ind, right_val = self._range_min_query_2(self.right_child(parent),
+                                                   mid+1, right, i, j)
     if left_ind == -1:
       return right_ind, right_val
     elif right_ind == -1:
@@ -557,7 +556,8 @@ class SegmentTree:
                                            max(i, left), min(j, mid), new_value)
     right_ind = self._update_segment_tree_2(right_path, mid+1, right,
                                             max(i, mid+1), min(j, right), new_value)
-    self.segment_tree[parent] = (left_ind if (self.array_a[left_ind] <= self.array_a[right_ind])
+    self.segment_tree[parent] = (left_ind if (self.array_a[left_ind]
+                                              <= self.array_a[right_ind])
                                  else right_ind)
     return self.segment_tree[parent]
 
@@ -619,29 +619,29 @@ class Graph:
     self.code_to_data = []  # used for integer vertices back into original input
 
   def convert_data_to_code(self, data: object) -> int:
-    """Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair, then return u."""
+    """Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair."""
     if data not in self.data_to_code:
       self.data_to_code[data] = len(self.code_to_data)
-      self.code_to_data.append(data)  # can be replaced with a count variable if space needed
+      self.code_to_data.append(data)  # can be replaced with a count variable if needed
     return self.data_to_code[data]
 
   def add_edge_u_v_wt_into_directed_graph(self, u: object, v: object, wt: Num, data: Num):
-    """A pick and choose function will convert u, v into index form then add it to the structure
-    you choose.
+    """A pick and choose function will convert u, v into index form then add it to the
+    structure you choose.
     """
-    u: int = self.convert_data_to_code(u)  # omit if u,v is in the form: int u | 0 <= u < |V|
-    v: int = self.convert_data_to_code(v)  # omit if u,v is in the form: int u | 0 <= u < |V|
+    u: int = self.convert_data_to_code(u)  # omit if u,v is in the form: int
+    v: int = self.convert_data_to_code(v)  # omit if u,v is in the form: int
 
     self.adj_list[u].append(v)
     # self.adj_list[u].append((v, wt))  # Adjacency list usage with weights
     self.adj_matrix[u][v] = wt      # Adjacency matrix usage
     self.edge_list.append((wt, u*self.num_nodes + v))   # Edge list usage space optimized
-    # the following lines come as a pair-set used in max flow algorithm and are used in tandem.
+    # the following lines come as a pair-set used in max flow algorithm.
     self.edge_list.append([v, wt, data])
     self.adj_list[u].append(len(self.edge_list) - 1)
 
-  def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: Num, data: Num):
-    """undirected graph version of the previous function. wt can be omitted if not used."""
+  def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: Num, data):
+    """undirected graph version of the previous function. wt can be omitted."""
     self.add_edge_u_v_wt_into_directed_graph(u, v, wt, data)
     self.add_edge_u_v_wt_into_directed_graph(v, u, wt, data)
 
@@ -679,9 +679,9 @@ class GraphAlgorithms:
     self.last = []
 
   def flood_fill_via_dfs(self, row: int, col: int, old_val: object, new_val: object):
-    """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
+    """Computes flood fill graph traversal via recursive depth first search.
 
-    Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
+    Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids |V|=row*col and |E|=4*|V|
     More uses: Region Colouring, Connectivity, Area/island Size, misc
     Input
       row, col: integer pair representing current grid position
@@ -695,10 +695,10 @@ class GraphAlgorithms:
           and self.graph.grid[new_row][new_col] == old_val):
         self.flood_fill_via_dfs(new_row, new_col, old_val, new_val)
 
-  def flood_fill_via_bfs(self, start_row: int, start_col: int, old_val: object, new_val: object):
+  def flood_fill_via_bfs(self, start_row: int, start_col: int, old_val: object, new_val):
     """Computes flood fill graph traversal via breadth first search. Use on grid graphs.
 
-    Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
+    Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids |V|=row*col and |E|=4*|V|
     More uses: previous uses tplus shortest connected pah
     """
     queue = deque([(start_row, start_col)])
@@ -717,15 +717,15 @@ class GraphAlgorithms:
 
     Complexity per call: Time: O(|E|log |V|), Space: O(|E|) + Union_Find
     More uses: finding min spanning tree
-    Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning tree
+    Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning
     Optimization: We use a heap to make space comp. O(|E|). instead of O(|E|log |E|)
-    when using sort, however edge_list is CONSUMED. Also uses space optimization u*V + u = u, v
+    when using sort, however edge_list is CONSUMED. Also uses space optimization
     """
     vertices = self.graph.num_nodes
     heapify(self.graph.edge_list)
     ufds = UnionFindDisjointSets(vertices)
     min_spanning_tree = []
-    while self.graph.edge_list and ufds.num_sets > 1:  # num_sets == 1 means graph connected
+    while self.graph.edge_list and ufds.num_sets > 1:  # num_sets == 1 graph is Done
       wt, uv = heappop(self.graph.edge_list)   # uv is u*num_nodes + v
       v, u = divmod(uv, vertices)        # u, v = uv//n, uv%n
       if not ufds.is_same_set(u, v):
@@ -912,7 +912,7 @@ class GraphAlgorithms:
   def apsp_floyd_warshall_variants(self):
     """Compressed Compilation of 5 variants of APSP. PICK AND CHOOSE IMPLEMENTATION.
     Contents:  # var 2 and 4 are untested right now
-      Variant 1: Transitive Closure to check if i is directly or indirectly connected to j.
+      Variant 1: Transitive Closure to check if i is directly or indirectly connected to j
       Variant 2: MiniMax and MaxiMin path problem. A[i][j] = INF if no edge exists
       Variant 3: Cheapest/Negative cycle, From APSP
       Variant 4: Diameter of a Graph, biggest shortest path in the graph, From APSP
@@ -936,7 +936,7 @@ class GraphAlgorithms:
   def articulation_point_and_bridge_helper_via_dfs(self, u: int):
     """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
-    Complexity per call: Time: O(|E|), Space: O(|V|) or O(|E|) depending on points vs edges.
+    Complexity per call: Time: O(|E|), Space: O(|V|) or O(|E|) depending on point vs edge
     """
     self.visited[u] = self.dfs_counter
     self.low_values[u] = self.visited[u]
@@ -959,7 +959,7 @@ class GraphAlgorithms:
     """Generates the name on an adj_list based graph.
 
     Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
-    More uses: finding the sets of single edge and vertex removals that disconnect the graph.
+    More uses: finding the sets of single edge and vertex removals that disconnect the G.
     Bridges stored as edges and points are True values in articulation_nodes.
     """
     self.dfs_counter = 0
@@ -974,8 +974,8 @@ class GraphAlgorithms:
     """Recursion part of the dfs. It is modified to list various types of edges.
 
     Complexity per call: Time: O(|E|), Space: O(|V|) at deepest call
-    More uses: listing edge types: Tree, Bidirectional, Back, Forward/Cross edge. On top of
-    listing Explored, Visited, and Unvisited.
+    More uses: listing edge types: Tree, Bidirectional, Back, Forward/Cross edge. On top
+    of listing Explored, Visited, and Unvisited.
     """
     self.visited[u] = EXPLORED
     for v in self.graph.adj_list[u]:
@@ -985,7 +985,7 @@ class GraphAlgorithms:
         self.parent[v] = u
         self.cycle_check_on_directed_graph_helper(v)
       elif self.visited[v] == EXPLORED:
-        edge_type = BIDIRECTIONAL if v == self.parent[u] else BACK  # case graph is not DAG
+        edge_type = BIDIRECTIONAL if v == self.parent[u] else BACK  # case graph not DAG
       elif self.visited[v] == VISITED:
         edge_type = FORWARD
       self.directed_edge_type.append((u, v, edge_type))
@@ -996,26 +996,26 @@ class GraphAlgorithms:
 
     Complexity per call: Time: O(|E| + |V|),
               Space: O(|E|) if you label each edge O(|V|) otherwise.
-    More uses: Checks if graph is acyclic(DAG) which can open potential for efficient algorithms
+    More uses: Checks if graph is acyclic(DAG) which can open use for efficient algorithms
     """
     self.visited = [UNVISITED] * self.graph.num_nodes
-    self.directed_edge_type = []  # can be swapped out for a marked variable if checking for DAG
+    self.directed_edge_type = []  # can be ignored if needed
     for u in range(self.graph.num_nodes):
       if self.visited[u] == UNVISITED:
         self.cycle_check_on_directed_graph_helper(u)
 
-  def strongly_connected_components_of_graph_kosaraju_helper(self, u: int, pass_one: bool):
-    """Pass one explore G and build stack, Pass two mark the SCC regions on transposition of G.
-    # TODO RETEST
+  def strongly_connected_components_of_graph_kosaraju_helper(self, u: int, first: bool):
+    """Pass one explore G and build stack, Pass two mark the SCC regions on transposition
+    of G. # TODO RETEST
     Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
     """
     self.visited[u] = VISITED
     self.component_region[u] = self.region_num
-    neighbours: IntList = self.graph.adj_list[u] if pass_one else self.graph.adj_list_trans[u]
+    neighbours = self.graph.adj_list[u] if first else self.graph.adj_list_trans[u]
     for v in neighbours:
       if self.visited[v] == UNVISITED:
-        self.strongly_connected_components_of_graph_kosaraju_helper(v, pass_one)
-    if pass_one:
+        self.strongly_connected_components_of_graph_kosaraju_helper(v, first)
+    if first:
       self.decrease_finish_order.append(u)
 
   def strongly_connected_components_of_graph_kosaraju(self):  # TODO RETEST
@@ -1037,7 +1037,7 @@ class GraphAlgorithms:
         self.region_num += 1
 
   def strongly_connected_components_of_graph_tarjans_helper(self, u: int):  # TODO RETEST
-    """Recursive part of tarjan's, pre-order finds the SCC regions, marks regions post-order.
+    """Recursive part of tarjan's, pre-order finds the SCC regions, marks regions postord.
 
     Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
     """
@@ -1095,7 +1095,7 @@ class GraphAlgorithms:
     """Checks if a graph has the bipartite property.
 
     Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
-    More Uses: check bipartite property, labeling a graph for 2 coloring if it is bipartite.
+    More Uses: check bipartite property, labeling a graph for 2 coloring if it is bipart.
     """
     is_bipartite, color = True, [UNVISITED] * self.graph.num_nodes
     for u in range(self.graph.num_nodes):
@@ -1105,9 +1105,9 @@ class GraphAlgorithms:
           break
     self.bipartite_colouring = color if is_bipartite else None
 
-  def max_flow_find_augmenting_path_helper(self, source: int, sink: int):  # TODO RETEST NEW
+  def max_flow_find_augmenting_path_helper(self, source: int, sink: int):
     """Will check if augmenting path in the graph from source to sink exists via bfs.
-
+    # TODO RETEST NEW
     Complexity per call: Time: O(|E| + |V|), Space O(|V|)
     Input
       source: the node which we are starting from.
@@ -1129,11 +1129,11 @@ class GraphAlgorithms:
     self.dist, self.parent = [], []
     return False
 
-  def send_flow_via_augmenting_path(self, source: int, sink: int, flow_in: Num):  # TODO RETEST
+  def send_flow_via_augmenting_path(self, source: int, sink: int, flow_in: Num):
     """Function to recursively emulate sending a flow. returns min pushed flow.
-
+    # TODO RETEST
     Complexity per call: Time: O(|V|), Space O(|V|)
-    Uses: preorder finds the min pushed_flow post order mutates edge_list based on that flow.
+    Uses: preorder finds the min pushed_flow post order mutates edge_list based on flow.
     Input:
       source: in this function it's technically the goal node
       sink: the current node we are observing
@@ -1167,7 +1167,7 @@ class GraphAlgorithms:
       v, edge_cap, edge_flow = self.graph.edge_list[edge_ind]
       if self.dist[v] != self.dist[u] + 1:
         continue
-      pushed_flow = self.send_max_flow_via_dfs(v, sink, min(flow_in, edge_cap - edge_flow))
+      pushed_flow = self.send_max_flow_via_dfs(v, sink, min(flow_in, edge_cap-edge_flow))
       if pushed_flow != 0:
         self.graph.edge_list[edge_ind][2] = edge_flow + pushed_flow
         self.graph.edge_list[edge_ind ^ 1][2] -= pushed_flow
@@ -1219,8 +1219,8 @@ from array import array
 
 class MathAlgorithms:
   def __init__(self):
-    """Only take what you need. This list needs to be global or instance level or passed in.
-    Attributes declared here must be passed in or global if not used in class format.
+    """Only take what you need. This list needs to be global or instance level or passed
+    in. Attributes declared here must be passed in or global if not used in class format.
     """
     self.mod_p = 0
 
@@ -1243,8 +1243,8 @@ class MathAlgorithms:
     self.factor_list = {}
     self.min_primes_list = []
 
-    self.mrpt_known_bounds = []
-    self.mrpt_known_tests = []
+    self.mrpt_bounds = []
+    self.mrpt_tests = []
 
     self.fibonacci_list = []
     self.fibonacci_dict = {0: 0, 1: 1, 2: 1}
@@ -1257,7 +1257,7 @@ class MathAlgorithms:
     """Generates list of primes up to n via eratosthenes method.
 
     Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
-    Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
+    Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
     """
     limit, prime_sieve = isqrt(n_inclusive) + 1, [True] * (n_inclusive + 1)
     prime_sieve[0] = prime_sieve[1] = False
@@ -1270,7 +1270,8 @@ class MathAlgorithms:
   def sieve_of_eratosthenes_optimized(self, n_inclusive: int) -> None:
     """Odds only optimized version of the previous method. Optimized to start at 3.
 
-    Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
+    Complexity: Time: O(max(n lnln(sqrt(n)), n)),
+               Space: post call O(n/ln(n)), mid-call O(n/2)
     """
     sqrt_n, limit = ((isqrt(n_inclusive) - 3) // 2) + 1, ((n_inclusive - 3) // 2) + 1
     primes_sieve = [True] * limit
@@ -1285,7 +1286,8 @@ class MathAlgorithms:
   def block_sieve_odd(self, limit: int):
     """Block sieve that builds up block by block to the correct amount needed.
 
-    Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(sqrt(n))
+    Complexity: Time: O(max(n lnln(sqrt(n)), n)),
+               Space: post call O(n/ln(n)), mid-call O(sqrt(n))
     """
     n, limit = limit, limit + 10
     end_sqrt, end_limit = isqrt(limit) + 1, (limit - 1) // 2
@@ -1341,7 +1343,7 @@ class MathAlgorithms:
     min_primes[1] = 1
     for prime in self.primes_list:
       min_primes[prime] = prime
-      start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2 * prime
+      start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2*prime
       for multiple in range(start, end, step):
         min_primes[multiple] = prime
     self.min_primes_list = min_primes
@@ -1429,7 +1431,7 @@ class MathAlgorithms:
     """Tests if n is prime via divisors up to sqrt(n).
 
     Complexity per call: Time: O(sqrt(n)), T(sqrt(n)/3), Space: O(1)
-    Optimizations: 6k + i method, since we checked 2 and 3 only need test form 6k + 1 and 6k + 5
+    Optimizations: 6k+i method, since we checked 2 and 3 only need test form 6k+1 and 6k+5
     """
     if n < 4:  # base case of n in 0, 1, 2, 3
       return n > 1
@@ -1466,18 +1468,18 @@ class MathAlgorithms:
     d, s = n-1, 0
     while d % 2 == 0:
       d, s = d // 2, s + 1
-    if n < self.mrpt_known_bounds[-1]:
-      for i, bound in enumerate(self.mrpt_known_bounds, 2):
+    if n < self.mrpt_bounds[-1]:
+      for i, bound in enumerate(self.mrpt_bounds, 2):
         if n < bound:
-          return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s) for j in range(i))
+          return not any(self.is_composite(self.mrpt_tests[j], d, n, s) for j in range(i))
     return not any(self.is_composite(prime, d, n, s)
                    for prime in choices(self.primes_list, k=precision_for_huge_n))
 
   def miller_rabin_primality_test_prep(self):
     """This function needs to be called before miller rabin"""
-    self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
-                              2152302898747, 3474749660383, 341550071728321]
-    self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
+    self.mrpt_bounds = [1373653, 25326001, 118670087467,
+                        2152302898747, 3474749660383, 341550071728321]
+    self.mrpt_tests = [2, 3, 5, 7, 11, 13, 17]
     self.sieve_of_eratosthenes(1000)  # comment out if different size needed
     self.primes_set = set(self.primes_list)  # comment out if already have bigger size
 
@@ -1485,7 +1487,7 @@ class MathAlgorithms:
     """A basic prime factorization of n function. without primes its just O(sqrt(n))
 
     Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
-    Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
+    Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
     """
     limit, prime_factors = isqrt(n) + 1, []
     for prime in takewhile(lambda x: x < limit, self.primes_list):
@@ -1523,7 +1525,7 @@ class MathAlgorithms:
     self.num_prime_factors = prime_factors
 
   def prime_factorize_n_variants(self, n: int) -> int:
-    """Covers all the variants listed above, holds the same time complexity with O(1) space."""
+    """Covers all the variants listed above, holds the same time and space complexity"""
     limit = isqrt(n) + 1
     sum_diff_prime_factors, num_diff_prime_factors = 0, 0
     sum_prime_factors, num_prime_factors = 0, 0
@@ -1555,11 +1557,11 @@ class MathAlgorithms:
     return num_diff_prime_factors
 
   def polynomial_function_f(self, x: int, c: int, m: int) -> int:
-    """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding."""
+    """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding"""
     return (x * x + c) % m  # paste this in code for speed up. is here for clarity only
 
   def pollard_rho(self, n: int, x0=2, c=1) -> int:
-    """Semi fast integer factorization. Based on the birthday paradox and floyd cycle finding.
+    """Semi fast integer factorization. Based on the birthday paradox and floyd cycle find
 
     Complexity per call: Time: O(min(max(p), n^0.25) * ln n), Space: O(log2(n) bits)
     """
@@ -1607,9 +1609,9 @@ class MathAlgorithms:
   def extended_euclid_iterative(self, a: int, b: int) -> Tuple[int, int, int]:
     """Solves coefficients of Bezout identity: ax + by = gcd(a, b), iteratively.
 
-    Complexity per call: Time: O(log n) about twice as fast in python vs above, Space: O(1)
+    Complexity per call: Time: O(log n) about twice as fast in python vs above, Space:O(1)
     Optimizations and notes:
-      divmod and abs are used to help deal with big numbers, remove if < 2**64 for speedup.
+      divmod and abs are used to help deal with big numbers, remove if < 2**64 for speedup
     """
     last_remainder, remainder = abs(a), abs(b)
     x, y, last_x, last_y = 0, 1, 1, 0
@@ -1626,9 +1628,9 @@ class MathAlgorithms:
     """
     return ((a % n) + n) % n
 
-  def modular_linear_equation_solver(self, a: int, b: int, n: int) -> List[int]:  # TODO RETEST
+  def modular_linear_equation_solver(self, a: int, b: int, n: int) -> List[int]:
     """Solves gives the solution x in ax = b(mod n).
-
+    # TODO RETEST
     Complexity per call: Time: O(log n), Space: O(d)
     """
     x, y, d = self.extended_euclid_iterative(a, n)
@@ -1637,9 +1639,9 @@ class MathAlgorithms:
       return [(x + i*(n//d)) % n for i in range(d)]
     return []
 
-  def linear_diophantine_1(self, a: int, b: int, c: int) -> Tuple[int, int]:  # TODO RETEST
+  def linear_diophantine_1(self, a: int, b: int, c: int) -> Tuple[int, int]:
     """Solves for x, y in ax + by = c. From stanford icpc 2013-14
-
+    # TODO RETEST
     Complexity per call: Time: O(log n), Space: O(1).
     Notes: order matters? 25x + 18y = 839 != 18x + 25y = 839
     """
@@ -1649,11 +1651,11 @@ class MathAlgorithms:
       return x, (c - a * x) // b
     return -1, -1
 
-  def linear_diophantine_2(self, a: int, b: int, c: int) -> Tuple[int, int]:  # TODO RETEST
+  def linear_diophantine_2(self, a: int, b: int, c: int) -> Tuple[int, int]:
     """Solves for x0, y0 in x = x0 + (b/d)n, y = y0 - (a/d)n.
     derived from ax + by = c, d = gcd(a, b), and d|c.
     Can further derive into: n = x0 (d/b), and n = y0 (d/a).
-
+    # TODO RETEST
     Complexity per call: Time: O(log n), Space: O(1).
     Optimizations and notes:
       unlike above this function order doesn't matter if a != b
@@ -1668,7 +1670,7 @@ class MathAlgorithms:
     Complexity per call: Time: O(log n), Space: O(1)
     """
     x, y, d = self.extended_euclid_iterative(b, m)
-    return None if d != 1 else x % m  # -1 instead of None if we intend to go on with the prog
+    return None if d != 1 else x % m  # -1 instead of None if we intend use return
 
   def chinese_remainder_theorem_1(self, remainders: List[int], modulos: List[int]) -> int:
     """Steven's CRT version to solve x in x = r[0] (mod m[0]) ... x = r[n-1] (mod m[n-1]).
@@ -1686,7 +1688,7 @@ class MathAlgorithms:
 
   def chinese_remainder_theorem_helper(self, mod1: int, rem1: int,
                                        mod2: int, rem2: int) -> Tuple[int, int]:
-    """Chinese remainder theorem (special case): find z such that z % m1 = r1, z % m2 = r2.
+    """Chinese remainder theorem (special case): find z such that z % m1 = r1, z % m2 = r2
     Here, z is unique modulo M = lcm(m1, m2). Return (z, M).  On failure, M = -1.
     from: stanford icpc 2016
     # TODO RETEST
@@ -1700,9 +1702,9 @@ class MathAlgorithms:
 
   def chinese_remainder_theorem_2(self, remainders: List[int],
                                   modulos: List[int]) -> Tuple[int, int]:
-    """Chinese remainder theorem: find z such that z % m[i] = r[i] for all i.  Note that the
-    solution is unique modulo M = lcm_i (m[i]).  Return (z, M). On failure, M = -1. Note that
-    we do not require the r[i]'s to be relatively prime.
+    """Chinese remainder theorem: find z such that z % m[i] = r[i] for all i.  Note that
+    solution is unique modulo M = lcm_i (m[i]).  Return (z, M). On failure, M = -1.
+    Note that we do not require the r[i]'s to be relatively prime.
     from: stanford icpc 2016
     # TODO RETEST
     Complexity per call: Time: O(n log n), Space: O(1)? O(mt) bit size
@@ -1727,7 +1729,7 @@ class MathAlgorithms:
 
   @lru_cache(maxsize=None)
   def fibonacci_n_dp_cached(self, n: int) -> int:
-    """Cached Dynamic programming to get the nth fibonacci. Derived from Cassini's identity.
+    """Cached Dynamic programming to get the nth fibonacci. Derived via Cassini's identity
 
     Complexity per call: Time: O(log n), Space: increase by O(log n).
     Optimization: can go back to normal memoization with same code but using dictionary.
