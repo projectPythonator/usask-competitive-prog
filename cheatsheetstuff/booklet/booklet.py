@@ -1,6 +1,5 @@
 from typing import TypeVar, List, Tuple, Dict
 Numeric = TypeVar('Numeric', int, float, complex)
-Reals = TypeVar('Reals', int, float, complex)
 Rationals = TypeVar('Rationals', int, float)
 Integers = int
 Num = int | float
