@@ -8,6 +8,7 @@ import prime_sieve_variants
 
 class MathAlgorithms:
     def __init__(self):
+        self.factor_list = None
         self.min_primes_list = None
         self.sieve_obj = prime_sieves.MathAlgorithms()
         self.sieve_function = self.sieve_obj.prime_sieve_super_fast
