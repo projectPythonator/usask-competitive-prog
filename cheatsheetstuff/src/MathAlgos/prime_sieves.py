@@ -2,6 +2,7 @@ from math import isqrt
 from array import array
 from itertools import repeat
 
+
 class MathAlgorithms:
     def __init__(self):
         self.primes_list = []
