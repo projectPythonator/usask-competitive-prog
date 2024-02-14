@@ -705,5 +705,3 @@ class TestMathMethods(unittest.TestCase):
             result_1 = obj_1.extended_euclid_recursive(a, b)
             result_2 = obj_2.extended_euclid_iterative(a, b)
             self.assertEqual(result_1, result_2, "{} {}".format(a, b))
-
-
