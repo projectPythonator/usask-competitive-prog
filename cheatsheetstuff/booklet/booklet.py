@@ -1390,14 +1390,15 @@ class MathAlgorithms:
 
   def num_and_sum_of_prime_factors(self, limit: int) -> None:
     """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
-    num_pf = [0] * (limit + 1)
-    sum_pf = [0] * (limit + 1)
-    for prime in range(2, limit + 1):
+    inclusive_limit = limit + 1
+    num_pf = [0] * inclusive_limit
+    sum_pf = [0] * inclusive_limit
+    for prime in range(2, inclusive_limit):
       if num_pf[prime] == 0:  # or sum_pf if using that one
         exponent_limit = int(log(limit, prime)) + 2
         for exponent in range(1, exponent_limit):
           prime_to_exponent = prime**exponent
-          for multiple in range(prime_to_exponent, limit + 1, prime_to_exponent):
+          for multiple in range(prime_to_exponent, inclusive_limit, prime_to_exponent):
             sum_pf[multiple] += prime
             num_pf[multiple] += 1
     self.num_prime_factors = num_pf
