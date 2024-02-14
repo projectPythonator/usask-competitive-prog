@@ -31,7 +31,7 @@ class MathAlgorithms:
 
   def fft_prepare_lengths_list(self, a_len: int):
     """Function for all powers 2 from 2 - a_len, inclusive. O(log n) complexity."""
-    self.fft_lengths = [2**i for i in range(1, a_len.bit_length())]
+    self.fft_lengths = [2**power for power in range(1, a_len.bit_length())]
 
   def fft_prepare_roots_helper(self, length: int, angle: float) -> List[complex]:
     """Precomputes roots of unity for a given length and angle. accumulate used here :).

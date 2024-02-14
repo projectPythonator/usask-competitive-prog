@@ -1856,7 +1856,7 @@ class MathAlgorithms:
 
   def fft_prepare_lengths_list(self, a_len: int):
     """Function for all powers 2 from 2 - a_len, inclusive. O(log n) complexity."""
-    self.fft_lengths = [2**i for i in range(1, a_len.bit_length())]
+    self.fft_lengths = [2 ** power for power in range(1, a_len.bit_length())]
 
   def fft_prepare_roots_helper(self, length: int, angle: float) -> List[complex]:
     """Precomputes roots of unity for a given length and angle. accumulate used here :).
@@ -1871,7 +1871,7 @@ class MathAlgorithms:
     """Precomputes all roots of unity for all lengths. Stores the result for later use.
 
     Complexity per call: Time: O(2^((log n)+1)-1) = O(n),
-              Space: O(n), S(2^((log n)+1)-1) | n == len of our data, which is 2^i.
+                  Space: O(n), S(2^((log n)+1)-1) | n == len of our data, which is 2^i.
     """
     signed_tau: float = -tau if invert else tau
     self.fft_roots_of_unity = [self.fft_prepare_roots_helper(length//2 - 1, signed_tau/length)
