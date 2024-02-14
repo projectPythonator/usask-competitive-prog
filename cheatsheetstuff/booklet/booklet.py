@@ -1406,19 +1406,20 @@ class MathAlgorithms:
 
   def num_and_sum_of_divisors_faster(self, limit: int) -> None:
     """runs in around x0.8-x0.5 the runtime of the slower one. Complexity function 4."""
-    num_divs = [1] * (limit + 1)
-    sum_divs = [1] * (limit + 1)
-    cur_pows = [1] * (limit + 1)
-    for prime in range(2, limit + 1):
+    inclusive_limit = limit + 1
+    num_divs = [1] * inclusive_limit
+    sum_divs = [1] * inclusive_limit
+    cur_pows = [1] * inclusive_limit
+    for prime in range(2, inclusive_limit):
       if num_divs[prime] == 1:
         exponent_limit = int(log(limit, prime)) + 1  # bug here on some inputs n
         for exponent in range(1, exponent_limit):
           prime_to_exponent = prime ** exponent
-          for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
+          for i in range(prime_to_exponent, inclusive_limit, prime_to_exponent):
             cur_pows[i] += 1
         tmp = prime - 1  # this line and the line below used for sum_divs
         prime_powers = [prime ** exponent for exponent in range(0, exponent_limit+1)]
-        for i in range(prime, limit + 1, prime):
+        for i in range(prime, inclusive_limit, prime):
           num_divs[i] *= cur_pows[i]
           sum_divs[i] *= ((prime_powers[cur_pows[i]] - 1) // tmp)
           cur_pows[i] = 1
