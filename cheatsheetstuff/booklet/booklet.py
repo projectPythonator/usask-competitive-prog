@@ -208,7 +208,7 @@ class SparseTable:
     self.max_n = max_n
     self.sparse_table = [[0] * max_n for _ in range(self.k_value)]
 
-  def prepare_sparse_table(self, array):
+  def prepare_sparse_table(self, new_array):
     """Prepare a new set of data for queries. O(f(x)) is complexity of calling f(x)
 
     Complexity per call: Time: O(O(f(x)) * n ln n), Space: O(n ln n), S(n log2 n).
@@ -218,7 +218,7 @@ class SparseTable:
     """
     spare_table, i_end, local_max_n = self.sparse_table, self.k_value + 1, self.max_n + 1
     #  spare_table[0] = [el for el in array]  # USE IF max_n == len(array)
-    for i, el in enumerate(array):
+    for i, el in enumerate(new_array):
       spare_table[0][i] = el
     for i in range(1, i_end):  # start from 1 and compute sub problems lvl by lvl
       prev_i = i - 1  # compute once here for better readability and avoid n ln n
@@ -1777,7 +1777,7 @@ class MathAlgorithms:
     of each prime factor in all the numbers between 1-2n or 1 to n.
 
     Complexity per call: Time: O(max(n lnln(sqrt(n)), n)), Space: O(n/ln(n)).
-    Optimization: compute bottom! once and factorize k+1 instead of two calls to factorial factor.
+    Optimization: compute bottom! once and factorize k+1 instead of two calls to factorial factor
     """
     top, bottom, ans = n, k, 1  # n = 2n and k = n in C(n, k) = (2n, n)
     self.prime_sieve_super_fast(n)  # or any sieve
@@ -1800,7 +1800,7 @@ class MathAlgorithms:
     Complexity per call: Time: v1 = O(log n), v2 = O(1), Space: O(1).
     v1 is uncommented, v2 is the commented out line, and must be precomputed see below.
     """
-    if n <= k or k == 0:  # base case: could flip them to be n, k = k, n but better to just return 0
+    if n <= k or k == 0:  # base case: explicit
       return 0 if n < k else 1
     if inverse:
       return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
@@ -2946,7 +2946,7 @@ class StringAlgorithms:
       left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
     self.longest_common_prefix = [permuted_lcp[suffix] for suffix in self.suffix_array]
 
-  def suffix_array_string_matching_multiple(self, patterns: List[str], text: str) -> List[IntList]:
+  def suffix_array_string_matching_multiple(self, patterns: List[str], text: str) -> List[List]:
     """Generates location indices for all patterns.
 
     Complexity per call: Time: O(k log n), T(2(k log n)), Space: O(k)
@@ -2971,7 +2971,7 @@ class StringAlgorithms:
             hi = mid
           else:
             lo = mid + 1
-        end = hi - (text[self.suffix_array[hi]: self.suffix_array[hi] + pattern_len] != pattern) + 1
+        end = hi-(text[self.suffix_array[hi]: self.suffix_array[hi]+pattern_len] != pattern)+1
         matches.append(sorted([self.suffix_array[i] for i in range(start, end)]))
     return matches
 
@@ -3081,7 +3081,7 @@ class Matrix:
     other_mat = other.matrix
     self.matrix = [[el for el in row] for row in other_mat]
 
-  def fill_matrix_from_row_col(self, new_matrix, row_offset: int, col_offset: int):  # TODO RETEST
+  def fill_matrix_from_row_col(self, new_matrix, row_offset: int, col_offset: int):  # TODO TEST
     """fill our matrix from row and col offset with new_matrix, O(n^2). Doesn't change size."""
     local_matrix = self.matrix  # prefix optimization see class docs for more info
     for i, row in enumerate(new_matrix):
@@ -3328,5 +3328,6 @@ class MatrixAlgorithms:
       if i_row[p] != i_col[p]:
         i_row_p, i_col_p = i_row[p], i_col[p]
         for k in range(n):
-          matrix_a[k][i_row_p], matrix_a[k][i_col_p] = (matrix_a[k][i_col_p], matrix_a[k][i_row_p])
+          matrix_a[k][i_row_p], matrix_a[k][i_col_p] = (matrix_a[k][i_col_p],
+                                                        matrix_a[k][i_row_p])
     return det
