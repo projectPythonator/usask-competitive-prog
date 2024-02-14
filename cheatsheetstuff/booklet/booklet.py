@@ -2944,7 +2944,7 @@ class StringAlgorithms:
       left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
     self.longest_common_prefix = [permuted_lcp[suffix] for suffix in self.suffix_array]
 
-  def suffix_array_compare_from_index(self, offset):  # TODO RETEST
+  def suffix_array_compare_from_index(self, offset):
     """C style string compare to compare 0 is equal 1 is greater than -1 is less than.
 
     Complexity per call: Time: O(k) len of pattern, Space: O(1)
@@ -2954,7 +2954,7 @@ class StringAlgorithms:
         return -1 if self.text_ord[offset + i] < num_char else 1
     return 0
 
-  def suffix_array_binary_search(self, lo, hi, comp_val):  # TODO RETEST
+  def suffix_array_binary_search(self, lo, hi, comp_val):
     """Standard binary search. comp_val allows us to select how strict we are, > vs >=
 
     Complexity per call: Time: O(k log n) len of pattern, Space: O(1)
@@ -2967,7 +2967,7 @@ class StringAlgorithms:
         lo = mid + 1
     return lo, hi
 
-  def suffix_array_string_matching(self, new_pattern):  # TODO RETEST
+  def suffix_array_string_matching(self, new_pattern):
     """Utilizing the suffix array we can search efficiently for a pattern. gives first and last
     index found for patterns.
 
