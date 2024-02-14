@@ -2944,43 +2944,34 @@ class StringAlgorithms:
       left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
     self.longest_common_prefix = [permuted_lcp[suffix] for suffix in self.suffix_array]
 
-  def suffix_array_compare_from_index(self, offset):
-    """C style string compare to compare 0 is equal 1 is greater than -1 is less than.
-
-    Complexity per call: Time: O(k) len of pattern, Space: O(1)
-    """
-    for i, num_char in enumerate(self.pattern_ord):
-      if num_char != self.text_ord[offset + i]:
-        return -1 if self.text_ord[offset + i] < num_char else 1
-    return 0
-
-  def suffix_array_binary_search(self, lo, hi, comp_val):
-    """Standard binary search. comp_val allows us to select how strict we are, > vs >=
-
-    Complexity per call: Time: O(k log n) len of pattern, Space: O(1)
-    """
-    while lo < hi:
-      mid = (lo + hi) // 2
-      if self.suffix_array_compare_from_index(self.suffix_array[mid]) > comp_val:
-        hi = mid
-      else:
-        lo = mid + 1
-    return lo, hi
-
-  def suffix_array_string_matching(self, new_pattern):
-    """Utilizing the suffix array we can search efficiently for a pattern. gives first and last
-    index found for patterns.
+  def suffix_array_string_matching_multiple(self, patterns: List[str], text: str) -> List[IntList]:
+    """Generates location indices for all patterns.
 
     Complexity per call: Time: O(k log n), T(2(k log n)), Space: O(k)
     """
-    self.pattern_ord = [ord(c) for c in new_pattern]  # line helps avoid repeated ord calls
-    lo, _ = self.suffix_array_binary_search(0, self.text_len - 1, GREATER_EQUAL)
-    if self.suffix_array_compare_from_index(self.suffix_array[lo]) != 0:
-      return -1, -1
-    _, hi = self.suffix_array_binary_search(lo, self.text_len - 1, GREATER_THAN)
-    if self.suffix_array_compare_from_index(self.suffix_array[hi]) != 0:
-      hi -= 1
-    return lo, hi
+    text += '\0'
+    text_len, matches = len(text), []
+    for pattern in patterns:
+      lo, hi, pattern_len = 0, text_len - 1, len(pattern)
+      while lo < hi:
+        mid = (lo + hi) // 2
+        if text[self.suffix_array[mid]: self.suffix_array[mid] + pattern_len] >= pattern:
+          hi = mid
+        else:
+          lo = mid + 1
+      if text[self.suffix_array[lo]: self.suffix_array[lo] + pattern_len] != pattern:
+        matches.append([])
+      else:
+        start, hi = lo, text_len - 1
+        while lo < hi:
+          mid = (lo + hi) // 2
+          if text[self.suffix_array[mid]: self.suffix_array[mid] + pattern_len] > pattern:
+            hi = mid
+          else:
+            lo = mid + 1
+        end = hi - (text[self.suffix_array[hi]: self.suffix_array[hi] + pattern_len] != pattern) + 1
+        matches.append(sorted([self.suffix_array[i] for i in range(start, end)]))
+    return matches
 
   def compute_longest_repeated_substring(self):
     """The longest repeated substring is just the longest common pattern. Require lcp to be
