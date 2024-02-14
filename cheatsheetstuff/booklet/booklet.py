@@ -1362,26 +1362,28 @@ class MathAlgorithms:
 
   def num_and_sum_of_divisors(self, limit: int) -> None:
     """Does a basic sieve. Complexity function 1."""
-    num_div = [1] * (limit + 1)
-    sum_div = [1] * (limit + 1)
-    for i in range(2, limit + 1):
-      for j in range(i, limit + 1, i):
-        num_div[j] += 1
-        sum_div[j] += i
+    limit += 1
+    num_div = [1] * limit
+    sum_div = [1] * limit
+    for divisor in range(2, limit):
+      for multiple in range(divisor, limit, divisor):
+        num_div[multiple] += 1
+        sum_div[multiple] += divisor
     self.num_divisors = num_div
     self.sum_divisors = sum_div
 
   def euler_phi_plus_sum_and_number_of_diff_prime_factors(self, limit: int) -> None:
     """This is basically same as sieve just using different ops. Complexity function 2."""
-    num_diff_pf = [0] * (limit + 1)
-    sum_diff_pf = [0] * (limit + 1)
-    phi = [i for i in range(limit + 1)]
-    for i in range(2, limit + 1):
-      if num_diff_pf[i] == 0:
-        for j in range(i, limit + 1, i):
-          num_diff_pf[j] += 1
-          sum_diff_pf[j] += i
-          phi[j] = (phi[j]//i) * (i-1)
+    limit += 1
+    num_diff_pf = [0] * limit
+    sum_diff_pf = [0] * limit
+    phi = [i for i in range(limit)]
+    for prime in range(2, limit):  # name is prime since we only iterate if its prime
+      if num_diff_pf[prime] == 0:
+        for multiple in range(prime, limit, prime):
+          num_diff_pf[multiple] += 1
+          sum_diff_pf[multiple] += prime
+          phi[multiple] = (phi[multiple]//prime) * (prime-1)
     self.num_diff_prime_factors = num_diff_pf
     self.sum_diff_prime_factors = sum_diff_pf
     self.euler_phi = phi
