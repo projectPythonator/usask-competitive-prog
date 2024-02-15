@@ -1334,6 +1334,22 @@ class MathAlgorithms:
                   if not ((sieve[i >> 5] >> (i & 31)) & 1)])
     self.primes_list = res
 
+  def prime_count_dp(self, limit):
+    root = isqrt(limit)
+    self.prime_sieve_super_fast(limit)
+    last = limit // (root + 1)
+    vec = [limit // i for i in range(1, root + 2)] + [i for i in range(last - 1, -1, -1)]
+    dp = [el - 1 for el in vec] + [0]
+    for i, prime in enumerate(self.primes_list):
+      prime2 = prime * prime
+      for j, el in enumerate(vec):
+        k = el
+        if k < prime2:
+          break
+        k //= prime
+        dp[j] -= dp[(root + 1 + last - k if k <= last else limit // k)-1]
+    return dp[0]
+
   def sieve_of_min_primes(self, n_inclusive: int) -> None:
     """Stores the min or max prime divisor for each number up to n.
 
