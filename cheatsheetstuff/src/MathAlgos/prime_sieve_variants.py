@@ -1,4 +1,5 @@
-from math import log
+from math import log, isqrt
+from bisect import bisect_right
 import prime_sieves
 
 
@@ -115,3 +116,40 @@ class MathAlgorithms:
                     cur_pows[multiple] = 1
         self.num_divisors = num_divs
         self.sum_divisors = sum_divs
+
+    def prime_count_dp_slower(self, limit):
+        root = isqrt(limit) + 1  # after this we mostly refer to root + 1 so just add one here
+        end = limit // root
+        phi_maybe = [i for i in range(1, end)] + [limit//i for i in range(root, 0, -1)]
+        dp = [el for el in phi_maybe]
+        dp_len, prime_index = len(dp), 0
+        for prime in range(2, root):
+            if dp[prime - 1] != dp[prime - 2]:
+                prime_index += 1
+                end = bisect_right(phi_maybe, prime * prime) - 2
+                for i in range(dp_len - 1, end, -1):
+                    k = phi_maybe[i] // prime
+                    dp[i] -= dp[k - 1 if k < root else dp_len - (limit // k)] - prime_index
+        return dp[dp_len - 1] - 1
+
+    def prime_count_dp_faster(self, n: int):
+        root, number_of_primes, step_multiplier = isqrt(n) + 1, n - 1, 1
+        high, low, visited_sieve = [0] * root, [0] * root, [0] * root
+        for divisor in range(2, root):
+            low[divisor], high[divisor] = divisor - 1, n // divisor - 1
+        for prime in range(2, root):
+            if low[prime] != low[prime - 1]:  # happens only when n is prime
+                t, end = low[prime - 1], min(root - 1, n // (prime * prime))
+                number_of_primes -= high[prime] - t
+                for i in range(prime + step_multiplier, end + 1, step_multiplier):
+                    if not visited_sieve[i]:  # already visited this composite number
+                        multiple = i * prime
+                        is_above_root = multiple > root - 1
+                        high[i] -= (low[n//multiple] if is_above_root else high[multiple]) - t
+                for i in range(root - 1, prime * prime - 1, -1):
+                    low[i] -= low[i // prime] - t
+                for prime_multiple in range(prime * prime, end + 1, prime):
+                    visited_sieve[prime_multiple] = 1
+                if prime == 2:
+                    step_multiplier += 1  # for, odds we can skip even numbers by stepping by 2
+        return number_of_primes
