@@ -10,10 +10,20 @@ import binomial_coefficient
 import fast_fourier_transform
 import chinese_remainder_theorem
 from bisect import bisect_right
+import gc
 
 
 class TestMathMethods(unittest.TestCase):
     """Pypy runs the tests pretty fast."""
+
+    @classmethod
+    def setUpClass(cls):
+        gc.collect()
+
+    @classmethod
+    def tearDownClass(cls):
+        gc.collect()
+    
     def test_is_prime_optimized_up_to_100(self):
         primes_to_100 = {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41,
                          43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97}
@@ -243,6 +253,7 @@ class TestMathMethods(unittest.TestCase):
         """tested up to 30k"""
         limit = 5000
         test_obj = factorizations.MathAlgorithms()
+        obj = prime_sieve_variants.MathAlgorithms()
         test_obj.fill_min_primes_list(limit)
         expected = [(1, 1), (1, 1)]
         for i in range(2, limit):
@@ -253,7 +264,6 @@ class TestMathMethods(unittest.TestCase):
                 expected_sum *= ((prime ** (power + 1) - 1) // (prime - 1))
             expected.append((expected_num, expected_sum))
         for i in range(2, limit):
-            obj = prime_sieve_variants.MathAlgorithms()
             obj.num_and_sum_of_divisors_faster(i)
             result = list(zip(obj.num_divisors, obj.sum_divisors))
             self.assertEqual(result, expected[:i+1], i)
@@ -263,6 +273,7 @@ class TestMathMethods(unittest.TestCase):
         limit = 2*(10 ** 6)
         power_limit = 7
         test_obj = factorizations.MathAlgorithms()
+        obj = prime_sieve_variants.MathAlgorithms()
         test_obj.fill_min_primes_list(limit)
         expected = [(1, 1), (1, 1)]
         app = expected.append
@@ -275,7 +286,6 @@ class TestMathMethods(unittest.TestCase):
             app((expected_num, expected_sum))
         for i in range(1, power_limit):
             cur = 10 ** i
-            obj = prime_sieve_variants.MathAlgorithms()
             obj.num_and_sum_of_divisors_faster(cur)
             result = list(zip(obj.num_divisors, obj.sum_divisors))
             self.assertEqual(result, expected[:cur+1], i)
@@ -285,6 +295,7 @@ class TestMathMethods(unittest.TestCase):
         limit = 2**21
         power_limit = 21
         test_obj = factorizations.MathAlgorithms()
+        obj = prime_sieve_variants.MathAlgorithms()
         test_obj.fill_min_primes_list(limit)
         expected = [(1, 1), (1, 1)]
         app = expected.append
@@ -297,17 +308,16 @@ class TestMathMethods(unittest.TestCase):
             app((expected_num, expected_sum))
         for i in range(1, power_limit):
             cur = 2 ** i
-            obj = prime_sieve_variants.MathAlgorithms()
             obj.num_and_sum_of_divisors_faster(cur)
             result = list(zip(obj.num_divisors, obj.sum_divisors))
             self.assertEqual(result, expected[:cur+1], i)
 
     def testing_num_and_sum_of_divisors_same_as_faster_version_2500_runs(self):
         """tested up to 10k"""
+        obj1 = prime_sieve_variants.MathAlgorithms()
+        obj2 = prime_sieve_variants.MathAlgorithms()
         limit = 2500
         for i in range(2, limit):
-            obj1 = prime_sieve_variants.MathAlgorithms()
-            obj2 = prime_sieve_variants.MathAlgorithms()
             obj1.num_and_sum_of_divisors(limit)
             obj2.num_and_sum_of_divisors_faster(limit)
             self.assertEqual(obj1.num_divisors, obj2.num_divisors)
@@ -651,9 +661,13 @@ class TestMathMethods(unittest.TestCase):
         limit = 300
         mod_m = 10**9+7
         obj_inv_2 = True
+        obj_2 = binomial_coefficient.MathAlgorithms()
         obj_3 = binomial_coefficient.MathAlgorithms()
         for max_n in range(10, limit+1):
-            obj_2 = binomial_coefficient.MathAlgorithms()
+            obj_2.mod_p = 0
+            obj_2.binomial = {}
+            obj_2.fact = []
+            obj_2.inv_fact = []
             obj_2.binomial_coefficient_n_mod_p_prep(max_n+1, mod_m, obj_inv_2)
             for n in range(max_n+1):
                 for k in range(n+1):
@@ -666,9 +680,13 @@ class TestMathMethods(unittest.TestCase):
         limit = 200
         mod_m = 10**9+7
         obj_inv_1 = False
+        obj_1 = binomial_coefficient.MathAlgorithms()
         obj_3 = binomial_coefficient.MathAlgorithms()
         for max_n in range(10, limit+1):
-            obj_1 = binomial_coefficient.MathAlgorithms()
+            obj_1.mod_p = 0
+            obj_1.binomial = {}
+            obj_1.fact = []
+            obj_1.inv_fact = []
             obj_1.binomial_coefficient_n_mod_p_prep(max_n+1, mod_m, obj_inv_1)
             for n in range(max_n+1):
                 for k in range(n+1):
@@ -686,7 +704,7 @@ class TestMathMethods(unittest.TestCase):
         """tested up to 16m"""
         limit = 22
         binary_strings = [bin(i)[-1:1:-1] for i in range(2**limit)]
-
+        obj = fast_fourier_transform.MathAlgorithms()
         def get_reversed(n):
             def get_rev(num, bit_size):
                 return int(binary_strings[num].ljust(bit_size, '0'), 2)
@@ -695,7 +713,6 @@ class TestMathMethods(unittest.TestCase):
             return [(a, b) for a, b in ans if a < b]
         for i in range(1, limit):
             expected = get_reversed(2**i)
-            obj = fast_fourier_transform.MathAlgorithms()
             obj.fft_prepare_swap_indices(2**i)
             self.assertEqual(obj.fft_swap_indices, expected)
 
