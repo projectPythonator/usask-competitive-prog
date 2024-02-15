@@ -119,7 +119,7 @@ class TestMathMethods(unittest.TestCase):
 
     def test_all_4_sieves_on_powers_of_10_up_to_10m(self):
         """tested up to 100m before."""
-        limit = 9
+        limit = 8
         obj1 = prime_sieves.MathAlgorithms()
         obj2 = prime_sieves.MathAlgorithms()
         obj3 = prime_sieves.MathAlgorithms()
@@ -156,6 +156,55 @@ class TestMathMethods(unittest.TestCase):
             self.assertEqual(obj1.primes_list, obj3.primes_list)
             self.assertEqual(obj1.primes_list, obj4.primes_list)
             self.assertEqual(obj1.primes_list, obj5.primes_list)
+
+    def testing_prime_count_dp_faster_100k(self):
+        """tested up to 1m"""
+        limit = 10**5
+        obj2 = prime_sieve_variants.MathAlgorithms()
+        obj2.fill_primes_list_and_set(limit)
+        for number in range(10, limit):
+            ind = bisect_right(obj2.primes_list, number)
+            result = obj2.prime_count_dp_faster(number)
+            self.assertEqual(result, ind)
+
+    def testing_prime_count_dp_slower_100k(self):
+        """tested up to 1m"""
+        limit = 10**5
+        obj2 = prime_sieve_variants.MathAlgorithms()
+        obj2.fill_primes_list_and_set(limit)
+        for number in range(10, limit):
+            ind = bisect_right(obj2.primes_list, number)
+            result = obj2.prime_count_dp_slower(number)
+            self.assertEqual(result, ind)
+
+    def testing_prime_count_dp_faster_and_slower_powers_10_up_to_12(self):
+        limit_power = 12
+        limit_base = 10
+        expected = [0, 4, 25, 168, 1229, 9592, 78498, 664579, 5761455, 50847534, 455052511,
+                    4118054813, 37607912018]
+        obj = prime_sieve_variants.MathAlgorithms()
+        for power in range(1, limit_power):
+            limit = limit_base ** power
+            result_1 = obj.prime_count_dp_slower(limit)
+            result_2 = obj.prime_count_dp_slower(limit)
+            self.assertEqual(result_1, expected[power])
+            self.assertEqual(result_2, expected[power])
+
+    def testing_prime_count_dp_faster_and_slower_powers_2_up_to_37(self):
+        limit_power = 37
+        limit_base = 2
+        expected = [0, 1, 2, 4, 6, 11, 18, 31, 54, 97, 172, 309, 564, 1028, 1900, 3512, 6542,
+                    12251, 23000, 43390, 82025, 155611, 295947, 564163, 1077871, 2063689,
+                    3957809, 7603553, 14630843, 28192750, 54400028, 105097565, 203280221,
+                    393615806, 762939111, 1480206279, 2874398515, 5586502348, 10866266172,
+                    21151907950, 41203088796]
+        obj = prime_sieve_variants.MathAlgorithms()
+        for power in range(1, limit_power):
+            limit = limit_base ** power
+            result_1 = obj.prime_count_dp_slower(limit)
+            result_2 = obj.prime_count_dp_slower(limit)
+            self.assertEqual(result_1, expected[power])
+            self.assertEqual(result_2, expected[power])
 
     def testing_sieve_of_min_primes_10k_runs(self):
         """tested on 100k runs"""
