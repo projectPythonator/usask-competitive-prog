@@ -1337,15 +1337,15 @@ class MathAlgorithms:
   def prime_count_dp_slower(self, limit):
     root = isqrt(limit) + 1  # after this we mostly refer to root + 1 so just add one here
     end = limit // root
-    phi_maybe = [i for i in range(1, end)] + [limit // i for i in range(root, 0, -1)]
-    dp = [el for el in phi_maybe]
+    low_and_high = [i for i in range(1, end)] + [limit // i for i in range(root, 0, -1)]
+    dp = [el for el in low_and_high]
     dp_len, prime_index = len(dp), 0
     for prime in range(2, root):
       if dp[prime - 1] != dp[prime - 2]:
         prime_index += 1
-        end = bisect_right(phi_maybe, prime * prime) - 2
+        end = bisect_right(low_and_high, prime * prime) - 2
         for i in range(dp_len - 1, end, -1):
-          k = phi_maybe[i] // prime
+          k = low_and_high[i] // prime
           dp[i] -= dp[k - 1 if k < root else dp_len - (limit // k)] - prime_index
     return dp[dp_len - 1] - 1
 
