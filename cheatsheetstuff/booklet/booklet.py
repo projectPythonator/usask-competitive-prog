@@ -1334,21 +1334,42 @@ class MathAlgorithms:
                   if not ((sieve[i >> 5] >> (i & 31)) & 1)])
     self.primes_list = res
 
-  def prime_count_dp(self, limit):
-    root = isqrt(limit)
-    self.prime_sieve_super_fast(limit)
-    last = limit // (root + 1)
-    vec = [limit // i for i in range(1, root + 2)] + [i for i in range(last - 1, -1, -1)]
-    dp = [el - 1 for el in vec] + [0]
-    for i, prime in enumerate(self.primes_list):
-      prime2 = prime * prime
-      for j, el in enumerate(vec):
-        k = el
-        if k < prime2:
-          break
-        k //= prime
-        dp[j] -= dp[(root + 1 + last - k if k <= last else limit // k)-1]
-    return dp[0]
+  def prime_count_dp_slower(self, limit):
+    root = isqrt(limit) + 1  # after this we mostly refer to root + 1 so just add one here
+    end = limit // root
+    phi_maybe = [i for i in range(1, end)] + [limit // i for i in range(root, 0, -1)]
+    dp = [el for el in phi_maybe]
+    dp_len, prime_index = len(dp), 0
+    for prime in range(2, root):
+      if dp[prime - 1] != dp[prime - 2]:
+        prime_index += 1
+        end = bisect_right(phi_maybe, prime * prime) - 2
+        for i in range(dp_len - 1, end, -1):
+          k = phi_maybe[i] // prime
+          dp[i] -= dp[k - 1 if k < root else dp_len - (limit // k)] - prime_index
+    return dp[dp_len - 1] - 1
+
+  def prime_count_dp_faster(self, n: int):
+    root, number_of_primes, step_multiplier = isqrt(n) + 1, n - 1, 1
+    high, low, visited_sieve = [0] * root, [0] * root, [0] * root
+    for divisor in range(2, root):
+      low[divisor], high[divisor] = divisor - 1, n // divisor - 1
+    for prime in range(2, root):
+      if low[prime] != low[prime - 1]:  # happens only when n is prime
+        t, end = low[prime - 1], min(root - 1, n // (prime * prime))
+        number_of_primes -= high[prime] - t
+        for i in range(prime + step_multiplier, end + 1, step_multiplier):
+          if not visited_sieve[i]:  # already visited this composite number
+            multiple = i * prime
+            is_above_root = multiple > root - 1
+            high[i] -= (low[n // multiple] if is_above_root else high[multiple]) - t
+        for i in range(root - 1, prime * prime - 1, -1):
+          low[i] -= low[i // prime] - t
+        for prime_multiple in range(prime * prime, end + 1, prime):
+          visited_sieve[prime_multiple] = 1
+        if prime == 2:
+          step_multiplier += 1  # for, odds we can skip even numbers by stepping by 2
+    return number_of_primes
 
   def sieve_of_min_primes(self, n_inclusive: int) -> None:
     """Stores the min or max prime divisor for each number up to n.
