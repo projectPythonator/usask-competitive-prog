@@ -332,8 +332,8 @@ class TestMathMethods(unittest.TestCase):
             n_limit = 10 ** power
             obj1.num_and_sum_of_divisors(n_limit)
             obj2.num_and_sum_of_divisors_faster(n_limit)
-            self.assertEqual(obj1.num_divisors, obj2.num_divisors)
-            self.assertEqual(obj1.sum_divisors, obj2.sum_divisors)
+            self.assertListEqual(obj1.num_divisors, obj2.num_divisors)
+            self.assertListEqual(obj1.sum_divisors, obj2.sum_divisors)
 
     def testing_num_and_sum_of_divisors_same_as_faster_version_powers_2(self):
         """tested up to 10m before."""
@@ -344,8 +344,8 @@ class TestMathMethods(unittest.TestCase):
             n_limit = 2 ** power
             obj1.num_and_sum_of_divisors(n_limit)
             obj2.num_and_sum_of_divisors_faster(n_limit)
-            self.assertEqual(obj1.num_divisors, obj2.num_divisors)
-            self.assertEqual(obj1.sum_divisors, obj2.sum_divisors)
+            self.assertListEqual(obj1.num_divisors, obj2.num_divisors)
+            self.assertListEqual(obj1.sum_divisors, obj2.sum_divisors)
 
     def testing_euler_phi_plus_sum_and_number_of_diff_prime_factors_5k_runs(self):
         """tested up to 10k"""
