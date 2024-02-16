@@ -3402,3 +3402,26 @@ class book_v1_forgot_to_add(GraphAlgorithms):
             has_negative_cycle = True
             # return True
 
+  def bellman_ford_moore_spfa(self, source):
+    distances = [INF] * self.graph.num_nodes
+    count = [0] * self.graph.num_nodes
+    in_queue = [False] * self.graph.num_nodes
+    queue = deque()
+    distances[source] = 0
+    queue.append(source)
+    in_queue[source] = True
+    while queue:
+      u = queue.popleft()
+      in_queue[u] = False
+      for v, wt in self.graph.adj_list[u]:
+        if distances[v] > distances[u] + wt:
+          distances[v] = distances[u] + wt
+          if not in_queue[v]:
+            queue.append(v)
+            in_queue[v] = True
+            count[v] += 1
+            if count[v] > self.graph.num_nodes:
+              self.dist = distances
+              return False
+    self.dist = distances
+    return True
