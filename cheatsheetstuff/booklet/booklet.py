@@ -3333,7 +3333,7 @@ class MatrixAlgorithms:
     return det
 
 
-class book_v1_forgot_to_add:
+class book_v1_forgot_to_add(GraphAlgorithms):
   def prime_count_dp_slower(self, limit):
     root = isqrt(limit) + 1  # after this we mostly refer to root + 1 so just add one here
     end = limit // root
@@ -3370,3 +3370,31 @@ class book_v1_forgot_to_add:
         if prime == 2:
           step_multiplier += 1  # for, odds we can skip even numbers by stepping by 2
     return number_of_primes
+
+  def bellman_ford_shortest_path(self, source: int):
+    distances = [INF] * self.graph.num_nodes
+    parents = [-1] * self.graph.num_nodes
+    distances[source] = 0
+    for i in range(self.graph.num_nodes - 1):
+      modified = False
+      for u in range(self.graph.num_nodes):
+        if distances[u] != INF:
+          for v, wt in self.graph.adj_list[u]:
+            if distances[v] > distances[u] + wt:
+              distances[v] = distances[u] + wt
+              parents[v] = u
+              modified = True
+      if not modified:
+        break
+    self.dist = distances
+    self.parent = parents
+
+  def bellman_ford_negative_cycle_check(self, source: int):
+    has_negative_cycle = False
+    for u in range(self.graph.num_nodes):
+      if self.dist[u] != INF:
+        for v, wt in self.graph.adj_list[u]:
+          if self.dist[v] > self.dist[u] + wt:
+            has_negative_cycle = True
+            # return True
+
