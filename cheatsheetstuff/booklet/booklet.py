@@ -3375,53 +3375,35 @@ class book_v1_forgot_to_add(GraphAlgorithms):
     """shortest path when graph has negative cycle.
 
     Complexity per call Time: O(k|E|), Space: O(|V|)
+    Optimizations: use adj_list and move the INF check to before visiting neighbours.
     """
-    distances = [INF] * self.graph.num_nodes
-    parents = [-1] * self.graph.num_nodes
+    num_verts = self.graph.num_nodes
+    distances, parents = [INF] * num_verts, [-1] * num_verts
     distances[source] = 0
-    for i in range(self.graph.num_nodes - 1):
-      modified = False
-      for u in range(self.graph.num_nodes):
-        if distances[u] != INF:
-          for v, wt in self.graph.adj_list[u]:
-            if distances[v] > distances[u] + wt:
-              distances[v] = distances[u] + wt
-              parents[v] = u
-              modified = True
+    for i in range(num_verts - 1):           # this code can be copied over the negative cycle
+      modified = False                       # check it will speed up the check a fair bit with
+      for u, v, wt in self.graph.edge_list:  # the only thing to change being the inner line
+        if distances[u] != INF and distances[v] > distances[u] + wt:
+          distances[v], parents[v], modified = distances[u] + wt, u, True
       if not modified:
         break
+    for i in range(num_verts - 1):           # this is the negative cycle check, can be used
+      for u, v, wt in self.graph.edge_list:  # with spfa algorithm too
+        if distances[u] != INF and distances[v] > distances[u] + wt:
+          distances[v] = -INF
     self.dist = distances
-    self.parent = parents
-
-  def bellman_ford_negative_cycle_check(self, source: int):
-    has_negative_cycle = False
-    for u in range(self.graph.num_nodes):
-      if self.dist[u] != INF:
-        for v, wt in self.graph.adj_list[u]:
-          if self.dist[v] > self.dist[u] + wt:
-            has_negative_cycle = True
-            # return True
 
   def bellman_ford_moore_spfa(self, source):
-    distances = [INF] * self.graph.num_nodes
-    count = [0] * self.graph.num_nodes
-    in_queue = [False] * self.graph.num_nodes
-    queue = deque()
-    distances[source] = 0
-    queue.append(source)
-    in_queue[source] = True
+    """Same complexity as bellmanford but faster in practice."""
+    num_verts = self.graph.num_nodes
+    distances, times_seen, in_queue = [INF] * num_verts,  [0] * num_verts, [False] * num_verts
+    queue, distances[source], in_queue[source] = deque([source]), 0, True
     while queue:
       u = queue.popleft()
       in_queue[u] = False
       for v, wt in self.graph.adj_list[u]:
-        if distances[v] > distances[u] + wt:
+        if distances[v] > distances[u] + wt and times_seen[v] <= self.graph.num_nodes:
           distances[v] = distances[u] + wt
           if not in_queue[v]:
+            times_seen[v], in_queue[v] = times_seen[v] + 1, True
             queue.append(v)
-            in_queue[v] = True
-            count[v] += 1
-            if count[v] > self.graph.num_nodes:
-              self.dist = distances
-              return False
-    self.dist = distances
-    return True
