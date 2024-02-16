@@ -3409,6 +3409,8 @@ class book_v1_forgot_to_add(GraphAlgorithms):
             queue.append(v)
 
   def solve_tower_of_powers(self):
+    """Compressed solution for tower of powers 2 power harder from this link.
+    https://shorturl.at/qDFG9 russel dash"""
     from math import log10, log
     EPS = 1e-14
     LIM = 309
