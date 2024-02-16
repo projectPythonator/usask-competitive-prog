@@ -15,10 +15,10 @@ import gc
 
 class TestMathMethods(unittest.TestCase):
     """Pypy runs the tests pretty fast."""
-
-    @classmethod
-    def setUpClass(cls):
-        gc.collect()
+    #
+    # @classmethod
+    # def setUpClass(cls):
+    #     gc.collect()
 
     @classmethod
     def tearDownClass(cls):
