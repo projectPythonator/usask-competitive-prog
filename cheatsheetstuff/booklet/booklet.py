@@ -3372,6 +3372,10 @@ class book_v1_forgot_to_add(GraphAlgorithms):
     return number_of_primes
 
   def bellman_ford_shortest_path(self, source: int):
+    """shortest path when graph has negative cycle.
+
+    Complexity per call Time: O(k|E|), Space: O(|V|)
+    """
     distances = [INF] * self.graph.num_nodes
     parents = [-1] * self.graph.num_nodes
     distances[source] = 0
