@@ -1,5 +1,4 @@
-FUNCTION_NAME:-----:PAGE_START-PAGE_END
-UnionFindDisjointSets:             :1-1
+UnionFindDisjointSets:             :1-1  
  find_set_recursive:---------------:1-1  
  find_set:-------------------------:1-1  
  is_same_set:----------------------:1-1  
@@ -17,8 +16,8 @@ FenwickTree:                       :2-2
  last_set_bit:---------------------:2-2  
  build_tree_from_frequency_array:--:2-2  
  build_tree_from_s:----------------:2-2  
- range_sum_from_i_to_j:------------:2-3  
- update_index_by_delta:------------:3-3  
+ range_sum_from_i_to_j:------------:2-2  
+ update_index_by_delta:------------:2-3  
  update_index_by_delta_2d:---------:3-3  
  sum_query_2d:---------------------:3-3  
  select_k:-------------------------:3-3  
@@ -55,79 +54,82 @@ Graph:                             :4-4
 GraphAlgorithms:                   :5-5  
  flood_fill_via_dfs:---------------:5-5  
  flood_fill_via_bfs:---------------:5-5  
- mst_kruskals_with_heaps:----------:5-5
- prims_visit_adj_matrix:-----------:5-5  
- mst_prims_with_adj_list:----------:5-5
+ mst_kruskals_via_heaps:-----------:5-5
+ mst_prims_adj_list:---------------:5-5
+ mst_prims_adj_list:---------------:5-5
  breadth_first_search_vanilla:-----:5-6
  topology_sort_via_tarjan_helper:--:6-6  
  topology_sort_via_tarjan:---------:6-6  
  topology_sort_via_kahns:----------:6-6  
  amortized_heap_fix:---------------:6-6  
- dijkstras:------------------------:6-6
- floyd_warshall_print_path:--------:6-6
- floyd_warshall:-------------------:6-6
+ sssp_dijkstras:-------------------:6-6
+ apsp_flyod_warshall_print_path:---:6-6
+ apsp_flyod_warshall:--------------:6-6
  apsp_floyd_warshall_variants:-----:6-6  
- articulation_point_and_bridge_h:--:6-7
- articulation_points_and_bridges:--:7-7
- cycle_check_on_directed_graph_h:--:7-7
- cycle_check_on_directed_graph:----:7-7  
- scc_of_graph_kosaraju_helper:-----:7-7
- scc_of_graph_kosaraju:------------:7-7
+ articulation_point_and_bridge_dfs::6-7
+ articulation_point_and_bridge_dfs::7-7
+ cycle_check_on_directed_graph_dfs::7-7
+ cycle_check_on_directed_graph_dfs::7-7
+ scc_graph_kosaraju_helper:--------:7-7
+ scc_graph_kosaraju:---------------:7-7
  scc_of_graph_tarjans_helper:------:7-7
  scc_of_graph_tarjans:-------------:7-7
  bipartite_check_on_graph_helper:--:7-7  
  bipartite_check_on_graph:---------:7-8  
- max_flow_find_augmenting_path_h:--:8-8
+ max_flow_find_augmenting_path_dfs::8-8
  send_flow_via_augmenting_path:----:8-8  
  send_max_flow_via_dfs:------------:8-8  
  max_flow_via_edmonds_karp:--------:8-8  
  max_flow_via_dinic:---------------:8-8  
 MathAlgorithms:                    :8-8  
- is_prime_trivial:-----------------:8-9  
- sieve_of_eratosthenes:------------:9-9  
+ sieve_of_eratosthenes:------------:8-9  
  sieve_of_eratosthenes_optimized:--:9-9  
+ block_sieve_odd:------------------:9-9  
+ prime_sieve_super_fast:-----------:9-9  
  sieve_of_min_primes:--------------:9-9  
  sieve_of_eratosthenes_variants:---:9-9  
  num_and_sum_of_divisors:----------:9-9  
- phi_num_and_sum_diff_prime_facts:-:9-9
+ phi_sum_and_num_of_diff_primes:---:9-9
  num_and_sum_of_prime_factors:-----:9-9  
- num_and_sum_of_divisors_faster:---:9-9  
- prime_factorize_n:----------------:9-9  
- prime_factorize_n_log_n:----------:9-9  
- prime_factorize_n_variants:-------:9-10 
- polynomial_function_f:------------:10-10
- pollard_rho:----------------------:10-10
- brent_pollard_rho:----------------:10-10
+ num_and_sum_of_divisors_faster:---:9-10 
+ is_prime_trivial:-----------------:10-10
  is_composite:---------------------:10-10
  miller_rabin_primality_test:------:10-10
  miller_rabin_primality_test_prep:-:10-10
- extended_euclid_recursive:--------:10-10
- extended_euclid_iterative:--------:10-10
- safe_modulo:----------------------:10-10
- modular_linear_equation_solver:---:10-10
- linear_diophantine_1:-------------:10-11
+ prime_factorize_n:----------------:10-10
+ prime_factorize_n_log_n:----------:10-10
+ factorial_prime_factors:----------:10-10
+ prime_factorize_n_variants:-------:10-10
+ polynomial_function_f:------------:10-10
+ pollard_rho:----------------------:10-10
+ brent_pollard_rho:----------------:10-11
+ extended_euclid_recursive:--------:11-11
+ extended_euclid_iterative:--------:11-11
+ safe_modulo:----------------------:11-11
+ modular_linear_equation_solver:---:11-11
+ linear_diophantine_1:-------------:11-11
  linear_diophantine_2:-------------:11-11
  mod_inverse:----------------------:11-11
  chinese_remainder_theorem_1:------:11-11
  chinese_remainder_theorem_helper:-:11-11
  chinese_remainder_theorem_2:------:11-11
  fibonacci_n_iterative:------------:11-11
- fibonacci_n_dp_cached:------------:11-11
- fibonacci_n_dp_cached_faster:-----:11-11
- generate_catalan_n:---------------:11-11
- generate_catalan_n_mod_inverse:---:11-11
- catalan_via_prime_facts:----------:11-11
- c_n_k:----------------------------:11-12
+ fibonacci_n_dp_cached:------------:11-12
+ fibonacci_n_dp_cached_faster:-----:12-12
+ generate_catalan_n:---------------:12-12
+ generate_catalan_n_mod_inverse:---:12-12
+ catalan_via_prime_factors_slower:-:12-12
+ c_n_k:----------------------------:12-12
  binomial_coefficient_n_mod_p_prep::12-12
  binomial_coefficient_dp_cache:----:12-12
  fft_prepare_swap_indices:---------:12-12
  fft_prepare_lengths_list:---------:12-12
  fft_prepare_roots_helper:---------:12-12
  fft_prepare_roots_of_unity:-------:12-12
- in_place_fast_fourier_transform:--:12-12
- fft_normalize:--------------------:12-12
- fft_multiply_in_place:------------:12-12
-Pt2d:                              :12-13
+ fft_in_place_fast_fourier:--------:12-13
+ fft_normalize:--------------------:13-13
+ fft_multiply_in_place:------------:13-13
+Pt2d:                              :13-13
  get_tup:--------------------------:13-13
 Pt3d:                              :13-13
 QuadEdge:                          :13-13
@@ -138,19 +140,19 @@ QuadEdge:                          :13-13
 QuadEdgeDataStructure:             :13-13
  make_edge:------------------------:13-13
  splice:---------------------------:13-13
- delete_edge:----------------------:13-13
- connect:--------------------------:13-13
-GeometryAlgorithms:                :13-13
- compare_ab:-----------------------:13-13
- dot_product:----------------------:13-13
- cross_product:--------------------:13-13
- distance_normalized:--------------:13-13
- distance:-------------------------:13-13
- rotate_cw_90_wrt_origin:----------:13-13
- rotate_ccw_90_wrt_origin:---------:13-13
- rotate_ccw_rad_wrt_origin:--------:13-13
- point_c_rotation_wrt_line_ab:-----:13-13
- angle_point_c_wrt_line_ab:--------:13-14
+ delete_edge:----------------------:13-14
+ connect:--------------------------:14-14
+GeometryAlgorithms:                :14-14
+ compare_ab:-----------------------:14-14
+ dot_product:----------------------:14-14
+ cross_product:--------------------:14-14
+ distance_normalized:--------------:14-14
+ distance:-------------------------:14-14
+ rotate_cw_90_wrt_origin:----------:14-14
+ rotate_ccw_90_wrt_origin:---------:14-14
+ rotate_ccw_rad_wrt_origin:--------:14-14
+ point_c_rotation_wrt_line_ab:-----:14-14
+ angle_point_c_wrt_line_ab:--------:14-14
  pt_on_line_segment_ab:------------:14-14
  project_pt_c_to_line_ab:----------:14-14
  project_pt_c_to_line_seg_ab:------:14-14
@@ -161,13 +163,13 @@ GeometryAlgorithms:                :13-13
  is_collinear_lines_ab_and_cd_2:---:14-14
  is_segments_intersect_ab_to_cd:---:14-14
  is_lines_intersect_ab_to_cd:------:14-14
- pt_lines_intersect_ab_to_cd:------:14-14
- pt_line_seg_intersect_ab_to_cd:---:14-14
- is_point_in_radius_of_circle:-----:14-14
- pt_circle_center_given_pt_abc:----:14-14
- pts_line_ab_intersects_circle_cr:-:14-14
- pts_two_circles_intersect_cr1_cr2::14-14
- pt_tangent_to_circle_cr:----------:14-15
+ pt_lines_intersect_ab_to_cd:------:14-15
+ pt_line_seg_intersect_ab_to_cd:---:15-15
+ is_point_in_radius_of_circle:-----:15-15
+ pt_circle_center_given_pt_abc:----:15-15
+ pts_line_ab_intersects_circle_cr:-:15-15
+ pts_two_circles_intersect_cr1_cr2::15-15
+ pt_tangent_to_circle_cr:----------:15-15
  tangents_between_2_circles:-------:15-15
  sides_of_triangle_abc:------------:15-15
  pt_p_in_triangle_abc:-------------:15-15
@@ -175,17 +177,17 @@ GeometryAlgorithms:                :13-13
  triangle_area_bh:-----------------:15-15
  triangle_area_from_heron_abc:-----:15-15
  triangle_area_from_cross_product:-:15-15
- incircle_radis_of_triangle_abc_h:-:15-15
+ incircle_radis_of_triangle_abc:---:15-15
  incircle_radius_of_triangle_abc:--:15-15
- circumcircle_radis_of_triangle_h:-:15-15
+ circumcircle_radis_of_triangle:---:15-15
  circumcircle_radius_of_triangle:--:15-15
- incircle_pt_for_triangle_abc_1:---:15-15
- triangle_circle_center_pt_abcd:---:15-15
- angle_bisector_for_triangle_abc:--:15-15
- perpendicular_bisector:-----------:15-15
- incircle_pt_for_triangle_abc_2:---:15-15
- circumcenter_pt_of_triangle_abc_2::15-15
- orthocenter_pt_of_triangle_abc_v2::15-16
+ incircle_pt_for_triangle_abc_1:---:15-16
+ triangle_circle_center_pt_abcd:---:16-16
+ angle_bisector_for_triangle_abc:--:16-16
+ perpendicular_bisector_triangles:-:16-16
+ incircle_pt_for_triangle_abc_2:---:16-16
+ circumcenter_pt_of_triangle_abc_2::16-16
+ orthocenter_pt_of_triangle_abc_v2::16-16
  perimeter_of_polygon_pts:---------:16-16
  signed_area_of_polygon_pts:-------:16-16
  area_of_polygon_pts:--------------:16-16
@@ -195,38 +197,36 @@ GeometryAlgorithms:                :13-13
  pt_p_on_polygon_perimeter_pts:----:16-16
  pt_position_wrt_polygon_pts:------:16-16
  remove_collinear_points:----------:16-16
- pt_p_in_convex_polygon_pts:-------:16-16
- centroid_pt_of_convex_polygon:----:16-16
- is_polygon_pts_simple_quadratic:--:16-16
- polygon_cut_from_line_ab:---------:16-16
- convex_hull_monotone_chain:-------:16-17
+ pt_p_in_convex_polygon_pts:-------:16-17
+ centroid_pt_of_convex_polygon:----:17-17
+ is_polygon_pts_simple_quadratic:--:17-17
+ polygon_cut_from_line_ab:---------:17-17
+ convex_hull_monotone_chain:-------:17-17
  rotating_caliper_of_polygon_pts:--:17-17
  closest_pair_helper:--------------:17-17
  closest_pair_recursive:-----------:17-17
  compute_closest_pair:-------------:17-17
- delaunay_triangulation_slow:------:17-17
- is_pt_left_of_edge:---------------:17-17
- is_pt_right_of_edge:--------------:17-17
- det3_helper:----------------------:17-17
- is_in_circle:---------------------:17-17
- build_triangulation:--------------:17-18
+ delaunay_triangulation_slow:------:17-18
+ is_pt_left_of_edge:---------------:18-18
+ is_pt_right_of_edge:--------------:18-18
+ det3_helper:----------------------:18-18
+ is_in_circle:---------------------:18-18
+ build_triangulation:--------------:18-18
  delaunay_triangulation_fast:------:18-18
-StringAlgorithms:                  :18-18
- kmp_preprocess:-------------------:18-18
- kmp_search_find_indices:----------:18-18
- suffix_array_counting_sort:-------:18-18
- suffix_array_build_array:---------:18-19
+StringAlgorithms:                  :18-19
+ kmp_preprocess:-------------------:19-19
+ kmp_search_find_indices:----------:19-19
+ suffix_array_counting_sort:-------:19-19
+ suffix_array_build_array:---------:19-19
  compute_longest_common_prefix:----:19-19
- suffix_array_compare_from_index:--:19-19
- suffix_array_binary_search:-------:19-19
- suffix_array_string_matching:-----:19-19
+ suffix_array_multi_string_match:--:19-19
  compute_longest_repeated_substr:--:19-19
  compute_owners:-------------------:19-19
- compute_longest_common_substring:-:19-19
- compute_rolling_hash:-------------:19-19
- hash_fast_log_n:------------------:19-19
- hash_fast_constant:---------------:19-19
-Matrix:                            :19-20
+ compute_longest_common_substring:-:19-20
+ compute_rolling_hash:-------------:20-20
+ hash_fast_log_n:------------------:20-20
+ hash_fast_constant:---------------:20-20
+Matrix:                            :20-20
  prep_matrix_multiply:-------------:20-20
  fast_copy:------------------------:20-20
  fill_matrix_from_row_col:---------:20-20
@@ -237,11 +237,17 @@ Matrix:                            :19-20
  row_divide:-----------------------:20-20
  row_reduce_helper:----------------:20-20
  row_reduce:-----------------------:20-20
- row_reduce_2:---------------------:20-20
- get_augmented_matrix:-------------:20-20
- get_determinant_matrix:-----------:20-20
-MatrixAlgorithms:                  :20-20
- matrix_pow_base_exponent_mod:-----:20-21
+ row_reduce_2:---------------------:20-21
+ get_augmented_matrix:-------------:21-21
+ get_determinant_matrix:-----------:21-21
+MatrixAlgorithms:                  :21-21
+ matrix_pow_base_exponent_mod:-----:21-21
  get_rank_via_reduced_row_echelon:-:21-21
  gauss_elimination:----------------:21-21
- gauss_jordan_elimination:---------:21-end
+ gauss_jordan_elimination:---------:21-22
+book_methods_missed_in_v1_print:---:22-22
+ prime_count_dp_slower:------------:22-22
+ prime_count_dp_faster:------------:22-22
+ bellman_ford_shortest_path:-------:22-22
+ bellman_ford_moore_spfa:----------:22-22
+ solve_tower_of_powers:------------:22-end
