@@ -2,13 +2,34 @@ from math import gcd, isqrt
 from collections import Counter
 from itertools import takewhile
 from typing import Dict, Tuple
+import prime_sieves
+import prime_sieve_variants
 
 
 class MathAlgorithms:
     def __init__(self):
+        self.factor_list = None
         self.min_primes_list = None
+        self.sieve_obj = prime_sieves.MathAlgorithms()
+        self.sieve_function = self.sieve_obj.prime_sieve_super_fast
         self.primes_list = []
         self.primes_set = set()
+
+        self.min_primes_obj = prime_sieve_variants.MathAlgorithms()
+        self.min_prime_function = self.min_primes_obj.sieve_of_min_primes
+        self.min_primes_list = []
+
+    def fill_primes_list_and_set(self, n):
+        """Fills primes list using sieve function"""
+        self.sieve_function(n)
+        self.primes_list = self.sieve_obj.primes_list
+        self.primes_set = set(self.primes_list)
+
+    def fill_min_primes_list(self, n):
+        self.min_prime_function(n)
+        self.min_primes_list = self.min_primes_obj.min_primes_list
+        self.primes_list = self.min_primes_obj.primes_list
+
     def prime_factorize_n_trivial(self, n: int) -> Dict:
         limit, prime_factors = isqrt(n) + 1, []
         for prime in range(2, limit):
@@ -19,50 +40,6 @@ class MathAlgorithms:
             prime_factors.append(n)
         return Counter(prime_factors)
 
-    def sieve_of_eratosthenes_optimized(self, limit: int) -> None:
-        """Odds only optimized version of the previous method. Optimized to start at 3.
-
-        Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
-        """
-        limit += 10
-        end_sqrt, end_limit = isqrt(limit) + 1, (limit - 1) // 2
-        sieve_and_block, primes, smaller_primes = [True] * (end_sqrt + 1), [2], []
-        app, smaller_app = primes.append, smaller_primes.append
-        for prime in range(3, end_sqrt, 2):
-            if sieve_and_block[prime]:
-                smaller_app([prime, (prime * prime - 1)//2])
-                for j in range(prime * prime, end_sqrt + 1, prime * 2):
-                    sieve_and_block[j] = False
-        for low in range(0, end_limit, end_sqrt):
-            for i in range(end_sqrt):
-                sieve_and_block[i] = True
-            for i, [p, idx] in enumerate(smaller_primes):
-                for idx in range(idx, end_sqrt, p):
-                    sieve_and_block[idx] = False
-                smaller_primes[i][1] = idx - end_sqrt + (0 if idx >= end_sqrt else p)
-            if low == 0:
-                sieve_and_block[0] = False
-            for i in range(min(end_sqrt, (end_limit + 1) - low)):
-                if sieve_and_block[i]:
-                    app((low + i) * 2 + 1)
-        self.primes_list = primes
-        while self.primes_list[-1] > limit-10:
-            self.primes_list.pop()
-
-    def sieve_of_min_primes(self, n_inclusive: int) -> None:
-        """Stores the min or max prime divisor for each number up to n.
-
-        Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n)
-        """
-        min_primes = [0] * (n_inclusive + 1)
-        min_primes[1] = 1
-        for prime in reversed(self.primes_list):
-            min_primes[prime] = prime
-            start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2 * prime
-            for j in range(start, end, step):
-                min_primes[j] = prime
-        self.min_primes_list = min_primes
-
     def prime_factorize_n(self, n: int) -> Dict:  # using this for testing
         """A basic prime factorization of n function. without primes its just O(sqrt(n))
 
@@ -71,12 +48,12 @@ class MathAlgorithms:
         """
         limit, prime_factors = isqrt(n) + 1, []
         for prime in takewhile(lambda x: x < limit, self.primes_list):
-            if n % prime == 0:
-                while n % prime == 0:
-                    n //= prime
-                    prime_factors.append(prime)
+            while n % prime == 0:
+                n //= prime
+                prime_factors.append(prime)
         if n > 1:  # n is prime or last factor of n is prime
             prime_factors.append(n)
+        self.factor_list = Counter(prime_factors)
         return Counter(prime_factors)
 
     def prime_factorize_n_log_n(self, n: int) -> Dict:

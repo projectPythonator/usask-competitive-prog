@@ -1,44 +1,23 @@
 from math import isqrt
 from itertools import takewhile
 from random import choices
+import prime_sieves
 
 
 class MathAlgorithms:
     def __init__(self):
-        self.primes_list = []
         self.mrpt_known_bounds = []
         self.mrpt_known_tests = []
+        self.sieve_obj = prime_sieves.MathAlgorithms()
+        self.sieve_function = self.sieve_obj.prime_sieve_super_fast
+        self.primes_list = []
         self.primes_set = set()
 
-    def sieve_of_eratosthenes(self, limit: int) -> None:
-        """Odds only optimized version of the previous method. Optimized to start at 3.
-
-        Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
-        """
-        limit += 10
-        end_sqrt, end_limit = isqrt(limit) + 1, (limit - 1) // 2
-        sieve_and_block, primes, smaller_primes = [True] * (end_sqrt + 1), [2], []
-        app, smaller_app = primes.append, smaller_primes.append
-        for prime in range(3, end_sqrt, 2):
-            if sieve_and_block[prime]:
-                smaller_app([prime, (prime * prime - 1)//2])
-                for j in range(prime * prime, end_sqrt + 1, prime * 2):
-                    sieve_and_block[j] = False
-        for low in range(0, end_limit, end_sqrt):
-            for i in range(end_sqrt):
-                sieve_and_block[i] = True
-            for i, [p, idx] in enumerate(smaller_primes):
-                for idx in range(idx, end_sqrt, p):
-                    sieve_and_block[idx] = False
-                smaller_primes[i][1] = idx - end_sqrt + (0 if idx >= end_sqrt else p)
-            if low == 0:
-                sieve_and_block[0] = False
-            for i in range(min(end_sqrt, (end_limit + 1) - low)):
-                if sieve_and_block[i]:
-                    app((low + i) * 2 + 1)
-        self.primes_list = primes
-        while self.primes_list[-1] > limit-10:
-            self.primes_list.pop()
+    def fill_primes_list_and_set(self, n):
+        """Fills primes list using sieve function"""
+        self.sieve_function(n)
+        self.primes_list = self.sieve_obj.primes_list
+        self.primes_set = set(self.primes_list)
 
     def is_prime_trivial(self, n: int) -> bool:
         """Tests if n is prime via divisors up to sqrt(n).
@@ -103,5 +82,6 @@ class MathAlgorithms:
         self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
                                   2152302898747, 3474749660383, 341550071728321]
         self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
-        self.sieve_of_eratosthenes(1000)         # comment out if different size needed
-        self.primes_set = set(self.primes_list)  # comment out if already have bigger size
+        self.fill_primes_list_and_set(1000)
+        # self.sieve_of_eratosthenes(1000)         # comment out if different size needed
+        # self.primes_set = set(self.primes_list)  # comment out if already have bigger size

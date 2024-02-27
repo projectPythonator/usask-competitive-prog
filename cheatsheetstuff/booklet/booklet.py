@@ -1,6 +1,5 @@
 from typing import TypeVar, List, Tuple, Dict
 Numeric = TypeVar('Numeric', int, float, complex)
-Reals = TypeVar('Reals', int, float, complex)
 Rationals = TypeVar('Rationals', int, float)
 Integers = int
 Num = int | float
@@ -40,7 +39,7 @@ class UnionFindDisjointSets:
   """This Data structure is for non-directional disjoint sets."""
 
   def __init__(self, n):
-    """Attributes declared here must be passed in or global if not used in class format."""
+    """Attributes declared here must be passed in or global if not used in classes."""
     self.num_sets = n      # optional information
     self.rank = [0] * n    # optional optimization
     self.set_sizes = [1] * n   # optional information
@@ -82,14 +81,14 @@ class UnionFindDisjointSets:
     """
     if not self.is_same_set(u, v):
       u_parent, v_parent = self.find_set(u), self.find_set(v)
-      if self.rank[u_parent] > self.rank[v_parent]:   # keep u_parent shorter than v_parent
+      if self.rank[u_parent] > self.rank[v_parent]:   # u_parent shorter than v_parent
         u_parent, v_parent = v_parent, u_parent
 
       if self.rank[u_parent] == self.rank[v_parent]:     # an optional speedup
         self.rank[v_parent] = self.rank[v_parent] + 1
       self.parent[u_parent] = v_parent            # this line joins u with v
       self.num_sets -= 1
-      self.set_sizes[v_parent] += self.set_sizes[u_parent]  # u -> v so add size_u to size_v
+      self.set_sizes[v_parent] += self.set_sizes[u_parent]  # u = v so add them
 
   def size_of_u(self, u):  # optional information
     """Gives you the size of set u. TIME and SPACE Complexity is the same as find_set"""
@@ -116,8 +115,8 @@ from math import isqrt, gcd
 
 
 # min use big value, max use smallest val, sum use 0, product use 1
-# for gcd and others you will need to change the code so that you set it to the starting value
-# this might mean longer implementations but that is the cost of the way I set it up
+# for gcd and others you will need to change the code so that you set it to the starting
+# value this might mean longer implementations but that is the cost of the way I set it up
 RQ_DEFAULT = 2 ** 32
 
 
@@ -129,11 +128,9 @@ class SquareRootDecomposition:
     Range Query Operation: min, max, gcd, sum, product and commutative functions.
   """
 
-  __slot__ = ("decomposed_blocks", 'size_of_blocks', 'num_of_blocks', 'range_of_data', 'data')
-
   def __init__(self):
-    """Attributes declared here must be passed in or global if not used in class format."""
-    self.size_of_blocks = self.num_of_blocks = self.range_of_data = 0
+    """Attributes declared here must be passed in or global if not used in class."""
+    self.size_of_blocks = self.num_of_blocks = self.data_range = 0
     self.decomposed_blocks = []
     self.data_copy = []
 
@@ -145,8 +142,8 @@ class SquareRootDecomposition:
     sqrt_len = isqrt(len(new_data)) + 1  # + 1 here to for to cover int(x) == floor(x)
     pad_val = RQ_DEFAULT  # DEFAULT INFO AT TOP OF CLASS
     self.size_of_blocks = self.num_of_blocks = sqrt_len
-    self.decomposed_blocks, self.range_of_data = [pad_val] * sqrt_len, sqrt_len ** 2
-    self.data_copy = [el for el in new_data] + [pad_val] * (self.range_of_data - len(new_data))
+    self.decomposed_blocks, self.data_range = [pad_val] * sqrt_len, sqrt_len ** 2
+    self.data_copy = [i for i in new_data] + [pad_val] * (self.data_range - len(new_data))
     for i in range(sqrt_len):
       self.update_block_n(i)
 
@@ -170,20 +167,20 @@ class SquareRootDecomposition:
     self.update_block_n(position_i // self.num_of_blocks)   # but this costs O(sqrt(n))
 
   def range_query_i_to_j(self, left, right):
-    """Compute a range query from left to right. Note right is inclusive not exclusive here.
+    """Compute a range query from left to right. Note right is inclusive here.
 
     Complexity per call: Time: O(sqrt(n) * O(f(x))), Space: (1)
     """
     block_size, result = self.size_of_blocks, RQ_DEFAULT  # DEFAULT INFO AT TOP OF CLASS
     if (right + 1) - left <= block_size:  # special case where right-left ~= block_size
-      for i in range(left, right + 1):  # right + 1 since right is inclusive in this function
+      for i in range(left, right + 1):  # right + 1 since right is inclusive
         result = min(result, self.data_copy[i])
     else:
       left_block, right_block = left // block_size, right // block_size
       end1, start2 = (left_block + 1) * block_size, right_block * block_size
       for i in range(left, end1):
         result = min(result, self.data_copy[i])
-      for i in range(start2, right + 1):  # right + 1 since right is inclusive in this func
+      for i in range(start2, right + 1):  # right + 1 since right is inclusive
         result = min(result, self.data_copy[i])
       for i in range(left_block + 1, right_block):
         result = min(result, self.decomposed_blocks[i])
@@ -200,18 +197,18 @@ class SparseTable:
   """Logarithmic Datastructure based around levels of precomputed data.
 
   Operations Supported:
-    DOES NOT SUPPORT DYNAMIC UPDATES much recompute structure after an update or before queries
+    DOES NOT SUPPORT DYNAMIC UPDATES must recompute structure after an update
     Range Query Operation: min, max, gcd, sum, product and commutative functions.
   """
   __slots__ = ("sparse_table", "k_value", "max_n")
 
   def __init__(self, max_n):
-    """Attributes declared here must be passed in or global if not used in class format."""
+    """Attributes declared here must be passed in or global if not used in class."""
     self.k_value = max_n.bit_length()
     self.max_n = max_n
     self.sparse_table = [[0] * max_n for _ in range(self.k_value)]
 
-  def prepare_sparse_table(self, array):
+  def prepare_sparse_table(self, new_array):
     """Prepare a new set of data for queries. O(f(x)) is complexity of calling f(x)
 
     Complexity per call: Time: O(O(f(x)) * n ln n), Space: O(n ln n), S(n log2 n).
@@ -221,13 +218,13 @@ class SparseTable:
     """
     spare_table, i_end, local_max_n = self.sparse_table, self.k_value + 1, self.max_n + 1
     #  spare_table[0] = [el for el in array]  # USE IF max_n == len(array)
-    for i, el in enumerate(array):
+    for i, el in enumerate(new_array):
       spare_table[0][i] = el
     for i in range(1, i_end):  # start from 1 and compute sub problems lvl by lvl
-      prev_i = i - 1  # compute once here for better readability and avoid n ln n computations
+      prev_i = i - 1  # compute once here for better readability and avoid n ln n
       j_end, prev_pow_2 = local_max_n - (1 << i), 1 << prev_i  # read comment above
       for j in range(j_end):
-        spare_table[i][j] = min(spare_table[prev_i][j], spare_table[prev_i][j + prev_pow_2])
+        spare_table[i][j] = min(spare_table[prev_i][j], spare_table[prev_i][j+prev_pow_2])
         # spare_table[i][j] = spare_table[prev_i][j] + spare_table[prev_i][j + prev_pow_2]
 
   def range_query_from_i_to_j(self, left, right):
@@ -238,7 +235,7 @@ class SparseTable:
       range min query: O(f(x)) = O(1) like most  V1
       range sum query: O(f(x)) = O(1) like others  V2
     Notes: V1 is min and max (there might be others) but for these you need only compute
-    two ranges so long as lower_bound == left and upper_bound == right, overlap won't matter
+    two ranges so long as lower_bound == left and upper_bound == right, overlap is fine
     """
     result = RQ_DEFAULT  # see SquareRootDecomposition class for more info
     ind = (right - left + 1).bit_length()-1  # I think this is same as log2(r - l + 1)
@@ -263,7 +260,7 @@ class FenwickTree:
   __slots__ = ("fenwick_tree", "fenwick_tree_size")
 
   def __init__(self, frequency_array=None):
-    """Attributes declared here must be passed in or global if not used in class format."""
+    """Attributes declared here must be passed in or global if not used in class."""
     self.fenwick_tree = []
     self.fenwick_tree_size = 0
     if frequency_array:  # None is False, so we can have this optional check :)
@@ -307,8 +304,8 @@ class FenwickTree:
     Complexity per call: Time: O(log n), Space: O(1).
     """
     if left > 1:  # when left isn't 1 we compute the formula above.
-      return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
-    sum_up_to_right = RQ_DEFAULT  # is 0 but see SquareRootDecomposition class for more info
+      return self.range_sum_from_i_to_j(1, right)-self.range_sum_from_i_to_j(1, left-1)
+    sum_up_to_right = RQ_DEFAULT  # is 0, see SquareRootDecomposition class for more info
     while right:
       sum_up_to_right += self.fenwick_tree[right]
       right -= self.last_set_bit(right)
@@ -316,7 +313,7 @@ class FenwickTree:
 
   def update_index_by_delta(self, index, delta):
     """Updates the branch that follows index by delta. version is 1-index based.
-    Branch defined as "for i in range(index, tree_size, f(i)=i & (-i))", for(start, end, step)
+    Branch defined as "for i in range(index,tree_size,f(i)=i & (-i))", for(start,end,step)
 
     Complexity per call: Time: O(log n), Space: O(1).
     """
@@ -356,8 +353,8 @@ class RangeUpdatePointQuery:
     self.point_update_range_query = FenwickTree([0] * m)
 
   def update_range_i_to_j_by_delta(self, left, right, delta):  # TODO semi tested
-    """For a range update we need only update all indices in [i,i+1...n] to have +delta and
-    then all indices in [j+1,j+2...n] with -delta to negate range(j+1, n) that was affected
+    """For a range update we need only update all indices in [i,i+1...n] to have +delta +
+    then all indices in [j+1,j+2...n] with -delta to negate range(j+1, n) that was changed
 
     Complexity per call: Time: O(log n), Space: O(1).
     """
@@ -388,7 +385,7 @@ class RangeUpdateRangeQuery:
     self.point_update_range_query.update_index_by_delta(right + 1, -delta * right)
 
   def range_sum_from_i_to_j(self, left, right):  # TODO semi tested
-    """Similar to the Fenwick tree we use inclusion exclusion, but we need to use our augmented
+    """Similar to the Fenwick tree we use inclusion exclusion, but we need to use our aug
     tree to handle 3 cases to compute formula sum[0, i] = sum(rupq, i) * i - sum(purq, i)
           | original            | simplified      |   conditions
     sum[0,i] =  | 0*i - 0             | 0           |   i < left
@@ -398,7 +395,7 @@ class RangeUpdateRangeQuery:
     Complexity per call: Time: O(log n), Space: O(1).
     """
     if left > 1:
-      return self.range_sum_from_i_to_j(1, right) - self.range_sum_from_i_to_j(1, left - 1)
+      return self.range_sum_from_i_to_j(1, right)-self.range_sum_from_i_to_j(1, left-1)
     return (self.range_update_point_query.point_sum_query_of_index(right) * right
             - self.point_update_range_query.range_sum_from_i_to_j(1, right))
 
@@ -420,7 +417,7 @@ class SegmentTree:
     n = len(new_array)
     next_2_pow_n = n if 2**(n.bit_length()-1) == n else 2**n.bit_length()
     self.lazy = [-1] * (4 * next_2_pow_n)     # 4 * n used to avoid index out of bounds
-    self.segment_tree = [0] * (4 * next_2_pow_n)  # 4 * n used to avoid index out of bounds
+    self.segment_tree = [0] * (4 * next_2_pow_n)  # 4 * n used to avoid index out of bound
     self.array_a = [el for el in new_array]
     if next_2_pow_n != n:                   # we add extra padding to the end to
       self.array_a.extend([RQ_DEFAULT]*(next_2_pow_n-n))  # make the len a power of 2
@@ -437,11 +434,11 @@ class SegmentTree:
     self.build_segment_tree_2()
 
   def left_child(self, parent):
-    """Macro function, gets left child in array based binary tree, paste in code for speedup."""
+    """Macro function, gets left child in array based binary tree, hardcode to speedup."""
     return parent << 1
 
   def right_child(self, parent):
-    """Macro function, gets right child in array based binary tree, paste in code to speedup."""
+    """Macro function, gets right child in array based binary tree,"""
     return (parent << 1) + 1
 
   def conqur(self, a, b):
@@ -479,10 +476,10 @@ class SegmentTree:
       left_path, right_path = self.left_child(parent), self.right_child(parent)
       self._build_segment_tree_2(left_path, left, mid)
       self._build_segment_tree_2(right_path, mid + 1, right)
-      left_ind = self.segment_tree[left_path]
-      right_ind = self.segment_tree[right_path]
-      self.segment_tree[parent] = (left_ind if (self.array_a[left_ind]
-                                                <= self.array_a[right_ind]) else right_ind)
+      left_i = self.segment_tree[left_path]
+      right_i = self.segment_tree[right_path]
+      self.segment_tree[parent] = (left_i if (self.array_a[left_i]
+                                              <= self.array_a[right_i]) else right_i)
 
   def _range_min_query_1(self, parent, left, right, i, j):
     self.propagate(parent, left, right)
@@ -506,7 +503,8 @@ class SegmentTree:
       return self.segment_tree[parent], self.array_a[self.segment_tree[parent]]
     mid = (left + right) // 2
     left_ind, left_val = self._range_min_query_2(self.left_child(parent), left, mid, i, j)
-    right_ind, right_val = self._range_min_query_2(self.right_child(parent), mid+1, right, i, j)
+    right_ind, right_val = self._range_min_query_2(self.right_child(parent),
+                                                   mid+1, right, i, j)
     if left_ind == -1:
       return right_ind, right_val
     elif right_ind == -1:
@@ -558,7 +556,8 @@ class SegmentTree:
                                            max(i, left), min(j, mid), new_value)
     right_ind = self._update_segment_tree_2(right_path, mid+1, right,
                                             max(i, mid+1), min(j, right), new_value)
-    self.segment_tree[parent] = (left_ind if (self.array_a[left_ind] <= self.array_a[right_ind])
+    self.segment_tree[parent] = (left_ind if (self.array_a[left_ind]
+                                              <= self.array_a[right_ind])
                                  else right_ind)
     return self.segment_tree[parent]
 
@@ -620,29 +619,29 @@ class Graph:
     self.code_to_data = []  # used for integer vertices back into original input
 
   def convert_data_to_code(self, data: object) -> int:
-    """Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair, then return u."""
+    """Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair."""
     if data not in self.data_to_code:
       self.data_to_code[data] = len(self.code_to_data)
-      self.code_to_data.append(data)  # can be replaced with a count variable if space needed
+      self.code_to_data.append(data)  # can be replaced with a count variable if needed
     return self.data_to_code[data]
 
   def add_edge_u_v_wt_into_directed_graph(self, u: object, v: object, wt: Num, data: Num):
-    """A pick and choose function will convert u, v into index form then add it to the structure
-    you choose.
+    """A pick and choose function will convert u, v into index form then add it to the
+    structure you choose.
     """
-    u: int = self.convert_data_to_code(u)  # omit if u,v is in the form: int u | 0 <= u < |V|
-    v: int = self.convert_data_to_code(v)  # omit if u,v is in the form: int u | 0 <= u < |V|
+    u: int = self.convert_data_to_code(u)  # omit if u,v is in the form: int
+    v: int = self.convert_data_to_code(v)  # omit if u,v is in the form: int
 
     self.adj_list[u].append(v)
     # self.adj_list[u].append((v, wt))  # Adjacency list usage with weights
     self.adj_matrix[u][v] = wt      # Adjacency matrix usage
     self.edge_list.append((wt, u*self.num_nodes + v))   # Edge list usage space optimized
-    # the following lines come as a pair-set used in max flow algorithm and are used in tandem.
+    # the following lines come as a pair-set used in max flow algorithm.
     self.edge_list.append([v, wt, data])
     self.adj_list[u].append(len(self.edge_list) - 1)
 
-  def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: Num, data: Num):
-    """undirected graph version of the previous function. wt can be omitted if not used."""
+  def add_edge_u_v_wt_into_undirected_graph(self, u: object, v: object, wt: Num, data):
+    """undirected graph version of the previous function. wt can be omitted."""
     self.add_edge_u_v_wt_into_directed_graph(u, v, wt, data)
     self.add_edge_u_v_wt_into_directed_graph(v, u, wt, data)
 
@@ -680,9 +679,9 @@ class GraphAlgorithms:
     self.last = []
 
   def flood_fill_via_dfs(self, row: int, col: int, old_val: object, new_val: object):
-    """Computes flood fill graph traversal via recursive depth first search. Use on grid graphs.
+    """Computes flood fill graph traversal via recursive depth first search.
 
-    Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
+    Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids |V|=row*col and |E|=4*|V|
     More uses: Region Colouring, Connectivity, Area/island Size, misc
     Input
       row, col: integer pair representing current grid position
@@ -696,10 +695,10 @@ class GraphAlgorithms:
           and self.graph.grid[new_row][new_col] == old_val):
         self.flood_fill_via_dfs(new_row, new_col, old_val, new_val)
 
-  def flood_fill_via_bfs(self, start_row: int, start_col: int, old_val: object, new_val: object):
+  def flood_fill_via_bfs(self, start_row: int, start_col: int, old_val: object, new_val):
     """Computes flood fill graph traversal via breadth first search. Use on grid graphs.
 
-    Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids usually |V|=row*col and |E|=4*|V|
+    Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids |V|=row*col and |E|=4*|V|
     More uses: previous uses tplus shortest connected pah
     """
     queue = deque([(start_row, start_col)])
@@ -718,15 +717,15 @@ class GraphAlgorithms:
 
     Complexity per call: Time: O(|E|log |V|), Space: O(|E|) + Union_Find
     More uses: finding min spanning tree
-    Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning tree
+    Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning
     Optimization: We use a heap to make space comp. O(|E|). instead of O(|E|log |E|)
-    when using sort, however edge_list is CONSUMED. Also uses space optimization u*V + u = u, v
+    when using sort, however edge_list is CONSUMED. Also uses space optimization
     """
     vertices = self.graph.num_nodes
     heapify(self.graph.edge_list)
     ufds = UnionFindDisjointSets(vertices)
     min_spanning_tree = []
-    while self.graph.edge_list and ufds.num_sets > 1:  # num_sets == 1 means graph connected
+    while self.graph.edge_list and ufds.num_sets > 1:  # num_sets == 1 graph is Done
       wt, uv = heappop(self.graph.edge_list)   # uv is u*num_nodes + v
       v, u = divmod(uv, vertices)        # u, v = uv//n, uv%n
       if not ufds.is_same_set(u, v):
@@ -875,7 +874,7 @@ class GraphAlgorithms:
       cur_dist, u = heappop(heap)
       if distance[u] < cur_dist:
         continue
-      # if u == sink: return cur_dist # uncomment this line for fast return
+      # if u == sink: return cur_dist # uncomment this line for fast return on sink foundZ
       for v, wt in self.graph.adj_list[u]:
         if distance[v] > cur_dist + wt:
           distance[v] = cur_dist + wt
@@ -913,7 +912,7 @@ class GraphAlgorithms:
   def apsp_floyd_warshall_variants(self):
     """Compressed Compilation of 5 variants of APSP. PICK AND CHOOSE IMPLEMENTATION.
     Contents:  # var 2 and 4 are untested right now
-      Variant 1: Transitive Closure to check if i is directly or indirectly connected to j.
+      Variant 1: Transitive Closure to check if i is directly or indirectly connected to j
       Variant 2: MiniMax and MaxiMin path problem. A[i][j] = INF if no edge exists
       Variant 3: Cheapest/Negative cycle, From APSP
       Variant 4: Diameter of a Graph, biggest shortest path in the graph, From APSP
@@ -937,7 +936,7 @@ class GraphAlgorithms:
   def articulation_point_and_bridge_helper_via_dfs(self, u: int):
     """Recursion part of the dfs. It kind of reminds me of how Union find works.
 
-    Complexity per call: Time: O(|E|), Space: O(|V|) or O(|E|) depending on points vs edges.
+    Complexity per call: Time: O(|E|), Space: O(|V|) or O(|E|) depending on point vs edge
     """
     self.visited[u] = self.dfs_counter
     self.low_values[u] = self.visited[u]
@@ -960,7 +959,7 @@ class GraphAlgorithms:
     """Generates the name on an adj_list based graph.
 
     Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
-    More uses: finding the sets of single edge and vertex removals that disconnect the graph.
+    More uses: finding the sets of single edge and vertex removals that disconnect the G.
     Bridges stored as edges and points are True values in articulation_nodes.
     """
     self.dfs_counter = 0
@@ -975,8 +974,8 @@ class GraphAlgorithms:
     """Recursion part of the dfs. It is modified to list various types of edges.
 
     Complexity per call: Time: O(|E|), Space: O(|V|) at deepest call
-    More uses: listing edge types: Tree, Bidirectional, Back, Forward/Cross edge. On top of
-    listing Explored, Visited, and Unvisited.
+    More uses: listing edge types: Tree, Bidirectional, Back, Forward/Cross edge. On top
+    of listing Explored, Visited, and Unvisited.
     """
     self.visited[u] = EXPLORED
     for v in self.graph.adj_list[u]:
@@ -986,7 +985,7 @@ class GraphAlgorithms:
         self.parent[v] = u
         self.cycle_check_on_directed_graph_helper(v)
       elif self.visited[v] == EXPLORED:
-        edge_type = BIDIRECTIONAL if v == self.parent[u] else BACK  # case graph is not DAG
+        edge_type = BIDIRECTIONAL if v == self.parent[u] else BACK  # case graph not DAG
       elif self.visited[v] == VISITED:
         edge_type = FORWARD
       self.directed_edge_type.append((u, v, edge_type))
@@ -997,26 +996,26 @@ class GraphAlgorithms:
 
     Complexity per call: Time: O(|E| + |V|),
               Space: O(|E|) if you label each edge O(|V|) otherwise.
-    More uses: Checks if graph is acyclic(DAG) which can open potential for efficient algorithms
+    More uses: Checks if graph is acyclic(DAG) which can open use for efficient algorithms
     """
     self.visited = [UNVISITED] * self.graph.num_nodes
-    self.directed_edge_type = []  # can be swapped out for a marked variable if checking for DAG
+    self.directed_edge_type = []  # can be ignored if needed
     for u in range(self.graph.num_nodes):
       if self.visited[u] == UNVISITED:
         self.cycle_check_on_directed_graph_helper(u)
 
-  def strongly_connected_components_of_graph_kosaraju_helper(self, u: int, pass_one: bool):
-    """Pass one explore G and build stack, Pass two mark the SCC regions on transposition of G.
-    # TODO RETEST
+  def strongly_connected_components_of_graph_kosaraju_helper(self, u: int, first: bool):
+    """Pass one explore G and build stack, Pass two mark the SCC regions on transposition
+    of G. # TODO RETEST
     Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
     """
     self.visited[u] = VISITED
     self.component_region[u] = self.region_num
-    neighbours: IntList = self.graph.adj_list[u] if pass_one else self.graph.adj_list_trans[u]
+    neighbours = self.graph.adj_list[u] if first else self.graph.adj_list_trans[u]
     for v in neighbours:
       if self.visited[v] == UNVISITED:
-        self.strongly_connected_components_of_graph_kosaraju_helper(v, pass_one)
-    if pass_one:
+        self.strongly_connected_components_of_graph_kosaraju_helper(v, first)
+    if first:
       self.decrease_finish_order.append(u)
 
   def strongly_connected_components_of_graph_kosaraju(self):  # TODO RETEST
@@ -1038,7 +1037,7 @@ class GraphAlgorithms:
         self.region_num += 1
 
   def strongly_connected_components_of_graph_tarjans_helper(self, u: int):  # TODO RETEST
-    """Recursive part of tarjan's, pre-order finds the SCC regions, marks regions post-order.
+    """Recursive part of tarjan's, pre-order finds the SCC regions, marks regions postord.
 
     Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
     """
@@ -1096,7 +1095,7 @@ class GraphAlgorithms:
     """Checks if a graph has the bipartite property.
 
     Complexity per call: Time: O(|E| + |V|), Space: O(|V|)
-    More Uses: check bipartite property, labeling a graph for 2 coloring if it is bipartite.
+    More Uses: check bipartite property, labeling a graph for 2 coloring if it is bipart.
     """
     is_bipartite, color = True, [UNVISITED] * self.graph.num_nodes
     for u in range(self.graph.num_nodes):
@@ -1106,9 +1105,9 @@ class GraphAlgorithms:
           break
     self.bipartite_colouring = color if is_bipartite else None
 
-  def max_flow_find_augmenting_path_helper(self, source: int, sink: int):  # TODO RETEST NEW
+  def max_flow_find_augmenting_path_helper(self, source: int, sink: int):
     """Will check if augmenting path in the graph from source to sink exists via bfs.
-
+    # TODO RETEST NEW
     Complexity per call: Time: O(|E| + |V|), Space O(|V|)
     Input
       source: the node which we are starting from.
@@ -1130,11 +1129,11 @@ class GraphAlgorithms:
     self.dist, self.parent = [], []
     return False
 
-  def send_flow_via_augmenting_path(self, source: int, sink: int, flow_in: Num):  # TODO RETEST
+  def send_flow_via_augmenting_path(self, source: int, sink: int, flow_in: Num):
     """Function to recursively emulate sending a flow. returns min pushed flow.
-
+    # TODO RETEST
     Complexity per call: Time: O(|V|), Space O(|V|)
-    Uses: preorder finds the min pushed_flow post order mutates edge_list based on that flow.
+    Uses: preorder finds the min pushed_flow post order mutates edge_list based on flow.
     Input:
       source: in this function it's technically the goal node
       sink: the current node we are observing
@@ -1168,7 +1167,7 @@ class GraphAlgorithms:
       v, edge_cap, edge_flow = self.graph.edge_list[edge_ind]
       if self.dist[v] != self.dist[u] + 1:
         continue
-      pushed_flow = self.send_max_flow_via_dfs(v, sink, min(flow_in, edge_cap - edge_flow))
+      pushed_flow = self.send_max_flow_via_dfs(v, sink, min(flow_in, edge_cap-edge_flow))
       if pushed_flow != 0:
         self.graph.edge_list[edge_ind][2] = edge_flow + pushed_flow
         self.graph.edge_list[edge_ind ^ 1][2] -= pushed_flow
@@ -1208,18 +1207,20 @@ class GraphAlgorithms:
 ##################################################
 
 
-from bisect import bisect_left
+from bisect import bisect_left, bisect_right
 from collections import Counter
 from functools import lru_cache
-from itertools import takewhile, accumulate
+from itertools import takewhile, accumulate, repeat
 from math import isqrt, log, gcd, prod, cos, sin, tau
 from operator import mul as operator_mul
+from random import choices
+from array import array
 
 
 class MathAlgorithms:
   def __init__(self):
-    """Only take what you need. This list needs to be global or instance level or passed in.
-    Attributes declared here must be passed in or global if not used in class format.
+    """Only take what you need. This list needs to be global or instance level or passed
+    in. Attributes declared here must be passed in or global if not used in class format.
     """
     self.mod_p = 0
 
@@ -1242,8 +1243,8 @@ class MathAlgorithms:
     self.factor_list = {}
     self.min_primes_list = []
 
-    self.mrpt_known_bounds = []
-    self.mrpt_known_tests = []
+    self.mrpt_bounds = []
+    self.mrpt_tests = []
 
     self.fibonacci_list = []
     self.fibonacci_dict = {0: 0, 1: 1, 2: 1}
@@ -1252,27 +1253,11 @@ class MathAlgorithms:
     self.fft_swap_indices = []
     self.fft_roots_of_unity = []
 
-  def is_prime_trivial(self, n: int) -> bool:
-    """Tests if n is prime via divisors up to sqrt(n).
-
-    Complexity per call: Time: O(sqrt(n)), T(sqrt(n)/3), Space: O(1)
-    Optimizations: 6k + i method, since we checked 2 and 3 only need test form 6k + 1 and 6k + 5
-    """
-    if n < 4:  # base case of n in 0, 1, 2, 3
-      return n > 1
-    if n % 2 == 0 or n % 3 == 0:  # this check is what allows us to use 6k + i
-      return False
-    limit = isqrt(n) + 1
-    for p in range(5, limit, 6):
-      if n % p == 0 or n % (p+2) == 0:
-        return False
-    return True
-
   def sieve_of_eratosthenes(self, n_inclusive: int) -> None:
     """Generates list of primes up to n via eratosthenes method.
 
     Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
-    Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
+    Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
     """
     limit, prime_sieve = isqrt(n_inclusive) + 1, [True] * (n_inclusive + 1)
     prime_sieve[0] = prime_sieve[1] = False
@@ -1285,7 +1270,8 @@ class MathAlgorithms:
   def sieve_of_eratosthenes_optimized(self, n_inclusive: int) -> None:
     """Odds only optimized version of the previous method. Optimized to start at 3.
 
-    Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space: post call O(n/ln(n)), mid-call O(n/2)
+    Complexity: Time: O(max(n lnln(sqrt(n)), n)),
+               Space: post call O(n/ln(n)), mid-call O(n/2)
     """
     sqrt_n, limit = ((isqrt(n_inclusive) - 3) // 2) + 1, ((n_inclusive - 3) // 2) + 1
     primes_sieve = [True] * limit
@@ -1297,6 +1283,57 @@ class MathAlgorithms:
           primes_sieve[j] = False
     self.primes_list = [2] + [2*i + 3 for i, el in enumerate(primes_sieve) if el]
 
+  def block_sieve_odd(self, limit: int):
+    """Block sieve that builds up block by block to the correct amount needed.
+
+    Complexity: Time: O(max(n lnln(sqrt(n)), n)),
+               Space: post call O(n/ln(n)), mid-call O(sqrt(n))
+    """
+    n, limit = limit, limit + 10
+    end_sqrt, end_limit = isqrt(limit) + 1, (limit - 1) // 2
+    sieve_and_block, primes, smaller_primes = [True] * (end_sqrt + 1), [2], []
+    app, smaller_app = primes.append, smaller_primes.append
+    for prime in range(3, end_sqrt, 2):
+      if sieve_and_block[prime]:
+        smaller_app([prime, (prime * prime - 1) // 2])
+        for j in range(prime * prime, end_sqrt + 1, prime * 2):
+          sieve_and_block[j] = False
+    for low in range(0, end_limit, end_sqrt):
+      for i in range(end_sqrt):
+        sieve_and_block[i] = True
+      for i, [p, idx] in enumerate(smaller_primes):
+        for idx in range(idx, end_sqrt, p):
+          sieve_and_block[idx] = False
+        smaller_primes[i][1] = idx - end_sqrt + (0 if idx >= end_sqrt else p)
+      if low == 0:
+        sieve_and_block[0] = False
+      for i in range(min(end_sqrt, (end_limit + 1) - low)):
+        if sieve_and_block[i] and (low + i) * 2 + 1 <= n:
+          app((low + i) * 2 + 1)
+    self.primes_list = primes
+
+  def prime_sieve_super_fast(self, limit: int):
+    """Optimized wheel sieve with bit compression.
+
+    Complexity: Time: O(max(n lnln(sqrt(n)), n)),
+               Space: post call O(n/ln(n)), mid-call S((n/3)/8)  4/32 == 1/8
+    """
+    res = [] if limit < 2 else [2] if limit == 2 else [2, 3]
+    if limit > 4:
+      n = limit + 1
+      flag = n % 6 == 2
+      sieve = array('L', repeat(0, (n // 3 + flag >> 5) + 1))
+      for i in range(1, isqrt(n) // 3 + 1):
+        if not ((sieve[i >> 5] >> (i & 31)) & 1):
+          k = (3 * i + 1) | 1
+          for j in range(k * k // 3, n // 3 + flag, 2 * k):
+            sieve[j >> 5] |= 1 << (j & 31)
+          for j in range(k * (k - 2 * (i & 1) + 4) // 3, n // 3 + flag, 2 * k):
+            sieve[j >> 5] |= 1 << (j & 31)
+      res.extend([(3 * i + 1) | 1 for i in range(1, n // 3 + (limit % 6 == 1))
+                  if not ((sieve[i >> 5] >> (i & 31)) & 1)])
+    self.primes_list = res
+
   def sieve_of_min_primes(self, n_inclusive: int) -> None:
     """Stores the min or max prime divisor for each number up to n.
 
@@ -1306,9 +1343,9 @@ class MathAlgorithms:
     min_primes[1] = 1
     for prime in self.primes_list:
       min_primes[prime] = prime
-      start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2 * prime
-      for j in range(start, end, step):
-        min_primes[j] = prime
+      start, end, step = prime * prime, n_inclusive + 1, prime if prime == 2 else 2*prime
+      for multiple in range(start, end, step):
+        min_primes[multiple] = prime
     self.min_primes_list = min_primes
 
   def sieve_of_eratosthenes_variants(self, n_inclusive: int) -> None:
@@ -1326,78 +1363,137 @@ class MathAlgorithms:
 
   def num_and_sum_of_divisors(self, limit: int) -> None:
     """Does a basic sieve. Complexity function 1."""
-    num_div = [1] * (limit + 1)
-    sum_div = [1] * (limit + 1)
-    for i in range(2, limit + 1):
-      for j in range(i, limit + 1, i):
-        num_div[j] += 1
-        sum_div[j] += i
+    limit += 1
+    num_div = [1] * limit
+    sum_div = [1] * limit
+    for divisor in range(2, limit):
+      for multiple in range(divisor, limit, divisor):
+        num_div[multiple] += 1
+        sum_div[multiple] += divisor
     self.num_divisors = num_div
     self.sum_divisors = sum_div
 
   def euler_phi_plus_sum_and_number_of_diff_prime_factors(self, limit: int) -> None:
     """This is basically same as sieve just using different ops. Complexity function 2."""
-    num_diff_pf = [0] * (limit + 1)
-    sum_diff_pf = [0] * (limit + 1)
-    phi = [i for i in range(limit + 1)]
-    for i in range(2, limit + 1):
-      if num_diff_pf[i] == 0:
-        for j in range(i, limit + 1, i):
-          num_diff_pf[j] += 1
-          sum_diff_pf[j] += i
-          phi[j] = (phi[j]//i) * (i-1)
+    limit += 1
+    num_diff_pf = [0] * limit
+    sum_diff_pf = [0] * limit
+    phi = [i for i in range(limit)]
+    for prime in range(2, limit):  # name is prime since we only iterate if its prime
+      if num_diff_pf[prime] == 0:
+        for multiple in range(prime, limit, prime):
+          num_diff_pf[multiple] += 1
+          sum_diff_pf[multiple] += prime
+          phi[multiple] = (phi[multiple]//prime) * (prime-1)
     self.num_diff_prime_factors = num_diff_pf
     self.sum_diff_prime_factors = sum_diff_pf
     self.euler_phi = phi
 
   def num_and_sum_of_prime_factors(self, limit: int) -> None:
     """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
-    num_pf = [0] * (limit + 1)
-    sum_pf = [0] * (limit + 1)
-    for prime in range(2, limit + 1):
+    inclusive_limit = limit + 1
+    num_pf = [0] * inclusive_limit
+    sum_pf = [0] * inclusive_limit
+    for prime in range(2, inclusive_limit):
       if num_pf[prime] == 0:  # or sum_pf if using that one
-        exponent_limit = int(log(limit, prime)) + 1
+        exponent_limit = int(log(limit, prime)) + 2
         for exponent in range(1, exponent_limit):
           prime_to_exponent = prime**exponent
-          for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
-            sum_pf[i] += prime
-            num_pf[i] += 1
+          for multiple in range(prime_to_exponent, inclusive_limit, prime_to_exponent):
+            sum_pf[multiple] += prime
+            num_pf[multiple] += 1
     self.num_prime_factors = num_pf
     self.sum_prime_factors = sum_pf
 
   def num_and_sum_of_divisors_faster(self, limit: int) -> None:
     """runs in around x0.8-x0.5 the runtime of the slower one. Complexity function 4."""
-    num_divs = [1] * (limit + 1)
-    sum_divs = [1] * (limit + 1)
-    cur_pows = [1] * (limit + 1)
-    for prime in range(2, limit + 1):
+    inclusive_limit = limit + 1
+    num_divs = [1] * inclusive_limit
+    sum_divs = [1] * inclusive_limit
+    cur_pows = [1] * inclusive_limit
+    for prime in range(2, inclusive_limit):
       if num_divs[prime] == 1:
-        exponent_limit = int(log(limit, prime)) + 1
+        exponent_limit = int(log(limit, prime)) + 2
         for exponent in range(1, exponent_limit):
           prime_to_exponent = prime ** exponent
-          for i in range(prime_to_exponent, limit + 1, prime_to_exponent):
-            cur_pows[i] += 1
+          for multiple in range(prime_to_exponent, inclusive_limit, prime_to_exponent):
+            cur_pows[multiple] += 1
         tmp = prime - 1  # this line and the line below used for sum_divs
-        prime_powers = [prime ** exponent for exponent in range(0, exponent_limit+1)]
-        for i in range(prime, limit + 1, prime):
-          num_divs[i] *= cur_pows[i]
-          sum_divs[i] *= ((prime_powers[cur_pows[i]] - 1) // tmp)
-          cur_pows[i] = 1
+        prime_powers = [prime ** exponent for exponent in range(0, exponent_limit + 1)]
+        for multiple in range(prime, inclusive_limit, prime):
+          num_divs[multiple] *= cur_pows[multiple]
+          sum_divs[multiple] *= ((prime_powers[cur_pows[multiple]] - 1) // tmp)
+          cur_pows[multiple] = 1
     self.num_divisors = num_divs
     self.sum_divisors = sum_divs
+
+  def is_prime_trivial(self, n: int) -> bool:
+    """Tests if n is prime via divisors up to sqrt(n).
+
+    Complexity per call: Time: O(sqrt(n)), T(sqrt(n)/3), Space: O(1)
+    Optimizations: 6k+i method, since we checked 2 and 3 only need test form 6k+1 and 6k+5
+    """
+    if n < 4:  # base case of n in 0, 1, 2, 3
+      return n > 1
+    if n % 2 == 0 or n % 3 == 0:  # this check is what allows us to use 6k + i
+      return False
+    limit = isqrt(n) + 1
+    for p in range(5, limit, 6):
+      if n % p == 0 or n % (p+2) == 0:
+        return False
+    return True
+
+  def is_composite(self, a: int, d: int, n: int, s: int) -> bool:
+    """The witness test of miller rabin.
+
+    Complexity per call: Time O(log^3(n)), Space: O(2**s, bits)
+    """
+    if 1 == pow(a, d, n):
+      return False
+    for i in range(s):
+      if n-1 == pow(a, d * 2**i, n):
+        return False
+    return True
+
+  def miller_rabin_primality_test(self, n: int, precision_for_huge_n=16) -> bool:
+    """Probabilistic primality test with error rate of 4^(-k) past 341550071728321.
+
+    Complexity per call: Time O(k log^3(n)), Space: O(2**s) bits
+    Note: range(16) used to just do a small test to weed out lots of numbers.
+    """
+    if n < self.primes_list[-1]:
+      return n in self.primes_set
+    if any((n % self.primes_list[p] == 0) for p in range(16)) or n == 3215031751:
+      return False  # 3215031751 is an edge case for this data set
+    d, s = n-1, 0
+    while d % 2 == 0:
+      d, s = d // 2, s + 1
+    if n < self.mrpt_bounds[-1]:
+      for i, bound in enumerate(self.mrpt_bounds, 2):
+        if n < bound:
+          return not any(self.is_composite(self.mrpt_tests[j], d, n, s) for j in range(i))
+    return not any(self.is_composite(prime, d, n, s)
+                   for prime in choices(self.primes_list, k=precision_for_huge_n))
+
+  def miller_rabin_primality_test_prep(self):
+    """This function needs to be called before miller rabin"""
+    self.mrpt_bounds = [1373653, 25326001, 118670087467,
+                        2152302898747, 3474749660383, 341550071728321]
+    self.mrpt_tests = [2, 3, 5, 7, 11, 13, 17]
+    self.sieve_of_eratosthenes(1000)  # comment out if different size needed
+    self.primes_set = set(self.primes_list)  # comment out if already have bigger size
 
   def prime_factorize_n(self, n: int) -> Dict:
     """A basic prime factorization of n function. without primes its just O(sqrt(n))
 
     Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
-    Variants: number and sum of prime factors, of diff prime factors, of divisors, and euler phi
+    Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
     """
     limit, prime_factors = isqrt(n) + 1, []
     for prime in takewhile(lambda x: x < limit, self.primes_list):
-      if n % prime == 0:
-        while n % prime == 0:
-          n //= prime
-          prime_factors.append(prime)
+      while n % prime == 0:
+        n //= prime
+        prime_factors.append(prime)
     if n > 1:  # n is prime or last factor of n is prime
       prime_factors.append(n)
     self.factor_list = Counter(prime_factors)
@@ -1416,8 +1512,20 @@ class MathAlgorithms:
     self.factor_list = Counter(prime_factors)
     return Counter(prime_factors)
 
+  def factorial_prime_factors(self, limit: int) -> None:
+    """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
+    end_point = bisect_right(self.primes_list, limit)
+    prime_factors = [0] * end_point
+    for i in range(end_point):
+      prime, prime_amount, x = self.primes_list[i], 0, limit
+      while x:
+        x //= prime
+        prime_amount += x
+      prime_factors[i] = prime_amount
+    self.num_prime_factors = prime_factors
+
   def prime_factorize_n_variants(self, n: int) -> int:
-    """Covers all the variants listed above, holds the same time complexity with O(1) space."""
+    """Covers all the variants listed above, holds the same time and space complexity"""
     limit = isqrt(n) + 1
     sum_diff_prime_factors, num_diff_prime_factors = 0, 0
     sum_prime_factors, num_prime_factors = 0, 0
@@ -1449,11 +1557,11 @@ class MathAlgorithms:
     return num_diff_prime_factors
 
   def polynomial_function_f(self, x: int, c: int, m: int) -> int:
-    """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding."""
+    """Represents the function f(x) = (x^2 + c) in pollard rho and brent, cycle finding"""
     return (x * x + c) % m  # paste this in code for speed up. is here for clarity only
 
   def pollard_rho(self, n: int, x0=2, c=1) -> int:
-    """Semi fast integer factorization. Based on the birthday paradox and floyd cycle finding.
+    """Semi fast integer factorization. Based on the birthday paradox and floyd cycle find
 
     Complexity per call: Time: O(min(max(p), n^0.25) * ln n), Space: O(log2(n) bits)
     """
@@ -1488,46 +1596,6 @@ class MathAlgorithms:
           break
     return g
 
-  def is_composite(self, a: int, d: int, n: int, s: int) -> bool:
-    """The witness test of miller rabin.
-
-    Complexity per call: Time O(log^3(n)), Space: O(2**s, bits)
-    """
-    if 1 == pow(a, d, n):
-      return False
-    for i in range(s):
-      if n-1 == pow(a, d * 2**i, n):
-        return False
-    return True
-
-  def miller_rabin_primality_test(self, n: int, precision_for_huge_n=16) -> bool:
-    """Probabilistic primality test with error rate of 4^(-k) past 341550071728321.
-
-    Complexity per call: Time O(k log^3(n)), Space: O(2**s) bits
-    Note: range(16) used to just do a small test to weed out lots of numbers.
-    """
-    if n < self.primes_list[-1]:
-      return n in self.primes_set
-    if any((n % self.primes_list[p] == 0) for p in range(16)) or n == 3215031751:
-      return False  # 3215031751 is an edge case for this data set
-    d, s = n-1, 0
-    while d % 2 == 0:
-      d, s = d//2, s+1
-    if n < self.mrpt_known_bounds[-1]:
-      for i, bound in enumerate(self.mrpt_known_bounds, 2):
-        if n < bound:
-          return not any(self.is_composite(self.mrpt_known_tests[j], d, n, s) for j in range(i))
-    return not any(self.is_composite(self.primes_list[j], d, n, s)
-                   for j in range(precision_for_huge_n))
-
-  def miller_rabin_primality_test_prep(self):
-    """This function needs to be called before miller rabin"""
-    self.mrpt_known_bounds = [1373653, 25326001, 118670087467,
-                              2152302898747, 3474749660383, 341550071728321]
-    self.mrpt_known_tests = [2, 3, 5, 7, 11, 13, 17]
-    self.sieve_of_eratosthenes(1000)  # comment out if different size needed
-    self.primes_set = set(self.primes_list)  # comment out if already have bigger size
-
   def extended_euclid_recursive(self, a: int, b: int) -> Tuple[int, int, int]:
     """Solves coefficients of Bezout identity: ax + by = gcd(a, b), recursively
 
@@ -1541,9 +1609,9 @@ class MathAlgorithms:
   def extended_euclid_iterative(self, a: int, b: int) -> Tuple[int, int, int]:
     """Solves coefficients of Bezout identity: ax + by = gcd(a, b), iteratively.
 
-    Complexity per call: Time: O(log n) about twice as fast in python vs above, Space: O(1)
+    Complexity per call: Time: O(log n) about twice as fast in python vs above, Space:O(1)
     Optimizations and notes:
-      divmod and abs are used to help deal with big numbers, remove if < 2**64 for speedup.
+      divmod and abs are used to help deal with big numbers, remove if < 2**64 for speedup
     """
     last_remainder, remainder = abs(a), abs(b)
     x, y, last_x, last_y = 0, 1, 1, 0
@@ -1560,9 +1628,9 @@ class MathAlgorithms:
     """
     return ((a % n) + n) % n
 
-  def modular_linear_equation_solver(self, a: int, b: int, n: int) -> List[int]:  # TODO RETEST
+  def modular_linear_equation_solver(self, a: int, b: int, n: int) -> List[int]:
     """Solves gives the solution x in ax = b(mod n).
-
+    # TODO RETEST
     Complexity per call: Time: O(log n), Space: O(d)
     """
     x, y, d = self.extended_euclid_iterative(a, n)
@@ -1571,9 +1639,9 @@ class MathAlgorithms:
       return [(x + i*(n//d)) % n for i in range(d)]
     return []
 
-  def linear_diophantine_1(self, a: int, b: int, c: int) -> Tuple[int, int]:  # TODO RETEST
+  def linear_diophantine_1(self, a: int, b: int, c: int) -> Tuple[int, int]:
     """Solves for x, y in ax + by = c. From stanford icpc 2013-14
-
+    # TODO RETEST
     Complexity per call: Time: O(log n), Space: O(1).
     Notes: order matters? 25x + 18y = 839 != 18x + 25y = 839
     """
@@ -1583,11 +1651,11 @@ class MathAlgorithms:
       return x, (c - a * x) // b
     return -1, -1
 
-  def linear_diophantine_2(self, a: int, b: int, c: int) -> Tuple[int, int]:  # TODO RETEST
+  def linear_diophantine_2(self, a: int, b: int, c: int) -> Tuple[int, int]:
     """Solves for x0, y0 in x = x0 + (b/d)n, y = y0 - (a/d)n.
     derived from ax + by = c, d = gcd(a, b), and d|c.
     Can further derive into: n = x0 (d/b), and n = y0 (d/a).
-
+    # TODO RETEST
     Complexity per call: Time: O(log n), Space: O(1).
     Optimizations and notes:
       unlike above this function order doesn't matter if a != b
@@ -1602,7 +1670,7 @@ class MathAlgorithms:
     Complexity per call: Time: O(log n), Space: O(1)
     """
     x, y, d = self.extended_euclid_iterative(b, m)
-    return None if d != 1 else x % m  # -1 instead of None if we intend to go on with the prog
+    return None if d != 1 else x % m  # -1 instead of None if we intend use return
 
   def chinese_remainder_theorem_1(self, remainders: List[int], modulos: List[int]) -> int:
     """Steven's CRT version to solve x in x = r[0] (mod m[0]) ... x = r[n-1] (mod m[n-1]).
@@ -1620,7 +1688,7 @@ class MathAlgorithms:
 
   def chinese_remainder_theorem_helper(self, mod1: int, rem1: int,
                                        mod2: int, rem2: int) -> Tuple[int, int]:
-    """Chinese remainder theorem (special case): find z such that z % m1 = r1, z % m2 = r2.
+    """Chinese remainder theorem (special case): find z such that z % m1 = r1, z % m2 = r2
     Here, z is unique modulo M = lcm(m1, m2). Return (z, M).  On failure, M = -1.
     from: stanford icpc 2016
     # TODO RETEST
@@ -1634,9 +1702,9 @@ class MathAlgorithms:
 
   def chinese_remainder_theorem_2(self, remainders: List[int],
                                   modulos: List[int]) -> Tuple[int, int]:
-    """Chinese remainder theorem: find z such that z % m[i] = r[i] for all i.  Note that the
-    solution is unique modulo M = lcm_i (m[i]).  Return (z, M). On failure, M = -1. Note that
-    we do not require the r[i]'s to be relatively prime.
+    """Chinese remainder theorem: find z such that z % m[i] = r[i] for all i.  Note that
+    solution is unique modulo M = lcm_i (m[i]).  Return (z, M). On failure, M = -1.
+    Note that we do not require the r[i]'s to be relatively prime.
     from: stanford icpc 2016
     # TODO RETEST
     Complexity per call: Time: O(n log n), Space: O(1)? O(mt) bit size
@@ -1661,7 +1729,7 @@ class MathAlgorithms:
 
   @lru_cache(maxsize=None)
   def fibonacci_n_dp_cached(self, n: int) -> int:
-    """Cached Dynamic programming to get the nth fibonacci. Derived from Cassini's identity.
+    """Cached Dynamic programming to get the nth fibonacci. Derived via Cassini's identity
 
     Complexity per call: Time: O(log n), Space: increase by O(log n).
     Optimization: can go back to normal memoization with same code but using dictionary.
@@ -1703,41 +1771,43 @@ class MathAlgorithms:
       catalan[i+1] = (((4*i + 2) % p) * (catalan[i] % p) * pow(i+2, p-2, p)) % p
     self.catalan_numbers = catalan
 
-  def catalan_via_prime_facts(self, n: int, k: int, mod_m: int) -> int:
+  def catalan_via_prime_factors_slower(self, n: int, k: int, mod_m: int) -> int:
     """Compute the nth Catalan number mod_n via prime factor reduction of C(2n, n)/(n+1).
     Notes: The function "num_and_sum_of_prime_factors" needs to be modified for computing number
     of each prime factor in all the numbers between 1-2n or 1 to n.
 
     Complexity per call: Time: O(max(n lnln(sqrt(n)), n)), Space: O(n/ln(n)).
+    Optimization: compute bottom! once and factorize k+1 instead of two calls to factorial factor
     """
     top, bottom, ans = n, k, 1  # n = 2n and k = n in C(n, k) = (2n, n)
-    self.num_and_sum_of_prime_factors(top)
-    top_factors = [el for el in self.num_prime_factors]
-    prime_array = [el for el in self.primes_list]  # saving primes to use in two lines later
-    self.num_and_sum_of_prime_factors(bottom)    # will handle n!n! in one go stored in num
-    for i, el in enumerate(self.num_prime_factors):  # num_prime_factors :)
-      top_factors[i] -= (2*el)
-    self.prime_factorize_n(k+1)  # factorizing here is faster than doing n! and (n+1)! separate
-    for p, v in self.factor_list.items():
-      top_factors[bisect_left(prime_array, p)] -= v
-    for ind, exponent in enumerate(top_factors):  # remember use multiplication not addition
+    self.prime_sieve_super_fast(n)  # or any sieve
+    self.factorial_prime_factors(top)
+    top_factors = [amt for amt in self.num_prime_factors]
+    self.factorial_prime_factors(bottom)  # will handle n!n! in one go stored in num
+    for prime_ind, exponent in enumerate(self.num_prime_factors):
+      top_factors[prime_ind] -= exponent
+    self.factorial_prime_factors(bottom + 1)  # will handle n!n! in one go stored in num
+    for prime_ind, exponent in enumerate(self.num_prime_factors):
+      top_factors[prime_ind] -= exponent
+    for prime_ind, exponent in enumerate(top_factors):  # remember use multiplication not add
       if exponent > 0:
-        ans = (ans * pow(prime_array[ind], exponent, mod_m)) % mod_m
+        ans = (ans * pow(self.primes_list[prime_ind], exponent, mod_m)) % mod_m
     return ans
 
-  def c_n_k(self, n: int, k: int) -> int:
+  def c_n_k(self, n: int, k: int, inverse: bool) -> int:
     """Computes C(n, k) % p. From competitive programming 4.
 
     Complexity per call: Time: v1 = O(log n), v2 = O(1), Space: O(1).
     v1 is uncommented, v2 is the commented out line, and must be precomputed see below.
     """
-    if n < k:  # base case: could flip them to be n, k = k, n but better to just return 0
-      return 0
+    if n <= k or k == 0:  # base case: explicit
+      return 0 if n < k else 1
+    if inverse:
+      return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
     n_fact, k_fact, n_k_fact, p = self.fact[n], self.fact[k], self.fact[n - k], self.mod_p
     return (n_fact * pow(k_fact, p - 2, p) * pow(n_k_fact, p - 2, p)) % p
-    # return 0 if n < k else (self.fact[n] * self.inv_fact[k] * self.inv_fact[n-k]) % self.mod_p
 
-  def binomial_coefficient_n_mod_p_prep(self, max_n: int, mod_p: int):
+  def binomial_coefficient_n_mod_p_prep(self, max_n: int, mod_p: int, inverse: bool):
     """Does preprocessing for binomial coefficients. From competitive programming 4.
 
     Complexity per call: Time: v1 O(n), v2 = O(n), Space: O(n).
@@ -1747,11 +1817,12 @@ class MathAlgorithms:
     for i in range(1, max_n):
       factorial_mod_p[i] = (factorial_mod_p[i - 1] * i) % mod_p
     self.mod_p, self.fact = mod_p, factorial_mod_p
-    # inverse_factorial_mod_p = [0] * max_n
-    # inverse_factorial_mod_p[-1] = pow(factorial_mod_p[-1], mod_p-2, mod_p)
-    # for i in range(max_n-2, -1, -1):
-    #   inverse_factorial_mod_p[i] = (inverse_factorial_mod_p[i+1] * (i+1)) % mod_p
-    # self.inv_fact = inverse_factorial_mod_p
+    if inverse:
+      inverse_factorial_mod_p = [0] * max_n
+      inverse_factorial_mod_p[-1] = pow(factorial_mod_p[-1], mod_p-2, mod_p)
+      for i in range(max_n-2, -1, -1):
+        inverse_factorial_mod_p[i] = (inverse_factorial_mod_p[i+1] * (i+1)) % mod_p
+      self.inv_fact = inverse_factorial_mod_p
 
   @lru_cache(maxsize=None)
   def binomial_coefficient_dp_with_cache(self, n: int, k: int) -> int:
@@ -1786,7 +1857,7 @@ class MathAlgorithms:
 
   def fft_prepare_lengths_list(self, a_len: int):
     """Function for all powers 2 from 2 - a_len, inclusive. O(log n) complexity."""
-    self.fft_lengths = [2**i for i in range(1, a_len.bit_length())]
+    self.fft_lengths = [2 ** power for power in range(1, a_len.bit_length())]
 
   def fft_prepare_roots_helper(self, length: int, angle: float) -> List[complex]:
     """Precomputes roots of unity for a given length and angle. accumulate used here :).
@@ -1801,7 +1872,7 @@ class MathAlgorithms:
     """Precomputes all roots of unity for all lengths. Stores the result for later use.
 
     Complexity per call: Time: O(2^((log n)+1)-1) = O(n),
-              Space: O(n), S(2^((log n)+1)-1) | n == len of our data, which is 2^i.
+                  Space: O(n), S(2^((log n)+1)-1) | n == len of our data, which is 2^i.
     """
     signed_tau: float = -tau if invert else tau
     self.fft_roots_of_unity = [self.fft_prepare_roots_helper(length//2 - 1, signed_tau/length)
@@ -1833,9 +1904,8 @@ class MathAlgorithms:
     Complexity per call: Time: O(n), Space: O(1) -> in fact we often reduce overall space.
     """
     carry, end = 0, len(a_vector) - 1
-    for number in a_vector:
-      number += carry
-      carry, number = divmod(number, base)
+    for i in range(end + 1):
+      carry, a_vector[i] = divmod(a_vector[i] + carry, base)
     while 0 == a_vector[end]:
       end -= 1
     return a_vector[:end+1][::-1]
@@ -1999,11 +2069,11 @@ class GeometryAlgorithms:
     paste directly into code and drop isclose for runtime speedup."""
     return 0 if isclose(a, b) else -1 if a < b else 1
 
-  def dot_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Reals:
+  def dot_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Numeric:
     """Compute the scalar product a.b of a,b equivalent to: a . b"""
     return left_vector.x*right_vector.x + left_vector.y*right_vector.y
 
-  def cross_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Reals:
+  def cross_product(self, left_vector: Pt2d, right_vector: Pt2d) -> Numeric:
     """Computes the scalar value perpendicular to a,b equivalent to: a x b"""
     return left_vector.x*right_vector.y - left_vector.y*right_vector.x
 
@@ -2011,7 +2081,7 @@ class GeometryAlgorithms:
     """Normalized distance between two points a, b equivalent to: sqrt(a^2 + b^2) = distance."""
     return dist(left_point, right_point)
 
-  def distance(self, left_point: Pt2d, right_point: Pt2d) -> Reals:
+  def distance(self, left_point: Pt2d, right_point: Pt2d) -> Numeric:
     """Squared distance between two points a, b equivalent to: a^2 + b^2 = distance."""
     return self.dot_product(left_point - right_point, left_point - right_point)
 
@@ -2876,43 +2946,34 @@ class StringAlgorithms:
       left = 0 if left < 1 else left - 1  # this replaced max(left - 1, 0)
     self.longest_common_prefix = [permuted_lcp[suffix] for suffix in self.suffix_array]
 
-  def suffix_array_compare_from_index(self, offset):  # TODO RETEST
-    """C style string compare to compare 0 is equal 1 is greater than -1 is less than.
-
-    Complexity per call: Time: O(k) len of pattern, Space: O(1)
-    """
-    for i, num_char in enumerate(self.pattern_ord):
-      if num_char != self.text_ord[offset + i]:
-        return -1 if self.text_ord[offset + i] < num_char else 1
-    return 0
-
-  def suffix_array_binary_search(self, lo, hi, comp_val):  # TODO RETEST
-    """Standard binary search. comp_val allows us to select how strict we are, > vs >=
-
-    Complexity per call: Time: O(k log n) len of pattern, Space: O(1)
-    """
-    while lo < hi:
-      mid = (lo + hi) // 2
-      if self.suffix_array_compare_from_index(self.suffix_array[mid]) > comp_val:
-        hi = mid
-      else:
-        lo = mid + 1
-    return lo, hi
-
-  def suffix_array_string_matching(self, new_pattern):  # TODO RETEST
-    """Utilizing the suffix array we can search efficiently for a pattern. gives first and last
-    index found for patterns.
+  def suffix_array_string_matching_multiple(self, patterns: List[str], text: str) -> List[List]:
+    """Generates location indices for all patterns.
 
     Complexity per call: Time: O(k log n), T(2(k log n)), Space: O(k)
     """
-    self.pattern_ord = [ord(c) for c in new_pattern]  # line helps avoid repeated ord calls
-    lo, _ = self.suffix_array_binary_search(0, self.text_len - 1, GREATER_EQUAL)
-    if self.suffix_array_compare_from_index(self.suffix_array[lo]) != 0:
-      return -1, -1
-    _, hi = self.suffix_array_binary_search(lo, self.text_len - 1, GREATER_THAN)
-    if self.suffix_array_compare_from_index(self.suffix_array[hi]) != 0:
-      hi -= 1
-    return lo, hi
+    text += '\0'
+    text_len, matches = len(text), []
+    for pattern in patterns:
+      lo, hi, pattern_len = 0, text_len - 1, len(pattern)
+      while lo < hi:
+        mid = (lo + hi) // 2
+        if text[self.suffix_array[mid]: self.suffix_array[mid] + pattern_len] >= pattern:
+          hi = mid
+        else:
+          lo = mid + 1
+      if text[self.suffix_array[lo]: self.suffix_array[lo] + pattern_len] != pattern:
+        matches.append([])
+      else:
+        start, hi = lo, text_len - 1
+        while lo < hi:
+          mid = (lo + hi) // 2
+          if text[self.suffix_array[mid]: self.suffix_array[mid] + pattern_len] > pattern:
+            hi = mid
+          else:
+            lo = mid + 1
+        end = hi-(text[self.suffix_array[hi]: self.suffix_array[hi]+pattern_len] != pattern)+1
+        matches.append(sorted([self.suffix_array[i] for i in range(start, end)]))
+    return matches
 
   def compute_longest_repeated_substring(self):
     """The longest repeated substring is just the longest common pattern. Require lcp to be
@@ -3020,7 +3081,7 @@ class Matrix:
     other_mat = other.matrix
     self.matrix = [[el for el in row] for row in other_mat]
 
-  def fill_matrix_from_row_col(self, new_matrix, row_offset: int, col_offset: int):  # TODO RETEST
+  def fill_matrix_from_row_col(self, new_matrix, row_offset: int, col_offset: int):  # TODO TEST
     """fill our matrix from row and col offset with new_matrix, O(n^2). Doesn't change size."""
     local_matrix = self.matrix  # prefix optimization see class docs for more info
     for i, row in enumerate(new_matrix):
@@ -3267,5 +3328,133 @@ class MatrixAlgorithms:
       if i_row[p] != i_col[p]:
         i_row_p, i_col_p = i_row[p], i_col[p]
         for k in range(n):
-          matrix_a[k][i_row_p], matrix_a[k][i_col_p] = (matrix_a[k][i_col_p], matrix_a[k][i_row_p])
+          matrix_a[k][i_row_p], matrix_a[k][i_col_p] = (matrix_a[k][i_col_p],
+                                                        matrix_a[k][i_row_p])
     return det
+
+
+class book_v1_forgot_to_add(GraphAlgorithms):
+  def prime_count_dp_slower(self, limit):
+    root = isqrt(limit) + 1  # after this we mostly refer to root + 1 so just add one here
+    end = limit // root
+    low_and_high = [i for i in range(1, end)] + [limit // i for i in range(root, 0, -1)]
+    dp = [el for el in low_and_high]
+    dp_len, prime_index = len(dp), 0
+    for prime in range(2, root):
+      if dp[prime - 1] != dp[prime - 2]:
+        prime_index += 1
+        end = bisect_right(low_and_high, prime * prime) - 2
+        for i in range(dp_len - 1, end, -1):
+          k = low_and_high[i] // prime
+          dp[i] -= dp[k - 1 if k < root else dp_len - (limit // k)] - prime_index
+    return dp[dp_len - 1] - 1
+
+  def prime_count_dp_faster(self, n: int):
+    root, number_of_primes, step_multiplier = isqrt(n) + 1, n - 1, 1
+    high, low, visited_sieve = [0] * root, [0] * root, [0] * root
+    for divisor in range(2, root):
+      low[divisor], high[divisor] = divisor - 1, n // divisor - 1
+    for prime in range(2, root):
+      if low[prime] != low[prime - 1]:  # happens only when n is prime
+        t, end = low[prime - 1], min(root - 1, n // (prime * prime))
+        number_of_primes -= high[prime] - t
+        for i in range(prime + step_multiplier, end + 1, step_multiplier):
+          if not visited_sieve[i]:  # already visited this composite number
+            multiple = i * prime
+            is_above_root = multiple > root - 1
+            high[i] -= (low[n // multiple] if is_above_root else high[multiple]) - t
+        for i in range(root - 1, prime * prime - 1, -1):
+          low[i] -= low[i // prime] - t
+        for prime_multiple in range(prime * prime, end + 1, prime):
+          visited_sieve[prime_multiple] = 1
+        if prime == 2:
+          step_multiplier += 1  # for, odds we can skip even numbers by stepping by 2
+    return number_of_primes
+
+  def bellman_ford_shortest_path(self, source: int):
+    """shortest path when graph has negative cycle.
+
+    Complexity per call Time: O(k|E|), Space: O(|V|)
+    Optimizations: use adj_list and move the INF check to before visiting neighbours.
+    """
+    num_verts = self.graph.num_nodes
+    distances, parents = [INF] * num_verts, [-1] * num_verts
+    distances[source] = 0
+    for i in range(num_verts - 1):           # this code can be copied over the negative cycle
+      modified = False                       # check it will speed up the check a fair bit with
+      for u, v, wt in self.graph.edge_list:  # the only thing to change being the inner line
+        if distances[u] != INF and distances[v] > distances[u] + wt:
+          distances[v], parents[v], modified = distances[u] + wt, u, True
+      if not modified:
+        break
+    for i in range(num_verts - 1):           # this is the negative cycle check, can be used
+      for u, v, wt in self.graph.edge_list:  # with spfa algorithm too
+        if distances[u] != INF and distances[v] > distances[u] + wt:
+          distances[v] = -INF
+    self.dist = distances
+
+  def bellman_ford_moore_spfa(self, source):
+    """Same complexity as bellmanford but faster in practice."""
+    num_verts = self.graph.num_nodes
+    distances, times_seen, in_queue = [INF] * num_verts,  [0] * num_verts, [False] * num_verts
+    queue, distances[source], in_queue[source] = deque([source]), 0, True
+    while queue:
+      u = queue.popleft()
+      in_queue[u] = False
+      for v, wt in self.graph.adj_list[u]:
+        if distances[v] > distances[u] + wt and times_seen[v] <= self.graph.num_nodes:
+          distances[v] = distances[u] + wt
+          if not in_queue[v]:
+            times_seen[v], in_queue[v] = times_seen[v] + 1, True
+            queue.append(v)
+
+  def solve_tower_of_powers(self):
+    """Compressed solution for tower of powers 2 power harder from this link.
+    https://shorturl.at/qDFG9 russel dash."""
+    from math import log10, log
+    EPS = 1e-14
+    LIM = 309
+    n = int(input())
+    ori = [[*map(int, input().split('^'))] for _ in range(n)]
+    pos = [0] * n
+    fmt = lambda x: print(x, '^'.join(map(str, ori[x])).ljust(40), end=' ')
+    for i in range(n - 1):
+      for j in range(i + 1, n):
+        expi, expj = ori[i].copy(), ori[j].copy()
+        if 1 in expi: expi = expi[:expi.index(1)]
+        if 1 in expj: expj = expj[:expj.index(1)]
+        si = sj = cmpi = cmpj = 1
+        infi = infj = 0
+        for k in range(len(expi) - 1, -1, -1):
+          if si * log10(expi[k]) < LIM:
+            si = expi[k] ** si; cmpi = si
+          else:
+            infi += 1
+            if infi == 1: cmpi = si * log(expi[k])
+            if infi == 2: cmpi = si * log(expi[k + 1]) + log(log(expi[k]))
+        for k in range(len(expj) - 1, -1, -1):
+          if sj * log10(expj[k]) < LIM:
+            sj = expj[k] ** sj; cmpj = sj
+          else:
+            infj += 1
+            if infj == 1: cmpj = sj * log(expj[k])
+            if infj == 2: cmpj = sj * log(expj[k + 1]) + log(log(expj[k]))
+        if infi > infj:
+          pos[i] += 1
+        elif infj > infi:
+          pos[j] += 1
+        else:
+          if (cmpi - cmpj) / (cmpi + cmpj) > EPS:
+            pos[i] += 1
+          elif (cmpi - cmpj) / (cmpi + cmpj) < -EPS:
+            pos[j] += 1
+          else:
+            expi, expj = expi[:infi][:-1], expj[:infj][:-1]
+            while expi and expj and expi[-1] == expj[-1]: expi.pop(), expj.pop()
+            if not expi and not expj: continue
+            if (not expi and expj) or expj[-1] > expi[-1]: pos[j] += 1
+            if (expi and not expj) or expi[-1] > expj[-1]: pos[i] += 1
+        # fmt(i), print(infi, cmpi), fmt(j), print(infj, cmpj), print('-'*80)
+    print('Case 1:')
+    for tow in map(lambda x: '^'.join(map(str, ori[x])),
+                   sorted(range(n), key=lambda x: pos[x])): print(tow)
