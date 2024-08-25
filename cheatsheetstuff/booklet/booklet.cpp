@@ -58,3 +58,41 @@ public:
 };
 
 
+/// <summary>
+/// ///////////////////////////////////////////////////////////////////
+/// </summary>
+
+typedef vector<bool> vec_bool;
+typedef vector<int> vec_int;
+class MathAlgorithms {
+private:
+	xy;
+	abs;
+	vec_int primesList;
+public:
+	void sieveOfEratosthenes(int nInclusive) {
+		/*Generates list of primes up to n via eratosthenes method.
+
+		Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
+		Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
+		*/
+		int limit = (int)sqrt(nInclusive);
+		vec_int primeSieve = vec_bool(++nInclusive, True);
+		for (int prime = 2; prime < limit; ++prime)
+			if (primeSieve[prime])
+				for (int composite = prime * prime; composite < nInclusive; composite += prime)
+					primeSieve[composite] = false;
+		for (int prime = 2; prime < nInclusive; ++prime)
+			if (primeSieve[prime])
+				primesList.push_back(prime);
+	}
+
+	void primeSeiveFaster(int limit) {
+		/*Optimized wheel sieve with bit compression.
+
+		Complexity: Time: O(max(n lnln(sqrt(n)), n)),
+				   Space: post call O(n/ln(n)), mid-call S((n/3)/8)  4/32 == 1/8
+		*/
+		vec_int result = (limit < 2)? vec_int(): (limit == 2)?: {2}: 
+	}
+};
