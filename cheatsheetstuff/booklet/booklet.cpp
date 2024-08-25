@@ -1,9 +1,9 @@
 #include <bits/stdic++.h> // This include is mostly for catch all and speed
 
-typedef vector<int> vec_int;
+typedef vector<int> vec_int;  // TBD if we go with typedefs
 
-#include <vector>		// for vec_int
-#include <algorithm>	// for iota, swap
+//#include <vector>		// for vec_int
+//#include <algorithm>	// for iota, swap
 
 class UnionFindDisjointSets {
 private:
@@ -55,6 +55,6 @@ public:
 		// Gives you the size of set u. TIME and SPACE Complexity is the same as find_set
 		return setSizes[findSet(u);
 	}
-
-
 };
+
+
