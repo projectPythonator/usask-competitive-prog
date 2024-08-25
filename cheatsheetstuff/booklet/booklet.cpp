@@ -28,5 +28,10 @@ public:
 		return (parent[i] == i) ? i : (parent[i] = findSet(parent[i]));
 	}
 
+	bool isSameSet(int u, int v) {
+		// Checks if u and v in same set. TIME and SPACE Complexity is the same as find_set
+		return findSet(u) == findSet(v);
+	}
+
 
 };
