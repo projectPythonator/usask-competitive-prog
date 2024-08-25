@@ -19,6 +19,14 @@ public:
 		iota(rank.begin(), rank.end(), 0);	// rank = {0, 1, 2...}
 	}
 
+	int findSet(int u) {
+		/*Recursively find which set u belongs to. Memoize on the way back up.
+
+		Complexity: Time: O(\alpha(n)) -> O(1), inverse ackerman practically constant
+				   Space: Amortized O(1) stack space
+		*/
+		return (parent[i] == i) ? i : (parent[i] = findSet(parent[i]));
+	}
 
 
 };
