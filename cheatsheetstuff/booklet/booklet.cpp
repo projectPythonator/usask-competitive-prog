@@ -88,11 +88,36 @@ public:
 	}
 
 	void primeSeiveFaster(int limit) {
-		/*Optimized wheel sieve with bit compression.
+		/*Block sieve that builds up block by block to the correct amount needed.
 
 		Complexity: Time: O(max(n lnln(sqrt(n)), n)),
-				   Space: post call O(n/ln(n)), mid-call S((n/3)/8)  4/32 == 1/8
+				   Space: post call O(n / ln(n)), mid - call O(sqrt(n))
 		*/
-		vec_int result = (limit < 2)? vec_int(): (limit == 2)?: {2}: 
+		const int sqrtBlock = round(sqrt(limit)); // block size in this version we use sqrt(n)
+		const int high = (limit - 1) / 2;	
+		vector<char> blockSieve(sqrtBlock + 1, true); // apparently char was faster than bool
+		vector<array<int, 2>> prime_and_blockStart;	  // holds prime, block start: pair
+		for (int i = 3; i < sqrtBlock; i += 2) { // fast pre-computation up to sqrt(n)
+			if (blockSieve[i]) {
+				prime_and_blockStart.push_back({i, (i*i-1) / 2});
+				for (int j = i*i; j <= sqrtBlock; j += 2*i)
+					blockSieve[j] = false;
+			}
+		}
+		blockSieve.pop_back();	// blockSieve needs to be sqrt(n) for the next section
+		for (int low = 0; low <= high; low += sqrtBlock) {		// here we fill the primes
+			fill(blockSieve.begin(), blockSieve.end(), true);	// list in blocks of size
+			for (auto& prime_and_beg : prime_and_blockStart) {	// sqrt(n)
+				int prime = prime_and_beg[0], idx = prime_and_beg[1];
+				for (; idx < sqrtBlock; idx += prime)
+					blockSieve[idx] = false;
+				i[1] = idx - sqrtBlock;	//  this line resets the block to the maintain module
+			}
+			if (low == 0)	// small corner case we need to handle
+				blockSieve[0] = false; 
+			for (int i = 0; i < sqrtBlock && low+i <= high; i++) // fill primesList up 
+				if (blockSieve[i])
+					primesList.push_back((low + i) * 2 + 1)
+		}
 	}
 };
