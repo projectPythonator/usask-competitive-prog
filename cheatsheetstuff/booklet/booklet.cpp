@@ -122,7 +122,7 @@ public:
 	}
 
 
-	void sieveOfMinPrimes_v3(int nInclusive) {  
+	void sieveOfMinPrimes(int nInclusive) {  
 		/*Stores the min or max prime divisor for each number up to n.
 
 			Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space : post call O(n)
