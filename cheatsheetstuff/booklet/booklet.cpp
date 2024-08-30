@@ -1,4 +1,4 @@
-#include <bits/stdic++.h> // This include is mostly for catch all and speed
+#include <bits/stdc++.h> // This include is mostly for catch all and speed
 
 typedef vector<int> vec_int;  // TBD if we go with typedefs
 
@@ -110,13 +110,13 @@ public:
 				int prime = prime_and_beg[0], idx = prime_and_beg[1];
 				for (; idx < sqrtBlock; idx += prime)
 					blockSieve[idx] = false;
-				i[1] = idx - sqrtBlock;	//  this line resets the block to the maintain module
+				prime_and_beg[1] = idx - sqrtBlock;	//  this line resets the block to the maintain module
 			}
 			if (low == 0)	// small corner case we need to handle
 				blockSieve[0] = false; 
-			for (int i = 0; i < sqrtBlock && low+i <= high; i++) // fill primesList up 
+			for (int i = 0; i < sqrtBlock && low + i <= high; i++) // fill primesList up 
 				if (blockSieve[i])
-					primesList.push_back((low + i) * 2 + 1)
+					primesList.push_back((low + i) * 2 + 1);
 		}
 	}
 
@@ -198,26 +198,23 @@ public:
 
 
 	void numAndSumOfDivisorsFaster(int limit) {
-		// This uses similar idea to sieve but avoids divisions. Complexity function 3.
-		inclusiveLimit++;
-		numDiv.assign(inclusiveLimit, 1);
-		sumDiv.assign(inclusiveLimit, 1);
-		curPow.assign(inclusiveLimit, 1);
-		primePowers.assign(32, 0); // use this 
-		for (int prime = 2; prime < inclusiveLimit; prime++)
-			if (numDiv[prime] == 1) {
-				int exponentLimit = lrint(log(limit) / log(prime)) + 2;
-				for (int exponent = primeToPowerN = 1; exponent < exponentLimit; exponent++) {
-					primeToPowerN *= prime;
-					primePowers[exponent] = primeToPowerN;
-					for (int multiple = primeToPowerN; multiple < inclusiveLimit; multiple += primeToPowerN)
-						curPow[multiple]++;
-				}
-				int tmp = prime - 1;
-				for (int multiple = prime; multiple < inclusiveLimit; multiple += prime) {
-					numDiv[multiple] *= curPow[multple];
-					sumDiv[multiple] *= ((primePowers[curPow[multiple]] - 1) / tmp);
-					curPow[multiple] = 1;
+		// This uses similar idea to sieve but avoids divisions. Complexity function 3
+		// sumDiv1.assign(limit + 1, 1);  // likely needs to be long long
+		numDiv1.assign(limit + 1, 1);
+		curPow.assign(limit + 1, 1); // here a
+		for (int prime = 2; prime <= limit; prime++)
+			if (numDiv1[prime] == 1) {
+				int exponentLimit = 0; long long primePows[32];
+				for (long long primeToExp = 1; primeToExp <= limit; primeToExp *= prime)
+					primePows[exponentLimit++] = primeToExp;
+				// primePows[exponentLimit] = primePows[exponentLimit-1] * prime; / use if calculating sumDiv
+				for (int exponent = 1; exponent < exponentLimit; exponent++)
+					for (int mul = primePows[exponent], primeToN = primePows[exponent]; mul <= limit; mul += primeToN)
+						curPow[mul]++;
+				for (int multiple = prime; multiple <= limit; multiple += prime) {
+					// sumDiv1[multiple] *= ((primePows[curPow[multiple]] - 1) / (prime - 1));
+					numDiv1[multiple] *= curPow[multiple];
+					curPow[multiple] = 1; // needs to happen regardless of version you are using
 				}
 			}
 	}
