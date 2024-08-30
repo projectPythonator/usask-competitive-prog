@@ -65,6 +65,9 @@ public:
 typedef vector<bool> vec_bool;
 typedef vector<int> vec_int32;
 typedef vector<long long> vec_int64;
+typedef uint64_t uint64;
+typedef __uint128_t uint128;
+
 class MathAlgorithms {
 private:
 	vec_int32 primesList, minPrimes;
@@ -218,5 +221,76 @@ public:
 					curPow[multiple] = 1; // needs to happen regardless of version you are using
 				}
 			}
+	}
+
+	bool isPrimeTrivial(int n) {
+		/*Tests if n is prime via divisors up to sqrt(n).
+
+		Complexity per call: Time: O(sqrt(n)), T(sqrt(n)/3), Space: O(1)
+		Optimizations: 6k+i method, since we checked 2 and 3 only need test form 6k+1 and 6k+5
+		*/
+		if (n < 4) return n > 1;					// base case of n in 0, 1, 2, 3
+		if (n % 2 == 0 || n % 3 == 0) return false; // this is what allows us to use 6k + i
+		int limit = lrint(sqrt(n)) + 1;
+		for (int prime = 5; prime < limit; prime += 6)
+			if (n % prime == 0 || n % (prime + 2) == 0)
+				return false;
+		return true;
+	}
+
+	uint64 mrptPowMod(uint64 base, uint64 exp, uint64 mod) {
+		/* binary exponentiation 
+		* taken from https://cp-algorithms.com
+		*/
+		uint64 result = 1;
+		base %= mod;
+		while (exp) {
+			if (exp & 1)
+				result = (uint128)result * base % mod;
+			base = (uint128)base * base % mod;
+			exp >>= 1;
+		}
+		return result;
+	}
+
+	bool mrptCompositeCheck(uint64 n, uint64 a uint64 d, int s) {
+		/*The witness test of miller rabin.
+		taken from https://cp-algorithms.com
+		Complexity per call: Time O(log^3(n)), Space: O(1)
+		*/
+		uint64 x = mrptPowMod(a, d, n);
+		if (x == 1 || x == n - 1) return false;
+		for (int r = 1; r < s; ++r) {
+			x = (uint128)x * x % n;
+			if (x == n - 1)
+				return false;
+		}
+		return true;
+	}
+
+	bool isPrimeMRPT(uint64 n) {
+		/*Handles all numbers up to 2^64-1 (maybe need to test it to gain confidence).
+		taken from https://cp-algorithms.com
+		Complexity per call: Time O(12 log^3(n)), Space: O(log2(n)) bits
+		Optimizations: test first 12 primes before running the algorithm or generate sieve.
+		*/
+		if (n < 2) return false;
+		int r = 0;
+		uint64 d = n - 1;
+		for (; (d & 1) == 0; d >>= 1, r++) {}	// turned whileloop into forloop
+
+		for (int a : {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37})
+			if (n == a || mrptCompositeCheck(n, a, d, r))
+				return n == a;
+		return true;
+	}
+
+	void primeFactorizeN(int n) {
+		/*A basic prime factorization of n function. without primes its just O(sqrt(n))
+		* 
+		* Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
+		* Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
+		*/
+
 	}
 };
