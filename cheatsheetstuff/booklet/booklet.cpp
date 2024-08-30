@@ -63,11 +63,14 @@ public:
 /// </summary>
 
 typedef vector<bool> vec_bool;
-typedef vector<int> vec_int;
+typedef vector<int> vec_int32;
+typedef vector<long long> vec_int64;
 class MathAlgorithms {
 private:
-	vec_int primesList, minPrimes;
-	vec_int numDiv, sumDiv;
+	vec_int32 primesList, minPrimes;
+	vec_int32 numDiv, numPF, numDiffPF;
+	vec_int64 sumDiv, sumPF, sumDiffPF
+
 public:
 	void sieveOfEratosthenes(int nInclusive) {
 		/*Generates list of primes up to n via eratosthenes method.
@@ -76,11 +79,11 @@ public:
 		Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
 		*/
 		int limit = (int)sqrt(nInclusive);
-		vec_int primeSieve = vec_bool(++nInclusive, True);
+		vec_bool primeSieve = vec_bool(++nInclusive, True);
 		for (int prime = 2; prime < limit; ++prime)
 			if (primeSieve[prime])
-				for (int composite = prime * prime; composite < nInclusive; composite += prime)
-					primeSieve[composite] = false;
+				for (int multiple = prime * prime; multiple < nInclusive; multiple += prime)
+					primeSieve[multiple] = false;
 		for (int prime = 2; prime < nInclusive; ++prime)
 			if (primeSieve[prime])
 				primesList.push_back(prime);
@@ -121,20 +124,20 @@ public:
 	}
 
 
-	void sieveOfMinPrimes(int nInclusive) {  
+	void sieveOfMinPrimes(int limit) {  
 		/*Stores the min or max prime divisor for each number up to n.
 
 			Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space : post call O(n)
 		*/
-		minPrimes.assign(nInclusive + 1, 0);
+		minPrimes.assign(limit + 1, 0);
 		iota(minPrimes.begin(), minPrimes.end(), 0);
-		for (int two = 2; two <= nInclusive; two += 2)
+		for (int two = 2; two <= limit; two += 2)
 			minPrimes[two] = 2;
-		for (int prime = 3; prime * prime <= nInclusive; prime += 2)
+		for (int prime = 3; prime * prime <= limit; prime += 2)
 			if (minPrimes[prime] == prime)  // we found a prime
-				for (int composite = prime * prime; composite <= nInclusive; composite += (2 * prime))
-					if (minPrimes[composite] == composite) // min not set yet
-						minPrimes[composite] = prime;
+				for (int multiple = prime * prime; multiple <= limit; multiple += (2 * prime))
+					if (minPrimes[multiple] == multiple) // min not set yet
+						minPrimes[multiple] = prime;
 	}
 	void sieveOfEratosthenesVariants(int n_inclusive) {
 		/*Seven variants of prime sieve listed above.
@@ -152,11 +155,10 @@ public:
 
 	void numAndSumOfDivisors(int limit) {
 		//  Does a basic sieve. Complexity function 1.
-		limit++;
-		numDiv.assign(limit, 1);
-		sumDiv.assign(limit, 1);
-		for (int divisor = 2; divisor < limit; divisor++)
-			for (int multiple = divisor; multiple < limit; multiple += divisor) {
+		numDiv.assign(limit + 1, 1);
+		sumDiv.assign(limit + 1, 1ll);  // likely needs to be long long
+		for (int divisor = 2; divisor <= limit; divisor++)
+			for (int multiple = divisor; multiple <= limit; multiple += divisor) {
 				numDiv[multiple]++;
 				sumDiv[multiple] += divisor;
 			}
@@ -164,14 +166,13 @@ public:
 
 	void eulerPhiPlusSumAndNumOfDiffPrimeFactors(int limit) {
 		// This is basically same as sieve just using different ops. Complexity function 2.
-		limit++;
-		numDiffPF.assign(limit, 0);
-		sumDiffPF.assign(limit, 0);
-		phi.assign(limit, 0);
+		numDiffPF.assign(limit + 1, 0);
+		sumDiffPF.assign(limit + 1, 0ll);	// likely needs to be long long
+		phi.assign(limit + 1, 0ll);			// likely needs to be long long
 		iota(phi.begin(), phi.end(), 0);
-		for (int prime = 2; prime < limit; prime++)
+		for (int prime = 2; prime <= limit; prime++)
 			if (numDiffPF[prime] == 0)
-				for (int multiple = prime; multiple < limit; multiple += prime) {
+				for (int multiple = prime; multiple <= limit; multiple += prime) {
 					numDiffPF[multiple]++;
 					sumDiffPF[multiple] += prime;
 					phi[multiple] = (phi[multiple] / prime) * (prime - 1);
@@ -180,25 +181,25 @@ public:
 
 	void numAndSumOfPrimeFactors(int limit) {
 		// This uses similar idea to sieve but avoids divisions. Complexity function 3.
-		inclusiveLimit++;
-		numPF.assign(inclusiveLimit, 0);
-		sumPF.assign(inclusiveLimit, 0);
-		for (int prime = 2; prime < inclusiveLimit; prime++)
+		numPF.assign(limit + 1, 0);
+		sumPF.assign(limit + 1, 0ll);	// likely needs to be long long
+		for (int prime = 2; prime <= limit; prime++)
 			if (numDiffPF[prime] == 0) {
-				int exponentLimit = lrint(log(limit) / log(prime)) + 2;
-				for (int exponent = primeToPowerN = 1; exponent < exponentLimit; exponent++) {
-					primeToPowerN *= prime;
-					for (int multiple = primeToPowerN; multiple < inclusiveLimit; multiple += primeToPowerN) {
+				int exponentLimit = 0;	// p^n | p^n <= limit < p^(n+1)
+				long long primePows[32];	// 32 limits us to 2^31 (2^0 == 1)
+				for (long long primeToN = 1; primeToN <= limit; primeToN *= prime)
+					primePows[exponentLimit++] = primeToN;
+				for (int exponent = 1; exponent < exponentLimit; exponent++) {
+					int primeToN = primePows[exponent];
+					for (int multiple = primeToN; multiple <= limit; multiple += primeToN) {
 						numPF[multiple]++;
 						sumPF[multiple] += prime;
-					}
-				}
-			}
+			} } } // 3 closing brackets
 	}
 
 
 	void numAndSumOfDivisorsFaster(int limit) {
-		// This uses similar idea to sieve but avoids divisions. Complexity function 3
+		// This uses similar idea to sieve but avoids divisions. Complexity function 4
 		// sumDiv1.assign(limit + 1, 1);  // likely needs to be long long
 		numDiv1.assign(limit + 1, 1);
 		curPow.assign(limit + 1, 1); // here a
