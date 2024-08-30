@@ -122,50 +122,19 @@ public:
 	}
 
 
-	void sieveOfMinPrimes_v1(int nInclusive) {  // current version needs testing on working and performance 
-		/*Stores the min or max prime divisor for each number up to n.
-
-			Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space : post call O(n)
-		*/
-		minPrimes.assign(nInclusive + 1, 2); // assign 2 skips marking evens in loop
-		minPrimes[1] = 1; 
-		for (const auto& prime : primesList) {
-			if (prime != 2) {  // skip 2 since we already set it
-				minPrimes[prime] = prime;
-				for (int curIdx = prime * prime; curIdx <= nInclusive; curIdx += (2 * prime))
-					minPrimes[curIdx] = prime;
-			}
-		}
-	}
-
-
-	void sieveOfMinPrimes_v2(int nInclusive) {  // current version needs testing on working and performance 
-		/*Stores the min or max prime divisor for each number up to n.
-
-			Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space : post call O(n)
-		*/
-		minPrimes.assign(nInclusive + 1, 0); minPrimes[1] = 1;
-		for (const auto& prime : primesList) {
-			minPrimes[prime] = prime;
-			int step = (prime == 2) ? 2 : 2 * prime;
-			for (int curIdx = prime * prime; curIdx <= nInclusive; curIdx += step)
-				minPrimes[curIdx] = prime;
-		}
-	}
-
-
-	void sieveOfMinPrimes_v3(int nInclusive) {  // current version needs testing on working and performance 
+	void sieveOfMinPrimes_v3(int nInclusive) {  
 		/*Stores the min or max prime divisor for each number up to n.
 
 			Complexity: Time: O(max(n lnln(sqrt(n)), n)), Space : post call O(n)
 		*/
 		minPrimes.assign(nInclusive + 1, 0);
-		minPrimes.iota(minPrimes.begin(), minPrimes.end(), 0);
+		iota(minPrimes.begin(), minPrimes.end(), 0);
 		for (int two = 2; two <= nInclusive; two += 2)
 			minPrimes[two] = 2;
 		for (int prime = 3; prime * prime <= nInclusive; prime += 2)
 			if (minPrimes[prime] == prime)  // we found a prime
-				for (int curIdx = prime * prime; curIdx <= nInclusive; curIdx += (2 * prime))
-					minPrimes[curIdx] = prime;
+				for (int composite = prime * prime; composite <= nInclusive; composite += (2 * prime))
+					if (minPrimes[composite] == composite)
+						minPrimes[composite] = prime;
 	}
 };
