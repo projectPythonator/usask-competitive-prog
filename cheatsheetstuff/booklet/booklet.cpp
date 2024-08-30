@@ -66,9 +66,8 @@ typedef vector<bool> vec_bool;
 typedef vector<int> vec_int;
 class MathAlgorithms {
 private:
-	xy;
-	abs;
 	vec_int primesList, minPrimes;
+	vec_int numDiv, sumDiv;
 public:
 	void sieveOfEratosthenes(int nInclusive) {
 		/*Generates list of primes up to n via eratosthenes method.
@@ -134,7 +133,32 @@ public:
 		for (int prime = 3; prime * prime <= nInclusive; prime += 2)
 			if (minPrimes[prime] == prime)  // we found a prime
 				for (int composite = prime * prime; composite <= nInclusive; composite += (2 * prime))
-					if (minPrimes[composite] == composite)
+					if (minPrimes[composite] == composite) // min not set yet
 						minPrimes[composite] = prime;
+	}
+	void sieveOfEratosthenesVariants(int n_inclusive) {
+		/*Seven variants of prime sieve listed above.
+
+			Complexity :
+				function 1 : Time : O(n log(n)), Space : O(n)
+				function 2 : Time : O(n lnln(n)), Space : O(n)
+				function 3 : Time : O(n lnln(n) log(n)), Space : O(n)
+				function 4 : Time : O(n lnln(n) log(n)), Space : O(n)
+			*/
+			euler_phi_plus_sum_and_number_of_diff_prime_factors(n_inclusive)
+			num_and_sum_of_divisors(n_inclusive)
+			num_and_sum_of_prime_factors(n_inclusive)
+	}
+
+	void numAndSumOfDivisors(int limit) {
+		//  Does a basic sieve. Complexity function 1.
+		limit++;
+		numDiv.assign(limit, 1);
+		sumDiv.assign(limit, 1);
+		for (int divisor = 2; divisor < limit; divisor++)
+			for (int multiple = divisor; multiple < limit; multiple += divisor) {
+				numDiv[multiple]++;
+				sumDiv[multiple] += divisor;
+			}
 	}
 };
