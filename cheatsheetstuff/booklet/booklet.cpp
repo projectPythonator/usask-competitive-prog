@@ -57,6 +57,74 @@ public:
 	}
 };
 
+/// <summary>
+/// ///////////////////////////////////////////////////////////////////
+/// </summary>
+
+typedef pair<int, int> adj_pair;
+typedef vector<adj_pair> adj_edge_list_wt;
+typedef vector<adj_edge_list_wt> adj_list_wt;
+typedef vector<int> adj_edge_list;
+typedef vector<adj_edge_list> adj_list;
+typedef vector<int> mat_row;
+typedef vector<adj_row> adj_mat;
+typedef pair<int, int> edge_a_b;
+typedef pair<int, edge_a_b> edge_weighted;
+typedef vector<edge_weighted> edge_list;
+typedef unordered_map<int, int> data_map;	// can change left side to whatever you need
+typedef vector<int> index_map;				// type must match leftside type above
+typedef vector<int> grid_row;
+typedef vector<grid_row> grid_graph;
+
+
+class Graph {
+private:
+	int numEdges, numNodes, numRows, numCols;
+	adj_list adjList, adjListTrans;
+	adj_list_wt adjListWt, adjListTransWt
+	adj_mat adjMatrix;
+	edge_list = edgeList;	// can also make this into a heap
+	data_map dataToIndex;
+	index_map IndexToData;
+	grid_graph grid;
+public:
+	int convertDataExample(int data) {
+		/*Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair.*/
+		if (!dataToIndex.contains(data) {
+			dataToIndex[data] = indexToData.size();
+			indexToData.push_back(data);
+		}
+		return dataToIndex[data];
+	}
+
+	void addEdgeUVWExample(int u, int v, int wt, int data) {
+		/*A pick and choose function will convert u, v into index form then add it to the
+		structure you need.
+		*/
+		int node_u = convertDataExample(u);
+		int node_v = convertDataExample(v);
+
+		adjList[node_u].push_back(node_v);
+		//adjListWt[node_u].push_back({ node_v, wt });	// use this for weighted
+		adjMatrix[node_u][node_v] = wt;					// Adjacency matrix usage
+		edgeList.push_back({ wt, {node_u, node_v} });	// edge list usage
+		edgeList.push_back({ not_v, {wt, data} });		// this one is used for flow
+		adjList[node_u].push_back(edgeList.size() - 1));
+	}
+
+	void addEdgeUndirected(int u, int v, int wt, int data) {
+		/*undirected graph version of the previous function. wt can be omitted.*/
+		addEdgeUVWExample(u, v, wt, data);
+		addEdgeUVWExample(v, u, wt, data);
+	}
+
+	void fillGridGraph(grid_graph newGrid) {
+		numRows = newGrid.size();
+		numCols = newGrid[0].size();
+		copy(newGrid.begin(), newGrid.end(), back_inserter(grid));
+	}
+};
+
 
 /// <summary>
 /// ///////////////////////////////////////////////////////////////////
