@@ -285,12 +285,22 @@ public:
 		return true;
 	}
 
-	void primeFactorizeN(int n) {
+	vec_int32 primeFactorizeN(int n) {
 		/*A basic prime factorization of n function. without primes its just O(sqrt(n))
 		* 
 		* Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
 		* Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
 		*/
-
+		vec_int32 factors;
+		for (auto& prime : primesList) {
+			if (prime * prime > n) break;
+			for (; n % prime == 0; n /= prime)
+				factors.push_back(prime);
+		}
+		if (n > 1)
+			factors.push_back(n);
+		return factors;
 	}
+
+
 };
