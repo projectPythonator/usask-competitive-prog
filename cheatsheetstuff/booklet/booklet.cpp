@@ -72,7 +72,8 @@ class MathAlgorithms {
 private:
 	vec_int32 primesList, minPrimes;
 	vec_int32 numDiv, numPF, numDiffPF;
-	vec_int64 sumDiv, sumPF, sumDiffPF
+	vec_int32 numFactorialPF;
+	vec_int64 sumDiv, sumPF, sumDiffPF;
 
 public:
 	void sieveOfEratosthenes(int nInclusive) {
@@ -312,5 +313,14 @@ public:
 		for (; n > 1; n /= minPrimes[n])
 			factors.push_back(minPrimes[n]);
 		return factors;
+	}
+
+	void factorialPrimeFactors(int limit) {
+		int endPoint = upper_bound(primesList.begin(), primesList.end(), limit);
+		numFactorialPF.assign(endPoint, 0);
+		for (int idx = 0; idx < endPoint; ++idx) {
+			int prime = primesList[idx], primeAmt = 0;
+			uint64 x = limit;
+		}
 	}
 };
