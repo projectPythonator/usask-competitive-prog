@@ -145,9 +145,9 @@ public:
 				function 3 : Time : O(n lnln(n) log(n)), Space : O(n)
 				function 4 : Time : O(n lnln(n) log(n)), Space : O(n)
 			*/
-			euler_phi_plus_sum_and_number_of_diff_prime_factors(n_inclusive)
-			num_and_sum_of_divisors(n_inclusive)
-			num_and_sum_of_prime_factors(n_inclusive)
+		euler_phi_plus_sum_and_number_of_diff_prime_factors(n_inclusive);
+		num_and_sum_of_divisors(n_inclusive);
+		num_and_sum_of_prime_factors(n_inclusive);
 	}
 
 	void numAndSumOfDivisors(int limit) {
@@ -159,6 +159,66 @@ public:
 			for (int multiple = divisor; multiple < limit; multiple += divisor) {
 				numDiv[multiple]++;
 				sumDiv[multiple] += divisor;
+			}
+	}
+
+	void eulerPhiPlusSumAndNumOfDiffPrimeFactors(int limit) {
+		// This is basically same as sieve just using different ops. Complexity function 2.
+		limit++;
+		numDiffPF.assign(limit, 0);
+		sumDiffPF.assign(limit, 0);
+		phi.assign(limit, 0);
+		iota(phi.begin(), phi.end(), 0);
+		for (int prime = 2; prime < limit; prime++)
+			if (numDiffPF[prime] == 0)
+				for (int multiple = prime; multiple < limit; multiple += prime) {
+					numDiffPF[multiple]++;
+					sumDiffPF[multiple] += prime;
+					phi[multiple] = (phi[multiple] / prime) * (prime - 1);
+				}
+	}
+
+	void numAndSumOfPrimeFactors(int limit) {
+		// This uses similar idea to sieve but avoids divisions. Complexity function 3.
+		inclusiveLimit++;
+		numPF.assign(inclusiveLimit, 0);
+		sumPF.assign(inclusiveLimit, 0);
+		for (int prime = 2; prime < inclusiveLimit; prime++)
+			if (numDiffPF[prime] == 0) {
+				int exponentLimit = lrint(log(limit) / log(prime)) + 2;
+				for (int exponent = primeToPowerN = 1; exponent < exponentLimit; exponent++) {
+					primeToPowerN *= prime;
+					for (int multiple = primeToPowerN; multiple < inclusiveLimit; multiple += primeToPowerN) {
+						numPF[multiple]++;
+						sumPF[multiple] += prime;
+					}
+				}
+			}
+	}
+
+
+	void numAndSumOfDivisorsFaster(int limit) {
+		// This uses similar idea to sieve but avoids divisions. Complexity function 3.
+		inclusiveLimit++;
+		numDiv.assign(inclusiveLimit, 1);
+		sumDiv.assign(inclusiveLimit, 1);
+		curPow.assign(inclusiveLimit, 1);
+		primePowers.assign(32, 0); // use this 
+		for (int prime = 2; prime < inclusiveLimit; prime++)
+			if (numDiv[prime] == 1) {
+				int exponentLimit = lrint(log(limit) / log(prime)) + 2;
+				for (int exponent = primeToPowerN = 1; exponent < exponentLimit; exponent++) {
+					primeToPowerN *= prime;
+					primePowers[exponent] = primeToPowerN;
+					for (int multiple = primeToPowerN; multiple < inclusiveLimit; multiple += primeToPowerN)
+						curPow[multiple]++;
+				}
+				int tmp = prime - 1;
+				for (int multiple = prime; multiple < inclusiveLimit; multiple += prime) {
+					numDiv[multiple] *= curPow[multple];
+					sumDiv[multiple] *= ((primePowers[curPow[multiple]] - 1) / tmp);
+					curPow[multiple] = 1;
+				}
 			}
 	}
 };
