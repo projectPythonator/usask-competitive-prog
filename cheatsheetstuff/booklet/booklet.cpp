@@ -200,11 +200,11 @@ public:
 
 	void numAndSumOfDivisorsFaster(int limit) {
 		// This uses similar idea to sieve but avoids divisions. Complexity function 4
-		// sumDiv1.assign(limit + 1, 1);  // likely needs to be long long
-		numDiv1.assign(limit + 1, 1);
+		// sumDiv.assign(limit + 1, 1ll);  // likely needs to be long long
+		numDiv.assign(limit + 1, 1);
 		curPow.assign(limit + 1, 1); // here a
 		for (int prime = 2; prime <= limit; prime++)
-			if (numDiv1[prime] == 1) {
+			if (numDiv[prime] == 1) {
 				int exponentLimit = 0; long long primePows[32];
 				for (long long primeToExp = 1; primeToExp <= limit; primeToExp *= prime)
 					primePows[exponentLimit++] = primeToExp;
@@ -213,8 +213,8 @@ public:
 					for (int mul = primePows[exponent], primeToN = primePows[exponent]; mul <= limit; mul += primeToN)
 						curPow[mul]++;
 				for (int multiple = prime; multiple <= limit; multiple += prime) {
-					// sumDiv1[multiple] *= ((primePows[curPow[multiple]] - 1) / (prime - 1));
-					numDiv1[multiple] *= curPow[multiple];
+					// sumDiv[multiple] *= ((primePows[curPow[multiple]] - 1) / (prime - 1));
+					numDiv[multiple] *= curPow[multiple];
 					curPow[multiple] = 1; // needs to happen regardless of version you are using
 				}
 			}
