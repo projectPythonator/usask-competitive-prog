@@ -302,5 +302,15 @@ public:
 		return factors;
 	}
 
-
+	vec_int32 primeFactorizeNLogN(int n) {
+		/*An optimized prime factorization of n function based on min primes already sieved.
+		*
+		* Complexity: Time: O(log n), Space: O(log n)
+		* Optimization: assign append to function and assign minPrimes[n] to a value in the loop
+		*/
+		vec_int32 factors;
+		for (; n > 1; n /= minPrimes[n])
+			factors.push_back(minPrimes[n]);
+		return factors;
+	}
 };
