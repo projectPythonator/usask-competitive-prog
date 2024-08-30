@@ -315,12 +315,58 @@ public:
 		return factors;
 	}
 
+	int primeFactorizeNVariants(int n) {
+		/*Covers all the variants listed above, holds the same time and space complexity*/
+		uint64 sumDiffPFV = 0, sumPFV = 0, sumDivV = 1, eulerPhi = n;
+		int numDiffPFV = 0, numPFV = 0, numDivV = 1;
+		for (auto& prime : primesList) {  // for(int prime = 2; prime*prime <= n; prime++)
+			if (prime * prime > n) break;
+			if (n % prime == 0) {
+				uint64 total = 1;	// for sum of divisors
+				int power = 0;		// for num of divisors
+				for (uint64 mul = prime; n % prime == 0; n /= prime) {
+					power++;	// for num prime factors, num divisors, and sum prime factors
+					total += mul;	// for sum divisors
+					mul *= prime;	// for sum divisors
+				}
+				sumDiffPFV += prime;
+				numDiffPFV++;
+				sumPFV += (prime * power);
+				numPFV += power;
+				numDivV *= (power + 1);
+				sumDivV *= total;
+				eulerPhi -= (eulerPhi / prime);
+			}
+		}
+		if (n > 1) {
+			sumDiffPFV += n;
+			numDiffPFV++;
+			sumPFV += n;
+			numPFV++;
+			numDivV *= 2;
+			sumDivV *= (n + 1);
+			eulerPhi -= (eulerPhi / n);
+		}
+		return numDiffPFV;
+	}
+
 	void factorialPrimeFactors(int limit) {
+		/* NHI I lost this or were I got the idea but it works for factorizing a factorial
+		* 
+		* Complexity: Time: O(n log n)), Space: O(n)
+		*/
 		int endPoint = upper_bound(primesList.begin(), primesList.end(), limit);
+		endPoint = endPoint - primesList.begin();
 		numFactorialPF.assign(endPoint, 0);
 		for (int idx = 0; idx < endPoint; ++idx) {
-			int prime = primesList[idx], primeAmt = 0;
-			uint64 x = limit;
+			int prime = primesList[idx];
+			uint64 primeAmt = 0;
+			for (int x = limit; x; primeAmt += x)
+				x /= prime;
+			numFactorialPF[idx] = primeAmt;
 		}
 	}
+
+
+
 };
