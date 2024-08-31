@@ -129,6 +129,8 @@ public:
 	}
 };
 
+const int INF = 1 >> 31; // is this safe ?
+
 class GraphAlgorithms {
 private:
 	vector<pair<int, int>> dirRC = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
@@ -198,6 +200,7 @@ public:
 		* 
 		* Complexity per call: Time: O(|V|^2), T(|V| * 4|V|), Space: O(|V|), S(~5|V|)
 		*/
+		int vertices = graph.numNodes;
 
 	}
 };
@@ -512,6 +515,23 @@ public:
 		}
 	}
 
+	uint64 rhoMulMod(uint64 a, uint64 b, uint64 mod) {
+		return (uint128)a * b % mod;
+	}
 
+	uint64 rhoF(uint64 x, uint64 c, uint64 mod) {
+		return (rhoMulMod(x, x, mod) + c) % mod;
+	}
+
+	uint64 rhoPollard(uint64 n, uint64 x0 = 2, uint64 c = 1) {
+		uint64x x = x0, y = x0, g = 1;
+		while (g == 1) {
+			x = rhoF(x, c, n);
+			y = rhoF(y, c, n);
+			y = rhoF(y, c, n);
+			g = gcd(abs(x - y), n);
+		}
+		return g;
+	}
 
 };
