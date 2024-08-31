@@ -55,6 +55,10 @@ public:
 		// Gives you the size of set u. TIME and SPACE Complexity is the same as find_set
 		return setSizes[findSet(u);
 	}
+
+	int getNumSets() {
+		return numSets;
+	}
 };
 
 /// <summary>
@@ -122,6 +126,79 @@ public:
 		numRows = newGrid.size();
 		numCols = newGrid[0].size();
 		copy(newGrid.begin(), newGrid.end(), back_inserter(grid));
+	}
+};
+
+class GraphAlgorithms {
+private:
+	vector<pair<int, int>> dirRC = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
+	Graph graph;
+	edge_list minSpanningTree;
+public:
+	void floodFillViaDFS(int row, int col, int oldVal, int newVal) {
+		/*Computes flood fill graph traversal via recursive depth first search.
+		* 
+		* Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids |V|=row*col and |E|=4*|V|
+		* More uses: Region Colouring, Connectivity, Area/island Size, misc
+		* Input:
+		*  row, col: integer pair representing current grid position
+		*  old_val, new_val: unexplored state, the value of an explored state
+		*/
+		graph.grid[row][col] = newVal;
+		for (const auto& [rowMod, colMod] : dirRC) {
+			int newRow = row + rowMod, newCol = col + colMod;
+			if (0 <= newRow && newRow < graph.numRows &&
+				0 <= newCol && newCol < graph.numCols &&
+				graph.grid[newRow][newCol] == oldVal)
+				floodFillViaDFS(newRow, newCol, oldVal, newVal);
+		}
+	}
+
+	void floodFillViaBFS(int startRow, int startCol, int oldVal, int newVal) {
+		/* Computes flood fill graph traversal via breadth first search. Use on grid graphs.
+		* 
+		* Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids |V|=row*col and |E|=4*|V|
+		* More uses: previous uses tplus shortest connected pah
+		*/
+		deque<pair<int, int>> q = { {startRow, startCol} };	// q to avoid name conflicts
+		while (!q.empty()) {
+			const auto& [newRow, newCol] = q.back(); q.pop_back();
+			for (const auto& [rowMod, colMod] : dirRC) {
+				int newRow = row + rowMod, newCol = col + colMod;
+				if (0 <= newRow && newRow < graph.numRows &&
+					0 <= newCol && newCol < graph.numCols &&
+					graph.grid[newRow][newCol] == oldVal) {
+					graph.grid[newRow][newCol] = newVal;
+					q.push_front({ newRow, newCol });
+		} } } // 3 brackets closes up to the loop
+	}
+
+	void minSpanningTreeViaKruskalsWithHeaps() {
+		/*Computes mst of graph G stored in edge_list, space optimized via heap.
+		* 
+		* Complexity per call: Time: O(|E| log |V|), Space: O(|E| log |E|) + Union_Find
+		* More uses: finding min spanning tree
+		* Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning
+		* Optimization: We use a heap to make space comp. O(|E|). instead of O(|E|log |E|)
+		* when using sort, however edge_list is CONSUMED. Also uses space optimization
+		*/
+		int vertices = graph.numNodes;
+		sort(graph.edgeList.begin(), graph.edgeList.end());  // optimization line here
+		auto UFDS = UnionFindDisjointSets(vertices);
+		for (const auto& [wt, [u, v]] : adj_edge_list) { // need to pop heap in loop
+			if (UFDS.getNumSets() == 1) break;
+			if (!UFDS.isSameSet(u, v)) {
+				minSpanningTree.push_back({ wt, {u, v} });
+				UFDS.unionSet(u, v);
+		} } //  2 brack closed on loop
+	}
+
+	void primsViaAdjMatrix(int source) {
+		/*Find min weight edge in adjacency matrix implementation of prims.
+		* 
+		* Complexity per call: Time: O(|V|^2), T(|V| * 4|V|), Space: O(|V|), S(~5|V|)
+		*/
+
 	}
 };
 
