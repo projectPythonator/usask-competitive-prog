@@ -22,6 +22,7 @@ typedef vector<int32_Pair> int32_Pair_Vec;
 typedef vector<int32_Triple> int32_Triple_Vec;
 typedef vector<int32_Quadruple> int32_Quadruple_Vec;
 
+// for when you need to avoid costly rehashing of things or if you want 0-(n-1) ordering
 typedef unordered_map<dataType, int32>	DAT_type_to; // Direct access table helper.
 typedef vector<dataType>								DAT_type_from; // Direct access table helper.
 
@@ -37,54 +38,45 @@ private:
 	int32_Vec parent, rank, setSizes;
 	int32 numSets;
 public:
+	// Attributes declared here must be passed in or global if not class based implementation
 	UnionFindDisjointSets(int32 n) {
-		// Attributes declared here must be passed in or global if not used in classes
-		parent.assign(n, 0);
-		setSizes.assign(n, 1);							// optional information
-		rank.assign(n, 0);									// optional optimization 
+		parent.assign		(n, 0);
+		setSizes.assign	(n, 1);							// optional information
+		rank.assign			(n, 0);							// optional optimization 
 		iota(rank.begin(), rank.end(), 0);	// rank = {0, 1, 2...}
 		numSets = n;												// optional information
 	}
 
-	int findSet(int u) {
-		/*Recursively find which set u belongs to. Memoize on the way back up.
+	// Recursively find which set u belongs to. Memoize on the way back up.
+	//
+	// Complexity: Time: O(\alpha(n)) -> O(1), inverse ackerman practically constant
+	//						Space: Amortized O(1) stack space
+	int32 findSet(int32 u) { return (parent[i] == i) ? i : (parent[i] = findSet(parent[i])); }
+	
+	// Checks if u and v in same set. TIME and SPACE Complexity is the same as findSet
+	bool isSameSet(int32 u, int32 v) { return findSet(u) == findSet(v); }
 
-		Complexity: Time: O(\alpha(n)) -> O(1), inverse ackerman practically constant
-				   Space: Amortized O(1) stack space
-		*/
-		return (parent[i] == i) ? i : (parent[i] = findSet(parent[i]));
-	}
+	// Gives you the size of set u. TIME and SPACE Complexity is the same as find_set
+	int sizeOfSet(int u) { return setSizes[findSet(u); }
 
-	bool isSameSet(int u, int v) {
-		// Checks if u and v in same set. TIME and SPACE Complexity is the same as findSet
-		return findSet(u) == findSet(v);
-	}
-
-	void unionSet(int u, int v) {
-		/* Join the set that contains u with the set that contains v.
-
-		Complexity: Time: O(\alpha(n)) -> O(1), inverse ackerman practically constant
-				   Space: Amortized O(1) stack space
-		*/
+	// just returns private value numSets
+	int getNumSets() const { return numSets; }
+	
+	// Join the set that contains u with the set that contains v.
+	//
+	//	Complexity: Time: O(\alpha(n))->O(1), inverse ackerman practically constant
+	//						 Space: Amortized O(1) stack space
+	void unionSet(int32 u, int32 v) {
 		if (!isSameSet(u, v)) {
-			int uParent = findSet(u), vParent = findSet(v);
+			int32 uParent = findSet(u), vParent = findSet(v);
 			if (rank[uParent] > rank[vParent])	// uParent shorter than vParent
 				swap(uParent, vParent);
 			if (rank[uParent] == rank[vParent]) // optional speedup
 				parent[vParent]++;
-			parent[uParent] = vParent;				// line that joins u and v
+			parent[uParent] = vParent;							// line that joins u and v
 			setsize[vParent] += setSizes[uParent];	// u = v so add join the size
-			numSets--;
+			numSets--;	// if you need numSets keep this line
 		}
-	}
-
-	int sizeOfSet(int u) {
-		// Gives you the size of set u. TIME and SPACE Complexity is the same as find_set
-		return setSizes[findSet(u);
-	}
-
-	int getNumSets() {
-		return numSets;
 	}
 };
 
