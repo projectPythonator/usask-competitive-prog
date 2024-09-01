@@ -87,7 +87,7 @@ public:
 /// </summary>
 
 typedef int32_pair edge_U2V;			// used for unweighted edges 
-typedef int32_pair edge_WtV;			// this might change if wt is not an int32
+typedef int32_pair edge_VWt;			// this might change if wt is not an int32
 typedef int32_triple edge_WTU2V;	// this might change if wt is not an int32
 typedef int32_triple edge_VWtDat;	// this might change if wt or data is not an int32
 
@@ -114,8 +114,8 @@ private:
 	index_map indexToData;
 	grid_graph grid;
 public:
-	int convertDataExample(int data) {
-		/*Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair.*/
+	// Converts data to the form: int u | 0 <= u < |V|, stores (data, u) pair.
+	int32 convertDataExample(dataType data) {
 		if (!dataToIndex.contains(data) {
 			dataToIndex[data] = indexToData.size();
 			indexToData.push_back(data);
@@ -123,23 +123,22 @@ public:
 		return dataToIndex[data];
 	}
 
-	void addEdgeUVWExample(int u, int v, int wt, int data) {
-		/*A pick and choose function will convert u, v into index form then add it to the
-		structure you need.
-		*/
-		int node_u = convertDataExample(u);
-		int node_v = convertDataExample(v);
+	// A pick and choose function will convert u, v into index form then add it to the
+	// structure you need.
+	void addEdgeUVWtExample(dataType u, dataType v, int32 wt, int32 data) {
+		int32 node_u = convertDataExample(u);
+		int32 node_v = convertDataExample(v);
 
 		adjList[node_u].push_back(node_v);
-		//adjListWt[node_u].push_back({ node_v, wt });	// use this for weighted
-		adjMatrix[node_u][node_v] = wt;					// Adjacency matrix usage
-		edgeList.push_back({ wt, {node_u, node_v} });	// edge list usage
-		edgeList.push_back({ node_v, {wt, data} });		// this one is used for flow
-		adjList[node_u].push_back(edgeList.size() - 1));
+		// adjListWt[node_u].push_back({ node_v, wt });	// use this for weighted
+		adjMatrix[node_u][node_v] = wt;									// Adjacency matrix usage
+		edgeList.push_back({ wt, node_u, node_v });			// edge list usage
+		edgeList.push_back({ node_v, wt, data });				// this one is used for flow
+		adjList[node_u].push_back(edgeList.size() - 1));// also for flow ?
 	}
 
-	void addEdgeUndirected(int u, int v, int wt, int data) {
-		/*undirected graph version of the previous function. wt can be omitted.*/
+	// undirected graph version of the previous function. wt can be omitted.
+	void addEdgeUndirected(dataType u, dataType v, int32 wt, int32 data) {
 		addEdgeUVWExample(u, v, wt, data);
 		addEdgeUVWExample(v, u, wt, data);
 	}
