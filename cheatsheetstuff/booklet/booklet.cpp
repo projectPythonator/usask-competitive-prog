@@ -477,7 +477,7 @@ public:
 	int32 primeFactorizeNVariants(int32 n) {
 		int64 sumDiffPFV = 0, sumPFV = 0, sumDivV = 1, eulerPhi = n;
 		int32 numDiffPFV = 0, numPFV = 0, numDivV = 1;
-		for (auto& prime : primesList) {  // for(int prime = 2; prime*prime <= n; prime++)
+		for (const auto& prime : primesList) {  // for(int prime=2; prime*prime<=n; prime++)
 			if (prime * prime > n) break;
 			if (n % prime == 0) {
 				int64 total = 1;	// for sum of divisors
