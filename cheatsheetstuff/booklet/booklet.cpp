@@ -107,7 +107,8 @@ private:
 	adj_list adjList, adjListTrans;
 	adj_list_wt adjListWt, adjListTransWt
 	adj_mat adjMatrix;
-	edge_list = edgeList;	// can also make this into a heap
+	edge_list edgeList;	// can also make this into a heap
+	edge_list_flow edgeListFlow;
 	data_map dataToIndex;
 	index_map IndexToData;
 	grid_graph grid;
