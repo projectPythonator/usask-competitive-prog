@@ -110,7 +110,7 @@ private:
 	edge_list edgeList;	// can also make this into a heap
 	edge_list_flow edgeListFlow;
 	data_map dataToIndex;
-	index_map IndexToData;
+	index_map indexToData;
 	grid_graph grid;
 public:
 	int convertDataExample(int data) {
