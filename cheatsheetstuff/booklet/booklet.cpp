@@ -154,35 +154,34 @@ const int INF = 1 >> 31; // is this safe ?
 
 class GraphAlgorithms {
 private:
-	vector<pair<int, int>> dirRC = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
+	int32_Pair_Vec dirRC = { {1, 0}, {0, 1}, {-1, 0}, {0, -1} };
 	Graph graph;
 	edge_list minSpanningTree;
 public:
-	void floodFillViaDFS(int row, int col, int oldVal, int newVal) {
-		/*Computes flood fill graph traversal via recursive depth first search.
-		* 
-		* Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids |V|=row*col and |E|=4*|V|
-		* More uses: Region Colouring, Connectivity, Area/island Size, misc
-		* Input:
-		*  row, col: integer pair representing current grid position
-		*  old_val, new_val: unexplored state, the value of an explored state
-		*/
+
+	// Computes flood fill graph traversal via recursive depth first search.
+	//
+	//	Complexity : Time: O(|V|+|E|), Space: O(|V|): for grids |V| = row*col and |E| = 4*|V|
+	//	More uses : Region Colouring, Connectivity, Area / island Size, misc
+	//	Input:
+	//		row, col : integer pair representing current grid position
+	//		old_val, new_val : unexplored state, the value of an explored state
+	void floodFillViaDFS(int32 row, int32 col, int32 oldVal, int32 newVal) {
 		graph.grid[row][col] = newVal;
 		for (const auto& [rowMod, colMod] : dirRC) {
-			int newRow = row + rowMod, newCol = col + colMod;
+			int32 newRow = row + rowMod, newCol = col + colMod;
 			if (0 <= newRow && newRow < graph.numRows &&
-				0 <= newCol && newCol < graph.numCols &&
-				graph.grid[newRow][newCol] == oldVal)
+					0 <= newCol && newCol < graph.numCols &&
+					graph.grid[newRow][newCol] == oldVal)
 				floodFillViaDFS(newRow, newCol, oldVal, newVal);
 		}
 	}
 
+	// Computes flood fill graph traversal via breadth first search.Use on grid graphs.
+	//
+	//	Complexity: Time: O(|V|+|E|), Space: O(|V|): for grids |V| = row*col and |E| = 4*|V|
+	//	More uses : previous uses tplus shortest connected pah
 	void floodFillViaBFS(int startRow, int startCol, int oldVal, int newVal) {
-		/* Computes flood fill graph traversal via breadth first search. Use on grid graphs.
-		* 
-		* Complexity: Time: O(|V| + |E|), Space: O(|V|): for grids |V|=row*col and |E|=4*|V|
-		* More uses: previous uses tplus shortest connected pah
-		*/
 		deque<pair<int, int>> q = { {startRow, startCol} };	// q to avoid name conflicts
 		while (!q.empty()) {
 			const auto& [newRow, newCol] = q.back(); q.pop_back();
