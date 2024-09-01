@@ -51,7 +51,7 @@ public:
 	//
 	// Complexity: Time: O(\alpha(n)) -> O(1), inverse ackerman practically constant
 	//						Space: Amortized O(1) stack space
-	int32 findSet(int32 u) { return (parent[i] == i) ? i : (parent[i] = findSet(parent[i])); }
+	int32 findSet(int32 u) { return (parent[u] == u) ? u : (parent[u] = findSet(parent[u])); }
 	
 	// Checks if u and v in same set. TIME and SPACE Complexity is the same as findSet
 	bool isSameSet(int32 u, int32 v) { return findSet(u) == findSet(v); }
