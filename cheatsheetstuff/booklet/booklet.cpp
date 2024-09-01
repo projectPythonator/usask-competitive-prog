@@ -261,7 +261,7 @@ public:
 	//
 	//	Complexity: Time: O(max(n lnln(sqrt(n)), n)),
 	//		    Space: post call O(n / ln(n)), mid - call O(sqrt(n))
-	void primeSeiveFaster(int32 limit) {
+	void primeSieveFaster(int32 limit) {
 		const int sqrtBlock = round(sqrt(limit)) + 1; // block size + 1 for safety :)
 		const int high = (limit - 1) / 2;	
 		char_vec blockSieve(sqrtBlock + 1, true);		// apparently char was faster than bool?
@@ -271,8 +271,7 @@ public:
 				prime_and_blockStart.push_back({i, (i*i-1) / 2});
 				for (int32 j = i*i; j <= sqrtBlock; j += 2*i)
 					blockSieve[j] = false;
-			}
-		}
+		} } // 2 brackets closes the forloop
 		blockSieve.pop_back();	// blockSieve needs to be sqrt(n) for the next section
 		for (int32 low = 0; low <= high; low += sqrtBlock) {		// here we fill the primes
 			fill(blockSieve.begin(), blockSieve.end(), true);	// list in blocks of size
