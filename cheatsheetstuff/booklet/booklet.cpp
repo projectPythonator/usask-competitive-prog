@@ -386,16 +386,16 @@ public:
 			}
 	}
 
-	bool isPrimeTrivial(int n) {
-		/*Tests if n is prime via divisors up to sqrt(n).
 
-		Complexity per call: Time: O(sqrt(n)), T(sqrt(n)/3), Space: O(1)
-		Optimizations: 6k+i method, since we checked 2 and 3 only need test form 6k+1 and 6k+5
-		*/
-		if (n < 4) return n > 1;					// base case of n in 0, 1, 2, 3
-		if (n % 2 == 0 || n % 3 == 0) return false; // this is what allows us to use 6k + i
-		int limit = lrint(sqrt(n)) + 1;
-		for (int prime = 5; prime < limit; prime += 6)
+	//Tests if n is prime via divisors up to sqrt(n).
+	//
+	//	Complexity per call : Time: O(sqrt(n)), T(sqrt(n) / 3), Space : O(1)
+	//	Optimizations: 6k+i method, since we checked 2 and 3 only need test form 6k+1 and 6k+5
+	bool isPrimeTrivial(int32 n) {
+		if (n < 4) return n > 1;										// base case of n in 0, 1, 2, 3
+		if (n % 2 == 0 || n % 3 == 0) return false; // this is what allows us to use 6k+i
+		int32 limit = lrint(sqrt(n)) + 1;
+		for (int32 prime = 5; prime < limit; prime += 6)
 			if (n % prime == 0 || n % (prime + 2) == 0)
 				return false;
 		return true;
