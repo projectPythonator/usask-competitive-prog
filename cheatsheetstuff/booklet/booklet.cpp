@@ -473,16 +473,16 @@ public:
 		return factors;
 	}
 
-	int primeFactorizeNVariants(int n) {
-		/*Covers all the variants listed above, holds the same time and space complexity*/
-		uint64 sumDiffPFV = 0, sumPFV = 0, sumDivV = 1, eulerPhi = n;
-		int numDiffPFV = 0, numPFV = 0, numDivV = 1;
+	// Covers all the variants listed above, holds the same time and space complexity
+	int32 primeFactorizeNVariants(int32 n) {
+		int64 sumDiffPFV = 0, sumPFV = 0, sumDivV = 1, eulerPhi = n;
+		int32 numDiffPFV = 0, numPFV = 0, numDivV = 1;
 		for (auto& prime : primesList) {  // for(int prime = 2; prime*prime <= n; prime++)
 			if (prime * prime > n) break;
 			if (n % prime == 0) {
-				uint64 total = 1;	// for sum of divisors
-				int power = 0;		// for num of divisors
-				for (uint64 mul = prime; n % prime == 0; n /= prime) {
+				int64 total = 1;	// for sum of divisors
+				int32 power = 0;	// for num of divisors
+				for (int64 mul = prime; n % prime == 0; n /= prime) {
 					power++;	// for num prime factors, num divisors, and sum prime factors
 					total += mul;	// for sum divisors
 					mul *= prime;	// for sum divisors
