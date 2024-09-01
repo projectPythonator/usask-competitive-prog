@@ -86,25 +86,24 @@ public:
 /// ///////////////////////////////////////////////////////////////////
 /// </summary>
 
-typedef pair<int, int> adj_pair;
-typedef vector<adj_pair> adj_edge_list_wt;
-typedef vector<adj_edge_list_wt> adj_list_wt;
-typedef vector<int> adj_edge_list;
-typedef vector<adj_edge_list> adj_list;
-typedef vector<int> mat_row;
-typedef vector<adj_row> adj_mat;
-typedef pair<int, int> edge_a_b;
-typedef pair<int, edge_a_b> edge_weighted;
-typedef vector<edge_weighted> edge_list;
-typedef unordered_map<int, int> data_map;	// can change left side to whatever you need
-typedef vector<int> index_map;				// type must match leftside type above
-typedef vector<int> grid_row;
-typedef vector<grid_row> grid_graph;
+typedef int32_pair edge_U2V;			// used for unweighted edges 
+typedef int32_pair edge_WtV;			// this might change if wt is not an int32
+typedef int32_triple edge_WTU2V;	// this might change if wt is not an int32
+typedef int32_triple edge_VWtDat;	// this might change if wt or data is not an int32
 
+typedef vector<edge_WTU2V> edge_list;
+typedef vector<edge_VWtDat> edge_list_flow;	// used for flow graphs
+typedef vector<int32_Pair_Vec> adj_list_wt;	// change to match edge_WtV if needed
+typedef vector<int32_Vec> adj_list;	
+typedef vector<int32_Vec> adj_mat;					// change inner type if matrix doesn't use int
+typedef vector<int32_Vec> grid_graph;				// change inner type if grid doesn't use int
+
+typedef DAT_type_to data_map;			// can change data type as needed. default at top of book
+typedef DAT_type_from index_map;	// type must match leftside type above
 
 class Graph {
 private:
-	int numEdges, numNodes, numRows, numCols;
+	int32 numEdges, numNodes, numRows, numCols;
 	adj_list adjList, adjListTrans;
 	adj_list_wt adjListWt, adjListTransWt
 	adj_mat adjMatrix;
@@ -133,7 +132,7 @@ public:
 		//adjListWt[node_u].push_back({ node_v, wt });	// use this for weighted
 		adjMatrix[node_u][node_v] = wt;					// Adjacency matrix usage
 		edgeList.push_back({ wt, {node_u, node_v} });	// edge list usage
-		edgeList.push_back({ not_v, {wt, data} });		// this one is used for flow
+		edgeList.push_back({ node_v, {wt, data} });		// this one is used for flow
 		adjList[node_u].push_back(edgeList.size() - 1));
 	}
 
