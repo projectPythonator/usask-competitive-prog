@@ -57,10 +57,10 @@ public:
 	bool isSameSet(int32 u, int32 v) { return findSet(u) == findSet(v); }
 
 	// Gives you the size of set u. TIME and SPACE Complexity is the same as find_set
-	int sizeOfSet(int u) { return setSizes[findSet(u); }
+	int32 sizeOfSet(int32 u) { return setSizes[findSet(u); }
 
 	// just returns private value numSets
-	int getNumSets() const { return numSets; }
+	int32 getNumSets() const { return numSets; }
 	
 	// Join the set that contains u with the set that contains v.
 	//
