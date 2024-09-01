@@ -401,10 +401,10 @@ public:
 		return true;
 	}
 
-	uint64 mrptPowMod(uint64 base, uint64 exp, uint64 mod) {
-		/* binary exponentiation 
-		* taken from https://cp-algorithms.com
-		*/
+	// binary exponentiation
+	//	taken from https https://cp-algorithms.com
+	//	Complexity Time: log(base), Space O(1) 
+	uint64 powMod(uint64 base, uint64 exp, uint64 mod) {
 		uint64 result = 1;
 		base %= mod;
 		while (exp) {
@@ -416,14 +416,13 @@ public:
 		return result;
 	}
 
-	bool mrptCompositeCheck(uint64 n, uint64 a uint64 d, int s) {
-		/*The witness test of miller rabin.
-		taken from https://cp-algorithms.com
-		Complexity per call: Time O(log^3(n)), Space: O(1)
-		*/
-		uint64 x = mrptPowMod(a, d, n);
+	// The witness test of miller rabin.
+	//	taken from https https://cp-algorithms.com
+	//	Complexity per call: Time O(log^3(n)), Space: O(1)
+	bool mrptCompositeCheck(uint64 n, uint64 a, uint64 d, int32 s) {
+		uint64 x = powMod(a, d, n);
 		if (x == 1 || x == n - 1) return false;
-		for (int r = 1; r < s; ++r) {
+		for (int32 r = 1; r < s; ++r) {
 			x = (uint128)x * x % n;
 			if (x == n - 1)
 				return false;
@@ -431,19 +430,18 @@ public:
 		return true;
 	}
 
+	// Handles all numbers up to 2 ^ 64 - 1 (maybe need to test it to gain confidence).
+	//	taken from https https://cp-algorithms.com
+	//	Complexity per call : Time O(12 log^3(n)), Space : O(log2(n)) bits
+	//	Optimizations : test first 12 primes before running the algorithm or generate sieve.
 	bool isPrimeMRPT(uint64 n) {
-		/*Handles all numbers up to 2^64-1 (maybe need to test it to gain confidence).
-		taken from https://cp-algorithms.com
-		Complexity per call: Time O(12 log^3(n)), Space: O(log2(n)) bits
-		Optimizations: test first 12 primes before running the algorithm or generate sieve.
-		*/
 		if (n < 2) return false;
-		int r = 0;
+		int32 r = 0;
 		uint64 d = n - 1;
 		for (; (d & 1) == 0; d >>= 1, r++) {}	// turned whileloop into forloop
 
-		for (int a : {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37})
-			if (n == a || mrptCompositeCheck(n, a, d, r))
+		for (int32 a: {2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37})
+			if (0 == (n % a) || mrptCompositeCheck(n, a, d, r)) // 0==(n%a) replaced n==a
 				return n == a;
 		return true;
 	}
