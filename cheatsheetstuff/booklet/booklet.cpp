@@ -5,7 +5,7 @@ using namespace std;	// okay for contests, DO NOT USE IRL
 
 // GLOBAL redefines
 // Goal of this section is to hopefully convey what bounds I would like the various types
-// to conform to if you find problems for example if int is 16 bit then use int32_t 
+// to conform to if you find problems for example if int is 16 bit then use 
 typedef int									int32;	// careful to ensure its 32bits
 typedef unsigned int				uint32;	// careful to ensure its 32bits
 typedef long long						int64;
@@ -18,6 +18,8 @@ typedef tuple<int32, int32> int32_Pair;
 typedef tuple<int32, int32, int32> int32_Triple;
 typedef tuple<int32, int32, int32, int32> int32_Quadruple;
 
+typedef vector<bool> bool_vec;
+typedef vector<char> char_vec;
 typedef vector<int32> int32_Vec;  
 typedef vector<int64> int64_Vec;
 typedef vector<int32_Pair> int32_Pair_Vec;
@@ -229,50 +231,45 @@ public:
 /// <summary>
 /// ///////////////////////////////////////////////////////////////////
 /// </summary>
-
-typedef vector<bool> vec_bool;
-typedef vector<int> vec_int32;
-typedef vector<long long> vec_int64;
+/// 
 
 class MathAlgorithms {
 private:
-	vec_int32 primesList, minPrimes;
-	vec_int32 numDiv, numPF, numDiffPF;
-	vec_int32 numFactorialPF;
-	vec_int64 sumDiv, sumPF, sumDiffPF;
+	int32_Vec primesList, minPrimes;
+	int32_Vec numDiv, numPF, numDiffPF;
+	int32_Vec numFactorialPF;
+	int64_Vec sumDiv, sumPF, sumDiffPF;
 
 public:
-	void sieveOfEratosthenes(int nInclusive) {
-		/*Generates list of primes up to n via eratosthenes method.
-
-		Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
-		Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
-		*/
-		int limit = (int)sqrt(nInclusive);
-		vec_bool primeSieve = vec_bool(++nInclusive, True);
-		for (int prime = 2; prime < limit; ++prime)
+	//Generates list of primes up to n via eratosthenes method.
+	//
+	//	Complexity: Time: O(n lnln(n)), Space: post call O(n/ln(n)), mid-call O(n)
+	//	Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
+	void sieveOfEratosthenes(int32 limit) {
+		int32 sqrtLimit = lrint(sqrt(limit)) + 1;
+		bool_vec primeSieve = bool_vec(limit + 1, True);
+		for (int prime = 2; prime < sqrtLimit; ++prime)
 			if (primeSieve[prime])
-				for (int multiple = prime * prime; multiple < nInclusive; multiple += prime)
+				for (int multiple = prime * prime; multiple <= limit; multiple += prime)
 					primeSieve[multiple] = false;
-		for (int prime = 2; prime < nInclusive; ++prime)
+		for (int prime = 2; prime <= limit; ++prime)
 			if (primeSieve[prime])
 				primesList.push_back(prime);
 	}
 
-	void primeSeiveFaster(int limit) {
-		/*Block sieve that builds up block by block to the correct amount needed.
-
-		Complexity: Time: O(max(n lnln(sqrt(n)), n)),
-				   Space: post call O(n / ln(n)), mid - call O(sqrt(n))
-		*/
-		const int sqrtBlock = round(sqrt(limit)); // block size in this version we use sqrt(n)
+	// Block sieve that builds up block by block to the correct amount needed.
+	//
+	//	Complexity: Time: O(max(n lnln(sqrt(n)), n)),
+	//		    Space: post call O(n / ln(n)), mid - call O(sqrt(n))
+	void primeSeiveFaster(int32 limit) {
+		const int sqrtBlock = round(sqrt(limit)) + 1; // block size + 1 for safety :)
 		const int high = (limit - 1) / 2;	
-		vector<char> blockSieve(sqrtBlock + 1, true); // apparently char was faster than bool?
-		vector<array<int, 2>> prime_and_blockStart;	  // holds prime, block start: pair
-		for (int i = 3; i < sqrtBlock; i += 2) { // fast pre-computation up to sqrt(n)
+		char_vec blockSieve(sqrtBlock + 1, true);		// apparently char was faster than bool?
+		int32_Pair_Vec prime_and_blockStart;				// holds prime, block start: pair
+		for (int32 i = 3; i < sqrtBlock; i += 2) { // fast pre-computation up to sqrt(n)
 			if (blockSieve[i]) {
 				prime_and_blockStart.push_back({i, (i*i-1) / 2});
-				for (int j = i*i; j <= sqrtBlock; j += 2*i)
+				for (int32 j = i*i; j <= sqrtBlock; j += 2*i)
 					blockSieve[j] = false;
 			}
 		}
