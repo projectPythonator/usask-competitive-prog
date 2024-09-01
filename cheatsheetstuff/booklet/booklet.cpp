@@ -196,24 +196,23 @@ public:
 		} } } // 3 brackets closes up to the while loop
 	}
 
+	//Computes mst of graph G stored in edge_list, space optimized via heap.
+	//
+	//	Complexity per call: Time: O(|E| log|V|), Space: O(|E| log|E|) + Union_Find
+	//	More uses : finding min spanning tree
+	//	Variants : min spanning subgraph and forrest, max spanning tree, 2nd min best spanning
+	//	Optimization : We use a heap to make space comp.O(| E | ).instead of O(| E | log | E | )
+	//	when using sort, however edge_list is CONSUMED.Also uses space optimization
 	void minSpanningTreeViaKruskalsWithHeaps() {
-		/*Computes mst of graph G stored in edge_list, space optimized via heap.
-		* 
-		* Complexity per call: Time: O(|E| log |V|), Space: O(|E| log |E|) + Union_Find
-		* More uses: finding min spanning tree
-		* Variants: min spanning subgraph and forrest, max spanning tree, 2nd min best spanning
-		* Optimization: We use a heap to make space comp. O(|E|). instead of O(|E|log |E|)
-		* when using sort, however edge_list is CONSUMED. Also uses space optimization
-		*/
-		int vertices = graph.numNodes;
+		int32 vertices = graph.numNodes;
 		sort(graph.edgeList.begin(), graph.edgeList.end());  // optimization line here
 		auto UFDS = UnionFindDisjointSets(vertices);
-		for (const auto& [wt, [u, v]] : adj_edge_list) { // need to pop heap in loop
+		for (const auto& [wt, u, v]: adj_edge_list) { // for heaps: need to pop heap in loop 
 			if (UFDS.getNumSets() == 1) break;
 			if (!UFDS.isSameSet(u, v)) {
-				minSpanningTree.push_back({ wt, {u, v} });
+				minSpanningTree.push_back({ wt, u, v });
 				UFDS.unionSet(u, v);
-		} } //  2 brack closed on loop
+		} } //  2 brack closed on the for loop
 	}
 
 	void primsViaAdjMatrix(int source) {
