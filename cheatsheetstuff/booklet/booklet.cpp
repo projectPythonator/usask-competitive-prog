@@ -103,9 +103,10 @@ typedef DAT_type_from index_map;	// type must match leftside type above
 
 class Graph {
 private:
+	// only take what you actually need for optimial performance
 	int32 numEdges, numNodes, numRows, numCols;
 	adj_list adjList, adjListTrans;
-	adj_list_wt adjListWt, adjListTransWt
+	adj_list_wt adjListWt, adjListTransWt;
 	adj_mat adjMatrix;
 	edge_list edgeList;	// can also make this into a heap
 	edge_list_flow edgeListFlow;
