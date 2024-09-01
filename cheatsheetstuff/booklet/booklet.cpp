@@ -193,7 +193,7 @@ public:
 						graph.grid[newRow][newCol] == oldVal) {
 					graph.grid[newRow][newCol] = newVal;
 					q.push_front({ newRow, newCol });
-		} } } // 3 brackets closes up to the loop
+		} } } // 3 brackets closes up to the while loop
 	}
 
 	void minSpanningTreeViaKruskalsWithHeaps() {
