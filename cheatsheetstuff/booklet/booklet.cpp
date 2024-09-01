@@ -1,14 +1,16 @@
 // GLOBALS used throughout the booklet
-#include <bits/stdc++.h> // This include is mostly for catch all and speed
+#include <bits/stdc++.h> // This include is mostly for catch all type speed DO NOT USE IRL
 
-using namespace std;	// okay for contests not for real life
+using namespace std;	// okay for contests, DO NOT USE IRL
 
 // GLOBAL redefines
+// Goal of this section is to hopefully convey what bounds I would like the various types
+// to conform to if you find problems for example if int is 16 bit then use int32_t 
 typedef int									int32;	// careful to ensure its 32bits
 typedef unsigned int				uint32;	// careful to ensure its 32bits
 typedef long long						int64;
 typedef unsigned long long	uint64;
-typedef __uint128_t					uint128;
+typedef __uint128_t					uint128;	// optional gcc type beware
 typedef string							dataType; // required to be hashable sometimes for unordered_map
 
 // mostly used in the graph functions
