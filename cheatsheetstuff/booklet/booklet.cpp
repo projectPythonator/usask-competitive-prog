@@ -274,17 +274,17 @@ public:
 			}
 		}
 		blockSieve.pop_back();	// blockSieve needs to be sqrt(n) for the next section
-		for (int low = 0; low <= high; low += sqrtBlock) {		// here we fill the primes
+		for (int32 low = 0; low <= high; low += sqrtBlock) {		// here we fill the primes
 			fill(blockSieve.begin(), blockSieve.end(), true);	// list in blocks of size
-			for (auto& prime_and_beg : prime_and_blockStart) {	// sqrt(n)
-				int prime = prime_and_beg[0], idx = prime_and_beg[1];
-				for (; idx < sqrtBlock; idx += prime)
+			for (auto& prime_idx : prime_and_blockStart) {	// prime_idx is a tuple pair
+				auto [prime, idx] = prime_idx;					// need to define the pair here since it
+				for (; idx < sqrtBlock; idx += prime)		// is a lot slower to modify the tuple
 					blockSieve[idx] = false;
-				prime_and_beg[1] = idx - sqrtBlock;	//  this line resets the block to the maintain module
+				get<1>(prime_idx) = idx - sqrtBlock;
 			}
-			if (low == 0)	// small corner case we need to handle
+			if (0 == low)	// small corner case we need to handle
 				blockSieve[0] = false; 
-			for (int i = 0; i < sqrtBlock && low + i <= high; i++) // fill primesList up 
+			for (int32 i = 0; i < sqrtBlock && low + i <= high; i++) // fill primesList up 
 				if (blockSieve[i])
 					primesList.push_back((low + i) * 2 + 1);
 		}
