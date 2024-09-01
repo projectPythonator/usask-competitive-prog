@@ -508,20 +508,19 @@ public:
 		return numDiffPFV;
 	}
 
-	void factorialPrimeFactors(int limit) {
-		/* NHI I lost this or were I got the idea but it works for factorizing a factorial
-		* 
-		* Complexity: Time: O(n log n)), Space: O(n)
-		*/
-		int endPoint = upper_bound(primesList.begin(), primesList.end(), limit);
-		endPoint = endPoint - primesList.begin();
+	// Multiplicity of P and Legendre's formula allow us to calculate factors of factorial
+	//	taken from https://cp-algorithms.com
+	//	Complexity: Time: O(n log n)), Space: O(n / log n) [number of primes to limit]
+	void factorialPrimeFactors(int32 limit) {
+		int32 endPoint = upper_bound(primesList.begin(), primesList.end(), limit);
+		endPoint = endPoint - primesList.begin();	// this fixes the offset
 		numFactorialPF.assign(endPoint, 0);
-		for (int idx = 0; idx < endPoint; ++idx) {
-			int prime = primesList[idx];
-			uint64 primeAmt = 0;
-			for (int x = limit; x; primeAmt += x)
+		for (int32 primeIdx = 0; primeIdx < endPoint; ++primeIdx) {
+			int32 prime = primesList[primeIdx];
+			int64 primeAmt = 0;
+			for (int32 x = limit; x; primeAmt += x)
 				x /= prime;
-			numFactorialPF[idx] = primeAmt;
+			numFactorialPF[primeIdx] = primeAmt;
 		}
 	}
 
@@ -534,7 +533,7 @@ public:
 	}
 
 	uint64 rhoPollard(uint64 n, uint64 x0 = 2, uint64 c = 1) {
-		uint64x x = x0, y = x0, g = 1;
+		uint64 x = x0, y = x0, g = 1;
 		while (g == 1) {
 			x = rhoF(x, c, n);
 			y = rhoF(y, c, n);
