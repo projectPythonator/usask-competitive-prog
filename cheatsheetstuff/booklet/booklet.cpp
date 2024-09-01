@@ -86,6 +86,7 @@ public:
 /// ///////////////////////////////////////////////////////////////////
 /// </summary>
 
+typedef int32_pair row_col;			
 typedef int32_pair edge_U2V;			// used for unweighted edges 
 typedef int32_pair edge_VWt;			// this might change if wt is not an int32
 typedef int32_triple edge_WTU2V;	// this might change if wt is not an int32
@@ -181,15 +182,15 @@ public:
 	//
 	//	Complexity: Time: O(|V|+|E|), Space: O(|V|): for grids |V| = row*col and |E| = 4*|V|
 	//	More uses : previous uses tplus shortest connected pah
-	void floodFillViaBFS(int startRow, int startCol, int oldVal, int newVal) {
-		deque<pair<int, int>> q = { {startRow, startCol} };	// q to avoid name conflicts
+	void floodFillViaBFS(int32 startRow, int32 startCol, int32 oldVal, int32 newVal) {
+		deque<row_col> q = { {startRow, startCol} };	// q to avoid name conflicts with queue
 		while (!q.empty()) {
-			const auto& [newRow, newCol] = q.back(); q.pop_back();
-			for (const auto& [rowMod, colMod] : dirRC) {
-				int newRow = row + rowMod, newCol = col + colMod;
+			const auto& [newRow, newCol] = q.back(); q.pop_back();	// THIS IS TWO LINES IN ONE!
+			for (const auto& [rowMod, colMod]: dirRC) {
+				int32 newRow = row + rowMod, newCol = col + colMod;
 				if (0 <= newRow && newRow < graph.numRows &&
-					0 <= newCol && newCol < graph.numCols &&
-					graph.grid[newRow][newCol] == oldVal) {
+						0 <= newCol && newCol < graph.numCols &&
+						graph.grid[newRow][newCol] == oldVal) {
 					graph.grid[newRow][newCol] = newVal;
 					q.push_front({ newRow, newCol });
 		} } } // 3 brackets closes up to the loop
