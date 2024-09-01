@@ -446,31 +446,29 @@ public:
 		return true;
 	}
 
-	vec_int32 primeFactorizeN(int n) {
-		/*A basic prime factorization of n function. without primes its just O(sqrt(n))
-		* 
-		* Complexity: Time: O(sqrt(n)/ln(sqrt(n))), Space: O(log n)
-		* Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
-		*/
-		vec_int32 factors;
-		for (auto& prime : primesList) {
-			if (prime * prime > n) break;
+	// A basic prime factorization of n function.without primes its just O(sqrt(n))
+	//
+	//	Complexity: Time: O(sqrt(n) / ln(sqrt(n))), Space : O(log n)
+	//	Variants: number and sum of prime factors, of diff prime factors, of divisors, and phi
+	int32_vec primeFactorizeN(int32 n) {
+		int32_vec factors;
+		for (const auto& prime : primesList) {	// assumes you have a prime list upto sqrt(n)
+			if (prime * prime > n) break;					// this check here since we use loop iterator
 			for (; n % prime == 0; n /= prime)
 				factors.push_back(prime);
 		}
-		if (n > 1)
+		if (n > 1)	// only happens when n had a prime factor above the sqrt
 			factors.push_back(n);
 		return factors;
 	}
 
-	vec_int32 primeFactorizeNLogN(int n) {
-		/*An optimized prime factorization of n function based on min primes already sieved.
-		*
-		* Complexity: Time: O(log n), Space: O(log n)
-		* Optimization: assign append to function and assign minPrimes[n] to a value in the loop
-		*/
-		vec_int32 factors;
-		for (; n > 1; n /= minPrimes[n])
+	// An optimized prime factorization of n function based on min primes already sieved.
+	//
+	//	Complexity: Time: O(log n), Space : O(log n)
+	//	Optimization: assign append to function and assign minPrimes[n] to a value in the loop
+	int32_vec primeFactorizeNLogN(int32 n) {
+		int32_vec factors;
+		for (; 1 < n; n /= minPrimes[n])
 			factors.push_back(minPrimes[n]);
 		return factors;
 	}
