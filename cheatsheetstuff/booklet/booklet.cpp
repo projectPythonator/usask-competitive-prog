@@ -1,22 +1,49 @@
+// GLOBALS used throughout the booklet
 #include <bits/stdc++.h> // This include is mostly for catch all and speed
 
-typedef vector<int> vec_int;  // TBD if we go with typedefs
+using namespace std;	// okay for contests not for real life
 
+// GLOBAL redefines
+typedef int									int32;	// careful to ensure its 32bits
+typedef unsigned int				uint32;	// careful to ensure its 32bits
+typedef long long						int64;
+typedef unsigned long long	uint64;
+typedef __uint128_t					uint128;
+typedef string							dataType; // required to be hashable sometimes for unordered_map
+
+// mostly used in the graph functions
+typedef tuple<int32, int32> int32_Pair;
+typedef tuple<int32, int32, int32> int32_Triple;
+typedef tuple<int32, int32, int32, int32> int32_Quadruple;
+
+typedef vector<int32> int32_Vec;  
+typedef vector<int64> int64_Vec;
+typedef vector<int32_Pair> int32_Pair_Vec;
+typedef vector<int32_Triple> int32_Triple_Vec;
+typedef vector<int32_Quadruple> int32_Quadruple_Vec;
+
+typedef unordered_map<dataType, int32>	DAT_type_to; // Direct access table helper.
+typedef vector<dataType>								DAT_type_from; // Direct access table helper.
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
 //#include <vector>		// for vec_int
 //#include <algorithm>	// for iota, swap
 
 class UnionFindDisjointSets {
 private:
-	vec_int parent, rank, setSizes;
-	int numSets;
+	int32_Vec parent, rank, setSizes;
+	int32 numSets;
 public:
-	UnionFindDisjointSets(int n) {
+	UnionFindDisjointSets(int32 n) {
 		// Attributes declared here must be passed in or global if not used in classes
 		parent.assign(n, 0);
-		numSets = n;						// optional information
-		setSizes.assign(n, 1);				// optional information
-		rank.assign(n, 0);					// optional optimization 
+		setSizes.assign(n, 1);							// optional information
+		rank.assign(n, 0);									// optional optimization 
 		iota(rank.begin(), rank.end(), 0);	// rank = {0, 1, 2...}
+		numSets = n;												// optional information
 	}
 
 	int findSet(int u) {
@@ -213,8 +240,6 @@ public:
 typedef vector<bool> vec_bool;
 typedef vector<int> vec_int32;
 typedef vector<long long> vec_int64;
-typedef uint64_t uint64;
-typedef __uint128_t uint128;
 
 class MathAlgorithms {
 private:
