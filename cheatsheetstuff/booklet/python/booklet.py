@@ -1513,7 +1513,10 @@ class MathAlgorithms:
     return Counter(prime_factors)
 
   def factorial_prime_factors(self, limit: int) -> None:
-    """This uses similar idea to sieve but avoids divisions. Complexity function 3."""
+    """NHI I lost this or were I got the idea but it works for factorizing a factorial
+    
+    Complexity: Time: O(n log n)), Space: O(n)
+    """
     end_point = bisect_right(self.primes_list, limit)
     prime_factors = [0] * end_point
     for i in range(end_point):
