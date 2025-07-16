@@ -139,4 +139,25 @@ public:
 		int vertices = graph.numNodes;
 
 	}
+
+    void topology_sort_tarjans_helper(int u) {
+        visited[u] = VISITED;
+        for(const auto& v: graph.adjList[u]) 
+            if(visited[v] == UNVISITED)
+                topology_sort_tarjans_helper(v);
+        topo_sort_node_list.append(u);
+    }
+
+    void topology_sort_via_tarjans(int source = -1){
+        visited.assign(UNVISITED, graph.num_nodes);
+        topo_sort_node_list.clear();
+        if(source != -1){
+            topology_sort_tarjans_helper(source);
+        } else {
+            for(int u = 0; u < graph.num_nodes; ++u)
+                if(visited[u] == UNVISITED)
+                    topology_sort_tarjans_helper(u);
+        } std::reverse(topo_sort_node_list);
+    }
+
 };
