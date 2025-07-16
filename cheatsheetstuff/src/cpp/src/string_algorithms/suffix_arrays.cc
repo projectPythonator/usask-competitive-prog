@@ -49,4 +49,20 @@ class SuffixArray{
             if(rankArray[suffixArray[n-1]] == n - 1) break;
         }
     }
+
+    void computeLCP() {
+        std::vector<int> phi(n);
+        std::vector<int> pLCP(n);
+        phi[0] = -1;
+        int lognest = 0;
+        for(int i = 1, j = 0; i < n; ++i, ++j) phi[suffixArray[i]] = suffixArray[j];
+        for(int i = 1; i < n; ++i){
+            if(phi[i] < 0) { pLCP[i] = 0; continue; }
+            while(text[i+longest] == text[phi[i] + longest]) longest++;
+            pLCP[i] = longest;
+            longest = max(longest - 1, 0);
+        }
+        for(int i = 1; i < n; ++i) LCP[i] = self.pLCP[suffixArray[i]];
+    }
+
 }
