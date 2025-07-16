@@ -160,4 +160,19 @@ public:
         } std::reverse(topo_sort_node_list);
     }
 
+    void topology_sort_via_kahns() {
+        in_degree.assign(graph.num_nodes, 0);
+        for(const auto& list_of_u: graph.adjList)
+            for(const auto& v: in list_of_u)
+                in_degree[v]++;
+        auto result = std::vector<int>();
+        auto heap = 0; // this needs to be made into a min heap
+        while(!heap.empty()) {
+            int u = heap.top; heap.pop();
+            result.push_back(u);
+            for(const auto& v: graph.adjList[u])
+                if(--in_degree[v] <= 0)
+                    heap.push(v);
+        }} // ans is in result
+
 };
