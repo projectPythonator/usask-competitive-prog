@@ -175,4 +175,33 @@ public:
                     heap.push(v);
         }} // ans is in result
 
+    void single_source_shortest_path_dijkatras(int source, int sink){
+        auto distance, parents = vi(graph.num_nodes, INF), vi(graph.num_nodes, UNVISITED);
+        distance[source], parents[source] = 0, source;
+        vector<ii> heap = {(0, source)}; // fix the typing on this ik there is better way
+        while(!heap.empty()) {
+            ii du = heap.top(); heap.pop(); // fix to be correct
+            int cur_dist = du[0], u = du[1];
+            if(distance[u] < cur_dist)
+                continue;
+            for(const auto& u,wt: graph.adj_list[u])
+                if(distance[v] > cur_dist + wt) {
+                    distance[v] = cur_dist + wt;
+                    parents[v] = u;
+                    heap.emplace((distance[v], v));
+                }}}  // results in distance and parents
+    
+    void all_pairs_shortest_paths_floyd_warshall() {
+        // matrix[i][j] = min(matrix[i][j], matrix[i][k]+matrix[k][j]); used when no parents
+        for(int k = 0; k < graph.num_nodes; ++k)
+            for(int i = 0; i < graph.num_nodes; ++i)
+                for(int j = 0; j < graph.num_nodes; ++j)
+                    if (matrix[i][j] > matrix[i][k] + matrix[k][j])
+                        matrix[i][j], parents[i][j] = matrix[i][k]+matrix[k][j], parents[k][j];
+    }
+
+    void all_pairs_shortest_paths_floyd_warshall_varients() {
+        // TODO
+    }
+
 };
