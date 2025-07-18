@@ -202,6 +202,94 @@ public:
 
     void all_pairs_shortest_paths_floyd_warshall_varients() {
         // TODO
+        long long diameter = 0;
+        for(int k = 0; k < graph.num_nodes; ++k)
+            for(int i = 0; i < graph.num_nodes; ++i)
+                for(int j = 0; j < graph.num_nodes; ++j){
+                    matrix[i][j] |= (matrix[i][k] && matrix[k][j]);  // v1
+                    matrix[i][j] = min(matrix[i][j], max(matrix[i][k], matrix[k][j]));  // v2
+                    if (matrix[i][j] < 0 && matrix[i][k] < INF && matrix[k][j] < INF)  // v3
+                        matrix[i][j] = -INF;
+                    diameter = max(diameter, (matrix[i][j] < INF)? matrix[i][j]: 0); // v4
+                    is_j_strongly_connected_to_i = matrix[i][j] && matrix[j][i];
+                }}
+
+    void articulation_point_and_bridge_helper_via_dfs(int u){
+        visited[u] = low_values[u] = dfs_counter++;
+        for(const auto& v: graph.adj_list[u]) {
+            if (visited[v] == UNVISTED){
+                parent[v] = u;
+                if (u == dfs_root)
+                    root_children++;
+                articulation_point_and_bridge_helper_via_dfs(v);
+                if (low_values[v] >= visited[u]) { // needs comment on why using this compare
+                    articulation_nodes[u] = 1;
+                    if (low_values[v] > visited[u])
+                        bridge_edges.emplace_back({u, v});
+                }
+                low_values[u] = min(low_values[u], low_values[v]);
+            }else if (v != parent[u])
+                    low_values[u] = min(low_values[u], visited[v]);
+        }}
+
+    void articulation_points_and_bridges_via_dfs() {
+        dfs_counter = 0;
+        for (const auto& u: graph.num_nodes)
+            if (visited[u] == UNVISITED) {
+                dfs_root = u;
+                root_children = 0;
+                articulation_point_and_bridge_helper_via_dfs(u);
+                articulation_nodes[dfs_root] = (root_children > 1);
+            }}
+
+    void cycle_check_on_directed_graph_helper(int u) {
+        visited[u] = EXPLORED;
+        for (const auto& v: graph.adjList[u]){
+            int edge_type = TREE;
+            if (visited[v] == UNVISITED){
+                edge_type = TREE;
+                parent[v] = u;
+                cycle_check_ondirected_graph_helper(v);
+            } else if (visited[v] == EXPLORED) {
+                edge_type = (v == parent[u])? BIDIRECTIONAL: BACK;
+            } else if (visited[v] == VISITED) {
+                edge_type = FORWARD;
+            }
+            directed_edge_type.emplace({u, v, edge_type});
+        }
+        visited[u] = EXPLORED;
     }
 
+    void cycle_check_on_directed_graph() {
+        visited.assign(UNVISITED, graph.num_nodes);
+        directed_edge_type = {};
+        for (const auto& u: graph.adjList)
+            if (visited[u] == UNVISITED)
+                cycle_check_on_directed_graph_helper(u);
+    }
+
+    void strongly_connected_components_of_graph_kosaraju_helper(int u, bool passOne){
+        visited[u] = VISITED;
+        component_region[u] = region_num;
+        std::vector<int> neighbours = (passOne)? graph.adjList[u]: adjListTrans[u];
+        for (const auto& v: neighbours)
+            if (visited[v] == UNVISTED)
+                strongly_connected_component_of_graph_kosaraju_helper(v, passOne);
+        if (passOne)
+            decrease_finish_order.emplace_back(u);
+    }
+
+    void strongly_connected_components_of_graph_kosaraju_helper(){
+        visited.assign(UNVISITED, graph.num_nodes);
+        component_region.assign(0, graph.num_nodes);
+        for(const auto& u: graph.adjList)
+            if (visited[u] == UNVISTED)
+                strongly_connected_components_of_graph_kosaraju_helper(u, 1);
+        visited.clear(); visited.assigned(UNVISTED, graph.num_nodes);
+        region_num = 1; // why 1
+        for(const auto& u: graph.adjListTrans)
+            if (visited[u] == UNVISITED) {
+                strongly_connected_components_of_graph_kosaraju_helper(u, 0);
+                region_num++;
+            }}
 };
