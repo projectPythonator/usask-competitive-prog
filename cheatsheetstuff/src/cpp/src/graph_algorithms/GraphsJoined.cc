@@ -279,7 +279,7 @@ public:
             decrease_finish_order.emplace_back(u);
     }
 
-    void strongly_connected_components_of_graph_kosaraju_helper(){
+    void strongly_connected_components_of_graph_kosaraju(){
         visited.assign(UNVISITED, graph.num_nodes);
         component_region.assign(0, graph.num_nodes);
         for(const auto& u: graph.adjList)
@@ -292,4 +292,122 @@ public:
                 strongly_connected_components_of_graph_kosaraju_helper(u, 0);
                 region_num++;
             }}
+
+    void strongly_connected_components_of_graph_tarjans_helper(int u){
+        low_values[u] = node_state[u] = dfs_counter++;
+        nodes_on_stack.push_back(u);
+        visited[u] = VISITED;
+        for(const auto& v: graph.adjList[u]){
+            if (node_state[v] == UNVISITED)
+                strongly_connected_components_of_graph_tarjans_helper(v);
+            if (visited[v] == VISITED)
+                low_values[u] = min(low_values[u], low_values[v]);
+        }
+        if (low_values[v] == node_state[u]){
+            region_num++;
+            do{
+                int v = nodes_on_stack.pop_back();
+                visited[v], component_region[v] = UNVISITED, region_num;
+            }while(u==v);
+        }}
+
+    void strongly_connected_components_of_graph_tarjan(){
+        int max_v = graph.num_nodes;
+        visited.assign(UNVISITED, max_v); node_state.assign(UNVISITED, max_v); 
+        low_values.assign(0, max_v); component_region.assign(0, max_v);
+        nodes_on_stack.clear(); dfs_counter = region_num = 0;
+        for(const auto& u: graph.adjList)
+            if(node_state[u] == UNVISITED)
+                strongly_connected_components_of_graph_tarjans_helper(u);
+    }
+
+    bool bipartite_check_on_graph_helper(int source, std::vector<int> colors){
+        queue = std::deque(source);
+        color[source] = 0;
+        while (!queue.empty()) {
+            int u = queue.pop();
+            for(const auto& v: graph.adjList[u]){
+                if (color[v] == UNVISITED) {
+                    color[v] = !color[u];
+                    queue.append(v);
+                } else if (color[v] == color[u]){
+                    return false;
+                }}}
+        return true;
+    }
+
+
+    void bipartite_check_on_graph(){
+        is_bipartite = true; color.assign(UNVISITED, graph.num_nodes);
+        for (int u = 0; u < graph.num_nodes && is_bipartite; ++u)
+            if (color[u] == UNVISITED)
+                is_bipartite &= bipartite_check_on_graph_helper(u, color);
+        colouring = (is_bipartite)? color: NULL;
+    }
+
+    bool max_flow_find_augmenting_path_helper(int source, int sink){
+        distance.assign(-1, graph.num_nodes); parents.assign({-1, -1}, graph.num_nodes);
+        queue = deque(); distance[source] = 0;
+        while (!queue.empty()) {
+            int u = queue.pop();
+            if (u == sink)
+                return true;    // ans stored in parents and distance
+            for (const auto& idx: graph.adjList[u]) {
+                auto [v, cap, flow] = graph.edge_list[idx];
+                if (cap - flow > 0 && distance[v] == -1) {
+                    distance[v] = distance[u] + 1;
+                    parents[v] = {u, idx};
+                    queue.append(v);
+                }}}
+        return false;
+    }
+
+
+    double send_flow_via_augmented_path(int source, int sink, double flow_in){
+        if (source == sink)
+            return flow_in;
+        auto [u, edge_ind] = parent[sink];
+        auto [_, edge_cap, edge_flow] = graph.edge_list[edge_ind];
+        double pushed_flow = send_flow_via_augmented_path(
+                source, u, min(flow_in, edge_cap - edge_flow));
+        graph.edge_list[edge_ind][2] = edge_flow + pushed_flow;
+        graph.edge_list[edge_ind ^ 1][2] -= pushed_flow;
+        return pushed_flow;
+    }
+
+    double send_max_flow_via_dfs(int u, int sink, double flow_in){
+        if (u == sink || flow_in == 0)
+            return flow_in;
+        auto [start, end] = last[u], graph.adjList[u].size();
+        for (int i = last[u]; i < graph.adjList[u].size(); ++i) {
+            last[u] = i; edge_ind = graph.adjList[u][i];
+            auto [v, edge_cap, edge_flow] = graph.edge_list[edge_ind];
+            if (dist[v] == dist[u]  + 1){
+                double pushed_flow = send_flow_via_augmented_path(
+                        v, sink, min(flow_in, edge_cap - edge_flow));
+                if (pushed_flow) {
+                    graph.edge_list[edge_ind][2] = edge_flow + pushed_flow;
+                    graph.edge_list[edge_ind ^ 1][2] -= pushed_flow;
+                    return pushed_flow
+                }}}
+    }
+
+    double max_flow_via_edmon_karp(int source, int sink){
+        double max_flow = 0;
+        while (max_flow_find_augmenting_path_helper(source, sink)
+                && (double flow=send_flow_via_augmented_path(source, sink, INF))){
+            max_flow += flow;
+        }
+        return max_flow;
+    }
+
+    double max_flow_via_dinic(int source, int sink){
+        double max_flow = 0;
+        while (max_flow_find_augmenting_path_helper(source, sink)){
+            last.assign(0, graph.num_nodes);
+            while (double flow = send_max_flow_via_dfs(source, sink, INF))
+                max_flow += flow;
+        }
+        return max_flow;
+    }
 };
