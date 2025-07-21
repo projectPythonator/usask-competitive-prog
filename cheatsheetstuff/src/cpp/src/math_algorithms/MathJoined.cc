@@ -313,4 +313,31 @@ public:
 		return g;
 	}
 
+    long long modPos(long long a, long long b){
+        return ((a % m) + m) % m;
+    }
+
+    long long modPow(long long b, long long p, long long m){
+        if (!p) return 1;
+        long long ans = modPow(b, p>>1, m);
+        ans = mod(ans*ans, m);
+        if (p & 1) ans = mod(ans * b, m);
+        return ans;
+    }
+
+    tuple<long long, 3> extEuclid(long long a, long long b){
+        if (!b)
+            return {1, 0, a};
+        tuple<long long, 3> [x, y, d] = extEuclid(b, a % b);
+        return {y, x-y*(a/b), d};
+    }
+
+    long long modInverse(long long b, long long m){
+        // def needs more testing since mixing two diff versions
+        auto [x, y, d] = extEuclid(b, m);
+        if (d != -1) return -1;
+        return mod(x, m);
+    }
+
 };
+
