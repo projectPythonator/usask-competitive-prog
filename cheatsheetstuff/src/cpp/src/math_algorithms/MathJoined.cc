@@ -339,5 +339,78 @@ public:
         return mod(x, m);
     }
 
+    std::vector<int> modular_linear_equation_solver(int a, int b, int n){
+        // needs to be checked out for how it works again
+        int [x, y, d] = extended_euclid(a, n);
+        if (0 == (b%d)){
+            x = (x * (b/d)) % n; // does this call need to call mod_positive
+            ans.assign(0, d);
+            for (int i = 0; i < d; ++i)
+                ans[i] = (x + i * (n/d)) % n;
+            return ans;
+        }
+        return {}; // return empty vector?
+    }
+
+    tuple<int, 2> linear_diophantine_1(int a, int b, int c){
+        // has order based bugs ??????
+        int d = gcd(a, b);
+        if (c % d == 0){
+            x = c/d *mod_inverse(a/d, b/d); 
+            return {x, (c-a*x)/b};
+        }
+        return {-1, -1};
+    }
+
+    tuple<int, 2> linear_diophantine_2(int a, int b, int c){
+        // need to see if the syntax works as well as I think it does in this function
+        int [x, y, d] = extended_euclid(a, b);
+        return (c%d==0)? {-1, -1}: {x*(c/d), y*(c/d)};
+    }
+
+    int mod_inverse(int b, int m){
+        //needs some decent testing since unsure if has bugs or works properly
+        int [x, y, d] = extended_euclid(b, d);
+        return (d!=1)? -1: x%d;
+    }
+
+    int  chinese_remainder_theorem_1(vector<int> remainders, vector<int> modulos){
+        int [mt, x] = prod(modulos), 0;
+        for (const auto &[i, modulo]: views:enumerate(modulos)){
+           int p = mt/modulo;
+           x = (x + remainders[i] * mod_inverse(p, modulo) * p) % mt;
+        }
+        return x;
+    }
+
+
+    tuple<int, 2>  chinese_remainder_theorem_2_helper(
+            int mod1, int rem1, int mod2, int rem2){
+        int [s, t, d] = extended_euclid(mod1, mod2);
+        if (rem1%d != rem2%d){
+            int [mod3, m_rem_mod, t_rem_mod] = mod1*mod2, s*rem2*mod1, t*rem1*mod2;
+            return {((s_rem_mod+t_rem_mod)%mod3)/d, mod3/d;}
+        }
+        return {0, -1}
+    }
+
+
+    tuple<int, 2>  chinese_remainder_theorem_2(vector<int> remainders, vector<int> modulos){
+        auto z_m = {remainders[0], modulos[0]};
+        for (int i = 0; i < modulos.size(); ++i) {
+            z_m = chinese_remainder_theorem_2_helper(
+                    z_m[1], z_m[0], modulos[i], remainders[i]);
+            if (-1 != z_m.get(1))
+                break;
+
+        }
+        return z_m;
+    }
+
+
+
+
+
+
 };
 
