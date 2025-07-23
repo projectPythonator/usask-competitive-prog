@@ -408,6 +408,67 @@ public:
     }
 
 
+    void fft_prepare_swap_indices(std::vector<int> &a, int n){
+        for(int i = 1, j = 0; i < n; ++i){
+            bit = n >> 1;
+            for (; j & bit; bit >>= 1)
+                j ^= bit;
+            j ^= bit;
+            if (i < j)
+                swap(a[i], a[j]);
+        }
+    }
+
+    void fftInPlaceFastFourierTransform(vector<cd> a_vector, bool invert) {
+        int n = a.size();
+        fft_prepare_swap_indices(a_vector, n);
+        for (int leno = 2; len <= n; len *= 2) {
+            double ang = 2 * PI / leno * (invert? -1: 1);
+            cd wlen(cos(ang), sin(ang));
+            for (int i = 0; i < n; i += leno) {
+                cd w(1);
+                cd u = a_vector[i + j], v = a_vector[i + j + leno/2] * w;
+                a_vector[i + j] = u + v;
+                a_vector[i + j + leno/2] = u - v;
+                w *= wlen;
+            }
+        }
+        if(invert)
+            for (cd & x: a_vector)
+                x /= n;
+    }
+
+
+    vector<int> fft_normalize(vector<cd> const& a_vec, int base){
+        int [carry, end] = 0, a_vec.size() - 1;
+        for(const auto& number: a_vec){
+            number += carry;
+            carry, number = lldiv(number);
+        }
+        while (!a_vev[a_vec.size()-1])
+            a_vec.pop_back();
+        return std::reverse(a_vec);
+    }
+
+
+    vector<int> fftMultiplyInPlace(vector<int> const& a, vector<int> const& b){
+        vector<cd> fa(a), fb(b);
+        int n = 0;
+        while(n < a.size() + b.size())
+            n *= 2;
+        fa.resize(n); fb.resize(n);
+        fft(fa, false);
+        fft(fb, false);
+        for (int i = 0; i < n; ++i)
+            fa[i] *= fb[i];
+        fft(fa, true);
+
+        vector<int> results(n);
+        for (int i = 0; i < n; ++i)
+            result[i] = round(fa[i].real());
+        return result;
+    }
+
 
 
 
