@@ -146,5 +146,154 @@ class GeometryAlgorithms {
         return Pt2d((a.x * v + b.x * u) / (v + u), (a.y * v + b.y * u) / (v + u));
     }
 
+    bool is_point_in_radius_of_circle(Pt2d point, Pt2d centerPoint, double radius) {
+        return compare_ab(distance_normalized(point, center_point), radius) < 0;
+    }
+
+    Pt2d pt_circle_center_given_pt_abc(Pt2d a, Pt2d b, Pt2d c) {
+        ab, ac = (a + b) / 2, (a + c) / 2;
+        ab_rotated = (a-ab).rotate_cw_90() + ab;
+        ac_rotated = (a-ac).rotate_cw_90() + ac;
+        return pt_lines_intersect_ab_to_cd(ab, ab_rotated, ac, ac_rotated);
+    }
+    
+    Tuple<2, Pt2d> pts_line_ab_intersects_circle_cr(Pt2d a, Pt2d b, Pt2d c, double radius) {
+        vec_ba, vec_ac = b-a, a-c;
+        double dist_sq_ba = vec_ba.dot_product(vec_ba);
+        double dist_sq_ac = vec_ac.dot_product(vec_ac);
+        double dist_sq_ac_ba = vec_ac.dot_product(vec_ba);
+        double dist_sq = dist_sq_ac_ba * dist_sq_ac_ba - dist_ba * dist_ac; 
+        int result = compare_ab(dist_sq, 0.0);
+        if (result >= 0) {
+            auto first_int = c + vec_ac + vec_ba*(-dist_sq_ac_ba + sqrt(dist_sq + EPS))/dist_sq_ba;
+            auto second_int = c + vec_ac + vec_ba*(-dist_sq_ac_ba - sqrt(dist_sq))/dist_sq_ba;
+            return (result == 0)? {first_int}, {first_int, second_int};
+        }
+        return {Pt2d(Inf, Inf), Pt2d(Inf, Inf)};
+    }
+
+    Tuple<2, Pt2d> pts_two_circles_intersect_cr1_cr2(Pt2d c1, Pt2d c2, double r1, double r2) {
+        center_dist = distance_normalized(c1, c2);
+        if (compare_ab(center_dist, r1+r2) <= 0 && compare_ab(center_dist + min(r1, r2), max(r1,  r2))) {
+            double x = (center_dist * center_dist - r2*r2 + r1*r1)/(2*center_dist);
+            double y = sqrt(r1*r1 - x*x);
+            Pt2d v = (c2-c1)/center_dist;
+            Pt2d pt1, pt2 = x1+v*x, v.rotate_ccw_90() * y;
+            return (compare_ab(y, 0.0))? {pt1 , pt2}: {pt1+pt2, pt1-pt2};
+        }
+        return {Pt2d(Inf, Inf), Pt2d(Inf, Inf)};
+    }
+
+    vector<Pt2d> pt_tangent_to_circle_cr(Pt2d centerPoint, double radius, Pt2d pt) {
+        Pt2d vec_pc = pt - center_point;
+        double x = vec_pc.dot_product(vec_pc);
+        double dist_sq = x - radius * radius;
+        int result = compare_ab(dist_sq, 0.0);
+        if (result >= 0) {
+            dist_sq = (result)? dist_sq: 0;
+            Pt2d q1 = vec_pc * (radius * radius / x);
+            Pt2d q2 = (vec_pc * -radius * sqrt(dist_sq) / x).rotate_ccw_90();
+            return {center_point + q1 -q2, center_point + q1 + q2};
+        }
+        return vector<Pt2d>();
+    }
+
+    
+    vector<Pt2d> tangents_between_2_circles(Pt2d c1, double r1, Pt2d c2, double r2) {
+        vector<Pt2d> r_tangents;
+        if (!compare_ab(r1, r2)) {
+            c2c1 = c2-c1;
+            double multiplier = r1/sqrt(c2c1.dot_product(c2c1));
+            tangent = (c2c1*multiplier).rotate_ccw_90();
+            r_tangents = {(c1+tangent, c2+tangent), (c1-tangent, c2-tangent)};
+        }else {
+            Pt2d ref_pt = ((c1 * -r2) + (c2*r1)) / (r1-r2);
+            vector<Pt2d> ps = pt_tangent_to_circle_cr(c1, r1, ref_pt);
+            vector<Pt2d> qs = pt_tangent_to_circle_cr(c2, r2, ref_pt);
+            for (const auto [a, b]: ranges::zip(ps, qs)) // is better way to do this ?;?????
+                r_tangents.push_back({a, b});
+        }
+        Pt2d ref_pt = ((c1 *r2) + (c2*r1)) / (r1+r2);
+        Pt2d ps = pt_tangent_to_circle_cr(c1, r1, ref_pt);
+        Pt2d qs = pt_tangent_to_circle_cr(c2, r2, ref_pt);
+        for (const auto [a, b]: ranges::zip(ps, qs)) // is better way to do this ?;?????
+            r_tangents.push_back({a, b});
+    }
+
+    tuple<3, double> sides_of_triangle_abc(Pt2d a, Pt2d b, Pt2d c){
+        return {distance_normalized(a,b), distance_normalized(b,c), distance_normalized(c,a)};
+    }
+
+    bool pt_p_in_trangle_abc(Pt2d a, Pt2d b, Pt2d c, Pt2d p){
+        return (point_c_rotation_wrt_line_ab(a, b, p) >= 0
+                && point_c_rotation_wrt_line_ab(b, c, p) >= 0
+                && point_c_rotation_wrt_line_ab(c, a, p) >= 0);
+    }
+
+    double perimeter_of_triangle_abc(double ab, double bc, double ca) {
+        return ab+bc+ca;
+    }
+
+    double triangle_area_bh(double base, double height){
+        return base*height/2;
+    }
+
+    double triangle_area_from_heron_abc(double ab, double bc, double ca) {
+        double s = perimeter_of_triangle_abc(ab, bc, ca) / 2;
+        return sqrt(s * (s - ab) * (s - bc) * (s - ca));
+    }
+
+    double triangle_area_from_cross_product_abc(Pt2d a, Pt2d b, Pt2d c){
+        return (a.cross_product(b) + b.cross_product(c) + c.cross_product(a))/2;
+    }
+
+    double incircle_radius_of_triangle_abc(Pt2d a, Pt2d b, Pt2d c){
+        double [ab, bc, ca] = sides_of_triangle_abc(a, b, c);
+        double area = triangle_area_from_heron_abc(ab, bc, ca);
+        double perimeter = perimeter_of_trangle_abc(ab, bc, ca);
+        return area / perimeter;
+    }
+
+    double circumcircule_radius_of_triangle_abc(Pt2d a, Pt2d b, Pt2d c) {
+        double [ab, bc, ca] = sides_of_triangle_abc(a, b, c);
+        double area = triangle_area_from_heron_abc(ab, bc, ca);
+        return (ab * bc * ca) / (4 * area);
+    }
+
+    tuple<3, double> incircle_pt_for_triangle_abc(Pt2d a, Pt2d b, Pt2d c) {
+        double radius = incircle_radius_of_triangle_abc(a, b, c);
+        if (compare_ab(radius, 0.0) == 0)
+            return {0, 0, 0};
+        double [ab, bc, ca] = sides_of_triangle_abc(a, b, c);
+        double ratio1 = ab/ca;
+        double ratio2 = ab/bc;
+        Pt2d pt1 = b + (c-b) * (ratio1 / (ratio1 + 1.0));
+        Pt2d pt2 = a + (c-a) * (ratio2 / (ratio2 + 1.0));
+        if (is_lines_intersect_ab_cd(a, pt1, b, pt2)) {
+            Pt2d intersection_pt pt_lines_intersect_ab_to_cd(a, pt1, b, pt2);
+            return {1, radius, round(intersection_pt, 12)};
+        }
+        return {0, 0, 0};
+    }
+
+    Pt2d triangle_circle_center_pt_abcd(Pt2d a, Pt2d b, Pt2d c, Pt2d d) {
+        Pt2d pt1 = (b-a).rotate_cw_90();
+        Pt2d pt2 = (d-a).rotate_cw_90();
+        double cross_prod_1_2 = pt1.cross_product(pt2);
+        if (compare_ab(cross_prod_1_2, 0.0) == 0)
+            return NULL;  // wtf to do when I used to return None
+
+        Pt2d pt3 = Pt2d(a.dot_product(pt1), c.dot_product(pt2));
+        double x = ((pt3.x * pt2.y) - (pt3.y * pt1.y)) / cross_prod_1_2;
+        double y = ((pt3.x * pt2.x) - (pt3.y * pt1.x)) / -cross_prod_1_2;
+        return round(Pt2d(x, y), 12);
+    }
+
+    Pt2d angle_bisector_for_triangle_abc(Pt2d a, Pt2d b, Pt2d c){
+        double  dist_ba = distance_normalized(b, a);
+        double  dist_ca = distance_normalized(c, a);
+        Pt2d ref_pt = (b-a)/dist_ba*dist_ca;
+        return ref_pt + (c-a)+a;
+    }
 
 };
