@@ -295,5 +295,126 @@ class GeometryAlgorithms {
         Pt2d ref_pt = (b-a)/dist_ba*dist_ca;
         return ref_pt + (c-a)+a;
     }
+    
+    Pt2d perpendicular_bisector_for_triangle_ab(Pt2d a, Pt2d b) {
+        Pt2d rotated_ba = (b-a).rotate_ccw_90();
+        return rotated_ba + (a+b)/2;
+    }
+
+    Pt2d incircle_pt_for_triangle_abc_2(Pt2d a, Pt2d b, Pt2d c) {
+        Pt2d bisector_abc = angle_bisector_for_triangle_abc(a, b, c);
+        Pt2d bisector_bca = angle_bisector_for_triangle_abc(b, c, a);
+        return triangle_circle_center_pt_abcd(a, bisector_abc, b, bisector_bca);
+    }
+
+    Pt2d circumcenter_pt_of_triangle_abc_2(Pt2d a, Pt2d b, Pt2d c){
+        Pt2d bisector_ab = perpendicular_bisector_for_triangle_ab(a, b);
+        Pt2d bisector_bc = perpendicular_bisector_for_triangle_ab(b, c);
+        Pt2d ab2, bc2 = (a+b)/2, (b+c)/2;
+        return triangle_circle_center_pt_abcd(ab2, bisector_ab, bc2, bisector_bc);
+    }
+
+    Pt2d orthocenter_pt_of_triangle_abc_v2(Pt2d a, Pt2d b, Pt2d c) {
+        return a+ b + c - circumcenter_pt_of_triangle_abc_2(a, b, c) * 2;
+    }
+
+    double perimeter_of_polygon_pts(vector<Pt2d> pts) {
+        double result = 0;
+        for (const auto &[a, b]: ranges::slide_view(pts, 2))
+            result += distance_normalized(a, b);
+        return result;
+    }
+
+    double signed_area_of_polygon_pts(vector<Pt2d> pts) {
+        double result = 0;
+        for (const auto &[a, b]: ranges::slide_view(pts, 2))
+            result += a.cross_product(b);
+        return result;
+    }
+
+    double area_of_polygon_pts(vector<Pt2d> pts) {
+        return abs(signed_area_of_polygon_pts(pts));
+    }
+
+    bool is_polygon_pts_convex(vector<Pt2d> pts) {
+        if(pts.size() > 3) {
+            int test[3] = {0};
+            for (const auto &[a, b, c]: ranges::slide_view(pts, 3))
+                test[1 + point_c_rotation_wrt_line_ab(a, b, c)]++; // has small bug here
+            return test[CW] == 0 ^ 0 == test[CCW]; // test to see if either got added to
+        }
+        return false;
+    }
+
+    bool pt_p_in_polygon_pts(vector<Pt2d> pts, Pt2d p) {
+        bool res = false; double x, y = p.x, p.y;
+        for (const auto &[a, b]: ranges::slide_view(pts, 2)){
+            double xa, ya = a.x, a.y;
+            double xb, yb = b.x, b.y;
+            if ((min(ya, yb) <= y && y < max(ya, yb))
+                    && (x < (xa + (xb - xa) * (y - ya) / (yb - ya))))
+                res = !res;
+        }
+        return res;
+    }
+
+    bool pt_p_in_polygon_pts_alternative(vector<Pt2d> pts, Pt2d p) {
+        if(pts.size() > 3) {
+            double angle_sum = 0.0;
+            for (const auto &[a, b]: ranges::slide_view(pts, 2)){
+                double angle = angle_point_c_wrt_line_ab(a, p, b);
+                angle_sum += (point_c_rotation_wrt_line_ab(p, a, b) < CL)? angle: -angle;
+            }
+            return compare_ab(abs(angle_sum), pi) > 0;
+        }
+        return false;
+    }
+
+
+    bool pt_p_on_polygon_perimeter_pts(vector<Pt2d> pts, Pt2d p) {
+        return ranges::any_of(ranges::slide_view(pts, 2), pt_on_line_segment_ab(a, b, p));
+    }
+
+    int pt_position_wrt_polygon_pts(vector<Pt2d> pts, Pt2d p) {
+        return (pt_p_on_polygon_perimeter_pts(pts, p))? 0: (pt_p_in_polygon_pts(pts, p))? 1 -1;
+    }
+
+    vector<Pt2d> remove_collinear_points(vector<Pt2d> pts) {
+        vector<Pt2d> r_pts; // check if an point this into ranges or algo call
+        for (const auto &[a, b, c]: ranges::slide_view(pts, 3))
+            if (CL != point_c_rotation_wrt_line_ab(a, b, c))
+                r_pts.emplace(b);
+        return r_pts;
+    }
+
+    bool pt_p_in_convex_polygon_pts(vector<Pt2d> pts, Pt2d p) {
+        int left, right = 1, pts.size() - 1;
+        Pt2d min_pt = pts[0];
+        while (left < right) {
+            int mid = midpoint(left, right) + 1;
+            if (point_c_rotation_wrt_line_ab(min_pt, pts[mid], p) == 1)
+                left = mid;
+            else
+                right = mid - 1;
+        }
+        if ((point_c_rotation_wrt_line_ab(min_pt, pts[left], p) == -1)
+                || (left == pts.size() - 1))
+            return false;
+        return point_c_rotation_wrt_line_ab(pts[left], pts[left + 1], p) == 0;
+    }
+
+    Pt2d centroid_pt_of_convex_polygon(vector<Pt2d> pts) {
+        Pt2d r_pt = Pt2d(0,0);
+        for (const auto &[a, b]: ranges::slide_view(pts, 2))
+            r_pt = r_pt + (a + b) * a.cross_product(b);
+        return r_pt;
+    }
+
+
+        
+
+
+
+
 
 };
